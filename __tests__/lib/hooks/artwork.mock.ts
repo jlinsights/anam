@@ -1,0 +1,72 @@
+import type { Artwork } from '@/lib/types'
+
+export const mockArtwork: Artwork = {
+  id: '1',
+  title: '작품 1',
+  slug: 'artwork-1',
+  year: 2024,
+  medium: '한지에 먹',
+  dimensions: '70 x 100 cm',
+  aspectRatio: '3/4',
+  description: '테스트용 작품 설명입니다.',
+  imageUrl: '/images/artworks/2024/artwork-1.jpg',
+  artistNote: '작가의 노트입니다.',
+  technique: '서예',
+  series: '테스트 시리즈',
+  featured: false,
+  tags: ['서예', '먹', '한지'],
+  available: true,
+  exhibition: null,
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
+}
+
+export const mockArtworks: Artwork[] = [
+  mockArtwork,
+  {
+    ...mockArtwork,
+    id: '2',
+    title: '길 道',
+    slug: 'way-dao',
+    featured: true,
+    medium: '한지에 먹, 색',
+    dimensions: '50 x 70 cm',
+    aspectRatio: '4/5',
+    imageUrl: '/images/artworks/2024/way-dao.jpg',
+  },
+  {
+    ...mockArtwork,
+    id: '3',
+    title: '복 福',
+    slug: 'blessing-fu',
+    year: 2023,
+    medium: '선지에 먹',
+    dimensions: '60 x 80 cm',
+    aspectRatio: '3/4',
+    imageUrl: '/images/artworks/2023/blessing-fu.jpg',
+  },
+  {
+    ...mockArtwork,
+    id: '4',
+    title: '항다반 恒茶飯',
+    slug: 'everyday-tea-rice',
+    year: 2025,
+    medium: '화선지에 먹',
+    dimensions: '40 x 60 cm',
+    aspectRatio: '2/3',
+    featured: true,
+    imageUrl: '/images/artworks/2025/everyday-tea-rice.jpg',
+  },
+]
+
+export const mockArtworkWithoutOptionalFields: Artwork = {
+  id: '5',
+  title: '최소 작품',
+  slug: 'minimal-artwork',
+  year: 2024,
+  medium: '한지에 먹',
+  dimensions: '50 x 70 cm',
+  aspectRatio: '1/1',
+  description: '기본 작품',
+  imageUrl: '/images/default.jpg',
+}
