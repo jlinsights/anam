@@ -8,10 +8,17 @@ const API_CACHE = 'api-v1.0.0'
 const STATIC_FILES = [
   '/',
   '/gallery',
+  '/artist',
   '/manifest.json',
   '/globals.css',
   // 오프라인 페이지
   '/offline'
+]
+
+// 갤러리 관련 파일들 (우선순위 캐싱)
+const GALLERY_PRIORITY_CACHE = [
+  '/api/artworks',
+  '/api/artist'
 ]
 
 // 이미지 파일 확장자

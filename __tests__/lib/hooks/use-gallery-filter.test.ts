@@ -83,7 +83,7 @@ describe('useGalleryFilter', () => {
     it('연도가 없는 작품을 적절히 처리해야 한다', () => {
       const artworksWithMissingYear = [
         ...mockArtworks,
-        { ...mockArtworkWithoutOptionalFields, year: undefined },
+        { ...mockArtworkWithoutOptionalFields, year: 0 }, // year는 number 타입이므로 0 사용
       ]
 
       mockUseGallery.mockReturnValue({
@@ -137,7 +137,7 @@ describe('useGalleryFilter', () => {
     it('재료가 없는 작품을 적절히 처리해야 한다', () => {
       const artworksWithMissingMedium = [
         ...mockArtworks,
-        { ...mockArtworkWithoutOptionalFields, medium: undefined },
+        { ...mockArtworkWithoutOptionalFields, medium: '기타' },
       ]
 
       mockUseGallery.mockReturnValue({
@@ -327,7 +327,7 @@ describe('useGalleryFilter', () => {
     it('빈 값들을 필터링해야 한다', () => {
       const artworksWithEmptyValues = [
         ...mockArtworks,
-        { ...mockArtworkWithoutOptionalFields, year: undefined, medium: undefined },
+        { ...mockArtworkWithoutOptionalFields, year: 0, medium: '' },
       ]
 
       const { result } = renderHook(() => useGalleryFilter(artworksWithEmptyValues))
@@ -607,7 +607,7 @@ describe('useGalleryStats', () => {
     it('연도나 재료가 없는 작품을 적절히 처리해야 한다', () => {
       const artworksWithMissingData = [
         mockArtworkWithoutOptionalFields,
-        { ...mockArtworkWithoutOptionalFields, year: undefined, medium: undefined },
+        { ...mockArtworkWithoutOptionalFields, year: 0, medium: '' },
       ]
 
       const { result } = renderHook(() => useGalleryStats(artworksWithMissingData))

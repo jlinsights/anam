@@ -16,7 +16,7 @@ export const mockArtwork: Artwork = {
   featured: false,
   tags: ['서예', '먹', '한지'],
   available: true,
-  exhibition: null,
+  exhibition: undefined,
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z',
 }
