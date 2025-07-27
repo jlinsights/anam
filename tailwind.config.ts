@@ -9,7 +9,7 @@ const config: Config = {
     "*.{js,ts,jsx,tsx,mdx}"
   ],
   safelist: [
-    // 동적으로 생성되는 클래스들을 보호
+    // 기존 동적 클래스들
     'animate-brush-in',
     'animate-ink-drop', 
     'animate-paper-fold',
@@ -41,7 +41,106 @@ const config: Config = {
     'btn-art-outline',
     'btn-art-ghost',
     'card-art',
-    'card-art-elevated'
+    'card-art-elevated',
+    // Zen Brutalism 새로운 클래스들
+    'p-zen-xs',
+    'p-zen-sm',
+    'p-zen-md',
+    'p-zen-lg',
+    'p-zen-xl',
+    'p-zen-2xl',
+    'm-zen-xs',
+    'm-zen-sm',
+    'm-zen-md',
+    'm-zen-lg',
+    'm-zen-xl',
+    'm-zen-2xl',
+    'gap-zen-xs',
+    'gap-zen-sm',
+    'gap-zen-md',
+    'gap-zen-lg',
+    'gap-zen-xl',
+    'gap-zen-2xl',
+    'space-y-zen-xs',
+    'space-y-zen-sm',
+    'space-y-zen-md',
+    'space-y-zen-lg',
+    'space-y-zen-xl',
+    'space-y-zen-2xl',
+    'brutal-border',
+    'brutal-shadow',
+    'brutal-shadow-strong',
+    'zen-typography-display',
+    'zen-typography-hero',
+    'zen-typography-section',
+    'zen-typography-body',
+    'brutal-typography-statement',
+    'brutal-typography-impact',
+    'brutal-typography-accent',
+    'ink-glass-primary',
+    'ink-glass-elevated',
+    'ink-glass-immersive',
+    'zen-brutalist-grid',
+    'zen-brutalist-layout',
+    // Phase 2: Advanced Glass Morphism & Ink Effects
+    'ink-flow-ambient',
+    'ink-ripple-effect',
+    'glass-morph-ambient',
+    'depth-layer-shift',
+    'ink-brush-flow',
+    'zen-breathe-deep',
+    'glass-depth-container',
+    'glass-layer-1',
+    'glass-layer-2',
+    'glass-layer-3',
+    'immersive-hover',
+    'fluid-ink-transition',
+    // Phase 3: Traditional Korean Composition & Cultural Layers
+    'composition-thirds',
+    'composition-golden',
+    'void-minimal',
+    'void-breathing',
+    'void-contemplative',
+    'void-infinite',
+    'void-cosmic',
+    'margin-void-minimal',
+    'margin-void-breathing',
+    'margin-void-contemplative',
+    'margin-void-infinite',
+    'margin-void-cosmic',
+    'yin-element',
+    'yang-element',
+    'yin-yang-balance',
+    'season-spring',
+    'season-summer',
+    'season-autumn',
+    'season-winter',
+    'seasonal-shift',
+    'depth-foreground',
+    'depth-middle',
+    'depth-background',
+    'depth-cultural',
+    'depth-temporal',
+    'cultural-depth-shift',
+    'stroke-press',
+    'stroke-horizontal',
+    'stroke-vertical',
+    'stroke-curve',
+    'void-breathing-animation',
+    'cultural-layer-flow',
+    'cultural-context',
+    'temporal-depth',
+    'thirds-top-left',
+    'thirds-top-center',
+    'thirds-top-right',
+    'thirds-center-left',
+    'thirds-center',
+    'thirds-center-right',
+    'thirds-bottom-left',
+    'thirds-bottom-center',
+    'thirds-bottom-right',
+    'traditional-composition',
+    'cultural-immersion'
   ],
   theme: {
     extend: {
@@ -149,7 +248,16 @@ const config: Config = {
   			'18': '4.5rem',
   			'88': '22rem',
   			'128': '32rem',
-  			'144': '36rem'
+  			'144': '36rem',
+  			// Zen Brutalism Spacing Scale
+  			'zen-xs': '0.5rem',    // 8px - 미세한 호흡
+  			'zen-sm': '1rem',      // 16px - 기본 호흡
+  			'zen-md': '2rem',      // 32px - 중간 호흡
+  			'zen-lg': '4rem',      // 64px - 깊은 호흡
+  			'zen-xl': '8rem',      // 128px - 명상적 호흡
+  			'zen-2xl': '16rem',    // 256px - 절대적 침묵
+  			'zen-3xl': '24rem',    // 384px - 완전한 여백
+  			'zen-4xl': '32rem'     // 512px - 무한의 공간
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -234,7 +342,13 @@ const config: Config = {
   			'ink': '0 4px 20px -2px rgba(0, 0, 0, 0.25)',
   			'paper': '0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)',
   			'glow': '0 0 20px rgba(255, 255, 255, 0.1)',
-  			'glow-strong': '0 0 40px rgba(255, 255, 255, 0.2)'
+  			'glow-strong': '0 0 40px rgba(255, 255, 255, 0.2)',
+  			// Zen Brutalism Shadows
+  			'brutal': '8px 8px 0px hsl(var(--ink))',
+  			'brutal-strong': '16px 16px 0px hsl(var(--ink))',
+  			'brutal-offset': '4px 4px 0px hsl(var(--ink-light))',
+  			'zen-float': '0 32px 64px rgba(0, 0, 0, 0.08)',
+  			'zen-depth': '0 1px 3px rgba(0, 0, 0, 0.12), 0 8px 24px rgba(0, 0, 0, 0.08)'
   		},
   				transitionDuration: {
 			'2000': '2000ms',

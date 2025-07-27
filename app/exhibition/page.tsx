@@ -9,7 +9,7 @@ const exhibitionInfo = {
   title: '길',
   titleEn: 'Way',
       subtitle: '아남 배옥영 개인전',
-  subtitleChinese: '熙勆 孔慶順',
+  subtitleChinese: '芽南 裵玉永',
   period: '2025.06.18 - 06.24',
   venue: '인사동 한국미술관 2층',
   address: '서울특별시 종로구 인사동길 41-1',
@@ -18,9 +18,9 @@ const exhibitionInfo = {
   admission: '무료',
   artist: {
     name: '아남 배옥영',
-    title: '희랑글씨 대표',
-    phone: '010-3019-1417',
-    email: 'heelang@orientalcalligraphy.org',
+    title: '사단법인 동양서예협회 초대작가',
+    phone: '010-5405-6071',
+    email: 'anam8488@hanmail.net',
   },
 }
 

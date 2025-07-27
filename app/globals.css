@@ -82,6 +82,110 @@
     --gold-dark: 45 100% 30%;
 
     /* ===========================================
+     * Zen Brutalism 디자인 토큰 시스템
+     * =========================================== */
+    /* Zen Brutalism Spacing Scale */
+    --space-zen-xs: 0.5rem;    /* 8px - 미세한 호흡 */
+    --space-zen-sm: 1rem;      /* 16px - 기본 호흡 */
+    --space-zen-md: 2rem;      /* 32px - 중간 호흡 */
+    --space-zen-lg: 4rem;      /* 64px - 깊은 호흡 */
+    --space-zen-xl: 8rem;      /* 128px - 명상적 호흡 */
+    --space-zen-2xl: 16rem;    /* 256px - 절대적 침묵 */
+    --space-zen-3xl: 24rem;    /* 384px - 완전한 여백 */
+    --space-zen-4xl: 32rem;    /* 512px - 무한의 공간 */
+    
+    /* Brutalist Elements */
+    --brutal-border: 4px;
+    --brutal-shadow: 8px 8px 0px hsl(var(--ink));
+    --brutal-shadow-strong: 16px 16px 0px hsl(var(--ink));
+    --brutal-offset: 4px 4px 0px hsl(var(--ink-light));
+    
+    /* ===========================================
+     * Phase 3: Traditional Korean Composition Principles
+     * =========================================== */
+    
+    /* 삼분법 (Rule of Thirds) Korean Traditional Composition */
+    --composition-golden-ratio: 1.618;
+    --composition-thirds-h: 33.333%;
+    --composition-thirds-v: 33.333%;
+    --composition-balance-left: 38.2%;
+    --composition-balance-right: 61.8%;
+    
+    /* 여백의 미학 (Aesthetics of Empty Space) */
+    --void-minimal: 2rem;      /* 최소 여백 */
+    --void-breathing: 4rem;    /* 호흡하는 여백 */
+    --void-contemplative: 8rem; /* 사색적 여백 */
+    --void-infinite: 16rem;    /* 무한의 여백 */
+    --void-cosmic: 24rem;      /* 우주적 여백 */
+    
+    /* 음양(陰陽) Balance System */
+    --yin-opacity: 0.382;      /* 음의 투명도 */
+    --yang-opacity: 0.618;     /* 양의 투명도 */
+    --balance-transition: 2400ms; /* 음양 전환 시간 */
+    
+    /* 계절 미학 (Seasonal Aesthetics) */
+    --season-spring: 120deg;   /* 봄 - 청록 */
+    --season-summer: 150deg;   /* 여름 - 녹색 */
+    --season-autumn: 30deg;    /* 가을 - 황금 */
+    --season-winter: 240deg;   /* 겨울 - 푸른회색 */
+    
+    /* 전통 깊이감 (Traditional Depth Layers) */
+    --depth-foreground: 10;    /* 전경 - 주요 내용 */
+    --depth-middle: 5;         /* 중경 - 보조 요소 */
+    --depth-background: 1;     /* 배경 - 분위기 */
+    --depth-cultural: 0.5;     /* 문화적 맥락 */
+    --depth-temporal: 0.1;     /* 시간적 차원 */
+    
+    /* 서예 필획 미학 (Calligraphy Stroke Aesthetics) */
+    --stroke-press: cubic-bezier(0.25, 0.46, 0.45, 0.94);  /* 점 */
+    --stroke-horizontal: cubic-bezier(0.4, 0, 0.2, 1);     /* 일 */
+    --stroke-vertical: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 궐 */
+    --stroke-hook: cubic-bezier(0.68, -0.55, 0.265, 1.55); /* 갈고리 */
+    --stroke-curve: cubic-bezier(0.23, 1, 0.32, 1);        /* 곡선 */
+    
+    /* Glass Morphism Base */
+    --glass-backdrop: blur(20px) saturate(180%);
+    --glass-backdrop-strong: blur(40px) saturate(200%);
+    --glass-backdrop-immersive: blur(60px) saturate(220%);
+    
+    /* Advanced Ink Morphism System */
+    --ink-gradient-primary: radial-gradient(
+      ellipse 200% 100% at 50% 0%,
+      hsla(var(--ink) / 0.15) 0%,
+      hsla(var(--ink-light) / 0.08) 45%,
+      transparent 70%
+    );
+    --ink-gradient-flow: linear-gradient(
+      135deg,
+      hsla(var(--ink) / 0.2) 0%,
+      hsla(var(--ink-light) / 0.1) 25%,
+      transparent 50%,
+      hsla(var(--ink-lighter) / 0.05) 75%,
+      hsla(var(--ink) / 0.1) 100%
+    );
+    --ink-gradient-immersive: conic-gradient(
+      from 45deg at 50% 50%,
+      hsla(var(--ink) / 0.3) 0deg,
+      hsla(var(--ink-dark) / 0.2) 90deg,
+      hsla(var(--ink-light) / 0.1) 180deg,
+      hsla(var(--ink) / 0.25) 270deg,
+      hsla(var(--ink) / 0.3) 360deg
+    );
+    
+    /* Multi-Layer Glass Depth */
+    --glass-layer-1: hsla(var(--paper) / 0.05);
+    --glass-layer-2: hsla(var(--paper-warm) / 0.08);
+    --glass-layer-3: hsla(var(--paper-cream) / 0.12);
+    --glass-border-1: hsla(var(--ink) / 0.1);
+    --glass-border-2: hsla(var(--ink-light) / 0.15);
+    --glass-border-3: hsla(var(--ink-lighter) / 0.2);
+    
+    /* Fluid Animation Variables */
+    --ink-flow-duration: 3000ms;
+    --glass-morph-duration: 2000ms;
+    --depth-transition-duration: 1500ms;
+
+    /* ===========================================
      * 예술적 그라디언트 시스템
      * =========================================== */
     --gradient-ink: linear-gradient(
@@ -448,6 +552,382 @@
   }
 
   /* ===========================================
+   * Zen Brutalism 유틸리티 클래스
+   * =========================================== */
+
+  /* Zen Spacing Utilities */
+  .p-zen-xs { padding: var(--space-zen-xs); }
+  .p-zen-sm { padding: var(--space-zen-sm); }
+  .p-zen-md { padding: var(--space-zen-md); }
+  .p-zen-lg { padding: var(--space-zen-lg); }
+  .p-zen-xl { padding: var(--space-zen-xl); }
+  .p-zen-2xl { padding: var(--space-zen-2xl); }
+  .p-zen-3xl { padding: var(--space-zen-3xl); }
+  .p-zen-4xl { padding: var(--space-zen-4xl); }
+
+  .m-zen-xs { margin: var(--space-zen-xs); }
+  .m-zen-sm { margin: var(--space-zen-sm); }
+  .m-zen-md { margin: var(--space-zen-md); }
+  .m-zen-lg { margin: var(--space-zen-lg); }
+  .m-zen-xl { margin: var(--space-zen-xl); }
+  .m-zen-2xl { margin: var(--space-zen-2xl); }
+  .m-zen-3xl { margin: var(--space-zen-3xl); }
+  .m-zen-4xl { margin: var(--space-zen-4xl); }
+
+  .gap-zen-xs { gap: var(--space-zen-xs); }
+  .gap-zen-sm { gap: var(--space-zen-sm); }
+  .gap-zen-md { gap: var(--space-zen-md); }
+  .gap-zen-lg { gap: var(--space-zen-lg); }
+  .gap-zen-xl { gap: var(--space-zen-xl); }
+  .gap-zen-2xl { gap: var(--space-zen-2xl); }
+
+  .space-y-zen-xs > * + * { margin-top: var(--space-zen-xs); }
+  .space-y-zen-sm > * + * { margin-top: var(--space-zen-sm); }
+  .space-y-zen-md > * + * { margin-top: var(--space-zen-md); }
+  .space-y-zen-lg > * + * { margin-top: var(--space-zen-lg); }
+  .space-y-zen-xl > * + * { margin-top: var(--space-zen-xl); }
+  .space-y-zen-2xl > * + * { margin-top: var(--space-zen-2xl); }
+
+  /* Zen Typography System */
+  .zen-typography-display {
+    @apply font-display text-8xl leading-none tracking-tight font-light;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  .zen-typography-hero {
+    @apply font-display text-6xl leading-tight tracking-wide font-normal;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  .zen-typography-section {
+    @apply font-display text-4xl leading-relaxed font-medium;
+    font-feature-settings: "kern" 1;
+  }
+
+  .zen-typography-body {
+    @apply font-body text-lg leading-loose tracking-wide;
+  }
+
+  /* Brutal Typography System */
+  .brutal-typography-statement {
+    @apply font-black text-9xl uppercase leading-none tracking-tighter;
+    font-feature-settings: "kern" 0;
+  }
+
+  .brutal-typography-impact {
+    @apply font-black text-6xl uppercase tracking-wider leading-none;
+    font-feature-settings: "kern" 0;
+  }
+
+  .brutal-typography-accent {
+    @apply font-bold text-2xl uppercase tracking-widest;
+    letter-spacing: 0.25em;
+  }
+
+  /* Brutalist Elements */
+  .brutal-border {
+    border: var(--brutal-border) solid hsl(var(--ink));
+  }
+
+  .brutal-shadow {
+    box-shadow: var(--brutal-shadow);
+  }
+
+  .brutal-shadow-strong {
+    box-shadow: var(--brutal-shadow-strong);
+  }
+
+  /* Advanced Glass Morphism Effects */
+  .ink-glass-primary {
+    position: relative;
+    background: var(--ink-gradient-primary);
+    backdrop-filter: var(--glass-backdrop);
+    border: 1px solid var(--glass-border-1);
+    box-shadow: 
+      0 8px 32px hsla(var(--ink) / 0.12),
+      inset 0 1px 0 hsla(255, 255, 255, 0.1);
+    transition: all var(--glass-morph-duration) cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .ink-glass-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--glass-layer-1);
+    backdrop-filter: blur(8px);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity var(--glass-morph-duration) cubic-bezier(0.23, 1, 0.32, 1);
+    pointer-events: none;
+  }
+
+  .ink-glass-primary:hover::before {
+    opacity: 1;
+  }
+
+  .ink-glass-elevated {
+    position: relative;
+    background: var(--ink-gradient-flow);
+    backdrop-filter: var(--glass-backdrop-strong);
+    border: 2px solid var(--glass-border-2);
+    box-shadow: 
+      0 16px 64px hsla(var(--ink) / 0.2),
+      0 4px 16px hsla(var(--ink) / 0.1),
+      inset 0 1px 0 hsla(255, 255, 255, 0.15);
+    transition: all var(--glass-morph-duration) cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .ink-glass-elevated::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--glass-layer-2);
+    backdrop-filter: blur(16px) saturate(150%);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity var(--glass-morph-duration) cubic-bezier(0.23, 1, 0.32, 1);
+    pointer-events: none;
+  }
+
+  .ink-glass-elevated::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: var(--ink-gradient-primary);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity var(--glass-morph-duration) cubic-bezier(0.23, 1, 0.32, 1);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .ink-glass-elevated:hover::before {
+    opacity: 1;
+  }
+
+  .ink-glass-elevated:hover::after {
+    opacity: 0.6;
+  }
+
+  .ink-glass-immersive {
+    position: relative;
+    background: var(--ink-gradient-immersive);
+    backdrop-filter: var(--glass-backdrop-immersive);
+    border: 3px solid var(--glass-border-3);
+    box-shadow: 
+      0 24px 96px hsla(var(--ink) / 0.3),
+      0 8px 24px hsla(var(--ink) / 0.15),
+      inset 0 1px 0 hsla(255, 255, 255, 0.2);
+    transition: all var(--glass-morph-duration) cubic-bezier(0.23, 1, 0.32, 1);
+    overflow: hidden;
+  }
+
+  .ink-glass-immersive::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--glass-layer-3);
+    backdrop-filter: blur(32px) saturate(200%);
+    border-radius: inherit;
+    opacity: 0;
+    transition: all var(--glass-morph-duration) cubic-bezier(0.23, 1, 0.32, 1);
+    pointer-events: none;
+  }
+
+  .ink-glass-immersive::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: var(--ink-gradient-flow);
+    border-radius: inherit;
+    opacity: 0;
+    transition: all var(--glass-morph-duration) cubic-bezier(0.23, 1, 0.32, 1);
+    pointer-events: none;
+    z-index: -1;
+    animation: ink-flow-ambient var(--ink-flow-duration) ease-in-out infinite;
+  }
+
+  .ink-glass-immersive:hover::before {
+    opacity: 1;
+    backdrop-filter: blur(40px) saturate(220%);
+  }
+
+  .ink-glass-immersive:hover::after {
+    opacity: 0.8;
+    animation-duration: calc(var(--ink-flow-duration) * 0.7);
+  }
+
+  /* Zen Brutalist Layout System */
+  .zen-brutalist-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-zen-xl);
+    padding: var(--space-zen-2xl);
+  }
+
+  @media (min-width: 1024px) {
+    .zen-brutalist-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-zen-2xl);
+    }
+  }
+
+  .zen-brutalist-layout {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: var(--space-zen-lg);
+  }
+
+  /* ===========================================
+   * Advanced Ink Morphism Animation Classes
+   * =========================================== */
+
+  .ink-flow-ambient {
+    animation: ink-flow-ambient var(--ink-flow-duration) ease-in-out infinite;
+  }
+
+  .ink-ripple-effect {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ink-ripple-effect::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at center,
+      hsla(var(--ink) / 0.2) 0%,
+      hsla(var(--ink-light) / 0.1) 30%,
+      transparent 70%
+    );
+    transform: scale(0.8);
+    opacity: 0;
+    transition: all 800ms var(--transition-zen);
+    pointer-events: none;
+  }
+
+  .ink-ripple-effect:hover::before {
+    animation: ink-ripple 1200ms ease-out;
+  }
+
+  .glass-morph-ambient {
+    animation: glass-morph var(--glass-morph-duration) ease-in-out infinite;
+  }
+
+  .depth-layer-shift {
+    animation: depth-layer-shift var(--depth-transition-duration) ease-in-out infinite;
+  }
+
+  .ink-brush-flow {
+    animation: ink-brush-flow 2000ms ease-out forwards;
+  }
+
+  .zen-breathe-deep {
+    animation: zen-breathe-deep 6000ms ease-in-out infinite;
+  }
+
+  /* ===========================================
+   * Multi-Layer Glass Depth System
+   * =========================================== */
+
+  .glass-depth-container {
+    position: relative;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  .glass-layer-1 {
+    position: relative;
+    background: var(--glass-layer-1);
+    backdrop-filter: blur(8px) saturate(120%);
+    border: 1px solid var(--glass-border-1);
+    z-index: 1;
+  }
+
+  .glass-layer-2 {
+    position: relative;
+    background: var(--glass-layer-2);
+    backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid var(--glass-border-2);
+    z-index: 2;
+    transform: translateZ(8px);
+  }
+
+  .glass-layer-3 {
+    position: relative;
+    background: var(--glass-layer-3);
+    backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid var(--glass-border-3);
+    z-index: 3;
+    transform: translateZ(16px);
+  }
+
+  /* Immersive Interaction Patterns */
+  .immersive-hover {
+    transition: all var(--glass-morph-duration) cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .immersive-hover:hover {
+    transform: translateY(-4px) scale(1.02);
+    filter: brightness(1.05) saturate(1.1);
+  }
+
+  .immersive-hover:hover .glass-layer-1 {
+    backdrop-filter: blur(12px) saturate(140%);
+    border-color: var(--glass-border-2);
+  }
+
+  .immersive-hover:hover .glass-layer-2 {
+    backdrop-filter: blur(20px) saturate(160%);
+    border-color: var(--glass-border-3);
+    transform: translateZ(12px);
+  }
+
+  .immersive-hover:hover .glass-layer-3 {
+    backdrop-filter: blur(32px) saturate(180%);
+    border-color: hsla(var(--gold) / 0.3);
+    transform: translateZ(24px);
+  }
+
+  /* Fluid Ink Transition System */
+  .fluid-ink-transition {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .fluid-ink-transition::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--ink-gradient-flow);
+    opacity: 0;
+    transition: all var(--ink-flow-duration) cubic-bezier(0.23, 1, 0.32, 1);
+    pointer-events: none;
+  }
+
+  .fluid-ink-transition:hover::before {
+    opacity: 1;
+    animation: ink-flow-ambient calc(var(--ink-flow-duration) * 0.5) ease-in-out infinite;
+  }
+
+  .fluid-ink-transition::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--ink-gradient-immersive);
+    opacity: 0;
+    transition: all calc(var(--ink-flow-duration) * 1.5) var(--transition-zen);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .fluid-ink-transition:hover::after {
+    opacity: 0.6;
+    animation: zen-breathe-deep calc(var(--ink-flow-duration) * 2) ease-in-out infinite;
+  }
+
+  /* ===========================================
    * 예술적 애니메이션 클래스
    * =========================================== */
 
@@ -536,6 +1016,256 @@
 
   .text-responsive-3xl {
     @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  /* ===========================================
+   * Phase 3: Traditional Korean Composition Utilities
+   * =========================================== */
+
+  /* 삼분법 레이아웃 (Rule of Thirds Layout) */
+  .composition-thirds {
+    display: grid;
+    grid-template-columns: var(--composition-thirds-h) 1fr var(--composition-thirds-h);
+    grid-template-rows: var(--composition-thirds-v) 1fr var(--composition-thirds-v);
+    width: 100%;
+    height: 100%;
+  }
+
+  .composition-golden {
+    display: grid;
+    grid-template-columns: var(--composition-balance-left) var(--composition-balance-right);
+    width: 100%;
+    height: 100%;
+  }
+
+  /* 여백의 미학 (Aesthetics of Empty Space) */
+  .void-minimal { padding: var(--void-minimal); }
+  .void-breathing { padding: var(--void-breathing); }
+  .void-contemplative { padding: var(--void-contemplative); }
+  .void-infinite { padding: var(--void-infinite); }
+  .void-cosmic { padding: var(--void-cosmic); }
+
+  .margin-void-minimal { margin: var(--void-minimal); }
+  .margin-void-breathing { margin: var(--void-breathing); }
+  .margin-void-contemplative { margin: var(--void-contemplative); }
+  .margin-void-infinite { margin: var(--void-infinite); }
+  .margin-void-cosmic { margin: var(--void-cosmic); }
+
+  /* 음양 균형 (Yin-Yang Balance) */
+  .yin-element {
+    opacity: var(--yin-opacity);
+    filter: brightness(0.8) contrast(1.2);
+    transition: all var(--balance-transition) var(--stroke-curve);
+  }
+
+  .yang-element {
+    opacity: var(--yang-opacity);
+    filter: brightness(1.2) contrast(0.8);
+    transition: all var(--balance-transition) var(--stroke-curve);
+  }
+
+  .yin-yang-balance {
+    animation: yin-yang-balance var(--balance-transition) ease-in-out infinite alternate;
+  }
+
+  /* 계절 미학 (Seasonal Aesthetics) */
+  .season-spring {
+    filter: hue-rotate(var(--season-spring)) saturate(1.1) brightness(1.1);
+  }
+
+  .season-summer {
+    filter: hue-rotate(var(--season-summer)) saturate(1.3) brightness(1.2);
+  }
+
+  .season-autumn {
+    filter: hue-rotate(var(--season-autumn)) saturate(1.4) brightness(1.1);
+  }
+
+  .season-winter {
+    filter: hue-rotate(var(--season-winter)) saturate(0.8) brightness(0.9);
+  }
+
+  .seasonal-shift {
+    animation: seasonal-shift 8000ms ease-in-out infinite;
+  }
+
+  /* 전통 깊이감 (Traditional Depth Layers) */
+  .depth-foreground { z-index: var(--depth-foreground); }
+  .depth-middle { z-index: var(--depth-middle); }
+  .depth-background { z-index: var(--depth-background); }
+  .depth-cultural { z-index: var(--depth-cultural); }
+  .depth-temporal { z-index: var(--depth-temporal); }
+
+  .cultural-depth-shift {
+    animation: cultural-depth-shift 10000ms ease-in-out infinite;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  /* 서예 필획 애니메이션 (Calligraphy Stroke Animations) */
+  .stroke-press {
+    animation: stroke-press 800ms var(--stroke-press) forwards;
+  }
+
+  .stroke-horizontal {
+    animation: stroke-horizontal 1200ms var(--stroke-horizontal) forwards;
+  }
+
+  .stroke-vertical {
+    animation: stroke-vertical 1000ms var(--stroke-vertical) forwards;
+  }
+
+  .stroke-curve {
+    animation: stroke-curve 1500ms var(--stroke-curve) forwards;
+  }
+
+  /* 여백의 호흡 (Breathing Space) */
+  .void-breathing-animation {
+    animation: void-breathing 5000ms ease-in-out infinite;
+  }
+
+  /* 문화적 레이어 (Cultural Layers) */
+  .cultural-layer-flow {
+    animation: cultural-layer-flow 12000ms ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cultural-context {
+    position: relative;
+    z-index: var(--depth-cultural);
+  }
+
+  .cultural-context::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      linear-gradient(45deg, transparent 60%, hsla(var(--ink) / 0.05) 80%),
+      radial-gradient(circle at 30% 70%, hsla(var(--gold) / 0.03) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .temporal-depth {
+    position: relative;
+    z-index: var(--depth-temporal);
+    opacity: 0.3;
+    filter: sepia(0.2) blur(1px);
+    transition: all var(--balance-transition) var(--stroke-curve);
+  }
+
+  .temporal-depth:hover {
+    opacity: 0.8;
+    filter: sepia(0.1) blur(0);
+    z-index: var(--depth-middle);
+  }
+
+  /* 삼분법 구성 요소 배치 (Rule of Thirds Positioning) */
+  .thirds-top-left {
+    grid-column: 1;
+    grid-row: 1;
+    place-self: start;
+  }
+
+  .thirds-top-center {
+    grid-column: 2;
+    grid-row: 1;
+    place-self: center start;
+  }
+
+  .thirds-top-right {
+    grid-column: 3;
+    grid-row: 1;
+    place-self: end start;
+  }
+
+  .thirds-center-left {
+    grid-column: 1;
+    grid-row: 2;
+    place-self: center start;
+  }
+
+  .thirds-center {
+    grid-column: 2;
+    grid-row: 2;
+    place-self: center;
+  }
+
+  .thirds-center-right {
+    grid-column: 3;
+    grid-row: 2;
+    place-self: center end;
+  }
+
+  .thirds-bottom-left {
+    grid-column: 1;
+    grid-row: 3;
+    place-self: end start;
+  }
+
+  .thirds-bottom-center {
+    grid-column: 2;
+    grid-row: 3;
+    place-self: center end;
+  }
+
+  .thirds-bottom-right {
+    grid-column: 3;
+    grid-row: 3;
+    place-self: end;
+  }
+
+  /* 전통 구성 애니메이션 활성화 */
+  .traditional-composition {
+    animation: thirds-composition 8000ms ease-in-out infinite;
+  }
+
+  /* 통합 문화적 경험 (Integrated Cultural Experience) */
+  .cultural-immersion {
+    position: relative;
+    background: 
+      var(--ink-gradient-immersive),
+      radial-gradient(circle at var(--composition-balance-left) var(--composition-thirds-v), 
+        hsla(var(--gold) / 0.1) 0%, transparent 50%);
+    backdrop-filter: var(--glass-backdrop-immersive);
+    animation: 
+      cultural-layer-flow 12000ms ease-in-out infinite,
+      seasonal-shift 8000ms ease-in-out infinite reverse;
+    transform-style: preserve-3d;
+    perspective: 1200px;
+  }
+
+  .cultural-immersion::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      conic-gradient(from 0deg at var(--composition-balance-right) var(--composition-thirds-v),
+        hsla(var(--ink) / 0.15) 0deg,
+        hsla(var(--ink-light) / 0.1) 90deg,
+        hsla(var(--gold) / 0.08) 180deg,
+        hsla(var(--brush) / 0.12) 270deg,
+        hsla(var(--ink) / 0.15) 360deg);
+    animation: yin-yang-balance var(--balance-transition) ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: var(--depth-cultural);
+  }
+
+  .cultural-immersion::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      linear-gradient(135deg, 
+        transparent 0%, 
+        hsla(var(--paper-warm) / 0.05) var(--composition-thirds-h), 
+        transparent var(--composition-balance-left),
+        hsla(var(--stone-light) / 0.03) var(--composition-balance-right),
+        transparent 100%);
+    animation: void-breathing 5000ms ease-in-out infinite;
+    pointer-events: none;
+    z-index: var(--depth-temporal);
   }
 }
 
@@ -641,6 +1371,313 @@
   }
   50% {
     transform: translateY(-8px) scale(1.02);
+  }
+}
+
+/* Advanced Ink Flow Animations */
+@keyframes ink-flow-ambient {
+  0%, 100% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg) brightness(1);
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    background-position: 25% 25%;
+    filter: hue-rotate(5deg) brightness(1.05);
+    transform: scale(1.01) rotate(0.5deg);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: hue-rotate(10deg) brightness(1.1);
+    transform: scale(1.02) rotate(1deg);
+  }
+  75% {
+    background-position: 75% 75%;
+    filter: hue-rotate(5deg) brightness(1.05);
+    transform: scale(1.01) rotate(0.5deg);
+  }
+}
+
+@keyframes ink-ripple {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes glass-morph {
+  0%, 100% {
+    backdrop-filter: blur(20px) saturate(180%);
+    border-color: hsla(var(--ink) / 0.1);
+  }
+  50% {
+    backdrop-filter: blur(40px) saturate(220%);
+    border-color: hsla(var(--ink) / 0.2);
+  }
+}
+
+@keyframes depth-layer-shift {
+  0%, 100% {
+    transform: translateZ(0) scale(1);
+    opacity: 0.6;
+  }
+  33% {
+    transform: translateZ(16px) scale(1.02);
+    opacity: 0.8;
+  }
+  66% {
+    transform: translateZ(32px) scale(1.04);
+    opacity: 1;
+  }
+}
+
+@keyframes ink-brush-flow {
+  0% {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+    opacity: 0;
+  }
+  50% {
+    clip-path: polygon(0 0, 60% 0, 40% 100%, 0% 100%);
+    opacity: 0.8;
+  }
+  100% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+    opacity: 1;
+  }
+}
+
+@keyframes zen-breathe-deep {
+  0%, 100% {
+    transform: scale(1) translateY(0) rotate(0deg);
+    filter: brightness(1) saturate(1);
+  }
+  25% {
+    transform: scale(1.01) translateY(-2px) rotate(0.5deg);
+    filter: brightness(1.02) saturate(1.05);
+  }
+  50% {
+    transform: scale(1.02) translateY(-4px) rotate(1deg);
+    filter: brightness(1.05) saturate(1.1);
+  }
+  75% {
+    transform: scale(1.01) translateY(-2px) rotate(0.5deg);
+    filter: brightness(1.02) saturate(1.05);
+  }
+}
+
+/* ===========================================
+ * Phase 3: Traditional Korean Composition Animations
+ * =========================================== */
+
+/* 삼분법 애니메이션 (Rule of Thirds Flow) */
+@keyframes thirds-composition {
+  0% {
+    transform: translateX(0) translateY(0);
+    opacity: 1;
+  }
+  33% {
+    transform: translateX(var(--composition-thirds-h)) translateY(0);
+    opacity: 0.8;
+  }
+  66% {
+    transform: translateX(var(--composition-thirds-h)) translateY(var(--composition-thirds-v));
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(0) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 음양 균형 애니메이션 (Yin-Yang Balance) */
+@keyframes yin-yang-balance {
+  0% {
+    opacity: var(--yin-opacity);
+    filter: brightness(0.8) contrast(1.2);
+  }
+  50% {
+    opacity: var(--yang-opacity);
+    filter: brightness(1.2) contrast(0.8);
+  }
+  100% {
+    opacity: var(--yin-opacity);
+    filter: brightness(0.8) contrast(1.2);
+  }
+}
+
+/* 계절 변화 애니메이션 (Seasonal Transitions) */
+@keyframes seasonal-shift {
+  0% {
+    filter: hue-rotate(var(--season-winter)) saturate(0.8) brightness(0.9);
+  }
+  25% {
+    filter: hue-rotate(var(--season-spring)) saturate(1.1) brightness(1.1);
+  }
+  50% {
+    filter: hue-rotate(var(--season-summer)) saturate(1.3) brightness(1.2);
+  }
+  75% {
+    filter: hue-rotate(var(--season-autumn)) saturate(1.4) brightness(1.1);
+  }
+  100% {
+    filter: hue-rotate(var(--season-winter)) saturate(0.8) brightness(0.9);
+  }
+}
+
+/* 전통 깊이감 시프트 (Traditional Depth Shift) */
+@keyframes cultural-depth-shift {
+  0% {
+    z-index: var(--depth-foreground);
+    transform: translateZ(0) scale(1);
+    opacity: 1;
+  }
+  20% {
+    z-index: var(--depth-middle);
+    transform: translateZ(-8px) scale(0.98);
+    opacity: 0.8;
+  }
+  40% {
+    z-index: var(--depth-background);
+    transform: translateZ(-16px) scale(0.95);
+    opacity: 0.6;
+  }
+  60% {
+    z-index: var(--depth-cultural);
+    transform: translateZ(-24px) scale(0.92);
+    opacity: 0.4;
+  }
+  80% {
+    z-index: var(--depth-temporal);
+    transform: translateZ(-32px) scale(0.88);
+    opacity: 0.2;
+  }
+  100% {
+    z-index: var(--depth-foreground);
+    transform: translateZ(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* 서예 필획 애니메이션 (Calligraphy Stroke) */
+@keyframes stroke-press {
+  0% {
+    transform: scale(0.9);
+    filter: blur(1px);
+  }
+  30% {
+    transform: scale(1.05);
+    filter: blur(0.5px);
+  }
+  100% {
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes stroke-horizontal {
+  0% {
+    width: 0%;
+    opacity: 0.8;
+  }
+  50% {
+    width: 70%;
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes stroke-vertical {
+  0% {
+    height: 0%;
+    opacity: 0.8;
+  }
+  50% {
+    height: 70%;
+    opacity: 1;
+  }
+  100% {
+    height: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes stroke-curve {
+  0% {
+    clip-path: circle(0% at 50% 50%);
+    opacity: 0.7;
+  }
+  50% {
+    clip-path: circle(70% at 50% 50%);
+    opacity: 0.9;
+  }
+  100% {
+    clip-path: circle(100% at 50% 50%);
+    opacity: 1;
+  }
+}
+
+/* 여백의 호흡 애니메이션 (Breathing Space) */
+@keyframes void-breathing {
+  0%, 100% {
+    padding: var(--void-minimal);
+    margin: var(--void-minimal);
+  }
+  25% {
+    padding: var(--void-breathing);
+    margin: var(--void-breathing);
+  }
+  50% {
+    padding: var(--void-contemplative);
+    margin: var(--void-contemplative);
+  }
+  75% {
+    padding: var(--void-infinite);
+    margin: var(--void-infinite);
+  }
+}
+
+/* 문화적 레이어 전환 (Cultural Layer Transition) */
+@keyframes cultural-layer-flow {
+  0% {
+    background-image: 
+      linear-gradient(var(--season-winter), transparent 30%),
+      radial-gradient(circle at 30% 30%, hsla(var(--ink) / 0.1) 0%, transparent 50%);
+    backdrop-filter: blur(4px) sepia(0.1);
+  }
+  25% {
+    background-image: 
+      linear-gradient(var(--season-spring), transparent 30%),
+      radial-gradient(circle at 70% 30%, hsla(var(--ink-light) / 0.15) 0%, transparent 50%);
+    backdrop-filter: blur(8px) sepia(0.2);
+  }
+  50% {
+    background-image: 
+      linear-gradient(var(--season-summer), transparent 30%),
+      radial-gradient(circle at 70% 70%, hsla(var(--gold) / 0.1) 0%, transparent 50%);
+    backdrop-filter: blur(12px) sepia(0.3);
+  }
+  75% {
+    background-image: 
+      linear-gradient(var(--season-autumn), transparent 30%),
+      radial-gradient(circle at 30% 70%, hsla(var(--brush) / 0.2) 0%, transparent 50%);
+    backdrop-filter: blur(8px) sepia(0.2);
+  }
+  100% {
+    background-image: 
+      linear-gradient(var(--season-winter), transparent 30%),
+      radial-gradient(circle at 30% 30%, hsla(var(--ink) / 0.1) 0%, transparent 50%);
+    backdrop-filter: blur(4px) sepia(0.1);
   }
 }
 
