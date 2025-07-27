@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
+import type { Artist } from '@/lib/types'
 import { Clock, Loader2, Mail, MapPin, Phone, Send } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface ContactFormData {
   name: string
@@ -21,6 +22,8 @@ interface ContactFormData {
 export default function ContactPage() {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [artist, setArtist] = useState<Artist | null>(null)
+  const [isLoadingArtist, setIsLoadingArtist] = useState(true)
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
@@ -28,6 +31,28 @@ export default function ContactPage() {
     subject: '',
     message: '',
   })
+
+  // Artist 정보 가져오기
+  useEffect(() => {
+    async function fetchArtist() {
+      try {
+        const response = await fetch('/api/artist')
+        const result = await response.json()
+        
+        if (result.success && result.data) {
+          setArtist(result.data)
+        } else {
+          console.warn('Failed to fetch artist data:', result.message)
+        }
+      } catch (error) {
+        console.error('Error fetching artist data:', error)
+      } finally {
+        setIsLoadingArtist(false)
+      }
+    }
+
+    fetchArtist()
+  }, [])
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -119,46 +144,77 @@ export default function ContactPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className='space-y-6'>
-                <div className='flex items-start gap-3'>
-                  <Mail className='w-5 h-5 text-primary mt-1' />
-                  <div>
-                    <p className='font-medium'>이메일</p>
-                    <p className='text-muted-foreground'>
-                      heelang@orientalcalligraphy.org
-                    </p>
+                {isLoadingArtist ? (
+                  <div className='flex items-center justify-center py-8'>
+                    <Loader2 className='w-6 h-6 animate-spin text-primary' />
+                    <span className='ml-2 text-muted-foreground'>연락처 정보를 불러오는 중...</span>
                   </div>
-                </div>
+                ) : (
+                  <>
+                    {artist?.email && (
+                      <div className='flex items-start gap-3'>
+                        <Mail className='w-5 h-5 text-primary mt-1' />
+                        <div>
+                          <p className='font-medium'>이메일</p>
+                          <p className='text-muted-foreground'>
+                            {artist.email}
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
-                <div className='flex items-start gap-3'>
-                  <Phone className='w-5 h-5 text-primary mt-1' />
-                  <div>
-                    <p className='font-medium'>전화번호</p>
-                    <p className='text-muted-foreground'>010-6877-0406</p>
-                  </div>
-                </div>
+                    {artist?.phone && (
+                      <div className='flex items-start gap-3'>
+                        <Phone className='w-5 h-5 text-primary mt-1' />
+                        <div>
+                          <p className='font-medium'>전화번호</p>
+                          <p className='text-muted-foreground'>{artist.phone}</p>
+                        </div>
+                      </div>
+                    )}
 
-                <div className='flex items-start gap-3'>
-                  <MapPin className='w-5 h-5 text-primary mt-1' />
-                  <div>
-                    <p className='font-medium'>주소</p>
-                    <p className='text-muted-foreground'>
-                      〶10068 경기 김포시 김포한강8로 173-88, 611동 602호
-                      (마산동, 한강신도시 동일스위트 더파크뷰 1단지)
-                    </p>
-                  </div>
-                </div>
+                    {artist?.currentLocation && (
+                      <div className='flex items-start gap-3'>
+                        <MapPin className='w-5 h-5 text-primary mt-1' />
+                        <div>
+                          <p className='font-medium'>주소</p>
+                          <p className='text-muted-foreground'>
+                            {artist.currentLocation}
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
-                <div className='flex items-start gap-3'>
-                  <Clock className='w-5 h-5 text-primary mt-1' />
-                  <div>
-                    <p className='font-medium'>운영시간</p>
-                    <p className='text-muted-foreground'>
-                      월-금: 10:00 - 18:00
-                      <br />
-                      토-일: 10:00 - 17:00
-                    </p>
-                  </div>
-                </div>
+                    <div className='flex items-start gap-3'>
+                      <Clock className='w-5 h-5 text-primary mt-1' />
+                      <div>
+                        <p className='font-medium'>운영시간</p>
+                        <p className='text-muted-foreground'>
+                          월-금: 10:00 - 18:00
+                          <br />
+                          토-일: 10:00 - 17:00
+                        </p>
+                      </div>
+                    </div>
+
+                    {artist?.website && (
+                      <div className='flex items-start gap-3'>
+                        <Mail className='w-5 h-5 text-primary mt-1' />
+                        <div>
+                          <p className='font-medium'>웹사이트</p>
+                          <a 
+                            href={artist.website} 
+                            target='_blank' 
+                            rel='noopener noreferrer'
+                            className='text-primary hover:underline'
+                          >
+                            {artist.website}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               </CardContent>
             </Card>
 
