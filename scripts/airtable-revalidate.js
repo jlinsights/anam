@@ -1,14 +1,14 @@
 /*
-  Airtable Automation Script: HEELANG Revalidate
-  -------------------------------------------------
+  Airtable Automation Script: ANAM Gallery Revalidate
+  ---------------------------------------------------
   목적: Airtable Base 내 레코드가 생성·업데이트·삭제될 때마다
-        Next.js 사이트의 캐시 태그("artworks")를 무효화합니다.
+        ANAM 갤러리 웹사이트의 캐시 태그("artworks")를 무효화합니다.
   사용 방법:
   1. Airtable → Automations → "When record updated / created / deleted" 트리거 선택.
   2. "Run a script" step 추가 후 본 스크립트 내용 붙여넣기.
   3. Variables 섹션에 다음 변수를 추가하세요:
-     • WEBHOOK_URL   – 예: https://your-domain.com/api/revalidate
-     • WEBHOOK_SECRET – .env 에 설정한 REVALIDATE_SECRET 값과 동일
+     • WEBHOOK_URL: https://anam-gallery-1oss65kc1-jlinsights-projects.vercel.app/api/revalidate
+     • WEBHOOK_SECRET: anam-gallery-2025-secure-webhook-key
   4. 테스트 실행 후 성공하면 Automation 을 켜세요.
 */
 
