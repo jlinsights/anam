@@ -236,12 +236,13 @@ const config: Config = {
   			'glow': '0 0 20px rgba(255, 255, 255, 0.1)',
   			'glow-strong': '0 0 40px rgba(255, 255, 255, 0.2)'
   		},
-  		transitionDuration: {
-  			'2000': '2000ms',
-  			'3000': '3000ms',
-  			'4000': '4000ms',
-  			'5000': '5000ms'
-  		},
+  				transitionDuration: {
+			'2000': '2000ms',
+			'3000': '3000ms',
+			'4000': '4000ms',
+			'5000': '5000ms',
+			'8000': '8000ms'
+		},
   		transitionTimingFunction: {
   			'brush': 'cubic-bezier(0.4, 0, 0.2, 1)',
   			'ink': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
@@ -256,9 +257,9 @@ const config: Config = {
     clear: false,
     skew: false,
   },
-  experimental: {
-    // 최적화 실험적 기능
-    optimizeUniversalDefaults: true,
-  },
+  // experimental: {
+  //   // 최적화 실험적 기능
+  //   optimizeUniversalDefaults: true,
+  // },
 };
 export default config;

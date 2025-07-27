@@ -1,13 +1,13 @@
 // 앱 전체에서 사용하는 상수들
 export const APP_CONFIG = {
-  name: '묵향 서예전',
-  nameEn: 'Calligraphy Catalog',
+  name: '아남 서예 갤러리',
+  nameEn: 'ANAM Calligraphy Gallery',
   description:
-    '현대 서예가의 작품을 온라인으로 감상할 수 있는 다국어 지원 전시 카탈로그',
+    '아남 배옥영 작가의 현대 서예 작품을 온라인으로 감상할 수 있는 디지털 갤러리',
   url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   author: {
-    name: '이름 예시',
-    email: 'artist@example.com',
+    name: '아남 배옥영',
+    email: 'contact@anam.com',
   },
 } as const
 
@@ -40,22 +40,24 @@ export const PAGINATION_CONFIG = {
 // SEO 관련 상수
 export const SEO_CONFIG = {
   keywords: [
-    '서예',
+    '현대서예',
+    'contemporary calligraphy',
     'calligraphy',
-    'art',
-    'exhibition',
+    'gallery',
     'Korean art',
-    '한국 전통 예술',
+    '한국 서예',
+    '아남',
+    '배옥영',
   ],
-  twitterHandle: '@calligraphy_art',
+  twitterHandle: '@anam_calligraphy',
 } as const
 
 // 사이트 메타데이터
 export const SITE_CONFIG = {
-  name: '희랑 서예',
-  description: '희랑 공경순 작가의 서예 작품을 소개합니다',
-  url: 'https://heelang.orientalcalligraphy.org',
-  author: '공경순 (Kong KyongSun)',
+  name: '아남 서예 갤러리',
+  description: '아남 배옥영 작가의 현대 서예 작품을 소개합니다',
+  url: 'https://anam.orientalcalligraphy.org',
+  author: '아남 배옥영 (ANAM Bae Ok Young)',
 } as const
 
 // 네비게이션 메뉴

@@ -12,12 +12,12 @@ export async function generateMetadata(): Promise<Metadata> {
     title: artist ? `${artist.name} - 작가 소개` : '작가 소개',
     description:
       artist?.bio ||
-      '한국의 서예 작가 희랑 공경순의 작품과 이야기를 만나보세요.',
+      '한국의 현대 서예 작가 아남 배옥영의 작품과 이야기를 만나보세요.',
     openGraph: {
       title: artist ? `${artist.name} - 작가 소개` : '작가 소개',
       description:
         artist?.bio ||
-        '한국의 서예 작가 희랑 공경순의 작품과 이야기를 만나보세요.',
+        '한국의 현대 서예 작가 아남 배옥영의 작품과 이야기를 만나보세요.',
       images: artist?.profileImageUrl
         ? [
             {

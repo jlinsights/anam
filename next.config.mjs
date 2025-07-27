@@ -39,12 +39,8 @@ const nextConfig = {
   }),
   webpack: (config, { dev, isServer }) => {
     if (dev) {
-      config.cache = {
-        type: "filesystem",
-        buildDependencies: {
-          config: [__filename],
-        },
-      };
+      // 개발 환경에서 캐시 비활성화로 문제 해결
+      config.cache = false;
 
       config.watchOptions = {
         poll: false,

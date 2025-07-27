@@ -145,7 +145,7 @@ function createSlug(title: string, year: number | string): string {
     .replace(/[^\w\s가-힣]/g, '')
     .replace(/\s+/g, '-')
     .trim()
-  return `heelang-${cleanTitle}-${year}`
+  return `anam-${cleanTitle}-${year}`
 }
 
 // 종횡비 계산 함수

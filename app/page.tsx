@@ -102,7 +102,7 @@ function HeroSection() {
         {featuredArtworks.map((artwork, index) => (
           <div
             key={artwork.id}
-            className={`absolute inset-0 transition-all duration-[2000ms] ease-in-out ${
+            className={`absolute inset-0 transition-all duration-2000 ease-in-out ${
               index === currentImageIndex
                 ? 'opacity-100 scale-100'
                 : 'opacity-0 scale-105'
@@ -113,7 +113,7 @@ function HeroSection() {
                 src={artwork.imageUrl}
                 alt={artwork.title}
                 fill
-                className={`object-cover transition-transform duration-[8000ms] ease-linear ${
+                className={`object-cover transition-transform duration-8000 ease-linear ${
                   index === currentImageIndex ? 'scale-110' : 'scale-100'
                 }`}
                 priority={index === 0}

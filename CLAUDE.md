@@ -5,10 +5,9 @@ code in this repository.
 
 ## Project Overview
 
-HEELANG is a Next.js-based exhibition website for Korean calligraphy artist 희랑
-공경순 (Kong Kyung Soon). The project showcases her personal exhibition "길
-(Way)" featuring 25+ contemporary calligraphy artworks with modern Korean
-aesthetic.
+ANAM is a Next.js-based calligraphy gallery website for Korean artist 아남 배옥영 
+(Bae Ok Young). The project showcases her contemporary calligraphy works and exhibitions 
+with traditional Korean aesthetic and modern responsive design.
 
 ## Development Commands
 
@@ -51,7 +50,7 @@ npm run optimize-images  # Optimize artwork images
 ### Directory Structure
 
 ```
-HEELANG/
+ANAM/
 ├── app/                    # Next.js App Router
 │   ├── api/               # API routes (Airtable integration)
 │   ├── gallery/           # Gallery pages with [slug] dynamic routes
@@ -106,7 +105,7 @@ AIRTABLE_API_KEY=your_airtable_api_key
 AIRTABLE_BASE_ID=your_airtable_base_id
 
 # Production URLs
-NEXT_PUBLIC_SITE_URL=https://heelang.vercel.app
+NEXT_PUBLIC_SITE_URL=https://anam.vercel.app
 ```
 
 ### Development Workflow
@@ -140,7 +139,7 @@ NEXT_PUBLIC_SITE_URL=https://heelang.vercel.app
 1. Add optimized images to `/public/Images/Artworks/{year}/`
 2. Update Airtable `Artworks` table OR modify `fallbackArtworksData` in
    `lib/artworks.ts`
-3. Ensure slug follows pattern: `heelang-{title}-{year}`
+3. Ensure slug follows pattern: `anam-{title}-{year}`
 
 ### Modifying Gallery Layout
 

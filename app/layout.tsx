@@ -24,52 +24,45 @@ const notoSerifKR = Noto_Serif_KR({
 })
 
 export const metadata: Metadata = {
-  title: '희랑 공경순 개인전 | 길 道',
+  title: '아남 배옥영 작가 서예 갤러리',
   description:
-    "희랑 공경순 작가의 현대 서예 개인전 '길 道' - 인생의 여정을 담은 깊이 있는 서예 작품을 온라인으로 감상하세요. 2024.12.14-2025.02.28 전시",
+    "아남 배옥영 작가의 현대 서예 작품을 온라인으로 감상할 수 있는 디지털 갤러리. 전통 서예의 정신과 현대적 감각이 조화를 이루는 독창적인 작품들을 만나보세요.",
   keywords: [
-    '희랑',
-    '공경순',
-    '서예',
+    '아남',
+    '배옥영',
     '현대서예',
-    '길',
-    '道',
-    '개인전',
-    '전시',
-    '한국서예',
+    '서예',
     '캘리그래피',
+    '한국서예',
+    '전통예술',
+    '현대작가',
+    '서예전시',
+    '붓글씨',
   ],
-  authors: [{ name: '희랑 공경순' }],
-  creator: '희랑 공경순',
-  publisher: 'The Asian Society of Calligraphic Arts (ASCA)',
+  authors: [{ name: '아남 배옥영' }],
+  creator: '아남 배옥영',
+  publisher: 'ANAM Art Gallery',
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://heelang.orientalcalligraphy.org'),
+  metadataBase: new URL('https://anam.orientalcalligraphy.org'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: '희랑 공경순 개인전 | 길 道',
+    title: '아남 배옥영 작가 서예 갤러리',
     description:
-      "희랑 공경순 작가의 현대 서예 개인전 '길 道' - 인생의 여정을 담은 깊이 있는 서예 작품을 온라인으로 감상하세요",
-    url: 'https://heelang.orientalcalligraphy.org',
-    siteName: '희랑 공경순 개인전',
+      "아남 배옥영 작가의 현대 서예 작품을 온라인으로 감상할 수 있는 디지털 갤러리. 전통 서예의 정신과 현대적 감각이 조화를 이루는 독창적인 작품들을 만나보세요.",
+    url: 'https://anam.orientalcalligraphy.org',
+    siteName: '아남 배옥영 서예 갤러리',
     images: [
       {
-        url: '/Images/Artworks/2025/heelang-way-2025-large.jpg',
+        url: '/Images/Artist/배옥영.jpeg',
         width: 1200,
         height: 630,
-        alt: '희랑 공경순 작품 - 길 (Way) 2025',
-        type: 'image/jpeg',
-      },
-      {
-        url: '/Images/Artworks/2025/heelang-way-2025-medium.jpg',
-        width: 800,
-        height: 600,
-        alt: '희랑 공경순 작품 - 길 (Way) 2025',
+        alt: '아남 배옥영 작가 프로필',
         type: 'image/jpeg',
       },
     ],
@@ -78,11 +71,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '희랑 공경순 개인전 | 길 道',
+    title: '아남 배옥영 작가 서예 갤러리',
     description:
-      "희랑 공경순 작가의 현대 서예 개인전 '길 道' - 인생의 여정을 담은 깊이 있는 서예 작품",
-    images: ['/Images/Artworks/2025/heelang-way-2025-large.jpg'],
-    creator: '@heelang_calligraphy',
+      "아남 배옥영 작가의 현대 서예 작품을 온라인으로 감상할 수 있는 디지털 갤러리",
+    images: ['/Images/Artist/배옥영.jpeg'],
+    creator: '@anam_art',
   },
   robots: {
     index: true,
@@ -112,10 +105,10 @@ export default function RootLayout({
         <link rel='manifest' href='/manifest.json' />
 
         {/* PWA 메타 태그 */}
-        <meta name='application-name' content='묵향 서예전' />
+        <meta name='application-name' content='아남 서예 갤러리' />
         <meta name='apple-mobile-web-app-capable' content='yes' />
         <meta name='apple-mobile-web-app-status-bar-style' content='default' />
-        <meta name='apple-mobile-web-app-title' content='묵향 서예전' />
+        <meta name='apple-mobile-web-app-title' content='아남 서예 갤러리' />
         <meta name='mobile-web-app-capable' content='yes' />
         <meta name='msapplication-config' content='/browserconfig.xml' />
         <meta name='msapplication-TileColor' content='#1a1a1a' />
@@ -189,61 +182,48 @@ export default function RootLayout({
                 '@context': 'https://schema.org',
                 '@graph': [
                   {
-                    '@type': 'ExhibitionEvent',
-                    name: '희랑 공경순 개인전 - 길 道',
-                    description:
-                      '희랑 공경순 작가의 현대 서예 개인전으로, 인생의 여정을 담은 깊이 있는 서예 작품들을 선보입니다.',
-                    startDate: '2024-12-14',
-                    endDate: '2025-02-28',
-                    eventStatus: 'https://schema.org/EventScheduled',
-                    eventAttendanceMode:
-                      'https://schema.org/OnlineEventAttendanceMode',
-                    location: {
-                      '@type': 'VirtualLocation',
-                      url: 'https://heelang.orientalcalligraphy.org',
-                    },
-                    organizer: {
-                      '@type': 'Organization',
-                      name: 'The Asian Society of Calligraphic Arts (ASCA)',
-                      url: 'https://heelang.orientalcalligraphy.org',
-                    },
-                    performer: {
-                      '@type': 'Person',
-                      name: '희랑 공경순',
-                      jobTitle: '서예가',
-                      description: '현대 서예의 새로운 지평을 여는 작가',
-                    },
-                    image:
-                      'https://heelang.orientalcalligraphy.org/Images/Artworks/2025/heelang-way-2025-large.jpg',
-                    url: 'https://heelang.orientalcalligraphy.org',
+                    '@type': 'Person',
+                    name: '아남 배옥영',
+                    alternateName: ['배옥영', 'ANAM', 'Bae Ok Young'],
+                    jobTitle: '현대 서예 작가',
+                    description: '한국의 전통 서예와 현대적 감각을 결합한 독창적인 작품 세계를 구축하고 있는 서예 작가',
+                    birthPlace: '한국',
+                    nationality: '한국',
+                    knowsAbout: ['현대 서예', '캘리그래피', '전통 서예', '한국 서예'],
+                    image: 'https://anam.orientalcalligraphy.org/Images/Artist/배옥영.jpeg',
+                    url: 'https://anam.orientalcalligraphy.org/artist',
+                    sameAs: [
+                      'https://instagram.com/anam_art',
+                      'https://anam.com'
+                    ],
                   },
                   {
                     '@type': 'WebSite',
-                    name: '희랑 공경순 개인전',
+                    name: '아남 배옥영 서예 갤러리',
                     description:
-                      "희랑 공경순 작가의 현대 서예 개인전 '길 道' 온라인 전시관",
-                    url: 'https://heelang.orientalcalligraphy.org',
+                      '아남 배옥영 작가의 현대 서예 작품을 온라인으로 감상할 수 있는 디지털 갤러리',
+                    url: 'https://anam.orientalcalligraphy.org',
                     inLanguage: 'ko-KR',
                     publisher: {
                       '@type': 'Organization',
-                      name: 'The Asian Society of Calligraphic Arts (ASCA)',
+                      name: 'ANAM Art Gallery',
+                    },
+                    author: {
+                      '@type': 'Person',
+                      name: '아남 배옥영',
                     },
                   },
                   {
-                    '@type': 'VisualArtwork',
-                    name: '길 (Way)',
-                    description:
-                      '2025년 작품으로, 인생의 여정과 도(道)의 의미를 현대적 서예로 표현한 작품',
-                    creator: {
+                    '@type': 'ArtGallery',
+                    name: '아남 배옥영 서예 갤러리',
+                    description: '전통 서예와 현대적 감각이 조화를 이루는 독창적인 작품들을 전시하는 온라인 갤러리',
+                    url: 'https://anam.orientalcalligraphy.org',
+                    image: 'https://anam.orientalcalligraphy.org/Images/Artist/배옥영.jpeg',
+                    artform: ['현대 서예', '캘리그래피', '전통 서예'],
+                    artist: {
                       '@type': 'Person',
-                      name: '희랑 공경순',
+                      name: '아남 배옥영',
                     },
-                    dateCreated: '2025',
-                    artMedium: '서예, 먹, 종이',
-                    artworkSurface: '종이',
-                    image:
-                      'https://heelang.orientalcalligraphy.org/Images/Artworks/2025/heelang-way-2025-large.jpg',
-                    url: 'https://heelang.orientalcalligraphy.org/gallery/way-2025',
                   },
                 ],
               },
@@ -263,7 +243,7 @@ export default function RootLayout({
           <footer className='bg-ink text-paper py-8'>
             <div className='container-art text-center'>
               <p className='text-responsive-sm text-ink-light'>
-                © 2025 The Asian Society of Calligraphic Arts (ASCA)
+                © 2025 아남 배옥영 서예 갤러리 (ANAM Calligraphy Gallery)
               </p>
             </div>
           </footer>

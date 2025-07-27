@@ -1,8 +1,8 @@
-# 🎨 희랑 공경순 개인전 | 길 (Way) 展
+# 🎨 아남 배옥영 작가 서예 갤러리
 
-> **"길"**을 주제로 한 공경순 작가의 현대 서예 작품 온라인 전시관
+> 배옥영 작가의 현대 서예 작품을 온라인으로 감상할 수 있는 디지털 갤러리
 
-현대 서예의 아름다움과 철학을 온라인으로 감상할 수 있는 디지털 갤러리입니다.
+전통 서예의 정신과 현대적 감각이 조화를 이루는 서예 작품을 온라인으로 경험할 수 있는 웹 갤러리입니다.
 
 ---
 
@@ -77,7 +77,7 @@
 
 ## 🚀 라이브 사이트
 
-**배포 URL**: [https://heelang.vercel.app](https://heelang.vercel.app)
+**배포 URL**: [https://anam.orientalcalligraphy.org](https://anam.orientalcalligraphy.org)
 
 [![Powered by Vercel](https://img.shields.io/badge/Powered%20by-Vercel-black)](https://vercel.com)
 
@@ -110,7 +110,7 @@
 ## 📁 프로젝트 구조
 
 ```
-HEELANG/
+ANAM/
 ├── app/                   # App Router 구조
 │   ├── layout.tsx         # 루트 레이아웃
 │   ├── page.tsx           # 메인 페이지
@@ -147,8 +147,8 @@ HEELANG/
 
 ```bash
 # 저장소 클론
-git clone https://github.com/jlinsights/HEELANG.git
-cd HEELANG
+git clone https://github.com/jlinsights/ANAM.git
+cd ANAM
 
 # 의존성 설치
 npm install
@@ -288,22 +288,21 @@ npm run deploy:preview
 
 ## 🙏 후원 및 지원
 
-**주최**: 희랑 공경순  
-**후원**: 사단법인 동양서예협회
+**작가**: 아남 배옥영  
+**갤러리**: ANAM Calligraphy Gallery
 
 ---
 
-> 🎨 **"길"이라는 주제를 통해 현대 서예의 아름다움과 철학을 전 세계와
-> 공유합니다** 🌍
+> 🎨 **전통 서예와 현대적 감각의 조화를 통해 독창적인 작품 세계를 
+> 전 세계와 공유합니다** 🌍
 
-[![Korean Calligraphy](https://img.shields.io/badge/Korean-Calligraphy-red)](https://github.com/jlinsights/HEELANG)
-[![Modern Art](https://img.shields.io/badge/Modern-Art-blue)](https://github.com/jlinsights/HEELANG)
-[![Digital Gallery](https://img.shields.io/badge/Digital-Gallery-green)](https://github.com/jlinsights/HEELANG)
+[![Korean Calligraphy](https://img.shields.io/badge/Korean-Calligraphy-red)](https://github.com/jlinsights/ANAM)
+[![Modern Art](https://img.shields.io/badge/Modern-Art-blue)](https://github.com/jlinsights/ANAM)
+[![Digital Gallery](https://img.shields.io/badge/Digital-Gallery-green)](https://github.com/jlinsights/ANAM)
 
 ## 프로젝트 개요
 
-희랑(熙勆) 공경순 작가의 개인전 '길(Way)'을 위한 Next.js 기반 전시
-웹사이트입니다.
+아남 배옥영 작가의 현대 서예 작품을 위한 Next.js 기반 디지털 서예 갤러리입니다.
 
 ## 기술 스택
 
@@ -397,10 +396,10 @@ featured: true
 #### Artist 테이블 예시 데이터:
 
 ```
-name: "공경순 (Kong Kyung Soon)"
-bio: "서울에서 활동하는 현대 서예가입니다..."
-statement: "나의 작업은 선과 공간, 여백의 관계를 탐구하는 과정입니다..."
-profileImageUrl: "/Images/Artist/Artist.png"
+name: "아남 배옥영 (ANAM Bae Ok Young)"
+bio: "한국의 전통 서예와 현대적 감각을 결합한 독창적인 작품 세계를 구축하고 있는 서예 작가입니다..."
+statement: "전통 서예의 정신을 바탕으로 현대적 감각을 더하여, 과거와 현재가 조화를 이루는 작품을 추구합니다..."
+profileImageUrl: "/Images/Artist/배옥영.jpeg"
 ```
 
 ## 로컬 개발 환경 설정
@@ -443,4 +442,4 @@ Airtable 연동이 실패하거나 환경 변수가 설정되지 않은 경우, 
 
 ## 라이선스
 
-이 프로젝트는 희랑 공경순 작가의 개인전을 위한 전용 웹사이트입니다.
+이 프로젝트는 아남 배옥영 작가의 서예 갤러리를 위한 전용 웹사이트입니다.

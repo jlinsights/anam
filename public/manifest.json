@@ -1,7 +1,7 @@
 {
-  "name": "희랑 공경순 개인전 - 길",
-  "short_name": "길",
-  "description": "희랑 공경순 작가의 '길' 전시 - 인생의 여정을 담은 현대 서예 작품 온라인 갤러리",
+  "name": "아남 배옥영 서예 갤러리",
+  "short_name": "아남 서예",
+  "description": "아남 배옥영 작가의 현대 서예 작품을 온라인으로 감상할 수 있는 디지털 갤러리",
   "lang": "ko",
   "start_url": "/",
   "display": "standalone",
@@ -9,7 +9,7 @@
   "theme_color": "#1a1a1a",
   "background_color": "#ffffff",
   "scope": "/",
-  "categories": ["art", "culture", "calligraphy", "exhibition"],
+  "categories": ["art", "culture", "calligraphy", "gallery"],
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
@@ -80,7 +80,7 @@
     {
       "name": "갤러리",
       "short_name": "갤러리",
-      "description": "서예 작품 갤러리로 바로가기",
+      "description": "현대 서예 작품 갤러리로 바로가기",
       "url": "/gallery",
       "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     }
