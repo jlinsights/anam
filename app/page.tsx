@@ -26,6 +26,7 @@ function HeroSection() {
   useEffect(() => {
     async function loadFeaturedArtworks() {
       try {
+        // 먼저 fallback 데이터 로드
         const { fallbackArtworksData } = await import('@/lib/artworks')
         const fallbackFeatured = fallbackArtworksData
           .filter((artwork) => artwork.featured)
@@ -39,15 +40,12 @@ function HeroSection() {
         setFeaturedArtworks(initialArtworks)
         setLoading(false)
 
-        try {
-          const { getFeaturedArtworks } = await import('@/lib/artworks')
-          const airtableArtworks = await getFeaturedArtworks(6)
+        // Airtable 데이터 로드 시도
+        const { getFeaturedArtworks } = await import('@/lib/artworks')
+        const airtableArtworks = await getFeaturedArtworks(6)
 
-          if (airtableArtworks && airtableArtworks.length > 0) {
-            setFeaturedArtworks(airtableArtworks)
-          }
-        } catch (airtableError) {
-          console.log('Using fallback data')
+        if (airtableArtworks && airtableArtworks.length > 0) {
+          setFeaturedArtworks(airtableArtworks)
         }
       } catch (error) {
         console.error('Failed to load data:', error)
@@ -202,7 +200,7 @@ function HeroSection() {
           {/* 서브타이틀 */}
           <div className='mb-12'>
             <p className='text-lg md:text-xl lg:text-2xl text-white/80 mb-8 text-shadow-medium hover:text-white/95 transition-colors duration-700'>
-              희랑 공경순 개인전
+              아남 배옥영 개인전
             </p>
 
             {/* 전시 정보 카드 */}
@@ -309,7 +307,7 @@ function FeaturedWorksSection() {
           badge='Featured Works'
           title='대표 작품'
           subtitle='문방사우와 서예의 조화'
-          description='전통 서예의 정신과 현대적 감각이 어우러진 희랑 작가의 대표작들을 만나보세요.'
+          description='전통 서예의 정신과 현대적 감각이 어우러진 아남 작가의 대표작들을 만나보세요.'
           variant='centered'
           size='lg'
           action={{
@@ -382,7 +380,7 @@ function ArtistSection() {
           <div className='space-y-8'>
             <SectionHeader
               badge='Artist'
-              title='희랑 공경순'
+              title='아남 배옥영'
               subtitle='서예가'
               description='전통 서예의 깊이와 현대적 감각을 조화시키며, 문방사우의 정신을 현대에 되살리는 작업을 하고 있습니다.'
               size='lg'
@@ -402,7 +400,7 @@ function ArtistSection() {
                   ) : (
                     <Image
                       src={profileImageUrl}
-                      alt='희랑 공경순 작가 프로필'
+                      alt='아남 배옥영 작가 프로필'
                       fill
                       className='object-cover hover-scale'
                       sizes='(max-width: 768px) 100vw, 50vw'
@@ -432,7 +430,7 @@ function ExhibitionSection() {
           badge='Exhibition'
           title='전시 정보'
           subtitle='길 道 WAY'
-          description='2025년 6월, 인사동에서 열리는 희랑 공경순 작가의 개인전에 여러분을 초대합니다.'
+          description='2025년 6월, 인사동에서 열리는 아남 배옥영 작가의 개인전에 여러분을 초대합니다.'
           variant='centered'
           size='lg'
         />

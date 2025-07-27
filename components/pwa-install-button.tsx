@@ -63,7 +63,7 @@ export function PWAInstallButton() {
                 </div>
                 <div>
                   <h3 className='font-display text-xl text-ink'>
-                    길 - 희랑 공경순 개인전
+                    길 - 아남 배옥영 개인전
                   </h3>
                   <p className='text-sm text-ink-light mt-1'>
                     언제든지 쉽게 작품을 감상하세요

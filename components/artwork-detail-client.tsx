@@ -18,8 +18,8 @@ export function ArtworkDetailClient({ title, slug }: ArtworkDetailClientProps) {
 
   const handleShare = async () => {
     const shareData = {
-      title: `${title} - 희랑 공경순`,
-      text: `희랑 공경순 작가의 작품 "${title}"을 감상해보세요.`,
+      title: `${title} - 아남 배옥영`,
+      text: `아남 배옥영 작가의 작품 "${title}"을 감상해보세요.`,
       url: `${window.location.origin}/gallery/${slug}`,
     }
 

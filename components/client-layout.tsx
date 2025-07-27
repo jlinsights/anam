@@ -6,6 +6,7 @@ import { I18nProvider } from '@/components/i18n-provider'
 import { PerformanceDashboard, PerformanceFloatingButton } from '@/components/performance-dashboard'
 import { PWAInstallPrompt } from '@/components/pwa-install-prompt'
 import { ServiceWorkerRegistration } from '@/components/service-worker-registration'
+import { UIProvider } from '@/lib/store/ui-store'
 
 interface ClientLayoutProps {
   children: React.ReactNode
@@ -30,27 +31,29 @@ export function ClientLayout({ children }: ClientLayoutProps) {
 
   // 클라이언트 사이드에서는 완전한 레이아웃 렌더링
   return (
-    <I18nProvider>
-      <AnalyticsProvider>
-        <div className='min-h-screen bg-background text-foreground'>
-          {children}
-          
-          {/* PWA 기능 */}
-          <ServiceWorkerRegistration />
-          <PWAInstallPrompt />
-          
-          {/* 성능 모니터링 플로팅 버튼 (개발 환경에서만 표시) */}
-          <PerformanceFloatingButton 
-            onClick={() => setShowPerformanceDashboard(true)} 
-          />
-          
-          {/* 성능 모니터링 대시보드 */}
-          <PerformanceDashboard
-            isVisible={showPerformanceDashboard}
-            onClose={() => setShowPerformanceDashboard(false)}
-          />
-        </div>
-      </AnalyticsProvider>
-    </I18nProvider>
+    <UIProvider>
+      <I18nProvider>
+        <AnalyticsProvider>
+          <div className='min-h-screen bg-background text-foreground'>
+            {children}
+            
+            {/* PWA 기능 */}
+            <ServiceWorkerRegistration />
+            <PWAInstallPrompt />
+            
+            {/* 성능 모니터링 플로팅 버튼 (개발 환경에서만 표시) */}
+            <PerformanceFloatingButton 
+              onClick={() => setShowPerformanceDashboard(true)} 
+            />
+            
+            {/* 성능 모니터링 대시보드 */}
+            <PerformanceDashboard
+              isVisible={showPerformanceDashboard}
+              onClose={() => setShowPerformanceDashboard(false)}
+            />
+          </div>
+        </AnalyticsProvider>
+      </I18nProvider>
+    </UIProvider>
   )
 }

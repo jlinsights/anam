@@ -78,7 +78,7 @@ export default async function ArtworkDetailPage({
               <Link href='/' className='flex items-center space-x-2'>
                 <Logo className='w-8 h-8' showLink={false} />
                 <span className='text-xl font-bold text-slate-900 dark:text-white'>
-                  희랑
+                  아남
                 </span>
               </Link>
               <div className='flex items-center space-x-4'>

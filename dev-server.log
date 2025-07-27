@@ -1,0 +1,25 @@
+
+> anam-gallery@0.1.0 dev
+> NODE_OPTIONS='--max-old-space-size=4096' next dev --port 3000
+
+   ▲ Next.js 15.4.4
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.213:3000
+   - Environments: .env.local
+   - Experiments (use with caution):
+     ⨯ reactCompiler
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 1870ms
+ ○ Compiling / ...
+ ✓ Compiled / in 4.8s (1682 modules)
+ GET / 200 in 5422ms
+ ✓ Compiled in 1089ms (717 modules)
+ ✓ Compiled in 912ms (1682 modules)
+ GET / 200 in 336ms
+ ✓ Compiled in 689ms (717 modules)
+ ✓ Compiled in 609ms (1682 modules)
+ GET / 200 in 328ms
+ GET / 200 in 88ms
+[?25h

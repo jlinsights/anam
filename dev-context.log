@@ -1,0 +1,70 @@
+
+> anam-gallery@0.1.0 dev
+> NODE_OPTIONS='--max-old-space-size=4096' next dev --port 3000
+
+   ▲ Next.js 15.4.4
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.213:3000
+   - Environments: .env.local
+   - Experiments (use with caution):
+     ⨯ reactCompiler
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 1912ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 3.5s (700 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /_next/static/webpack/2a194cd520990a6c.webpack.hot-update.json 404 in 4240ms
+ ○ Compiling / ...
+ ✓ Compiled / in 4.7s (1671 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 4743ms
+ GET / 200 in 2172ms
+ GET /_next/static/webpack/2a194cd520990a6c.webpack.hot-update.json 404 in 4589ms
+ GET / 200 in 124ms
+ ✓ Compiled in 404ms (718 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 157ms
+ GET / 200 in 100ms
+ GET / 200 in 174ms
+ ⨯ app/layout.tsx
+`next/font` error:
+Unknown subset `korean` for font `Noto Serif KR`.
+Available subsets: `cyrillic`, `latin`, `latin-ext`, `vietnamese`
+ ⨯ app/layout.tsx
+`next/font` error:
+Unknown subset `korean` for font `Noto Serif KR`.
+Available subsets: `cyrillic`, `latin`, `latin-ext`, `vietnamese`
+ ✓ Compiled in 952ms (1682 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 634ms
+ GET / 200 in 142ms
+ ✓ Compiled in 1403ms (1682 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 1022ms
+ GET / 200 in 391ms
+ ✓ Compiled in 1951ms (1682 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 591ms
+ GET / 200 in 486ms
+ ✓ Compiled in 907ms (1682 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 736ms
+ GET / 200 in 190ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 1132ms (1682 modules)
+ GET / 200 in 623ms
+ GET / 200 in 92ms
+ ✓ Compiled in 891ms (1682 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 565ms
+ GET / 200 in 233ms
+ ✓ Compiled in 815ms (1682 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 701ms
+ GET / 200 in 224ms
+[?25h

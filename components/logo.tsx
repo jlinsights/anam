@@ -23,19 +23,19 @@ export function Logo({
       {forceWhite ? (
         <img
           src='/logos/Logo & Tagline_black BG.png'
-          alt='희랑 공경순 개인전 - 길'
+          alt='아남 배옥영 개인전 - 길'
           className='h-full w-auto object-contain'
         />
       ) : (
         <>
           <img
             src='/logos/Logo & Tagline_white BG.png'
-            alt='희랑 공경순 개인전 - 길'
+            alt='아남 배옥영 개인전 - 길'
             className='h-full w-auto object-contain dark:hidden'
           />
           <img
             src='/logos/Logo & Tagline_black BG.png'
-            alt='희랑 공경순 개인전 - 길'
+            alt='아남 배옥영 개인전 - 길'
             className='h-full w-auto object-contain hidden dark:block'
           />
         </>

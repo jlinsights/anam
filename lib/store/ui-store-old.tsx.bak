@@ -1,0 +1,376 @@
+/**
+ * ANAM UI 상태 관리 스토어
+ * React Context를 사용한 전역 상태 관리 (Zustand 대신 임시 사용)
+ */
+
+import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react'
+
+// 테마 관련 타입
+export type Theme = 'light' | 'dark' | 'system'
+
+// 언어 관련 타입
+export type Language = 'ko' | 'en' | 'ja' | 'zh'
+
+// 갤러리 필터 타입
+export interface GalleryFilter {
+  year?: string
+  medium?: string
+  searchQuery?: string
+  sortBy: 'year' | 'title' | 'medium'
+  sortOrder: 'asc' | 'desc'
+}
+
+// UI 상태 인터페이스
+interface UIState {
+  // 테마 상태
+  theme: Theme
+  resolvedTheme: 'light' | 'dark'
+
+  // 언어 상태
+  language: Language
+
+  // 네비게이션 상태
+  isMobileMenuOpen: boolean
+  isSearchOpen: boolean
+
+  // 갤러리 상태
+  galleryFilter: GalleryFilter
+  selectedArtworkId: string | null
+  isLightboxOpen: boolean
+
+  // 로딩 상태
+  isLoading: boolean
+  loadingMessage: string
+
+  // 오류 상태
+  error: string | null
+
+  // 사용자 설정
+  preferences: {
+    reducedMotion: boolean
+    autoplaySlideshow: boolean
+    showArtworkDetails: boolean
+    gridSize: 'small' | 'medium' | 'large'
+  }
+}
+
+// 액션 타입
+type UIAction = 
+  | { type: 'SET_THEME'; payload: Theme }
+  | { type: 'SET_RESOLVED_THEME'; payload: 'light' | 'dark' }
+  | { type: 'TOGGLE_THEME' }
+  | { type: 'SET_LANGUAGE'; payload: Language }
+  | { type: 'TOGGLE_MOBILE_MENU' }
+  | { type: 'CLOSE_MOBILE_MENU' }
+  | { type: 'TOGGLE_SEARCH' }
+  | { type: 'CLOSE_SEARCH' }
+  | { type: 'SET_GALLERY_FILTER'; payload: Partial<GalleryFilter> }
+  | { type: 'RESET_GALLERY_FILTER' }
+  | { type: 'SET_SELECTED_ARTWORK'; payload: string | null }
+  | { type: 'OPEN_LIGHTBOX'; payload: string }
+  | { type: 'CLOSE_LIGHTBOX' }
+  | { type: 'SET_LOADING'; payload: { loading: boolean; message?: string } }
+  | { type: 'SET_ERROR'; payload: string | null }
+  | { type: 'CLEAR_ERROR' }
+  | { type: 'SET_PREFERENCE'; payload: { key: keyof UIState['preferences']; value: any } }
+  | { type: 'TOGGLE_PREFERENCE'; payload: keyof Omit<UIState['preferences'], 'gridSize'> }
+  | { type: 'RESET' }
+
+// 초기 상태
+const initialState: UIState = {
+  theme: 'system',
+  resolvedTheme: 'light',
+  language: 'ko',
+  isMobileMenuOpen: false,
+  isSearchOpen: false,
+  galleryFilter: {
+    sortBy: 'year',
+    sortOrder: 'desc',
+  },
+  selectedArtworkId: null,
+  isLightboxOpen: false,
+  isLoading: false,
+  loadingMessage: '',
+  error: null,
+  preferences: {
+    reducedMotion: false,
+    autoplaySlideshow: true,
+    showArtworkDetails: true,
+    gridSize: 'medium',
+  },
+}
+
+// 리듀서 함수
+function uiReducer(state: UIState, action: UIAction): UIState {
+  switch (action.type) {
+    case 'SET_THEME':
+      const theme = action.payload
+      if (theme === 'system') {
+        const systemTheme = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light'
+        return { ...state, theme, resolvedTheme: systemTheme }
+      } else {
+        return { ...state, theme, resolvedTheme: theme }
+      }
+    
+    case 'SET_RESOLVED_THEME':
+      return { ...state, resolvedTheme: action.payload }
+    
+    case 'TOGGLE_THEME':
+      if (state.theme === 'system') {
+        const newTheme = state.resolvedTheme === 'light' ? 'dark' : 'light'
+        return { ...state, theme: newTheme, resolvedTheme: newTheme }
+      } else {
+        const newTheme = state.resolvedTheme === 'light' ? 'dark' : 'light'
+        return { ...state, theme: newTheme, resolvedTheme: newTheme }
+      }
+    
+    case 'SET_LANGUAGE':
+      return { ...state, language: action.payload }
+    
+    case 'TOGGLE_MOBILE_MENU':
+      return { ...state, isMobileMenuOpen: !state.isMobileMenuOpen }
+    
+    case 'CLOSE_MOBILE_MENU':
+      return { ...state, isMobileMenuOpen: false }
+    
+    case 'TOGGLE_SEARCH':
+      return { ...state, isSearchOpen: !state.isSearchOpen }
+    
+    case 'CLOSE_SEARCH':
+      return { ...state, isSearchOpen: false }
+    
+    case 'SET_GALLERY_FILTER':
+      return { 
+        ...state, 
+        galleryFilter: { ...state.galleryFilter, ...action.payload }
+      }
+    
+    case 'RESET_GALLERY_FILTER':
+      return { 
+        ...state, 
+        galleryFilter: { sortBy: 'year', sortOrder: 'desc' }
+      }
+    
+    case 'SET_SELECTED_ARTWORK':
+      return { ...state, selectedArtworkId: action.payload }
+    
+    case 'OPEN_LIGHTBOX':
+      return { 
+        ...state, 
+        selectedArtworkId: action.payload, 
+        isLightboxOpen: true 
+      }
+    
+    case 'CLOSE_LIGHTBOX':
+      return { 
+        ...state, 
+        isLightboxOpen: false, 
+        selectedArtworkId: null 
+      }
+    
+    case 'SET_LOADING':
+      return { 
+        ...state, 
+        isLoading: action.payload.loading, 
+        loadingMessage: action.payload.message || '' 
+      }
+    
+    case 'SET_ERROR':
+      return { ...state, error: action.payload }
+    
+    case 'CLEAR_ERROR':
+      return { ...state, error: null }
+    
+    case 'SET_PREFERENCE':
+      return { 
+        ...state, 
+        preferences: { 
+          ...state.preferences, 
+          [action.payload.key]: action.payload.value 
+        }
+      }
+    
+    case 'TOGGLE_PREFERENCE':
+      return { 
+        ...state, 
+        preferences: { 
+          ...state.preferences, 
+          [action.payload]: !state.preferences[action.payload]
+        }
+      }
+    
+    case 'RESET':
+      return initialState
+    
+    default:
+      return state
+  }
+}
+
+// Context 생성
+const UIContext = createContext<{
+  state: UIState
+  dispatch: React.Dispatch<UIAction>
+} | undefined>(undefined)
+
+// Provider 컴포넌트
+export function UIProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(uiReducer, initialState)
+  
+  return (
+    <UIContext.Provider value={{ state, dispatch }}>
+      {children}
+    </UIContext.Provider>
+  )
+}
+
+// 커스텀 훅
+function useUIContext() {
+  const context = useContext(UIContext)
+  if (context === undefined) {
+    throw new Error('useUIContext must be used within a UIProvider')
+  }
+  return context
+}
+
+// Zustand와 호환되는 인터페이스를 위한 훅
+export function useUIStore<T>(selector: (state: UIState & UIActions) => T): T {
+  const { state, dispatch } = useUIContext()
+  
+  const actions: UIActions = {
+    setTheme: (theme) => dispatch({ type: 'SET_THEME', payload: theme }),
+    setResolvedTheme: (theme) => dispatch({ type: 'SET_RESOLVED_THEME', payload: theme }),
+    toggleTheme: () => dispatch({ type: 'TOGGLE_THEME' }),
+    setLanguage: (language) => dispatch({ type: 'SET_LANGUAGE', payload: language }),
+    toggleMobileMenu: () => dispatch({ type: 'TOGGLE_MOBILE_MENU' }),
+    closeMobileMenu: () => dispatch({ type: 'CLOSE_MOBILE_MENU' }),
+    toggleSearch: () => dispatch({ type: 'TOGGLE_SEARCH' }),
+    closeSearch: () => dispatch({ type: 'CLOSE_SEARCH' }),
+    setGalleryFilter: (filter) => dispatch({ type: 'SET_GALLERY_FILTER', payload: filter }),
+    resetGalleryFilter: () => dispatch({ type: 'RESET_GALLERY_FILTER' }),
+    setSelectedArtwork: (id) => dispatch({ type: 'SET_SELECTED_ARTWORK', payload: id }),
+    openLightbox: (artworkId) => dispatch({ type: 'OPEN_LIGHTBOX', payload: artworkId }),
+    closeLightbox: () => dispatch({ type: 'CLOSE_LIGHTBOX' }),
+    setLoading: (loading, message) => dispatch({ type: 'SET_LOADING', payload: { loading, message } }),
+    setError: (error) => dispatch({ type: 'SET_ERROR', payload: error }),
+    clearError: () => dispatch({ type: 'CLEAR_ERROR' }),
+    setPreference: (key, value) => dispatch({ type: 'SET_PREFERENCE', payload: { key, value } }),
+    togglePreference: (key) => dispatch({ type: 'TOGGLE_PREFERENCE', payload: key }),
+    reset: () => dispatch({ type: 'RESET' }),
+  }
+  
+  return selector({ ...state, ...actions })
+}
+
+// 액션 인터페이스
+interface UIActions {
+  setTheme: (theme: Theme) => void
+  setResolvedTheme: (theme: 'light' | 'dark') => void
+  toggleTheme: () => void
+  setLanguage: (language: Language) => void
+  toggleMobileMenu: () => void
+  closeMobileMenu: () => void
+  toggleSearch: () => void
+  closeSearch: () => void
+  setGalleryFilter: (filter: Partial<GalleryFilter>) => void
+  resetGalleryFilter: () => void
+  setSelectedArtwork: (id: string | null) => void
+  openLightbox: (artworkId: string) => void
+  closeLightbox: () => void
+  setLoading: (loading: boolean, message?: string) => void
+  setError: (error: string | null) => void
+  clearError: () => void
+  setPreference: <K extends keyof UIState['preferences']>(
+    key: K,
+    value: UIState['preferences'][K]
+  ) => void
+  togglePreference: (
+    key: keyof Omit<UIState['preferences'], 'gridSize'>
+  ) => void
+  reset: () => void
+}
+
+// 선택자 함수들 (성능 최적화)
+export const useTheme = () =>
+  useUIStore((state) => ({
+    theme: state.theme,
+    resolvedTheme: state.resolvedTheme,
+    setTheme: state.setTheme,
+    toggleTheme: state.toggleTheme,
+  }))
+
+export const useLanguage = () =>
+  useUIStore((state) => ({
+    language: state.language,
+    setLanguage: state.setLanguage,
+  }))
+
+export const useNavigation = () =>
+  useUIStore((state) => ({
+    isMobileMenuOpen: state.isMobileMenuOpen,
+    isSearchOpen: state.isSearchOpen,
+    toggleMobileMenu: state.toggleMobileMenu,
+    closeMobileMenu: state.closeMobileMenu,
+    toggleSearch: state.toggleSearch,
+    closeSearch: state.closeSearch,
+  }))
+
+export const useGallery = () =>
+  useUIStore((state) => ({
+    galleryFilter: state.galleryFilter,
+    selectedArtworkId: state.selectedArtworkId,
+    isLightboxOpen: state.isLightboxOpen,
+    setGalleryFilter: state.setGalleryFilter,
+    resetGalleryFilter: state.resetGalleryFilter,
+    setSelectedArtwork: state.setSelectedArtwork,
+    openLightbox: state.openLightbox,
+    closeLightbox: state.closeLightbox,
+  }))
+
+export const useLoading = () =>
+  useUIStore((state) => ({
+    isLoading: state.isLoading,
+    loadingMessage: state.loadingMessage,
+    setLoading: state.setLoading,
+  }))
+
+export const useError = () =>
+  useUIStore((state) => ({
+    error: state.error,
+    setError: state.setError,
+    clearError: state.clearError,
+  }))
+
+export const usePreferences = () =>
+  useUIStore((state) => ({
+    preferences: state.preferences,
+    setPreference: state.setPreference,
+    togglePreference: state.togglePreference,
+  }))
+
+// 사용자 정의 훅 - 시스템 테마 감지
+export const useSystemTheme = () => {
+  const setResolvedTheme = useUIStore((state) => state.setResolvedTheme)
+  const theme = useUIStore((state) => state.theme)
+
+  useEffect(() => {
+    if (theme !== 'system') return
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const handleChange = (e: MediaQueryListEvent) => {
+      setResolvedTheme(e.matches ? 'dark' : 'light')
+    }
+
+    // 초기 설정
+    setResolvedTheme(mediaQuery.matches ? 'dark' : 'light')
+
+    // 리스너 등록
+    mediaQuery.addEventListener('change', handleChange)
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange)
+    }
+  }, [theme, setResolvedTheme])
+}

@@ -158,7 +158,7 @@ export const translations: Record<Locale, Translation> = {
     },
     accessibility: {
       skipToMain: '메인 콘텐츠로 건너뛰기',
-      artworkImage: '{title} - 공경순 작가의 {year}년 서예 작품',
+      artworkImage: '{title} - 배옥영 작가의 {year}년 서예 작품',
       keyboardInstructions: '키보드로 작품을 탐색할 수 있습니다',
       openFilter: '필터 열기',
       closeFilter: '필터 닫기',

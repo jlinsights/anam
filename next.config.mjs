@@ -16,10 +16,7 @@ const nextConfig = {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    quality: 85,
     minimumCacheTTL: 60 * 60 * 24 * 365, // 1년 캐시
-    dangerouslyAllowSVG: false,
-    contentDispositionType: 'attachment',
     domains: [
       "imagedelivery.net",
       // 필요시 다른 외부 도메인도 추가
@@ -49,10 +46,8 @@ const nextConfig = {
     },
   }),
   webpack: (config, { dev, isServer }) => {
+    // 개발 환경에서 안정성을 위한 설정
     if (dev) {
-      // 개발 환경에서 캐시 비활성화로 문제 해결
-      config.cache = false;
-
       config.watchOptions = {
         poll: false,
         ignored: ["**/node_modules/**", "**/.git/**", "**/.next/**"],

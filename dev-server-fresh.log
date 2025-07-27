@@ -1,0 +1,90 @@
+
+> anam-gallery@0.1.0 dev
+> NODE_OPTIONS='--max-old-space-size=4096' next dev --port 3000
+
+   ▲ Next.js 15.4.4
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.213:3000
+   - Environments: .env.local
+   - Experiments (use with caution):
+     ⨯ reactCompiler
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 1872ms
+ ○ Compiling / ...
+ ✓ Compiled / in 3.2s (1679 modules)
+ GET / 200 in 3840ms
+ ✓ Compiled in 867ms (716 modules)
+ GET / 200 in 211ms
+ GET / 200 in 181ms
+ ✓ Compiled in 656ms (716 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 222ms
+ ✓ Compiled in 1424ms (1679 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 384ms
+ ⨯ ./lib/store/ui-store.ts
+Error:   [31mx[0m Expected '>', got 'value'
+     ,-[[36;1;4m/Users/jaehong/Developer/Projects/ANAM/lib/store/ui-store.ts[0m:223:1]
+ [2m220[0m |   const [state, dispatch] = useReducer(uiReducer, initialState)
+ [2m221[0m |   
+ [2m222[0m |   return (
+ [2m223[0m |     <UIContext.Provider value={{ state, dispatch }}>
+     : [35;1m                        ^^^^^[0m
+ [2m224[0m |       {children}
+ [2m225[0m |     </UIContext.Provider>
+ [2m226[0m |   )
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./lib/store/ui-store.ts
+./components/client-layout.tsx
+ ⨯ ./lib/store/ui-store.ts
+Error:   [31mx[0m Expected '>', got 'value'
+     ,-[[36;1;4m/Users/jaehong/Developer/Projects/ANAM/lib/store/ui-store.ts[0m:223:1]
+ [2m220[0m |   const [state, dispatch] = useReducer(uiReducer, initialState)
+ [2m221[0m |   
+ [2m222[0m |   return (
+ [2m223[0m |     <UIContext.Provider value={{ state, dispatch }}>
+     : [35;1m                        ^^^^^[0m
+ [2m224[0m |       {children}
+ [2m225[0m |     </UIContext.Provider>
+ [2m226[0m |   )
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./lib/store/ui-store.ts
+./components/client-layout.tsx
+ ⨯ ./lib/store/ui-store.ts
+Error: 
+
+Caused by:
+    0: Failed to read source code from /Users/jaehong/Developer/Projects/ANAM/lib/store/ui-store.ts
+    1: No such file or directory (os error 2)
+
+Import trace for requested module:
+./lib/store/ui-store.ts
+./components/client-layout.tsx
+ ○ Compiling /_error ...
+ ⨯ ./lib/store/ui-store.ts
+Error: 
+
+Caused by:
+    0: Failed to read source code from /Users/jaehong/Developer/Projects/ANAM/lib/store/ui-store.ts
+    1: No such file or directory (os error 2)
+
+Import trace for requested module:
+./lib/store/ui-store.ts
+./components/client-layout.tsx
+ GET / 500 in 4640ms
+ GET / 500 in 993ms
+ GET / 500 in 11ms
+ GET / 500 in 10ms
+[?25h

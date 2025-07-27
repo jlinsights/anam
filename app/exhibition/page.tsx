@@ -8,7 +8,7 @@ import Link from 'next/link'
 const exhibitionInfo = {
   title: '길',
   titleEn: 'Way',
-  subtitle: '희랑 공경순 개인전',
+      subtitle: '아남 배옥영 개인전',
   subtitleChinese: '熙勆 孔慶順',
   period: '2025.06.18 - 06.24',
   venue: '인사동 한국미술관 2층',
@@ -17,7 +17,7 @@ const exhibitionInfo = {
   closed: '전시 기간 중 무휴',
   admission: '무료',
   artist: {
-    name: '희랑 공경순',
+    name: '아남 배옥영',
     title: '희랑글씨 대표',
     phone: '010-3019-1417',
     email: 'heelang@orientalcalligraphy.org',
@@ -30,7 +30,7 @@ const programs = [
     schedule: '6월 21일(토) 14:00',
     duration: '60분',
     capacity: '30명',
-    description: '희랑 공경순 작가와 함께하는 특별한 대화 시간',
+    description: '아남 배옥영 작가와 함께하는 특별한 대화 시간',
   },
   {
     title: '서예 시연',

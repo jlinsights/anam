@@ -33,13 +33,13 @@ export async function POST(request: NextRequest) {
 
     // 이메일 내용 구성
     const mailOptions = {
-      from: `"희랑 갤러리 문의" <${process.env.SMTP_USER}>`,
+      from: `"아남 갤러리 문의" <${process.env.SMTP_USER}>`,
       to: 'heelang@orientalcalligraphy.org',
-      subject: `[희랑 갤러리 문의] ${validatedData.subject}`,
+              subject: `[아남 갤러리 문의] ${validatedData.subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
-            희랑 갤러리 문의
+            아남 갤러리 문의
           </h2>
           
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
           </div>
           
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6; color: #6c757d; font-size: 14px;">
-            <p>이 메시지는 희랑 갤러리 웹사이트의 문의 폼을 통해 전송되었습니다.</p>
+            <p>이 메시지는 아남 갤러리 웹사이트의 문의 폼을 통해 전송되었습니다.</p>
             <p>전송 시간: ${new Date().toLocaleString('ko-KR', {
               timeZone: 'Asia/Seoul',
             })}</p>

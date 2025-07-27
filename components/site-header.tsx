@@ -30,7 +30,7 @@ export function SiteHeader() {
             aria-hidden='true'
           />
           <span className='font-bold sm:inline-block text-neutral-800 dark:text-neutral-200'>
-            희랑
+            아남
           </span>
         </Link>
         <nav

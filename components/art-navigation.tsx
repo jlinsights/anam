@@ -83,7 +83,7 @@ export function ArtNavigation({
           <Link
             href='/'
             className='flex items-center space-x-3 group focus-art'
-            aria-label='희랑 홈페이지로 이동'
+            aria-label='아남 홈페이지로 이동'
           >
             <Logo
               size='xl'
@@ -187,7 +187,7 @@ export function ArtNavigation({
                   <div className='py-6 border-t border-border/30'>
                     <div className='text-center'>
                       <p className='text-xs text-ink-lighter mb-2'>
-                        희랑 공경순 개인전
+                        아남 배옥영 개인전
                       </p>
                       <p className='text-xs text-ink-lighter'>길 道 WAY</p>
                     </div>

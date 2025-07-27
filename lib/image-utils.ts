@@ -92,9 +92,9 @@ export function generateAltText(
   type: 'artwork' | 'artist'
 ): string {
   if (type === 'artwork') {
-    return `희랑 공경순 작가의 서예 작품 "${title}"`
+    return `아남 배옥영 작가의 서예 작품 "${title}"`
   }
-  return `희랑 공경순 작가 ${title}`
+      return `아남 배옥영 작가 ${title}`
 }
 
 /**

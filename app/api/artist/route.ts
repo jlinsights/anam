@@ -5,8 +5,8 @@ import { NextRequest, NextResponse } from 'next/server'
 function getFallbackArtistData(): Artist {
   return {
     id: 'artist-heelang',
-    name: '희랑 공경순',
-    bio: '희랑 공경순은 현대 한국 서예의 새로운 지평을 열어가는 작가입니다. 전통 서예의 깊은 정신성을 바탕으로 현대적 감각을 접목한 독창적인 작품 세계를 구축하고 있습니다.',
+    name: '아남 배옥영',
+    bio: '아남 배옥영은 현대 한국 서예의 새로운 지평을 열어가는 작가입니다. 전통 서예의 깊은 정신성을 바탕으로 현대적 감각을 접목한 독창적인 작품 세계를 구축하고 있습니다.',
     profileImageUrl: '/images/artist/artist.png',
     email: 'contact@orientalcalligraphy.org',
     phone: '',

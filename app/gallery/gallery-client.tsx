@@ -307,7 +307,7 @@ export default function GalleryClient({
           <PageHeader
             breadcrumb={[{ label: '홈', href: '/' }, { label: '갤러리' }]}
             title='작품 갤러리'
-            subtitle='희랑 공경순의 서예 작품'
+            subtitle='아남 배옥영의 서예 작품'
             description='전통 서예의 정신과 현대적 감각이 어우러진 작품들을 감상해보세요.'
             badge='Gallery'
             variant='default'

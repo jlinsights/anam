@@ -126,7 +126,7 @@ export const translations: Record<Locale, TranslationStructure> = {
     },
     gallery: {
       title: '작품 갤러리',
-      subtitle: '희랑 공경순 작가의 서예 작품을 감상하세요',
+      subtitle: '아남 배옥영 작가의 서예 작품을 감상하세요',
       allArtworks: '전체 작품',
       noResults: '검색 결과가 없습니다',
       searchPlaceholder: '작품명, 년도, 기법으로 검색...',
@@ -181,11 +181,11 @@ export const translations: Record<Locale, TranslationStructure> = {
       reset: '초기화',
     },
     meta: {
-      defaultTitle: '희랑 공경순 개인전 - 길 道',
-      defaultDescription: '희랑 공경순 작가의 현대 서예 개인전. 인생의 여정을 담은 깊이 있는 서예 작품을 온라인으로 감상하세요.',
-      exhibitionTitle: '희랑 공경순 개인전 - 전시',
-      galleryTitle: '희랑 공경순 개인전 - 갤러리',
-      artistTitle: '희랑 공경순 개인전 - 작가',
+          defaultTitle: '아남 배옥영 개인전 - 길 道',
+    defaultDescription: '아남 배옥영 작가의 현대 서예 개인전. 인생의 여정을 담은 깊이 있는 서예 작품을 온라인으로 감상하세요.',
+    exhibitionTitle: '아남 배옥영 개인전 - 전시',
+    galleryTitle: '아남 배옥영 개인전 - 갤러리',
+    artistTitle: '아남 배옥영 개인전 - 작가',
     },
   },
   en: {

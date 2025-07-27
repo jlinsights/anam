@@ -173,7 +173,7 @@ export default function ArtworkDetailModalClient({
               다른 작품들
             </h2>
             <p className='text-slate-600 dark:text-slate-400'>
-              희랑의 다른 작품들을 감상해보세요
+              아남의 다른 작품들을 감상해보세요
             </p>
           </div>
 
