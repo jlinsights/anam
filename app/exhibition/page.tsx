@@ -54,8 +54,8 @@ export default function ExhibitionPage() {
     <div className='min-h-screen bg-paper relative overflow-hidden flex flex-col'>
       {/* Zen Brutalism Foundation Background Effects */}
       <div className='fixed inset-0 pointer-events-none'>
-        <div className='absolute inset-0 zen-breathe-deep opacity-2' />
-        <div className='absolute inset-0 ink-flow-ambient opacity-1' />
+        <div className='absolute inset-0 zen-breathe-deep opacity-20' />
+        <div className='absolute inset-0 ink-flow-ambient opacity-10' />
       </div>
 
       <ArtNavigation />
@@ -85,21 +85,21 @@ export default function ExhibitionPage() {
       <NavigationSpacer />
 
       {/* Main Content */}
-      <main className='section-padding relative z-10 flex-1'>
-        <div className='zen-brutalist-layout'>
+      <main className='container mx-auto px-4 py-8 relative z-10 flex-1'>
+        <div className='max-w-7xl mx-auto'>
 
           {/* Exhibition Details */}
-          <section className='mb-zen-3xl temporal-depth'>
-            <div className='grid md:grid-cols-2 gap-zen-2xl'>
+          <section className='mb-16 temporal-depth'>
+            <div className='grid md:grid-cols-2 gap-12'>
               {/* Date & Venue */}
-              <div className='space-y-zen-xl void-contemplative'>
-                <div className='space-y-zen-lg'>
+              <div className='space-y-8 void-contemplative'>
+                <div className='space-y-6'>
                   <div className='zen-brutalist-card glass-layer-1 zen-hover-scale void-breathing'>
-                    <div className='flex items-start space-x-zen-lg'>
-                      <div className='w-12 h-12 bg-gold/10 rounded-full flex items-center justify-center flex-shrink-0'>
-                        <Calendar className='h-6 w-6 text-gold' />
+                    <div className='flex items-start space-x-4'>
+                      <div className='w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center flex-shrink-0'>
+                        <Calendar className='h-6 w-6 text-yellow-600' />
                       </div>
-                      <div className='space-y-zen-sm'>
+                      <div className='space-y-2'>
                         <h3 className='zen-typography-section text-ink stroke-horizontal'>
                           전시 기간
                         </h3>
