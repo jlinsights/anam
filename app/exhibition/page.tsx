@@ -1,6 +1,7 @@
 import { ArtNavigation, NavigationSpacer } from '@/components/art-navigation'
+import { ZenBrutalistHero } from '@/components/zen-brutalist-hero'
+import { ZenBrutalistFooter } from '@/components/zen-brutalist-footer'
 // import KakaoMap from "@/components/kakao-map";
-import { PageHeader } from '@/components/section-header'
 import { Button } from '@/components/ui/button'
 import { Calendar, Clock, Mail, MapPin, Phone, User } from 'lucide-react'
 import Link from 'next/link'
@@ -8,11 +9,11 @@ import Link from 'next/link'
 const exhibitionInfo = {
   title: '먹, 그리고...',
   titleEn: 'Ink, and...',
-      subtitle: '아남 배옥영 개인전',
+  subtitle: '아남 배옥영 개인전',
   subtitleChinese: '芽南 裵玉永',
-  period: '2025.06.18 - 06.24',
-  venue: '인사동 한국미술관 2층',
-  address: '서울특별시 종로구 인사동길 41-1',
+  period: '2026년 4월 15일(화) ~ 4월 20일(일)',
+  venue: '예술의전당 서울서예박물관 제1전시실',
+  address: '〶06757 서울시 서초구 남부순환로 2406',
   hours: '10:00 - 18:00',
   closed: '전시 기간 중 무휴',
   admission: '무료',
@@ -27,7 +28,7 @@ const exhibitionInfo = {
 const programs = [
   {
     title: '작가와의 만남',
-    schedule: '6월 21일(토) 14:00',
+    schedule: '4월 18일(금) 14:00',
     duration: '60분',
     capacity: '30명',
     description: '아남 배옥영 작가와 함께하는 특별한 대화 시간',
@@ -41,7 +42,7 @@ const programs = [
   },
   {
     title: '갤러리 토크',
-    schedule: '6월 22일(일) 16:00',
+    schedule: '4월 19일(토) 16:00',
     duration: '45분',
     capacity: '20명',
     description: '작품에 담긴 철학과 의미에 대한 깊이 있는 해설',
@@ -50,91 +51,87 @@ const programs = [
 
 export default function ExhibitionPage() {
   return (
-    <div className='min-h-screen bg-background'>
+    <div className='min-h-screen bg-paper relative overflow-hidden flex flex-col'>
+      {/* Zen Brutalism Foundation Background Effects */}
+      <div className='fixed inset-0 pointer-events-none'>
+        <div className='absolute inset-0 zen-breathe-deep opacity-2' />
+        <div className='absolute inset-0 ink-flow-ambient opacity-1' />
+      </div>
+
       <ArtNavigation />
+      
+      {/* Zen Brutalist Hero for Exhibition Page */}
+      <ZenBrutalistHero
+        phase="2"
+        title={{
+          main: exhibitionInfo.title,
+          sub: exhibitionInfo.titleEn,
+          english: exhibitionInfo.subtitle
+        }}
+        description={{
+          primary: "먹을 먹고, 그리고... 인생의 매 순간이 하나의 여정이며",
+          secondary: "붓을 들고 종이 위에 획을 그어나가는 것 또한 그 과정을 만들어가는 것입니다"
+        }}
+        concept="EXHIBITION 2026"
+        navigation={{
+          prev: { href: '/artist', label: '작가 소개' },
+          demo: { href: '/zen-demo', label: 'Zen 체험' }
+        }}
+        variant="fusion"
+        enableInteraction={true}
+        className="min-h-[60vh]"
+      />
+
       <NavigationSpacer />
 
       {/* Main Content */}
-      <main className='section-padding'>
-        <div className='container-art'>
-          {/* Page Header */}
-          <PageHeader
-            breadcrumb={[{ label: '홈', href: '/' }, { label: '전시 정보' }]}
-            title={`${exhibitionInfo.title} (${exhibitionInfo.titleEn})`}
-            subtitle={exhibitionInfo.subtitle}
-            description='먹을 먹고, 그리고... 인생의 매 순간이 하나의 여정이며, 붓을 들고 종이 위에 획을 그어나가는 것 또한 그 과정을 만들어가는 것입니다.'
-            badge='Exhibition'
-            variant='default'
-            size='lg'
-          />
-
-          {/* Exhibition Hero */}
-          <section
-            className='relative overflow-hidden rounded-lg mb-16'
-            style={{
-              backgroundImage: `url('/Images/Artworks/2025/heelang-way-2025-large.jpg')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              height: '400px',
-            }}
-          >
-            <div className='absolute inset-0 bg-black/40 dark:bg-black/60'></div>
-            <div className='relative z-10 h-full flex items-center justify-center'>
-              <div className='text-center space-y-4'>
-                <h2 className='font-display text-4xl lg:text-5xl text-white drop-shadow-lg'>
-                  {exhibitionInfo.title}
-                </h2>
-                <p className='font-english text-xl text-white/90 drop-shadow-md'>
-                  {exhibitionInfo.titleEn}
-                </p>
-                <p className='font-korean text-lg text-white/80 drop-shadow-md'>
-                  {exhibitionInfo.subtitleChinese}
-                </p>
-              </div>
-            </div>
-          </section>
+      <main className='section-padding relative z-10 flex-1'>
+        <div className='zen-brutalist-layout'>
 
           {/* Exhibition Details */}
-          <section className='mb-16'>
-            <div className='grid md:grid-cols-2 gap-12'>
+          <section className='mb-zen-3xl temporal-depth'>
+            <div className='grid md:grid-cols-2 gap-zen-2xl'>
               {/* Date & Venue */}
-              <div className='space-y-8'>
-                <div className='space-y-6'>
-                  <div className='flex items-start space-x-4'>
-                    <div className='w-12 h-12 bg-ink/10 rounded-full flex items-center justify-center flex-shrink-0'>
-                      <Calendar className='h-6 w-6 text-ink-light' />
-                    </div>
-                    <div className='space-y-2'>
-                      <h3 className='font-display text-xl text-ink'>
-                        전시 기간
-                      </h3>
-                      <div className='flex items-center space-x-3 text-lg'>
-                        <span className='font-body text-ink-light'>
-                          {exhibitionInfo.period}
-                        </span>
+              <div className='space-y-zen-xl void-contemplative'>
+                <div className='space-y-zen-lg'>
+                  <div className='zen-brutalist-card glass-layer-1 zen-hover-scale void-breathing'>
+                    <div className='flex items-start space-x-zen-lg'>
+                      <div className='w-12 h-12 bg-gold/10 rounded-full flex items-center justify-center flex-shrink-0'>
+                        <Calendar className='h-6 w-6 text-gold' />
                       </div>
-                      <p className='font-body text-sm text-ink-light'>
-                        {exhibitionInfo.closed}
-                      </p>
+                      <div className='space-y-zen-sm'>
+                        <h3 className='zen-typography-section text-ink stroke-horizontal'>
+                          전시 기간
+                        </h3>
+                        <div className='flex items-center space-x-zen-sm'>
+                          <span className='zen-typography-body text-ink-light'>
+                            {exhibitionInfo.period}
+                          </span>
+                        </div>
+                        <p className='zen-typography-body text-ink-light text-sm void-minimal'>
+                          {exhibitionInfo.closed}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className='flex items-start space-x-4'>
-                    <div className='w-12 h-12 bg-ink/10 rounded-full flex items-center justify-center flex-shrink-0'>
-                      <MapPin className='h-6 w-6 text-ink-light' />
-                    </div>
-                    <div className='space-y-2'>
-                      <h3 className='font-display text-xl text-ink'>
-                        전시 장소
-                      </h3>
-                      <div className='space-y-1'>
-                        <p className='font-body text-ink-light'>
-                          {exhibitionInfo.venue}
-                        </p>
-                        <p className='font-body text-sm text-ink-light'>
-                          {exhibitionInfo.address}
-                        </p>
+                  <div className='zen-brutalist-card glass-layer-1 zen-hover-scale void-breathing'>
+                    <div className='flex items-start space-x-zen-lg'>
+                      <div className='w-12 h-12 bg-gold/10 rounded-full flex items-center justify-center flex-shrink-0'>
+                        <MapPin className='h-6 w-6 text-gold' />
+                      </div>
+                      <div className='space-y-zen-sm'>
+                        <h3 className='zen-typography-section text-ink stroke-horizontal'>
+                          전시 장소
+                        </h3>
+                        <div className='space-y-zen-xs'>
+                          <p className='zen-typography-body text-ink-light'>
+                            {exhibitionInfo.venue}
+                          </p>
+                          <p className='zen-typography-body text-ink-light text-sm void-minimal'>
+                            {exhibitionInfo.address}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -142,53 +139,57 @@ export default function ExhibitionPage() {
               </div>
 
               {/* Hours & Contact */}
-              <div className='space-y-8'>
-                <div className='space-y-6'>
-                  <div className='flex items-start space-x-4'>
-                    <div className='w-12 h-12 bg-ink/10 rounded-full flex items-center justify-center flex-shrink-0'>
-                      <Clock className='h-6 w-6 text-ink-light' />
-                    </div>
-                    <div className='space-y-2'>
-                      <h3 className='font-display text-xl text-ink'>
-                        관람 시간
-                      </h3>
-                      <div className='flex items-center space-x-3'>
-                        <span className='font-body text-ink-light'>
-                          {exhibitionInfo.hours}
-                        </span>
+              <div className='space-y-zen-xl void-contemplative'>
+                <div className='space-y-zen-lg'>
+                  <div className='zen-brutalist-card glass-layer-1 zen-hover-scale void-breathing'>
+                    <div className='flex items-start space-x-zen-lg'>
+                      <div className='w-12 h-12 bg-gold/10 rounded-full flex items-center justify-center flex-shrink-0'>
+                        <Clock className='h-6 w-6 text-gold' />
                       </div>
-                      <p className='font-body text-sm text-ink-light'>
-                        입장료: {exhibitionInfo.admission}
-                      </p>
+                      <div className='space-y-zen-sm'>
+                        <h3 className='zen-typography-section text-ink stroke-horizontal'>
+                          관람 시간
+                        </h3>
+                        <div className='flex items-center space-x-zen-sm'>
+                          <span className='zen-typography-body text-ink-light'>
+                            {exhibitionInfo.hours}
+                          </span>
+                        </div>
+                        <p className='zen-typography-body text-ink-light text-sm void-minimal'>
+                          입장료: {exhibitionInfo.admission}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className='flex items-start space-x-4'>
-                    <div className='w-12 h-12 bg-ink/10 rounded-full flex items-center justify-center flex-shrink-0'>
-                      <User className='h-6 w-6 text-ink-light' />
-                    </div>
-                    <div className='space-y-2'>
-                      <h3 className='font-display text-xl text-ink'>
-                        작가 정보
-                      </h3>
-                      <div className='space-y-2'>
-                        <p className='font-body text-ink'>
-                          {exhibitionInfo.artist.name}
-                        </p>
-                        <p className='font-body text-sm text-ink-light'>
-                          {exhibitionInfo.artist.title}
-                        </p>
-                        <div className='flex items-center space-x-3'>
-                          <Phone className='h-4 w-4 text-ink-light' />
-                          <span className='font-body text-ink-light'>
-                            {exhibitionInfo.artist.phone}
-                          </span>
-                        </div>
-                        <div className='flex items-center space-x-3'>
-                          <Mail className='h-4 w-4 text-ink-light' />
-                          <span className='font-body text-ink-light'>
-                            {exhibitionInfo.artist.email}
-                          </span>
+                  <div className='zen-brutalist-card glass-layer-1 zen-hover-scale void-breathing'>
+                    <div className='flex items-start space-x-zen-lg'>
+                      <div className='w-12 h-12 bg-gold/10 rounded-full flex items-center justify-center flex-shrink-0'>
+                        <User className='h-6 w-6 text-gold' />
+                      </div>
+                      <div className='space-y-zen-sm'>
+                        <h3 className='zen-typography-section text-ink stroke-horizontal'>
+                          작가 정보
+                        </h3>
+                        <div className='space-y-zen-sm'>
+                          <p className='zen-typography-body text-ink'>
+                            {exhibitionInfo.artist.name}
+                          </p>
+                          <p className='zen-typography-body text-ink-light text-sm void-minimal'>
+                            {exhibitionInfo.artist.title}
+                          </p>
+                          <div className='flex items-center space-x-zen-sm'>
+                            <Phone className='h-4 w-4 text-gold' />
+                            <span className='zen-typography-body text-ink-light text-sm'>
+                              {exhibitionInfo.artist.phone}
+                            </span>
+                          </div>
+                          <div className='flex items-center space-x-zen-sm'>
+                            <Mail className='h-4 w-4 text-gold' />
+                            <span className='zen-typography-body text-ink-light text-sm'>
+                              {exhibitionInfo.artist.email}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -199,37 +200,43 @@ export default function ExhibitionPage() {
           </section>
 
           {/* Programs */}
-          <section className='mb-16'>
-            <h2 className='font-display text-3xl text-ink text-center mb-12'>
+          <section className='mb-zen-3xl cultural-context'>
+            <h2 className='zen-typography-display text-ink text-center mb-zen-3xl stroke-press'>
               특별 프로그램
             </h2>
 
-            <div className='grid md:grid-cols-3 gap-8'>
+            <div className='grid md:grid-cols-3 gap-zen-xl temporal-depth'>
               {programs.map((program, index) => (
                 <div
                   key={index}
-                  className='bg-paper/50 rounded-lg p-6 border border-border/30 hover:shadow-lg transition-shadow'
+                  className='zen-brutalist-card glass-layer-2 zen-hover-scale void-breathing'
                 >
-                  <h3 className='font-display text-xl text-ink mb-4'>
+                  <h3 className='zen-typography-section text-ink stroke-horizontal mb-zen-lg'>
                     {program.title}
                   </h3>
-                  <div className='space-y-3 text-sm'>
-                    <div className='flex items-center space-x-2'>
-                      <Calendar className='h-4 w-4 text-ink-light' />
-                      <span className='text-ink-light'>{program.schedule}</span>
+                  <div className='space-y-zen-md'>
+                    <div className='flex items-center space-x-zen-sm'>
+                      <div className='p-zen-xs bg-gold/10 rounded-lg'>
+                        <Calendar className='h-4 w-4 text-gold' />
+                      </div>
+                      <span className='zen-typography-body text-ink-light'>{program.schedule}</span>
                     </div>
-                    <div className='flex items-center space-x-2'>
-                      <Clock className='h-4 w-4 text-ink-light' />
-                      <span className='text-ink-light'>{program.duration}</span>
+                    <div className='flex items-center space-x-zen-sm'>
+                      <div className='p-zen-xs bg-gold/10 rounded-lg'>
+                        <Clock className='h-4 w-4 text-gold' />
+                      </div>
+                      <span className='zen-typography-body text-ink-light'>{program.duration}</span>
                     </div>
-                    <div className='flex items-center space-x-2'>
-                      <User className='h-4 w-4 text-ink-light' />
-                      <span className='text-ink-light'>
+                    <div className='flex items-center space-x-zen-sm'>
+                      <div className='p-zen-xs bg-gold/10 rounded-lg'>
+                        <User className='h-4 w-4 text-gold' />
+                      </div>
+                      <span className='zen-typography-body text-ink-light'>
                         정원: {program.capacity}
                       </span>
                     </div>
                   </div>
-                  <p className='text-ink-light mt-4 text-sm leading-relaxed'>
+                  <p className='zen-typography-body text-ink-light mt-zen-lg leading-relaxed void-minimal'>
                     {program.description}
                   </p>
                 </div>
@@ -238,43 +245,44 @@ export default function ExhibitionPage() {
           </section>
 
           {/* Map */}
-          <section className='mb-16'>
-            <h2 className='font-display text-3xl text-ink text-center mb-12'>
+          <section className='mb-zen-3xl cultural-context'>
+            <h2 className='zen-typography-display text-ink text-center mb-zen-3xl stroke-press'>
               오시는 길
             </h2>
-            <div className='bg-paper/50 rounded-lg p-6 border border-border/30'>
+            <div className='zen-brutalist-card glass-layer-1 zen-hover-scale void-breathing'>
               {/* <KakaoMap
                 latitude={37.5735}
                 longitude={126.9854}
-                placeName="인사동 한국미술관"
-                address="서울특별시 종로구 인사동길 41-1"
+                placeName="서예박물관"
+                address="서울특별시 종로구 계동길 84"
               /> */}
-              <div className='mt-6 text-center'>
-                <p className='text-ink-light mb-2'>{exhibitionInfo.address}</p>
-                <p className='text-sm text-ink-light'>
-                  지하철 3호선 안국역 6번 출구에서 도보 5분
+              <div className='text-center temporal-depth'>
+                <p className='zen-typography-body text-ink-light mb-zen-sm'>{exhibitionInfo.address}</p>
+                <p className='zen-typography-body text-ink-light text-sm void-minimal'>
+                  지하철 2호선 서초역 5번 출구에서 도보 10분<br />
+                  지하철 3호선 남부터미널역 5번 출구에서 도보 15분
                 </p>
               </div>
             </div>
           </section>
 
           {/* Call to Action */}
-          <section className='text-center'>
-            <div className='bg-ink/5 rounded-lg p-8 border border-border/30'>
-              <h3 className='font-display text-2xl text-ink mb-4'>
+          <section className='text-center void-contemplative'>
+            <div className='zen-brutalist-card glass-layer-2 zen-hover-scale cultural-context'>
+              <h3 className='zen-typography-hero text-ink stroke-press mb-zen-lg'>
                 전시 관람 예약
               </h3>
-              <p className='text-ink-light mb-6'>
+              <p className='zen-typography-body text-ink-light mb-zen-2xl void-breathing'>
                 더 나은 관람 경험을 위해 사전 예약을 권장합니다.
               </p>
-              <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-                <Button asChild className='btn-art'>
+              <div className='flex flex-col sm:flex-row gap-zen-lg justify-center'>
+                <Button asChild className='btn-art px-zen-xl py-zen-lg brutal-shadow zen-hover-scale'>
                   <Link href='/contact'>관람 예약하기</Link>
                 </Button>
                 <Button
                   asChild
                   variant='outline'
-                  className='border-ink/20 text-ink hover:bg-ink/5'
+                  className='btn-art-outline px-zen-xl py-zen-lg zen-hover-scale'
                 >
                   <Link href='/gallery'>작품 미리보기</Link>
                 </Button>
@@ -283,6 +291,13 @@ export default function ExhibitionPage() {
           </section>
         </div>
       </main>
+
+      {/* Zen Brutalist Footer */}
+      <ZenBrutalistFooter 
+        variant="fusion" 
+        showPhaseNavigation={true} 
+        enableInteraction={true}
+      />
     </div>
   )
 }
