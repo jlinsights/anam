@@ -150,19 +150,19 @@ export const fallbackArtworksData: Artwork[] = [
   {
     id: '21',
     slug: 'anam-way-2025',
-    title: '길 (Way)',
+    title: '먹, 그리고...',
     year: 2025,
     medium: '화선지에 먹 (Ink on Mulberry Paper)',
     dimensions: '140 x 70 cm',
     aspectRatio: '2/1',
-    description: '인생의 길, 예술의 길에 대한 깊은 사유를 담은 작품입니다.',
+    description: '먹을 먹고, 그리고... 인생의 다양한 순간들을 담은 작품입니다.',
     imageUrl: getArtworkImageUrl('anam-way-2025', 2025, 'medium'),
     imageUrlQuery: 'way path life journey calligraphy',
-    artistNote: '올바른 길에 대한 끊임없는 탐구와 성찰의 과정을 표현했습니다.',
+    artistNote: '먹을 먹고, 그리고... 그 순간의 감정과 생각을 표현했습니다.',
     featured: true,
     category: 'recent',
     available: true,
-    tags: ['길', '인생', '예술', '탐구'],
+    tags: ['먹', '인생', '예술', '탐구'],
   },
 
   // 2024년 작품

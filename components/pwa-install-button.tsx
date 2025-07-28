@@ -59,11 +59,11 @@ export function PWAInstallButton() {
             <FadeInContainer>
               <div className='text-center space-y-3'>
                 <div className='w-16 h-16 bg-ink rounded-2xl flex items-center justify-center mx-auto'>
-                  <span className='text-white font-display text-xl'>길</span>
+                  <span className='text-white font-display text-xl'>먹, 그리고...</span>
                 </div>
                 <div>
                   <h3 className='font-display text-xl text-ink'>
-                    길 - 아남 배옥영 개인전
+                    먹, 그리고... - 아남 배옥영 개인전
                   </h3>
                   <p className='text-sm text-ink-light mt-1'>
                     언제든지 쉽게 작품을 감상하세요

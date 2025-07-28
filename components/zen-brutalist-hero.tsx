@@ -1,9 +1,12 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
+import type { Artwork } from '@/lib/types'
 
 interface ZenBrutalistHeroProps {
   phase: '1' | '2' | '3'
@@ -25,6 +28,8 @@ interface ZenBrutalistHeroProps {
   variant?: 'zen' | 'brutal' | 'fusion'
   enableInteraction?: boolean
   className?: string
+  backgroundArtworks?: Artwork[]
+  showImageCarousel?: boolean
 }
 
 export function ZenBrutalistHero({
@@ -35,10 +40,13 @@ export function ZenBrutalistHero({
   navigation,
   variant = 'fusion',
   enableInteraction = true,
-  className
+  className,
+  backgroundArtworks = [],
+  showImageCarousel = false
 }: ZenBrutalistHeroProps) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isHovered, setIsHovered] = useState(false)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const heroRef = useRef<HTMLDivElement>(null)
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
@@ -50,6 +58,31 @@ export function ZenBrutalistHero({
     
     setMousePosition({ x, y })
   }, [enableInteraction])
+
+  // Image carousel functionality
+  useEffect(() => {
+    if (showImageCarousel && backgroundArtworks.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentImageIndex((prev) => (prev + 1) % backgroundArtworks.length)
+      }, 6000)
+
+      return () => clearInterval(interval)
+    }
+  }, [showImageCarousel, backgroundArtworks.length])
+
+  const nextImage = () => {
+    if (backgroundArtworks.length > 1) {
+      setCurrentImageIndex((prev) => (prev + 1) % backgroundArtworks.length)
+    }
+  }
+
+  const prevImage = () => {
+    if (backgroundArtworks.length > 1) {
+      setCurrentImageIndex(
+        (prev) => (prev - 1 + backgroundArtworks.length) % backgroundArtworks.length
+      )
+    }
+  }
 
   // Phase-specific styling
   const phaseStyles = {
@@ -127,6 +160,84 @@ export function ZenBrutalistHero({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Background Image Carousel */}
+      {showImageCarousel && backgroundArtworks.length > 0 && (
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="relative w-full h-full">
+            {/* Current Background Image */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
+              style={{
+                backgroundImage: `url(${backgroundArtworks[currentImageIndex]?.image || backgroundArtworks[currentImageIndex]?.thumbnail})`,
+                opacity: 0.1
+              }}
+            />
+            
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-paper/95 via-paper/90 to-paper/95" />
+            
+            {/* Image Navigation Controls */}
+            <div className="absolute bottom-zen-lg right-zen-lg flex items-center space-x-zen-sm pointer-events-auto">
+              <button
+                onClick={prevImage}
+                disabled={backgroundArtworks.length <= 1}
+                className={cn(
+                  'w-10 h-10 rounded-full flex items-center justify-center',
+                  'bg-ink/10 hover:bg-ink/20 backdrop-blur-sm transition-all',
+                  'disabled:opacity-30 disabled:cursor-not-allowed'
+                )}
+              >
+                <ChevronLeft className="w-4 h-4 text-ink" />
+              </button>
+              
+              <button
+                onClick={nextImage}
+                disabled={backgroundArtworks.length <= 1}
+                className={cn(
+                  'w-10 h-10 rounded-full flex items-center justify-center',
+                  'bg-ink/10 hover:bg-ink/20 backdrop-blur-sm transition-all',
+                  'disabled:opacity-30 disabled:cursor-not-allowed'
+                )}
+              >
+                <ChevronRight className="w-4 h-4 text-ink" />
+              </button>
+            </div>
+            
+            {/* Image Indicators */}
+            {backgroundArtworks.length > 1 && (
+              <div className="absolute bottom-zen-lg left-zen-lg flex space-x-zen-xs pointer-events-auto">
+                {backgroundArtworks.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={cn(
+                      'w-2 h-2 rounded-full transition-all duration-300',
+                      index === currentImageIndex 
+                        ? 'bg-ink/80 w-6' 
+                        : 'bg-ink/30 hover:bg-ink/50'
+                    )}
+                  />
+                ))}
+              </div>
+            )}
+            
+            {/* Artwork Info */}
+            {backgroundArtworks[currentImageIndex] && (
+              <div className="absolute bottom-zen-lg left-1/2 transform -translate-x-1/2">
+                <div className="bg-ink/10 backdrop-blur-sm rounded-xl px-zen-md py-zen-sm">
+                  <p className="text-xs text-ink/70 text-center">
+                    {backgroundArtworks[currentImageIndex].title}
+                    {backgroundArtworks[currentImageIndex].year && (
+                      <span className="ml-zen-xs">({backgroundArtworks[currentImageIndex].year})</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Dynamic Background Effects */}
       {enableInteraction && (
         <div 

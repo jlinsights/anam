@@ -5,25 +5,25 @@ import GalleryClient from './gallery-client'
 export const dynamic = 'force-static' // can be revalidated via tag
 
 export const metadata: Metadata = {
-      title: '갤러리 | 아남 배옥영 개인전 | 길',
+      title: '갤러리 | 아남 배옥영 개인전 | 먹, 그리고...',
   description:
-          "아남 배옥영 작가의 서예 작품을 감상하세요. '길'을 주제로 한 현대 서예 작품을 온라인으로 만나보실 수 있습니다.",
+          "아남 배옥영 작가의 서예 작품을 감상하세요. '먹, 그리고...'를 주제로 한 현대 서예 작품을 온라인으로 만나보실 수 있습니다.",
   keywords: [
     '갤러리',
     '서예 작품',
           '아남 배옥영',
     '현대서예',
     '한국서예',
-    '길',
+    '먹, 그리고...',
     'calligraphy gallery',
     'korean art',
-    'way',
+    'eat-and',
   ],
   openGraph: {
     title: '갤러리 | 아남 배옥영 개인전',
     description: '현대 서예 작품 컬렉션',
     url: '/gallery',
-    siteName: '길 (Way) 展',
+    siteName: '먹, 그리고... 展',
     type: 'website',
     locale: 'ko_KR',
   },

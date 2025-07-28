@@ -181,7 +181,7 @@ export const translations: Record<Locale, TranslationStructure> = {
       reset: '초기화',
     },
     meta: {
-          defaultTitle: '아남 배옥영 개인전 - 길 道',
+          defaultTitle: '아남 배옥영 개인전 - 먹, 그리고...',
     defaultDescription: '아남 배옥영 작가의 현대 서예 개인전. 인생의 여정을 담은 깊이 있는 서예 작품을 온라인으로 감상하세요.',
     exhibitionTitle: '아남 배옥영 개인전 - 전시',
     galleryTitle: '아남 배옥영 개인전 - 갤러리',
@@ -219,7 +219,7 @@ export const translations: Record<Locale, TranslationStructure> = {
     },
     gallery: {
       title: 'Artwork Gallery',
-      subtitle: 'Explore the calligraphy works of Artist HeeRang Kong Kyung Soon',
+      subtitle: 'Explore the calligraphy works of Artist Anam Bae Ok Young',
       allArtworks: 'All Artworks',
       noResults: 'No results found',
       searchPlaceholder: 'Search by title, year, medium...',
@@ -274,11 +274,11 @@ export const translations: Record<Locale, TranslationStructure> = {
       reset: 'Reset',
     },
     meta: {
-      defaultTitle: 'HeeRang Kong Kyung Soon Solo Exhibition - The Way 道',
-      defaultDescription: 'Solo exhibition of contemporary calligraphy by artist HeeRang Kong Kyung Soon. Experience profound calligraphy works depicting the journey of life online.',
-      exhibitionTitle: 'HeeRang Kong Kyung Soon Solo Exhibition - Exhibition',
-      galleryTitle: 'HeeRang Kong Kyung Soon Solo Exhibition - Gallery',
-      artistTitle: 'HeeRang Kong Kyung Soon Solo Exhibition - Artist',
+      defaultTitle: 'Anam Bae Ok Young Solo Exhibition - Ink, and...',
+      defaultDescription: 'Solo exhibition of contemporary calligraphy by artist Anam Bae Ok Young. Experience profound calligraphy works depicting the journey of life online.',
+      exhibitionTitle: 'Anam Bae Ok Young Solo Exhibition - Exhibition',
+      galleryTitle: 'Anam Bae Ok Young Solo Exhibition - Gallery',
+      artistTitle: 'Anam Bae Ok Young Solo Exhibition - Artist',
     },
   },
   ja: {

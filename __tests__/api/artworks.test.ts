@@ -56,7 +56,7 @@ describe('/api/artworks', () => {
       expect(data.success).toBe(true)
       expect(data.data).toBeTruthy()
       expect(data.data.slug).toBe('way-dao')
-      expect(data.data.title).toBe('길 道')
+      expect(data.data.title).toBe('먹, 그리고...')
     })
 
     it('존재하지 않는 slug 조회 시 null을 반환해야 한다', async () => {

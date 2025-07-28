@@ -6,8 +6,8 @@ import { Calendar, Clock, Mail, MapPin, Phone, User } from 'lucide-react'
 import Link from 'next/link'
 
 const exhibitionInfo = {
-  title: '길',
-  titleEn: 'Way',
+  title: '먹, 그리고...',
+  titleEn: 'Ink, and...',
       subtitle: '아남 배옥영 개인전',
   subtitleChinese: '芽南 裵玉永',
   period: '2025.06.18 - 06.24',
@@ -62,7 +62,7 @@ export default function ExhibitionPage() {
             breadcrumb={[{ label: '홈', href: '/' }, { label: '전시 정보' }]}
             title={`${exhibitionInfo.title} (${exhibitionInfo.titleEn})`}
             subtitle={exhibitionInfo.subtitle}
-            description='인생의 매 순간이 하나의 길이며, 붓을 들고 종이 위에 획을 그어나가는 것 또한 길을 만들어가는 과정입니다.'
+            description='먹을 먹고, 그리고... 인생의 매 순간이 하나의 여정이며, 붓을 들고 종이 위에 획을 그어나가는 것 또한 그 과정을 만들어가는 것입니다.'
             badge='Exhibition'
             variant='default'
             size='lg'

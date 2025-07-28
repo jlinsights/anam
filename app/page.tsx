@@ -5,6 +5,8 @@ import { ArtworkGrid } from '@/components/artwork-card'
 import { SectionHeader } from '@/components/section-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { ZenBrutalistHero } from '@/components/zen-brutalist-hero'
+import { ZenBrutalistFooter } from '@/components/zen-brutalist-footer'
 import type { Artwork } from '@/lib/types'
 import {
   ArrowRight,
@@ -17,238 +19,29 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-// 히어로 섹션 컴포넌트
-function HeroSection() {
-  const [featuredArtworks, setFeaturedArtworks] = useState<Artwork[]>([])
-  const [loading, setLoading] = useState(true)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-
-  useEffect(() => {
-    async function loadFeaturedArtworks() {
-      try {
-        // 먼저 fallback 데이터 로드
-        const { fallbackArtworksData } = await import('@/lib/artworks')
-        const fallbackFeatured = fallbackArtworksData
-          .filter((artwork) => artwork.featured)
-          .slice(0, 6)
-
-        const initialArtworks =
-          fallbackFeatured.length > 0
-            ? fallbackFeatured
-            : fallbackArtworksData.slice(0, 6)
-
-        setFeaturedArtworks(initialArtworks)
-        setLoading(false)
-
-        // Airtable 데이터 로드 시도
-        const { getFeaturedArtworks } = await import('@/lib/artworks')
-        const airtableArtworks = await getFeaturedArtworks(6)
-
-        if (airtableArtworks && airtableArtworks.length > 0) {
-          setFeaturedArtworks(airtableArtworks)
-        }
-      } catch (error) {
-        console.error('Failed to load data:', error)
-        setLoading(false)
-      }
-    }
-
-    loadFeaturedArtworks()
-  }, [])
-
-  useEffect(() => {
-    if (featuredArtworks.length > 0) {
-      const interval = setInterval(() => {
-        setCurrentImageIndex((prev) => (prev + 1) % featuredArtworks.length)
-      }, 8000)
-
-      return () => clearInterval(interval)
-    }
-  }, [featuredArtworks.length])
-
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % featuredArtworks.length)
-  }
-
-  const prevImage = () => {
-    setCurrentImageIndex(
-      (prev) => (prev - 1 + featuredArtworks.length) % featuredArtworks.length
-    )
-  }
-
-  if (loading || featuredArtworks.length === 0) {
-    return (
-      <section className='relative min-h-screen flex items-center justify-center bg-gradient-zen'>
-        <div className='absolute inset-0 bg-ink/10' />
-        <div className='relative z-10 text-center'>
-          <div className='animate-pulse space-y-6'>
-            <div className='w-32 h-32 bg-ink/20 rounded-full mx-auto' />
-            <div className='h-8 bg-ink/20 rounded w-64 mx-auto' />
-            <div className='h-4 bg-ink/20 rounded w-96 mx-auto' />
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  const currentArtwork = featuredArtworks[currentImageIndex]
-
+// Zen Brutalist Hero Section for Main Page
+function MainPageHero() {
   return (
-    <section className='relative min-h-screen flex items-center justify-center overflow-hidden'>
-      {/* 배경 이미지 */}
-      <div className='absolute inset-0'>
-        {featuredArtworks.map((artwork, index) => (
-          <div
-            key={artwork.id}
-            className={`absolute inset-0 transition-all duration-2000 ease-in-out ${
-              index === currentImageIndex
-                ? 'opacity-100 scale-100'
-                : 'opacity-0 scale-105'
-            }`}
-          >
-            {artwork.imageUrl && (
-              <Image
-                src={artwork.imageUrl}
-                alt={artwork.title}
-                fill
-                className={`object-cover transition-transform duration-8000 ease-linear ${
-                  index === currentImageIndex ? 'scale-110' : 'scale-100'
-                }`}
-                priority={index === 0}
-                style={{
-                  filter:
-                    index === currentImageIndex
-                      ? 'brightness(0.7) contrast(1.1) saturate(1.1)'
-                      : 'brightness(0.5) contrast(1.0) saturate(1.0)',
-                  transition: 'filter 2s ease-in-out, transform 8s ease-out',
-                }}
-              />
-            )}
-          </div>
-        ))}
-
-        {/* 오버레이 */}
-        <div className='absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/60' />
-        <div className='absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/20' />
-      </div>
-
-      {/* 네비게이션 컨트롤 */}
-      <div className='absolute inset-x-0 top-1/2 -translate-y-1/2 z-20 flex justify-between px-6 md:px-12'>
-        <Button
-          variant='ghost'
-          size='lg'
-          onClick={prevImage}
-          className='glass-strong hover:bg-white/20 text-white border-white/30 hover:border-white/50 transition-all duration-500 hover:scale-110 focus-art'
-          aria-label='이전 이미지'
-        >
-          <ChevronLeft className='h-6 w-6 transition-transform duration-300 hover:scale-125' />
-        </Button>
-        <Button
-          variant='ghost'
-          size='lg'
-          onClick={nextImage}
-          className='glass-strong hover:bg-white/20 text-white border-white/30 hover:border-white/50 transition-all duration-500 hover:scale-110 focus-art'
-          aria-label='다음 이미지'
-        >
-          <ChevronRight className='h-6 w-6 transition-transform duration-300 hover:scale-125' />
-        </Button>
-      </div>
-
-      {/* 인디케이터 */}
-      <div className='absolute bottom-8 left-1/2 -translate-x-1/2 z-20'>
-        <div className='glass-strong rounded-full px-4 py-2 border border-white/20'>
-          <div className='flex space-x-2'>
-            {featuredArtworks.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentImageIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all duration-700 hover:scale-150 focus-art ${
-                  index === currentImageIndex
-                    ? 'bg-white shadow-lg scale-125'
-                    : 'bg-white/50 hover:bg-white/75'
-                }`}
-                aria-label={`이미지 ${index + 1}로 이동`}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* 히어로 콘텐츠 */}
-      <div className='relative z-10 text-center text-white px-4 container-art'>
-        <div className='animate-brush-in'>
-          {/* 상단 영문 타이틀 */}
-          <div className='mb-8 md:mb-12'>
-            <p className='text-xs md:text-sm text-white/60 tracking-[0.3em] uppercase text-shadow-soft mb-2 hover:text-white/80 transition-colors duration-700'>
-              Contemporary Calligraphy Solo Exhibition
-            </p>
-            <p className='text-xs md:text-sm text-white/50 tracking-wide text-shadow-soft hover:text-white/70 transition-colors duration-700'>
-              @heelang_calligraphy
-            </p>
-          </div>
-
-          {/* 메인 타이틀 */}
-          <div className='mb-12 md:mb-16 hover-scale'>
-            <h1 className='font-display text-6xl md:text-8xl lg:text-9xl font-bold mb-6 tracking-wider text-shadow-strong hover:text-shadow-glow transition-all duration-1000'>
-              길 道
-            </h1>
-            <p className='font-display text-2xl md:text-4xl lg:text-5xl font-light tracking-[0.2em] text-white/90 text-shadow-medium hover:text-white hover:tracking-[0.25em] transition-all duration-1000'>
-              WAY
-            </p>
-          </div>
-
-          {/* 서브타이틀 */}
-          <div className='mb-12'>
-            <p className='text-lg md:text-xl lg:text-2xl text-white/80 mb-8 text-shadow-medium hover:text-white/95 transition-colors duration-700'>
-              아남 배옥영 개인전
-            </p>
-
-            {/* 전시 정보 카드 */}
-            <Card className='glass-strong border-white/20 max-w-md mx-auto hover:bg-white/10 hover:border-white/30 hover-lift'>
-              <CardContent className='p-6 space-y-4'>
-                <div className='flex items-center justify-center space-x-2 text-white/90'>
-                  <Calendar className='w-4 h-4' />
-                  <span className='font-medium'>2025년 6월 18일 - 24일</span>
-                </div>
-                <p className='text-sm text-white/70'>오전 10시 - 오후 6시</p>
-
-                <div className='w-12 h-px bg-white/30 mx-auto' />
-
-                <div className='flex items-center justify-center space-x-2 text-white/90'>
-                  <MapPin className='w-4 h-4' />
-                  <span className='font-medium'>인사동 한국미술관 2층</span>
-                </div>
-                <p className='text-xs text-white/70'>
-                  후원: 사단법인 동양서예협회
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* CTA 버튼 */}
-          <div className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
-            <Button
-              asChild
-              size='lg'
-              className='btn-art bg-white text-ink hover:bg-white/90'
-            >
-              <Link href='/gallery'>
-                작품 감상하기
-                <ArrowRight className='ml-2 h-4 w-4' />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant='outline'
-              size='lg'
-              className='btn-art-outline border-white text-white hover:bg-white hover:text-ink'
-            >
-              <Link href='/exhibition'>전시 정보</Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    </section>
+    <ZenBrutalistHero
+      phase="1"
+      title={{
+        main: "먹, 그리고...",
+        sub: "INK, AND...",
+        english: "Contemporary Calligraphy Solo Exhibition"
+      }}
+      description={{
+        primary: "아남 배옥영 개인전",
+        secondary: "전통 서예의 정신과 현대적 감각이 어우러진 혁신적인 디지털 갤러리"
+      }}
+      concept="ZEN BRUTALISM FOUNDATION"
+      navigation={{
+        demo: { href: '/zen-demo', label: 'Zen 체험' },
+        next: { href: '/gallery', label: '갤러리' }
+      }}
+      variant="fusion"
+      enableInteraction={true}
+      className="min-h-screen"
+    />
   )
 }
 
@@ -301,42 +94,58 @@ function FeaturedWorksSection() {
   }, [])
 
   return (
-    <section className='section-padding bg-background'>
-      <div className='container-art'>
-        <SectionHeader
-          badge='Featured Works'
-          title='대표 작품'
-          subtitle='문방사우와 서예의 조화'
-          description='전통 서예의 정신과 현대적 감각이 어우러진 아남 작가의 대표작들을 만나보세요.'
-          variant='centered'
-          size='lg'
-          action={{
-            label: '전체 작품 보기',
-            href: '/gallery',
-            variant: 'outline',
-          }}
-        />
+    <section className='section-padding bg-paper zen-breathe-deep'>
+      <div className='zen-brutalist-layout'>
+        <div className='text-center mb-zen-3xl'>
+          <span className='brutal-typography-accent text-gold text-sm uppercase tracking-wider mb-zen-md block'>
+            Featured Works
+          </span>
+          <h2 className='zen-typography-section text-ink mb-zen-lg stroke-horizontal'>
+            대표 작품
+          </h2>
+          <p className='zen-typography-hero text-ink-light mb-zen-lg'>
+            문방사우와 서예의 조화
+          </p>
+          <p className='zen-typography-body text-ink-lighter max-w-4xl mx-auto void-breathing'>
+            전통 서예의 정신과 현대적 감각이 어우러진 아남 작가의 대표작들을 만나보세요.
+          </p>
+        </div>
 
-        <div className='mt-16'>
+        <div className='mt-zen-3xl'>
           {loading ? (
-            <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
+            <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-zen-lg'>
               {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className='card-art'>
-                  <div className='aspect-[3/4] bg-stone-light animate-pulse rounded-t-xl' />
-                  <div className='p-4 space-y-3'>
-                    <div className='h-6 bg-stone-light animate-pulse rounded' />
-                    <div className='h-4 bg-stone-light animate-pulse rounded w-3/4' />
+                <div key={i} className='zen-brutalist-card void-breathing'>
+                  <div className='aspect-[3/4] bg-stone/20 animate-pulse rounded-xl' />
+                  <div className='p-zen-md space-y-zen-sm'>
+                    <div className='h-6 bg-stone/20 animate-pulse rounded' />
+                    <div className='h-4 bg-stone/20 animate-pulse rounded w-3/4' />
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <ArtworkGrid
-              artworks={featuredArtworks}
-              variant='featured'
-              columns={4}
-              showActions={true}
-            />
+            <div className='space-y-zen-xl'>
+              <ArtworkGrid
+                artworks={featuredArtworks}
+                variant='featured'
+                columns={4}
+                showActions={true}
+              />
+              
+              {/* Zen Brutalist CTA */}
+              <div className='text-center'>
+                <Button
+                  asChild
+                  className='btn-art px-zen-2xl py-zen-lg brutal-shadow'
+                >
+                  <Link href='/gallery'>
+                    전체 작품 보기
+                    <ArrowRight className='ml-zen-sm h-4 w-4' />
+                  </Link>
+                </Button>
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -374,46 +183,70 @@ function ArtistSection() {
   }, [])
 
   return (
-    <section className='section-padding bg-gradient-zen'>
-      <div className='container-art'>
-        <div className='grid lg:grid-cols-2 gap-12 lg:gap-16 items-center'>
-          <div className='space-y-8'>
-            <SectionHeader
-              badge='Artist'
-              title='아남 배옥영'
-              subtitle='서예가'
-              description='전통 서예의 깊이와 현대적 감각을 조화시키며, 문방사우의 정신을 현대에 되살리는 작업을 하고 있습니다.'
-              size='lg'
-              action={{
-                label: '작가 소개 더보기',
-                href: '/artist',
-                variant: 'default',
-              }}
-            />
+    <section className='section-padding bg-gradient-zen cultural-context'>
+      <div className='zen-brutalist-layout'>
+        <div className='grid lg:grid-cols-2 gap-zen-3xl items-center'>
+          <div className='space-y-zen-2xl void-breathing'>
+            <div className='text-left space-y-zen-lg'>
+              <span className='brutal-typography-accent text-gold text-sm uppercase tracking-wider'>
+                Artist
+              </span>
+              <h2 className='zen-typography-section text-ink stroke-vertical'>
+                아남 배옥영
+              </h2>
+              <p className='zen-typography-hero text-ink-light stroke-horizontal'>
+                서예가
+              </p>
+              <p className='zen-typography-body text-ink-lighter void-contemplative max-w-2xl'>
+                전통 서예의 깊이와 현대적 감각을 조화시키며, 문방사우의 정신을 현대에 되살리는 작업을 하고 있습니다.
+              </p>
+              
+              <div className='pt-zen-lg'>
+                <Button
+                  asChild
+                  className='btn-art px-zen-xl py-zen-md brutal-shadow'
+                >
+                  <Link href='/artist'>
+                    작가 소개 더보기
+                    <ArrowRight className='ml-zen-sm h-4 w-4' />
+                  </Link>
+                </Button>
+              </div>
+            </div>
           </div>
-          <div className='relative'>
-            <Card className='card-art-elevated overflow-hidden'>
-              <CardContent className='p-0'>
-                <div className='aspect-[4/5] relative bg-stone-100'>
-                  {loading ? (
-                    <div className='w-full h-full flex items-center justify-center animate-pulse bg-stone-200' />
-                  ) : (
+          
+          <div className='relative void-breathing'>
+            <div className='zen-brutalist-card overflow-hidden glass-layer-1 brutal-shadow-strong'>
+              <div className='aspect-[4/5] relative bg-stone/10'>
+                {loading ? (
+                  <div className='w-full h-full flex items-center justify-center animate-pulse bg-stone/20 zen-breathe-slow' />
+                ) : (
+                  <>
                     <Image
                       src={profileImageUrl}
                       alt='아남 배옥영 작가 프로필'
                       fill
-                      className='object-cover hover-scale'
+                      className='object-cover zen-hover-scale'
                       sizes='(max-width: 768px) 100vw, 50vw'
                       priority
                       placeholder='blur'
                       blurDataURL='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkbHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyLli5N4Q5Ox4DfveMEEAAkAAEAAA='
                     />
-                  )}
-                  <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent' />
-                </div>
-              </CardContent>
-            </Card>
-            {error && <div className='text-red-500 text-sm mt-2'>{error}</div>}
+                    <div className='absolute inset-0 bg-gradient-to-t from-ink/20 via-transparent to-transparent' />
+                    <div className='absolute top-zen-md right-zen-md'>
+                      <div className='w-12 h-12 rounded-full bg-gold/20 backdrop-blur-sm flex items-center justify-center'>
+                        <span className='text-gold text-sm font-bold'>芽南</span>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+            {error && (
+              <div className='text-red-500 text-sm mt-zen-sm void-minimal'>
+                {error}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -421,77 +254,83 @@ function ArtistSection() {
   )
 }
 
-// 전시 정보 섹션
+// 전시 정보 섹션 with Zen Brutalism
 function ExhibitionSection() {
   return (
-    <section className='section-padding bg-background'>
-      <div className='container-art'>
-        <SectionHeader
-          badge='Exhibition'
-          title='전시 정보'
-          subtitle='길 道 WAY'
-          description='2025년 6월, 인사동에서 열리는 아남 배옥영 작가의 개인전에 여러분을 초대합니다.'
-          variant='centered'
-          size='lg'
-        />
-
-        <div className='mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
-          <Card className='card-art-elevated'>
-            <CardContent className='p-8 text-center space-y-4'>
-              <div className='w-12 h-12 bg-gradient-ink rounded-full flex items-center justify-center mx-auto'>
-                <Calendar className='w-6 h-6 text-white dark:text-paper' />
-              </div>
-              <h3 className='font-display text-xl font-semibold text-ink'>
-                전시 기간
-              </h3>
-              <div className='space-y-2'>
-                <p className='font-medium text-ink'>2025년 6월 18일 - 24일</p>
-                <p className='text-sm text-ink-light'>오전 10시 - 오후 6시</p>
-                <p className='text-xs text-ink-lighter'>월요일 휴관</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className='card-art-elevated'>
-            <CardContent className='p-8 text-center space-y-4'>
-              <div className='w-12 h-12 bg-gradient-ink rounded-full flex items-center justify-center mx-auto'>
-                <MapPin className='w-6 h-6 text-white dark:text-paper' />
-              </div>
-              <h3 className='font-display text-xl font-semibold text-ink'>
-                전시 장소
-              </h3>
-              <div className='space-y-2'>
-                <p className='font-medium text-ink'>인사동 한국미술관</p>
-                <p className='text-sm text-ink-light'>2층 전시실</p>
-                <p className='text-xs text-ink-lighter'>
-                  서울시 종로구 인사동길
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className='card-art-elevated md:col-span-2 lg:col-span-1'>
-            <CardContent className='p-8 text-center space-y-4'>
-              <div className='w-12 h-12 bg-gradient-ink rounded-full flex items-center justify-center mx-auto'>
-                <ArrowRight className='w-6 h-6 text-white dark:text-paper' />
-              </div>
-              <h3 className='font-display text-xl font-semibold text-ink'>
-                관람 안내
-              </h3>
-              <div className='space-y-2'>
-                <p className='font-medium text-ink'>무료 관람</p>
-                <p className='text-sm text-ink-light'>사전 예약 불필요</p>
-                <p className='text-xs text-ink-lighter'>단체 관람 문의 환영</p>
-              </div>
-            </CardContent>
-          </Card>
+    <section className='section-padding bg-paper temporal-depth'>
+      <div className='zen-brutalist-layout'>
+        <div className='text-center mb-zen-3xl void-contemplative'>
+          <span className='brutal-typography-accent text-gold text-sm uppercase tracking-wider mb-zen-md block'>
+            Exhibition
+          </span>
+          <h2 className='zen-typography-section text-ink mb-zen-lg stroke-press'>
+            전시 정보
+          </h2>
+          <p className='zen-typography-hero text-ink-light mb-zen-lg'>
+            먹, 그리고... 道
+          </p>
+          <p className='zen-typography-body text-ink-lighter max-w-4xl mx-auto void-breathing'>
+            2026년 4월, 서예박물관에서 열리는 아남 배옥영 작가의 개인전에 여러분을 초대합니다.
+          </p>
         </div>
 
-        <div className='mt-12 text-center'>
-          <Button asChild size='lg' className='btn-art'>
+        <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-zen-xl mb-zen-3xl'>
+          {/* 전시 기간 */}
+          <div className='zen-brutalist-card glass-layer-1 text-center space-y-zen-lg'>
+            <div className='w-16 h-16 bg-gradient-to-br from-ink to-gold rounded-full flex items-center justify-center mx-auto brutal-shadow-soft'>
+              <Calendar className='w-6 h-6 text-paper' />
+            </div>
+            <h3 className='zen-typography-hero text-ink'>
+              전시 기간
+            </h3>
+            <div className='space-y-zen-sm void-breathing'>
+              <p className='zen-typography-body text-ink font-medium'>2026년 4월 15일(화) ~ 4월 20일(일)</p>
+              <p className='text-ink-light'>6일간</p>
+              <p className='text-ink-lighter text-sm'>오전 10시 - 오후 6시</p>
+            </div>
+          </div>
+
+          {/* 전시 장소 */}
+          <div className='zen-brutalist-card glass-layer-1 text-center space-y-zen-lg'>
+            <div className='w-16 h-16 bg-gradient-to-br from-ink to-gold rounded-full flex items-center justify-center mx-auto brutal-shadow-soft'>
+              <MapPin className='w-6 h-6 text-paper' />
+            </div>
+            <h3 className='zen-typography-hero text-ink'>
+              전시 장소
+            </h3>
+            <div className='space-y-zen-sm void-breathing'>
+              <p className='zen-typography-body text-ink font-medium'>서예박물관</p>
+              <p className='text-ink-light'>제1전시실</p>
+              <p className='text-ink-lighter text-sm'>
+                한국 전통 서예 문화의 성지
+              </p>
+            </div>
+          </div>
+
+          {/* 관람 안내 */}
+          <div className='zen-brutalist-card glass-layer-1 text-center space-y-zen-lg md:col-span-2 lg:col-span-1'>
+            <div className='w-16 h-16 bg-gradient-to-br from-ink to-gold rounded-full flex items-center justify-center mx-auto brutal-shadow-soft'>
+              <ArrowRight className='w-6 h-6 text-paper' />
+            </div>
+            <h3 className='zen-typography-hero text-ink'>
+              관람 안내
+            </h3>
+            <div className='space-y-zen-sm void-breathing'>
+              <p className='zen-typography-body text-ink font-medium'>무료 관람</p>
+              <p className='text-ink-light'>사전 예약 불필요</p>
+              <p className='text-ink-lighter text-sm'>단체 관람 문의 환영</p>
+            </div>
+          </div>
+        </div>
+
+        <div className='text-center void-contemplative'>
+          <Button 
+            asChild 
+            className='btn-art px-zen-2xl py-zen-lg brutal-shadow-strong'
+          >
             <Link href='/exhibition'>
               전시 상세 정보
-              <ArrowRight className='ml-2 h-4 w-4' />
+              <ArrowRight className='ml-zen-sm h-4 w-4' />
             </Link>
           </Button>
         </div>
@@ -500,16 +339,38 @@ function ExhibitionSection() {
   )
 }
 
-// 메인 페이지 컴포넌트
+// 메인 페이지 컴포넌트 with Zen Brutalism Foundation
 export default function HomePage() {
   return (
-    <main className='min-h-screen'>
+    <main className='min-h-screen bg-paper relative overflow-hidden flex flex-col'>
+      {/* Zen Brutalism Foundation Background Effects */}
+      <div className='fixed inset-0 pointer-events-none'>
+        <div className='absolute inset-0 zen-breathe-deep opacity-2' />
+        <div className='absolute inset-0 ink-flow-ambient opacity-1' />
+      </div>
+
+      {/* Enhanced Navigation */}
       <ArtNavigation variant='transparent' />
-      <HeroSection />
+      
+      {/* Zen Brutalist Hero */}
+      <MainPageHero />
+      
+      {/* Navigation Spacer */}
       <NavigationSpacer />
-      <FeaturedWorksSection />
-      <ArtistSection />
-      <ExhibitionSection />
+      
+      {/* Enhanced Sections */}
+      <div className='relative z-10 space-y-0'>
+        <FeaturedWorksSection />
+        <ArtistSection />
+        <ExhibitionSection />
+      </div>
+
+      {/* Zen Brutalist Footer */}
+      <ZenBrutalistFooter 
+        variant="zen" 
+        showPhaseNavigation={true} 
+        enableInteraction={true}
+      />
     </main>
   )
 }

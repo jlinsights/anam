@@ -26,7 +26,7 @@ export const mockArtworks: Artwork[] = [
   {
     ...mockArtwork,
     id: '2',
-    title: '길 道',
+    title: '먹, 그리고...',
     slug: 'way-dao',
     featured: true,
     medium: '한지에 먹, 색',

@@ -236,7 +236,7 @@ export const translations: Record<Locale, Translation> = {
     accessibility: {
       skipToMain: 'Skip to main content',
       artworkImage:
-        '{title} - Calligraphy artwork by Kong Kyung Soon from {year}',
+        '{title} - Calligraphy artwork by Anam Bae Ok Young from {year}',
       keyboardInstructions: 'You can navigate artworks using keyboard',
       openFilter: 'Open filter',
       closeFilter: 'Close filter',

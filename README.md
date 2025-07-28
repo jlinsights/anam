@@ -1,149 +1,154 @@
-# 🎨 아남 배옥영 작가 서예 갤러리
+# 🎨 ANAM Gallery - 아남 배옥영 작가 서예 갤러리
 
-> 배옥영 작가의 현대 서예 작품을 온라인으로 감상할 수 있는 디지털 갤러리
+> **Zen Brutalism Foundation** - 전통의 깊이와 현대적 몰입감을 동시에 제공하는 UI/UX 디자인
 
-전통 서예의 정신과 현대적 감각이 조화를 이루는 서예 작품을 온라인으로 경험할 수 있는 웹 갤러리입니다.
+전통 한국 서예의 정신과 현대적 디지털 인터랙션이 조화를 이루는 혁신적인 웹 갤러리입니다.
 
----
-
-## 🆕 최근 업데이트/개선 사항
-
-- **아티스트 프로필 이미지 최적화**
-  - 원본 PNG에서 배경 제거(누끼) 후, 다양한 크기의 JPG(large/medium/thumb)로
-    변환
-  - 모든 코드/경로에서 소문자 및 일관된 파일명(`artist-large.jpg` 등) 사용
-  - 배포 환경(리눅스 서버)에서의 대소문자 구분 문제 예방
-- **Exhibition(전시) 아이콘 다크모드 가독성 개선**
-  - Tailwind의 `text-white dark:text-paper` 클래스로 아이콘 색상 일관성 확보
-- **정적 자산 관리 및 배포 안정성 강화**
-  - git을 통한 이미지/정적 파일 복구 및 관리 방법 적용
-  - 빌드/배포 전, 모든 이미지 경로와 파일 존재 여부 점검
-  - 배포 후, CDN 캐시/브라우저 캐시 문제 대응(강력 새로고침, 시크릿 모드 활용)
+[![Korean Calligraphy](https://img.shields.io/badge/Korean-Calligraphy-red)](https://github.com/jlinsights/ANAM)
+[![Zen Brutalism](https://img.shields.io/badge/Zen-Brutalism-black)](https://github.com/jlinsights/ANAM)
+[![Digital Gallery](https://img.shields.io/badge/Digital-Gallery-green)](https://github.com/jlinsights/ANAM)
 
 ---
 
-### 📸 이미지 및 정적 자산 관리 가이드
+## 🆕 **NEW: Zen Brutalism Foundation 디자인 시스템**
 
-- **이미지 최적화**
-  - `public/Images/Artist/` 및 `public/Images/Artworks/` 내 모든 파일은 소문자,
-    일관된 네이밍 사용
-  - PNG → JPG 변환 시, 배경색(흰색) 지정 및 WebP 자동 변환 지원
-  - 필요시 `rembg`, `convert`(ImageMagick) 등 툴 활용
-- **경로 일관성**
-  - 코드 내 이미지 참조는 항상 소문자 경로 사용 (예:
-    `/images/artist/artist-large.jpg`)
-  - 대소문자 혼용 시, 배포 서버에서 404 에러 발생 가능
-- **파일 복구/관리**
-  - git을 통한 파일 복구: `git checkout <commit> -- <경로>`
-  - 불필요한 파일/이미지 삭제 후, 최적화된 파일만 커밋
+### 🎯 **3단계 진화 디자인 철학**
 
----
+| Phase | 컨셉 | 핵심 요소 |
+|-------|------|-----------|
+| **Phase 1** | **백지의 시작** - Zen Foundation | 여백의 미학 + 기하학적 브루탈리즘 |
+| **Phase 2** | **먹과 유리의 조화** - Glass Immersion | 다층 글래스 모피즘 + 유동하는 먹 효과 |
+| **Phase 3** | **전통의 깊이** - Cultural Integration | 삼분법, 음양균형, 계절 미학 통합 |
 
-### 🚀 빌드/배포 체크리스트
+### ✨ **혁신적 디자인 컴포넌트**
 
-- [ ] 모든 이미지/정적 파일이 git에 커밋되어 있는지 확인
-- [ ] 코드 내 경로와 실제 파일명이 일치하는지 점검(특히 대소문자)
-- [ ] 빌드/배포 후, 실제 서비스에서 이미지/아이콘이 정상 노출되는지 확인
-- [ ] 캐시 문제 발생 시, 강력 새로고침(Shift+Reload) 또는 시크릿 모드로 테스트
-- [ ] 에러 발생 시, git을 통한 파일 복구 및 경로 재점검
+- **🖼️ ZenBrutalistHero**: 단계별 히어로 섹션 (실시간 마우스 추적 상호작용)
+- **🎨 ZenBrutalistFooter**: 문화적 디자인 개념 통합 푸터  
+- **📱 Interactive Artwork Cards**: 전통 미학 + 현대적 몰입감
+- **🌊 Fluid Ink System**: 실시간 먹 그라디언트 애니메이션
+- **🏛️ Cultural Composition**: 한국 전통 구성 원리 (삼분법, 여백의 미학, 음양균형)
 
----
+### 🚀 **Demo Pages**
 
-### 👩‍💻 Junior 개발자를 위한 실전 팁
-
-- **이미지 최적화와 경로 관리**는 배포 환경에서의 에러(404, 누락 등) 예방에 매우
-  중요합니다.
-- **정적 자산은 항상 git으로 관리**하고, 불필요한 파일은 주기적으로 정리하세요.
-- **배포 전/후 체크리스트**를 습관화하면, 운영 중 장애를 크게 줄일 수 있습니다.
+- **[/zen-demo](https://anam-gallery.vercel.app/zen-demo)** - Phase 1: 선적 미니멀리즘 showcase
+- **[/immersive-demo](https://anam-gallery.vercel.app/immersive-demo)** - Phase 2: 몰입형 유리+먹 효과
+- **[/cultural-demo](https://anam-gallery.vercel.app/cultural-demo)** - Phase 3: 전통 문화 통합 체험
 
 ---
 
-## ✨ 주요 기능
+## 🚀 **라이브 사이트**
 
-- 🎨 **작품 갤러리**: 25점의 서예 작품을 4x3 그리드로 감상
-- 🔍 **작품 검색/필터**: 제목, 년도, 재료별 실시간 검색 및 필터링
-- 📱 **반응형 디자인**: 모바일, 태블릿, 데스크톱 최적화
-- 🌙 **다크/라이트 테마**: 사용자 환경에 맞는 테마 선택
-- 🚀 **PWA 지원**: 모바일 앱처럼 설치 및 오프라인 사용 가능
-- 🖼️ **이미지 라이트박스(모달)**: 작품 상세페이지에서 작품 이미지를 클릭하면
-  전체화면 모달로 크게 감상 가능
-- 📝 **작가노트(artistNote) 지원**: 작품 상세페이지에서 작품 설명 아래에
-  작가노트가 있을 경우 함께 표시
-- 👩‍🎨 **아티스트 프로필**: Cloudflare Images + Airtable 연동, 모바일 최적화,
-  연락처(인스타그램/이메일/전화) 세로 정렬
-- 🛡️ **에러 처리/폴백**: Airtable 연동 실패 시 로컬 데이터 폴백, 에러 바운더리
-  적용
-- 🧑‍💻 **접근성/키보드 네비게이션**: WCAG 2.1 AA, 키보드 조작 지원
-
-## 🚀 라이브 사이트
-
-**배포 URL**: [https://anam.orientalcalligraphy.org](https://anam.orientalcalligraphy.org)
+**배포 URL**: [https://anam-gallery.vercel.app](https://anam-gallery.vercel.app)
 
 [![Powered by Vercel](https://img.shields.io/badge/Powered%20by-Vercel-black)](https://vercel.com)
 
-## 🛠 기술 스택
+---
 
+## ✨ **주요 기능**
+
+### 🎨 **갤러리 & 작품 관리**
+- **58점의 서예 작품** - Airtable 연동 실시간 관리
+- **반응형 그리드** - 4x3 (데스크톱) → 2x6 (모바일) 적응형 레이아웃
+- **고급 검색/필터** - 제목, 년도, 재료별 실시간 검색
+- **라이트박스 모달** - 전체화면 작품 감상 (키보드 네비게이션 지원)
+- **작가노트 시스템** - 작품별 상세 설명 및 제작 의도
+
+### 🖱️ **인터랙티브 경험**
+- **실시간 마우스 추적** - 마우스 움직임에 반응하는 동적 배경 효과
+- **다층 글래스 깊이감** - 3단계 독립적 블러 및 투명도 시스템
+- **유동하는 먹 애니메이션** - 전통 서예 붓질을 디지털로 재현
+- **계절 미학 변화** - 사계절 색상 변화 및 호흡하는 여백 시스템
+
+### 🎯 **사용자 경험 (UX)**
+- **Progressive Web App** - 모바일 앱처럼 설치 및 오프라인 사용
+- **다크/라이트 테마** - 시스템 환경에 맞는 자동 테마 전환
+- **WCAG 2.1 AA 준수** - 스크린 리더 및 키보드 네비게이션 완전 지원
+- **성능 최적화** - WebP 이미지 자동 변환, 지연 로딩, CDN 최적화
+
+---
+
+## 🛠 **기술 스택**
+
+### **Core Framework**
 - **Framework**: Next.js 15.3.3 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **UI Components**: Radix UI + shadcn/ui
-- **State Management**: React 19 Hooks
+- **Language**: TypeScript 5
+- **Runtime**: React 19
 - **Build Tool**: Turbopack
-- **Deployment**: Vercel
-- **Testing**: Jest + Testing Library
 
-## 📱 갤러리 레이아웃
+### **Design System**
+- **Styling**: Tailwind CSS + 사용자 정의 Zen Brutalism 테마
+- **UI Components**: Radix UI + shadcn/ui
+- **Animation**: CSS Custom Properties + Transform3D
+- **Typography**: 전통 서예 기반 계층적 타이포그래피
 
-### 반응형 그리드 시스템
+### **Data & CMS**
+- **CMS**: Airtable (58개 작품 + 작가 정보 동적 관리)
+- **Fallback System**: 로컬 데이터 자동 대체
+- **Image Management**: Optimized WebP/AVIF + 다중 해상도
 
-- **데스크톱 (1024px+)**: 4열 × 3행 = 12개 작품
-- **태블릿 (768px-1023px)**: 3열 × 4행 = 12개 작품
-- **모바일 (~767px)**: 2열 × 6행 = 12개 작품
+### **Deployment & Performance**
+- **Platform**: Vercel (Edge Runtime)
+- **CDN**: Global CDN + Image Optimization
+- **Monitoring**: Real-time performance metrics
+- **Testing**: Jest + Testing Library + E2E
 
-### 페이지네이션
+---
 
-- 페이지당 12개 작품 표시
-- 직관적인 이전/다음 버튼
-- 페이지 번호 네비게이션 (최대 5개)
-- 전체 작품 수 및 현재 위치 정보
-
-## 📁 프로젝트 구조
+## 📁 **프로젝트 구조**
 
 ```
 ANAM/
-├── app/                   # App Router 구조
-│   ├── layout.tsx         # 루트 레이아웃
-│   ├── page.tsx           # 메인 페이지
-│   ├── gallery/           # 갤러리 섹션
-│   │   ├── page.tsx       # 갤러리 메인
-│   │   ├── gallery-client.tsx # 클라이언트 컴포넌트
-│   │   ├── loading.tsx    # 로딩 UI
-│   │   └── [slug]/        # 개별 작품 페이지
-│   ├── artists/           # 작가 소개
-│   ├── exhibition/        # 전시 정보
-│   ├── contact/           # 연락처
-│   └── offline/           # 오프라인 페이지
-├── components/            # 재사용 컴포넌트
-│   ├── ui/               # shadcn/ui 컴포넌트
-│   ├── animations/       # 애니메이션 컴포넌트
-│   ├── optimized-image.tsx # 최적화된 이미지
-│   ├── search-filter.tsx # 검색 필터
-│   └── theme-toggle.tsx  # 테마 토글
-├── lib/                  # 유틸리티 및 데이터
-│   ├── artworks.ts       # 작품 데이터
-│   ├── utils.ts          # 공통 유틸리티
-│   └── types.ts          # 타입 정의
-├── styles/               # 스타일 파일
-├── public/               # 정적 자산
-│   ├── images/           # 작품 이미지
-│   └── icons/            # 아이콘
-└── scripts/              # 빌드 스크립트
-    └── optimize-images.js # 이미지 최적화
+├── app/                          # Next.js App Router
+│   ├── layout.tsx                # 루트 레이아웃 (테마 프로바이더)
+│   ├── page.tsx                  # 메인 페이지
+│   ├── gallery/                  # 갤러리 섹션
+│   │   ├── page.tsx              # 갤러리 메인 (58개 작품)
+│   │   ├── gallery-client.tsx    # 클라이언트 상호작용
+│   │   └── [slug]/               # 개별 작품 상세 페이지
+│   ├── artist/                   # 작가 소개 (Airtable 연동)
+│   ├── exhibition/               # 전시 정보
+│   ├── contact/                  # 연락처 (인스타그램/이메일/전화)
+│   │
+│   ├── zen-demo/                 # 🆕 Phase 1: Zen Foundation Demo
+│   ├── immersive-demo/           # 🆕 Phase 2: Glass Immersion Demo  
+│   └── cultural-demo/            # 🆕 Phase 3: Cultural Integration Demo
+│
+├── components/                   # 재사용 컴포넌트
+│   ├── ui/                       # shadcn/ui 기본 컴포넌트
+│   │
+│   ├── zen-brutalist-hero.tsx    # 🆕 단계별 히어로 섹션
+│   ├── zen-brutalist-footer.tsx  # 🆕 문화적 디자인 푸터
+│   ├── zen-brutalist-artwork-card.tsx      # 🆕 Phase 1 작품 카드
+│   ├── immersive-artwork-card.tsx          # 🆕 Phase 2 몰입형 카드
+│   ├── cultural-artwork-card.tsx           # 🆕 Phase 3 문화적 카드
+│   │
+│   ├── optimized-image.tsx       # 최적화된 이미지 컴포넌트
+│   ├── search-filter.tsx         # 고급 검색 필터
+│   └── theme-toggle.tsx          # 다크/라이트 테마 토글
+│
+├── lib/                          # 핵심 라이브러리
+│   ├── airtable.ts               # Airtable CMS 연동
+│   ├── artworks.ts               # 작품 데이터 + 폴백 시스템
+│   ├── types.ts                  # TypeScript 타입 정의
+│   └── utils.ts                  # 공통 유틸리티
+│
+├── styles/                       # 스타일링
+│   └── globals.css               # 🆕 Zen Brutalism 글로벌 스타일
+│
+├── public/                       # 정적 자산
+│   ├── Images/                   # 작품 이미지 (년도별 정리)
+│   │   ├── Artworks/             # 58개 작품 이미지
+│   │   └── Artist/               # 작가 프로필 이미지
+│   └── icons/                    # UI 아이콘
+│
+└── tailwind.config.ts            # 🆕 Zen Brutalism 테마 구성
 ```
 
-## 🏃‍♂️ 로컬 개발
+---
 
-### 시작하기
+## 🏃‍♂️ **로컬 개발 환경 설정**
+
+### **1. 기본 설정**
 
 ```bash
 # 저장소 클론
@@ -157,11 +162,27 @@ npm install
 npm run dev
 ```
 
-### 개발 명령어
+### **2. 환경 변수 설정**
+
+`.env.local` 파일 생성:
 
 ```bash
-# 개발 서버
+# Airtable CMS 연동 (선택사항 - 폴백 시스템 있음)
+AIRTABLE_API_KEY=your_airtable_api_key_here
+AIRTABLE_BASE_ID=your_airtable_base_id_here
+
+# 사이트 URL
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+### **3. 개발 명령어**
+
+```bash
+# 개발 서버 (포트 3000)
 npm run dev
+
+# 다른 포트로 실행
+npm run dev -- --port 3001
 
 # 프로덕션 빌드
 npm run build
@@ -169,277 +190,364 @@ npm run build
 # 프로덕션 서버
 npm start
 
-# 린팅
+# 코드 품질 검사
 npm run lint
+npm run type-check
 
 # 테스트 실행
 npm test
-
-# 테스트 (watch 모드)
 npm run test:watch
-
-# 커버리지 확인
 npm run test:coverage
 
 # 이미지 최적화
 npm run optimize-images
+
+# 배포
+npm run deploy              # Vercel 프로덕션
+npm run deploy:preview      # Vercel 프리뷰
 ```
-
-### 배포 명령어
-
-```bash
-# Vercel 프로덕션 배포
-npm run deploy
-
-# Vercel 프리뷰 배포
-npm run deploy:preview
-```
-
-## 🎯 페이지별 기능
-
-### 메인 페이지 (`/`)
-
-- 전시 소개 및 컨셉
-- 주요 작품 하이라이트
-- 전시 정보 요약
-- 갤러리 바로가기
-
-### 갤러리 (`/gallery`)
-
-- **4x3 그리드 레이아웃**: 한 페이지에 12개 작품
-- **실시간 검색**: 제목, 년도, 재료별 필터링
-- **키보드 네비게이션**: 화살표 키로 작품 탐색
-- **페이지네이션**: 전체 작품을 페이지별로 구성
-
-### 작품 상세 (`/gallery/[slug]`)
-
-- 고해상도 작품 이미지
-- **이미지 클릭 시 전체화면 라이트박스(모달)**
-- 상세 작품 정보 (제목, 년도, 재료, 크기)
-- **작가노트(artistNote) 표시**: 작품 설명 아래에 artistNote가 있을 경우 함께
-  노출
-- 이전/다음 작품 네비게이션
-
-### 작가 소개 (`/artist`)
-
-- Cloudflare Images 기반 프로필 이미지(모바일 최적화)
-- 이름, 직함, 소개, "작가 소개 더보기" 버튼
-- **연락처(인스타그램/이메일/전화) 세로 정렬**
-- 전시 경력 및 수상 내역
-
-### 전시 정보 (`/exhibition`)
-
-- 전시 개요 및 기획 의도
-- 후원 기관 정보
-- 전시 일정 및 관련 행사
-
-## 🎨 작품 컬렉션
-
-총 **25점**의 서예 작품으로 구성:
-
-- **주제**: "길(Way)"의 다양한 해석
-- **장르**: 현대 서예, 전통 서예
-- **재료**: 지본채색, 지본묵서, 견본채색 등
-- **크기**: 다양한 규격의 작품들
-
-## 🌟 주요 특징
-
-### 성능 최적화
-
-- **Next.js App Router**: 최신 React 19 기능 활용
-- **이미지 최적화**: 자동 WebP 변환 및 레이지 로딩
-- **번들 분석**: @next/bundle-analyzer로 성능 모니터링
-- **Vercel Edge**: 전 세계 CDN을 통한 빠른 로딩
-
-### 접근성 (Accessibility)
-
-- **WCAG 2.1 AA 준수**: 스크린 리더 지원
-- **키보드 네비게이션**: 모든 기능을 키보드로 조작 가능
-- **고대비 모드**: 시각 장애인을 위한 테마
-- **의미론적 HTML**: 검색 엔진 최적화
-
-### 사용자 경험 (UX)
-
-- **Progressive Web App**: 모바일 앱처럼 설치 가능
-- **오프라인 지원**: 네트워크 없이도 기본 탐색 가능
-- **부드러운 애니메이션**: Framer Motion을 활용한 자연스러운 전환
-- **직관적 UI**: 미니멀한 디자인으로 작품에 집중
-
-## 🔧 개발자를 위한 정보
-
-### 기술적 특징
-
-- **TypeScript 5**: 완전한 타입 안정성
-- **Tailwind CSS**: 유틸리티 퍼스트 CSS 프레임워크
-- **Radix UI**: 헤드리스 UI 컴포넌트
-- **React 19**: 최신 React 기능 활용
-- **ESLint + Prettier**: 코드 품질 관리
-
-### 테스트
-
-- **Unit Tests**: Jest + Testing Library
-- **Component Tests**: React 컴포넌트 테스트
-- **E2E Tests**: 사용자 시나리오 테스트
-- **Visual Regression**: 스크린샷 기반 테스트
-
-## 📄 라이선스
-
-이 프로젝트는 MIT 라이선스 하에 배포됩니다.
-
-## 🙏 후원 및 지원
-
-**작가**: 아남 배옥영  
-**갤러리**: ANAM Calligraphy Gallery
 
 ---
 
-> 🎨 **전통 서예와 현대적 감각의 조화를 통해 독창적인 작품 세계를 
-> 전 세계와 공유합니다** 🌍
+## 🎯 **페이지별 상세 기능**
 
-[![Korean Calligraphy](https://img.shields.io/badge/Korean-Calligraphy-red)](https://github.com/jlinsights/ANAM)
-[![Modern Art](https://img.shields.io/badge/Modern-Art-blue)](https://github.com/jlinsights/ANAM)
-[![Digital Gallery](https://img.shields.io/badge/Digital-Gallery-green)](https://github.com/jlinsights/ANAM)
+### **메인 페이지 (`/`)**
+- 갤러리 소개 및 작가 컨셉
+- 주요 작품 하이라이트 (featured works)
+- Zen Brutalism 디자인 미리보기
+- 갤러리 및 데모 페이지 바로가기
 
-## 프로젝트 개요
+### **갤러리 (`/gallery`)**
+- **58개 작품** Airtable 실시간 연동
+- **반응형 그리드**: 4x3 (데스크톱) → 3x4 (태블릿) → 2x6 (모바일)
+- **고급 검색**: 제목, 년도, 재료, 카테고리별 실시간 필터링
+- **정렬 옵션**: 년도순, 제목순, 카테고리별
+- **키보드 네비게이션**: 화살표 키로 작품 탐색
+- **무한 스크롤** 또는 **페이지네이션** (설정 가능)
 
-아남 배옥영 작가의 현대 서예 작품을 위한 Next.js 기반 디지털 서예 갤러리입니다.
+### **작품 상세 (`/gallery/[slug]`)**
+- **고해상도 이미지** - 클릭 시 전체화면 라이트박스
+- **상세 메타데이터**: 제목, 년도, 재료, 크기, 종횡비
+- **작가노트**: 작품 제작 의도 및 배경 설명
+- **이전/다음 네비게이션**: 키보드 화살표 키 지원
+- **공유 기능**: 소셜 미디어 공유 링크
+- **관련 작품 추천**: 같은 년도/재료 작품 제안
 
-## 기술 스택
+### **작가 소개 (`/artist`)**
+- **Airtable 연동** 동적 프로필 관리
+- **프로필 이미지**: 다중 해상도 최적화
+- **상세 이력**: 학력, 전시, 수상, 소장처
+- **연락처**: 인스타그램, 이메일, 전화 (세로 정렬)
+- **작가 철학** 및 **작업 노트**
 
-- **Frontend**: Next.js 15, React 19, TypeScript
-- **Styling**: Tailwind CSS
-- **CMS**: Airtable (작품 및 작가 정보 관리)
-- **Deployment**: Vercel
+### **🆕 데모 페이지들**
 
-## Airtable 연동 설정
+#### **Zen Demo (`/zen-demo`) - Phase 1**
+- **선적 미니멀리즘** 디자인 시스템 showcase
+- **여백의 미학** 구현 (5단계 호흡 시스템)
+- **브루탈리즘 타이포그래피** 계층 구조
+- **기하학적 구조**와 **명상적 여백**의 조화
 
-### 1. Airtable Base 설정
+#### **Immersive Demo (`/immersive-demo`) - Phase 2**
+- **다층 글래스 모피즘** (3단계 독립 깊이감)
+- **유동하는 먹 애니메이션** (실시간 마우스 추적)
+- **몰입형 상호작용** 패턴
+- **성능 메트릭** 및 **기술적 특징** 설명
 
-Airtable에서 다음과 같은 구조로 Base를 생성하세요:
+#### **Cultural Demo (`/cultural-demo`) - Phase 3**
+- **삼분법 구성** 시각적 구현
+- **황금비율 배치** 시스템
+- **음양균형** 인터랙션
+- **사계절 미학** 변화 (호흡하는 색상 시스템)
+- **전통 깊이감** 5단계 층위 구현
 
-#### Artworks 테이블
+---
 
-- `id` (Single line text) - 작품 고유 ID
-- `slug` (Single line text) - URL용 슬러그
-- `title` (Single line text) - 작품 제목
-- `year` (Number) - 제작 연도
-- `medium` (Single line text) - 재료/기법
-- `dimensions` (Single line text) - 작품 크기
-- `aspectRatio` (Single line text) - 종횡비 (예: "2/1", "1/1", "5/7")
-- `description` (Long text) - 작품 설명
-- `imageUrl` (URL) - 작품 이미지 URL
-- `imageUrlQuery` (Single line text) - 이미지 쿼리 파라미터 (선택사항)
-- `artistNote` (Long text) - 작가 노트 (선택사항)
-- `featured` (Checkbox) - 대표작 여부
-- `category` (Single line text) - 카테고리 (선택사항)
-- `tags` (Multiple select) - 태그 (선택사항)
-- `price` (Number) - 가격 (선택사항)
-- `available` (Checkbox) - 판매 가능 여부 (선택사항)
+## 🎨 **Zen Brutalism Foundation 디자인 시스템**
 
-#### Artist 테이블
+### **핵심 디자인 원칙**
 
-- `name` (Single line text) - 작가명
-- `bio` (Long text) - 작가 약력
-- `statement` (Long text) - 작가 노트
-- `profileImageUrl` (URL) - 프로필 이미지 URL
-- `birthYear` (Number) - 출생년도 (선택사항)
-- `education` (Multiple select) - 학력 (선택사항)
-- `exhibitions` (Multiple select) - 전시 이력 (선택사항)
-- `awards` (Multiple select) - 수상 이력 (선택사항)
-- `collections` (Multiple select) - 소장처 (선택사항)
-- `website` (URL) - 개인 웹사이트 (선택사항)
-- `socialLinks` (Long text) - 소셜 링크 JSON 형태 (선택사항)
+1. **여백의 미학 (Void Aesthetics)**
+   - 5단계 호흡 시스템: `zen-xs` → `zen-4xl`
+   - 명상적 여백을 통한 집중도 향상
+   - 전통 한국 회화의 공간 철학 적용
 
-### 2. 환경 변수 설정
+2. **브루탈리즘 구조 (Brutal Structure)**
+   - 기하학적 정확성과 강렬한 대비
+   - 그림자 시스템: `brutal-shadow` → `brutal-shadow-strong`
+   - 전통 서예의 힘찬 필획을 현대적 구조로 재해석
 
-프로젝트 루트에 `.env.local` 파일을 생성하고 다음 변수들을 설정하세요:
+3. **글래스 모피즘 진화 (Glass Morphism Evolution)**
+   - 3단계 독립적 깊이감: `glass-layer-1/2/3`
+   - 동적 블러 및 채도 조절
+   - 전통 먹의 투명성을 현대적 유리 효과로 구현
+
+4. **문화적 상호작용 (Cultural Interaction)**
+   - 실시간 마우스 추적 상호작용
+   - 계절별 색상 변화 시스템
+   - 전통 구성 원리의 디지털 구현
+
+### **색상 시스템**
+
+```css
+/* 전통 한국 색상 팔레트 */
+--ink: 28 25 23           /* 먹색 - 주요 텍스트 */
+--paper: 254 252 232      /* 한지색 - 배경 */
+--gold: 168 85 27         /* 황금색 - 강조 */
+--stone: 120 113 108      /* 돌색 - 보조 */
+--brush: 87 83 74         /* 붓색 - 중성 */
+
+/* 계절 색상 (사계절 미학) */
+--season-spring: 134 239 172    /* 봄 - 청록 */
+--season-summer: 74 222 128     /* 여름 - 녹색 */
+--season-autumn: 251 191 36     /* 가을 - 황금 */
+--season-winter: 156 163 175    /* 겨울 - 회색 */
+```
+
+### **타이포그래피 계층**
+
+```css
+/* Zen Typography */
+.zen-typography-display     /* 64px - 주요 제목 */
+.zen-typography-hero        /* 48px - 히어로 제목 */
+.zen-typography-section     /* 32px - 섹션 제목 */
+.zen-typography-body        /* 18px - 본문 텍스트 */
+
+/* Brutal Typography */
+.brutal-typography-impact     /* 강렬한 임팩트 */
+.brutal-typography-statement  /* 선언적 메시지 */
+.brutal-typography-accent     /* 강조 요소 */
+```
+
+---
+
+## 🌟 **기술적 특징**
+
+### **성능 최적화**
+- **Next.js 15 App Router**: 최신 React 19 + Server Components
+- **이미지 최적화**: 자동 WebP/AVIF 변환, 다중 해상도, 지연 로딩
+- **번들 최적화**: Turbopack + Tree Shaking + Code Splitting
+- **CDN 최적화**: Vercel Edge Network 전 세계 배포
+- **메모리 관리**: 효율적인 상태 관리 및 가비지 컬렉션
+
+### **접근성 (Accessibility)**
+- **WCAG 2.1 AA 완전 준수**: 스크린 리더 100% 호환
+- **키보드 네비게이션**: 모든 기능을 키보드로 조작 가능
+- **고대비 모드**: 시각 장애인을 위한 고대비 테마
+- **의미론적 HTML**: SEO 및 스크린 리더 최적화
+- **Focus Management**: 논리적 탭 순서 및 포커스 표시
+
+### **Progressive Web App (PWA)**
+- **오프라인 지원**: Service Worker + Cache API
+- **모바일 설치**: Add to Home Screen 기능
+- **Push Notifications**: 새로운 작품 업데이트 알림 (선택사항)
+- **Background Sync**: 오프라인 상태에서 데이터 동기화
+
+---
+
+## 🔧 **개발자를 위한 고급 정보**
+
+### **Airtable CMS 연동 시스템**
+
+#### **자동 폴백 시스템**
+```typescript
+// Airtable 연동 실패 시 자동으로 로컬 데이터 사용
+const artworks = await getArtworks() || fallbackArtworksData
+```
+
+#### **실시간 캐싱 전략**
+- **Memory Cache**: 세션 내 데이터 재사용
+- **SWR Pattern**: Stale-While-Revalidate 전략
+- **ISR (Incremental Static Regeneration)**: 정적 페이지 점진적 업데이트
+
+### **컴포넌트 아키텍처**
+
+#### **Design System Components**
+```typescript
+// Phase별 Hero 컴포넌트
+<ZenBrutalistHeroPhase1 
+  navigation={{ next: '/immersive-demo' }}
+  enableInteraction={true}
+/>
+
+// Variant 기반 Artwork Card
+<ZenBrutalistArtworkCard
+  variant="zen|brutal|glass-ink|fusion"
+  immersionLevel="subtle|moderate|intense|maximum"
+  traditionalDepth={true}
+/>
+```
+
+#### **실시간 상호작용 시스템**
+```typescript
+// 마우스 추적 기반 동적 배경
+const handleMouseMove = useCallback((e: MouseEvent) => {
+  const x = e.clientX / window.innerWidth
+  const y = e.clientY / window.innerHeight
+  setDynamicBackground(`radial-gradient(
+    circle at ${x * 100}% ${y * 100}%,
+    hsla(var(--ink) / 0.08) 0%,
+    transparent 70%
+  )`)
+}, [])
+```
+
+### **테스트 전략**
+
+#### **단위 테스트 (Unit Tests)**
+```bash
+# 컴포넌트 테스트
+npm run test -- --testPathPattern=components
+
+# 유틸리티 함수 테스트  
+npm run test -- --testPathPattern=lib
+
+# 커버리지 확인 (90%+ 목표)
+npm run test:coverage
+```
+
+#### **통합 테스트 (Integration Tests)**
+```bash
+# API 연동 테스트
+npm run test -- --testPathPattern=api
+
+# 페이지 렌더링 테스트
+npm run test -- --testPathPattern=pages
+```
+
+#### **E2E 테스트 (End-to-End)**
+```bash
+# 사용자 시나리오 테스트
+npm run test:e2e
+
+# 시각적 회귀 테스트
+npm run test:visual
+```
+
+---
+
+## 📊 **성능 지표**
+
+### **Core Web Vitals**
+- **LCP (Largest Contentful Paint)**: < 2.5초
+- **FID (First Input Delay)**: < 100ms
+- **CLS (Cumulative Layout Shift)**: < 0.1
+
+### **Lighthouse Scores**
+- **Performance**: 95+ / 100
+- **Accessibility**: 100 / 100
+- **Best Practices**: 100 / 100
+- **SEO**: 100 / 100
+
+### **번들 사이즈**
+- **Initial Bundle**: < 100KB (gzipped)
+- **Runtime Bundle**: < 50KB (gzipped)
+- **Image Optimization**: WebP/AVIF 자동 변환
+
+---
+
+## 🚀 **배포 및 운영**
+
+### **Vercel 배포 설정**
 
 ```bash
-# Airtable 설정
-AIRTABLE_API_KEY=your_airtable_api_key_here
-AIRTABLE_BASE_ID=your_airtable_base_id_here
+# 프로덕션 배포
+npm run deploy
 
-# 또는 클라이언트 사이드에서 사용하려면 (권장하지 않음)
-# NEXT_PUBLIC_AIRTABLE_API_KEY=your_airtable_api_key_here
-# NEXT_PUBLIC_AIRTABLE_BASE_ID=your_airtable_base_id_here
+# 프리뷰 배포 (PR 자동 배포)
+npm run deploy:preview
+
+# 환경별 배포
+vercel --prod                    # 프로덕션
+vercel                          # 프리뷰
 ```
 
-### 3. Airtable API 키 및 Base ID 확인 방법
-
-1. **API 키 확인**:
-   - [Airtable Account](https://airtable.com/account) 페이지 접속
-   - "Generate API key" 클릭하여 API 키 생성
-   - 생성된 키를 복사
-
-2. **Base ID 확인**:
-   - [Airtable API Documentation](https://airtable.com/api) 접속
-   - 해당 Base 선택
-   - URL에서 `app` 뒤의 문자열이 Base ID (예: `appXXXXXXXXXXXXXX`)
-
-### 4. 데이터 구조 예시
-
-#### Artworks 테이블 예시 데이터:
-
-```
-id: "1"
-slug: "way"
-title: "길"
-year: 2025
-medium: "한지에 먹"
-dimensions: "70×140cm"
-aspectRatio: "1/2"
-description: "인생의 여정을 표현한 작품"
-imageUrl: "/Images/Artworks/2025/heelang-way-2025.jpg"
-featured: true
-```
-
-#### Artist 테이블 예시 데이터:
-
-```
-name: "아남 배옥영 (ANAM Bae Ok Young)"
-bio: "한국의 전통 서예와 현대적 감각을 결합한 독창적인 작품 세계를 구축하고 있는 서예 작가입니다..."
-statement: "전통 서예의 정신을 바탕으로 현대적 감각을 더하여, 과거와 현재가 조화를 이루는 작품을 추구합니다..."
-profileImageUrl: "/Images/Artist/배옥영.jpeg"
-```
-
-## 로컬 개발 환경 설정
-
-1. 의존성 설치:
-
+### **환경 변수 (Vercel Dashboard)**
 ```bash
-npm install
+# 필수 환경 변수
+AIRTABLE_API_KEY=key***********     # Airtable API 키
+AIRTABLE_BASE_ID=app***********     # Base ID
+NEXT_PUBLIC_SITE_URL=https://***    # 사이트 URL
+
+# 선택적 환경 변수  
+NEXT_PUBLIC_GA_ID=G-**********      # Google Analytics
+VERCEL_URL=***.vercel.app           # Vercel 자동 생성
 ```
 
-2. 개발 서버 실행:
+### **모니터링 및 분석**
+- **Vercel Analytics**: 실시간 성능 모니터링
+- **Google Analytics**: 사용자 행동 분석 (선택사항)
+- **Error Reporting**: 자동 에러 수집 및 알림
+- **Performance Monitoring**: Core Web Vitals 추적
 
-```bash
-npm run dev
-```
+---
 
-3. 브라우저에서 `http://localhost:3000` 접속
+## 🎨 **작품 컬렉션 정보**
 
-## 주요 기능
+### **현재 컬렉션** (58점)
+- **제작 기간**: 2021-2025년 (5년간)
+- **주요 테마**: "길(Way)"의 다양한 해석과 인생 여정
+- **장르**: 현대 서예, 전통 서예, 실험적 서예
+- **재료**: 지본채색, 지본묵서, 견본채색, 한지에 먹 등
+- **크기**: 소품(30×40cm)부터 대작(140×280cm)까지 다양
 
-- **Airtable CMS 연동**: 작품과 작가 정보를 Airtable에서 동적으로 관리
-- **반응형 갤러리**: 모바일부터 데스크톱까지 최적화된 갤러리 뷰
-- **다크/라이트 모드**: 사용자 선호에 따른 테마 전환
-- **SEO 최적화**: 메타데이터 및 구조화된 데이터 지원
-- **성능 최적화**: 이미지 최적화 및 지연 로딩
-- **에러 처리**: 포괄적인 에러 바운더리 및 폴백 시스템
+### **작품 카테고리**
+- **자연 시리즈**: 계절감과 자연의 변화 표현
+- **철학 시리즈**: 인생의 깊이와 성찰 담은 작품
+- **감정 시리즈**: 기쁨, 슬픔, 그리움 등 인간의 감정
+- **전통 재해석**: 고전 시가를 현대적 감각으로 재해석
 
-## 배포
+---
 
-Vercel을 통한 배포 시 환경 변수를 Vercel 대시보드에서 설정해야 합니다:
+## 🔮 **향후 개발 계획**
 
-1. Vercel 프로젝트 설정 → Environment Variables
-2. `AIRTABLE_API_KEY`와 `AIRTABLE_BASE_ID` 추가
-3. Production, Preview, Development 환경에 모두 적용
+### **Phase 4: AI Integration (계획 중)**
+- **AI 기반 작품 추천**: 사용자 선호도 학습
+- **가상 큐레이션**: AI 큐레이터 시스템
+- **인터랙티브 서예**: 실시간 서예 체험
 
-## 폴백 시스템
+### **Phase 5: VR/AR Experience (연구 중)**
+- **가상 갤러리**: 3D 몰입형 갤러리 투어
+- **AR 작품 배치**: 실제 공간에 작품 배치 시뮬레이션
+- **VR 서예 체험**: 가상현실 서예 워크샵
 
-Airtable 연동이 실패하거나 환경 변수가 설정되지 않은 경우, `lib/artworks.ts`의
-로컬 데이터를 사용합니다. 이를 통해 개발 환경에서도 안정적으로 작동합니다.
+### **추가 기능 개발**
+- **다국어 지원**: 영어, 일본어, 중국어 번역
+- **소셜 기능**: 작품 댓글, 공유, 좋아요
+- **이커머스**: 작품 판매 및 결제 시스템
+- **교육 플랫폼**: 온라인 서예 강좌
 
-## 라이선스
+---
 
-이 프로젝트는 아남 배옥영 작가의 서예 갤러리를 위한 전용 웹사이트입니다.
+## 🙏 **기여 및 후원**
+
+### **작가 정보**
+- **작가명**: 아남 배옥영 (ANAM Bae Ok Young, b.1955)
+- **작가호**: 芽南 (아남)
+- **전문 분야**: 현대 서예, 전통 서예, 문인화
+
+### **갤러리 정보**
+- **갤러리명**: ANAM Calligraphy Gallery
+- **설립년도**: 2024년
+- **미션**: 전통 서예와 현대 기술의 융합을 통한 새로운 예술 경험 제공
+
+### **개발팀**
+- **Design System**: Zen Brutalism Foundation
+- **Technical Stack**: Next.js 15 + React 19 + TypeScript
+- **Powered by**: Claude Code AI Assistant
+
+---
+
+## 📄 **라이선스 및 저작권**
+
+- **소프트웨어**: MIT License
+- **작품 저작권**: 아남 배옥영 작가 (All Rights Reserved)
+- **디자인 시스템**: Zen Brutalism Foundation (Open Source)
+
+---
+
+> 🎨 **"전통의 깊이와 현대적 몰입감을 동시에 제공하는 혁신적인 디지털 갤러리"** 🌍
+> 
+> **Zen Brutalism Foundation**을 통해 한국 전통 서예의 아름다움을 전 세계와 공유합니다.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/jlinsights/ANAM)
