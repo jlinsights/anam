@@ -20,13 +20,13 @@ export default function ArtworkDetailModalClient({
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   return (
-    <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto'>
-      {/* Image Section */}
-      <div className='space-y-4'>
-        <div className='relative aspect-square rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800'>
+    <div className='grid grid-cols-1 lg:grid-cols-2 gap-zen-lg max-w-6xl mx-auto'>
+      {/* Image Section - 컴팩트화 */}
+      <div className='space-y-zen-md'>
+        <div className='relative aspect-square rounded-xl overflow-hidden bg-paper border border-stone/20'>
           <GalleryDetailImage
             artwork={artwork}
-            className='w-full h-full object-cover'
+            className='w-full h-full object-cover zen-hover-scale'
             onClick={() => setIsModalOpen(true)}
           />
         </div>
@@ -43,7 +43,7 @@ export default function ArtworkDetailModalClient({
               onClick={(e) => e.stopPropagation()} // 이미지 클릭 시 모달 닫히지 않게
             />
             <button
-              className='absolute top-4 right-4 text-white text-3xl'
+              className='absolute top-4 right-4 text-white text-3xl hover:opacity-70 transition-opacity'
               onClick={() => setIsModalOpen(false)}
             >
               ×
@@ -51,21 +51,21 @@ export default function ArtworkDetailModalClient({
           </div>
         )}
       </div>
-      {/* Details Section */}
-      <div className='space-y-6'>
-        <div className='space-y-4'>
-          <h1 className='text-3xl font-bold text-slate-900 dark:text-white'>
+      {/* Details Section - 타이포그래피 개선 */}
+      <div className='space-y-zen-lg'>
+        <div className='space-y-zen-md'>
+          <h1 className='text-2xl font-semibold text-ink leading-tight'>
             {artwork.title}
           </h1>
 
-          {/* 구매가능 상태 표시 */}
-          <div className='flex items-center space-x-2'>
+          {/* 구매가능 상태 표시 - 컴팩트화 */}
+          <div className='flex items-center gap-zen-sm flex-wrap'>
             {artwork.available !== undefined && (
               <div
-                className={`flex items-center space-x-2 px-3 py-1.5 rounded-full text-sm font-medium ${
+                className={`flex items-center gap-zen-xs px-zen-md py-zen-xs rounded-lg text-sm font-medium ${
                   artwork.available
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                    ? 'bg-green-50 text-green-700 border border-green-200'
+                    : 'bg-red-50 text-red-700 border border-red-200'
                 }`}
               >
                 {artwork.available ? (
@@ -83,65 +83,64 @@ export default function ArtworkDetailModalClient({
             )}
 
             {artwork.price && (
-              <div className='px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full text-sm font-medium'>
+              <div className='px-zen-md py-zen-xs bg-gold/10 text-gold border border-gold/20 rounded-lg text-sm font-medium'>
                 {artwork.price.toLocaleString()}원
               </div>
             )}
           </div>
 
-          <div className='flex items-center space-x-4 text-sm text-slate-600 dark:text-slate-400'>
-            <div className='flex items-center space-x-1'>
-              <Calendar className='w-4 h-4' />
+          <div className='flex items-center gap-zen-md text-sm text-ink-light flex-wrap'>
+            <div className='flex items-center gap-zen-xs'>
+              <Calendar className='w-4 h-4 text-gold' />
               <span>{artwork.year}년</span>
             </div>
 
             {artwork.medium && (
-              <div className='flex items-center space-x-1'>
-                <Palette className='w-4 h-4' />
+              <div className='flex items-center gap-zen-xs'>
+                <Palette className='w-4 h-4 text-gold' />
                 <span>{artwork.medium}</span>
               </div>
             )}
 
             {artwork.dimensions && (
-              <div className='flex items-center space-x-1'>
-                <Ruler className='w-4 h-4' />
+              <div className='flex items-center gap-zen-xs'>
+                <Ruler className='w-4 h-4 text-gold' />
                 <span>{artwork.dimensions}</span>
               </div>
             )}
           </div>
         </div>
 
-        {/* 작품 설명 */}
+        {/* 작품 설명 - 타이포그래피 개선 */}
         {artwork.description && (
-          <div className='mt-6'>
-            <h3 className='text-lg font-semibold mb-1'>작품 설명</h3>
-            <p className='text-base text-muted-foreground'>
+          <div>
+            <h3 className='text-lg font-medium text-ink mb-zen-sm'>
+              작품 설명
+            </h3>
+            <p className='text-base text-ink-light leading-relaxed'>
               {artwork.description}
             </p>
           </div>
         )}
 
-        {/* 작가노트(artistNote): 작품 설명 아래에 artistNote가 있을 때만 표시 */}
+        {/* 작가노트(artistNote) - 타이포그래피 개선 */}
         {artwork.artistNote && (
-          <div className='mt-6'>
-            <h3 className='text-lg font-semibold mb-1'>작가노트</h3>
-            {/* 줄바꿈이 유지되도록 whitespace-pre-line 적용 */}
-            <p className='text-base text-muted-foreground whitespace-pre-line'>
+          <div>
+            <h3 className='text-lg font-medium text-ink mb-zen-sm'>작가노트</h3>
+            <p className='text-base text-ink-light leading-relaxed whitespace-pre-line'>
               {artwork.artistNote}
             </p>
           </div>
         )}
 
         {artwork.tags && artwork.tags.length > 0 && (
-          <div className='space-y-2'>
-            <h3 className='text-lg font-semibold text-slate-900 dark:text-white'>
-              태그
-            </h3>
-            <div className='flex flex-wrap gap-2'>
+          <div className='space-y-zen-sm'>
+            <h3 className='text-lg font-medium text-ink'>태그</h3>
+            <div className='flex flex-wrap gap-zen-sm'>
               {artwork.tags.map((tag: string, index: number) => (
                 <span
                   key={index}
-                  className='px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full text-sm'
+                  className='px-zen-md py-zen-xs bg-stone/10 text-ink border border-stone/20 rounded-lg text-sm'
                 >
                   {tag}
                 </span>
@@ -150,14 +149,17 @@ export default function ArtworkDetailModalClient({
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className='flex space-x-4 pt-4'>
+        {/* Action Buttons - 레이아웃 개선 */}
+        <div className='flex gap-zen-md pt-zen-md flex-wrap'>
           <ArtworkDetailClient title={artwork.title} slug={artwork.slug} />
           <Link href='/contact'>
             <Button
               size='sm'
               variant={artwork.available === false ? 'secondary' : 'default'}
               disabled={artwork.available === false}
+              className={
+                artwork.available === false ? '' : 'btn-art zen-hover-scale'
+              }
             >
               {artwork.available === false ? '판매완료' : '작품 문의하기'}
             </Button>
@@ -165,45 +167,45 @@ export default function ArtworkDetailModalClient({
         </div>
       </div>
 
-      {/* 추천 작품 섹션 */}
+      {/* 추천 작품 섹션 - 레이아웃 개선 */}
       {recommendedArtworks.length > 0 && (
-        <div className='lg:col-span-2 mt-16'>
-          <div className='mb-8'>
-            <h2 className='text-2xl font-bold text-slate-900 dark:text-white mb-2'>
+        <div className='lg:col-span-2 mt-zen-2xl'>
+          <div className='mb-zen-lg'>
+            <h2 className='text-xl font-semibold text-ink mb-zen-sm'>
               다른 작품들
             </h2>
-            <p className='text-slate-600 dark:text-slate-400'>
+            <p className='text-base text-ink-light'>
               아남의 다른 작품들을 감상해보세요
             </p>
           </div>
 
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6'>
+          <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-zen-md'>
             {recommendedArtworks.map((recommendedArtwork: any) => (
               <Link
                 key={recommendedArtwork.id}
                 href={`/gallery/${recommendedArtwork.slug}`}
-                className='group block bg-white dark:bg-slate-800 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1'
+                className='group block bg-paper border border-stone/20 rounded-xl overflow-hidden zen-hover-scale'
               >
-                <div className='relative aspect-square overflow-hidden bg-slate-100 dark:bg-slate-700'>
+                <div className='relative aspect-square overflow-hidden'>
                   <Image
                     src={recommendedArtwork.imageUrl}
                     alt={recommendedArtwork.title}
                     fill
                     className='object-cover group-hover:scale-105 transition-transform duration-300'
-                    sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw'
+                    sizes='(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw'
                     loading='lazy'
                   />
-                  <div className='absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300' />
+                  <div className='absolute inset-0 bg-black/0 group-hover:bg-ink/5 transition-colors duration-300' />
                 </div>
-                <div className='p-3 sm:p-4'>
-                  <h3 className='font-semibold text-slate-900 dark:text-white mb-1 line-clamp-1 text-sm sm:text-base'>
+                <div className='p-zen-md'>
+                  <h3 className='font-medium text-ink mb-zen-xs line-clamp-1 text-sm'>
                     {recommendedArtwork.title}
                   </h3>
-                  <p className='text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-2'>
+                  <p className='text-xs text-ink-light mb-zen-xs'>
                     {recommendedArtwork.year}년
                   </p>
                   {recommendedArtwork.medium && (
-                    <p className='text-xs text-slate-500 dark:text-slate-500 line-clamp-2'>
+                    <p className='text-xs text-ink-lighter line-clamp-1'>
                       {recommendedArtwork.medium}
                     </p>
                   )}

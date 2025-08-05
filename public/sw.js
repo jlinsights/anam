@@ -12,14 +12,11 @@ const STATIC_FILES = [
   '/manifest.json',
   '/globals.css',
   // 오프라인 페이지
-  '/offline'
+  '/offline',
 ]
 
 // 갤러리 관련 파일들 (우선순위 캐싱)
-const GALLERY_PRIORITY_CACHE = [
-  '/api/artworks',
-  '/api/artist'
-]
+const GALLERY_PRIORITY_CACHE = ['/api/artworks', '/api/artist']
 
 // 이미지 파일 확장자
 const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg']
@@ -27,9 +24,10 @@ const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg']
 // 설치 이벤트 - 필수 파일들을 캐시
 self.addEventListener('install', (event) => {
   console.log('📦 Service Worker: Installing...')
-  
+
   event.waitUntil(
-    caches.open(STATIC_CACHE)
+    caches
+      .open(STATIC_CACHE)
       .then((cache) => {
         console.log('📦 Service Worker: Caching static files')
         return cache.addAll(STATIC_FILES)
@@ -48,16 +46,19 @@ self.addEventListener('install', (event) => {
 // 활성화 이벤트 - 오래된 캐시 정리
 self.addEventListener('activate', (event) => {
   console.log('🚀 Service Worker: Activating...')
-  
+
   event.waitUntil(
-    caches.keys()
+    caches
+      .keys()
       .then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
             // 현재 버전이 아닌 캐시 삭제
-            if (cacheName !== STATIC_CACHE && 
-                cacheName !== IMAGES_CACHE && 
-                cacheName !== API_CACHE) {
+            if (
+              cacheName !== STATIC_CACHE &&
+              cacheName !== IMAGES_CACHE &&
+              cacheName !== API_CACHE
+            ) {
               console.log('🗑️ Service Worker: Deleting old cache', cacheName)
               return caches.delete(cacheName)
             }
@@ -76,13 +77,13 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
-  
+
   // GET 요청만 처리
   if (request.method !== 'GET') return
-  
+
   // 외부 도메인 요청은 무시
   if (url.origin !== location.origin) return
-  
+
   // 요청 타입에 따른 캐시 전략
   if (isImageRequest(request)) {
     // 이미지: Cache First (캐시 우선)
@@ -102,25 +103,32 @@ self.addEventListener('fetch', (event) => {
 // 이미지 요청 확인
 function isImageRequest(request) {
   const url = new URL(request.url)
-  return IMAGE_EXTENSIONS.some(ext => url.pathname.includes(ext)) ||
-         request.destination === 'image'
+  return (
+    IMAGE_EXTENSIONS.some((ext) => url.pathname.includes(ext)) ||
+    request.destination === 'image'
+  )
 }
 
 // 정적 자원 확인
 function isStaticAsset(request) {
   const url = new URL(request.url)
-  return url.pathname.includes('/_next/') ||
-         url.pathname.includes('/static/') ||
-         url.pathname.endsWith('.css') ||
-         url.pathname.endsWith('.js') ||
-         url.pathname.endsWith('.woff') ||
-         url.pathname.endsWith('.woff2')
+  return (
+    url.pathname.includes('/_next/') ||
+    url.pathname.includes('/static/') ||
+    url.pathname.endsWith('.css') ||
+    url.pathname.endsWith('.js') ||
+    url.pathname.endsWith('.woff') ||
+    url.pathname.endsWith('.woff2')
+  )
 }
 
 // 페이지 요청 확인
 function isPageRequest(request) {
-  return request.mode === 'navigate' ||
-         (request.method === 'GET' && request.headers.get('accept').includes('text/html'))
+  return (
+    request.mode === 'navigate' ||
+    (request.method === 'GET' &&
+      request.headers.get('accept').includes('text/html'))
+  )
 }
 
 // Cache First 전략 (캐시 우선)
@@ -129,25 +137,25 @@ async function cacheFirstStrategy(request, cacheName) {
     // 캐시에서 먼저 찾기
     const cache = await caches.open(cacheName)
     const cachedResponse = await cache.match(request)
-    
+
     if (cachedResponse) {
       console.log('💾 Cache hit:', request.url)
       return cachedResponse
     }
-    
+
     // 캐시에 없으면 네트워크에서 가져오기
     console.log('🌐 Cache miss, fetching:', request.url)
     const networkResponse = await fetch(request)
-    
+
     // 성공적인 응답만 캐시
     if (networkResponse.ok) {
       cache.put(request, networkResponse.clone())
     }
-    
+
     return networkResponse
   } catch (error) {
     console.error('❌ Cache first strategy failed:', error)
-    
+
     // 이미지 요청 실패 시 placeholder 반환
     if (isImageRequest(request)) {
       return new Response(
@@ -155,16 +163,19 @@ async function cacheFirstStrategy(request, cacheName) {
         { headers: { 'Content-Type': 'image/svg+xml' } }
       )
     }
-    
+
     // 페이지 요청 실패 시 오프라인 페이지
     if (isPageRequest(request)) {
       const cache = await caches.open(STATIC_CACHE)
-      return cache.match('/offline') || new Response('오프라인 상태입니다', {
-        status: 503,
-        headers: { 'Content-Type': 'text/html; charset=utf-8' }
-      })
+      return (
+        cache.match('/offline') ||
+        new Response('오프라인 상태입니다', {
+          status: 503,
+          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        })
+      )
     }
-    
+
     throw error
   }
 }
@@ -175,33 +186,36 @@ async function networkFirstStrategy(request, cacheName) {
     // 네트워크에서 먼저 시도
     console.log('🌐 Network first:', request.url)
     const networkResponse = await fetch(request)
-    
+
     // 성공적인 응답은 캐시에 저장
     if (networkResponse.ok) {
       const cache = await caches.open(cacheName)
       cache.put(request, networkResponse.clone())
     }
-    
+
     return networkResponse
   } catch (error) {
     console.log('💾 Network failed, trying cache:', request.url)
-    
+
     // 네트워크 실패 시 캐시에서 찾기
     const cache = await caches.open(cacheName)
     const cachedResponse = await cache.match(request)
-    
+
     if (cachedResponse) {
       return cachedResponse
     }
-    
+
     // 캐시에도 없으면 오프라인 페이지
     if (isPageRequest(request)) {
-      return cache.match('/offline') || new Response('오프라인 상태입니다', {
-        status: 503,
-        headers: { 'Content-Type': 'text/html; charset=utf-8' }
-      })
+      return (
+        cache.match('/offline') ||
+        new Response('오프라인 상태입니다', {
+          status: 503,
+          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        })
+      )
     }
-    
+
     throw error
   }
 }
@@ -222,7 +236,7 @@ async function doBackgroundSync() {
 self.addEventListener('push', (event) => {
   if (event.data) {
     const data = event.data.json()
-    
+
     const options = {
       body: data.body,
       icon: '/icons/icon-192x192.png',
@@ -230,34 +244,30 @@ self.addEventListener('push', (event) => {
       vibrate: [100, 50, 100],
       data: {
         dateOfArrival: Date.now(),
-        primaryKey: data.primaryKey
+        primaryKey: data.primaryKey,
       },
       actions: [
         {
           action: 'explore',
           title: '작품 보기',
-          icon: '/icons/icon-96x96.png'
+          icon: '/icons/icon-96x96.png',
         },
         {
           action: 'close',
-          title: '닫기'
-        }
-      ]
+          title: '닫기',
+        },
+      ],
     }
-    
-    event.waitUntil(
-      self.registration.showNotification(data.title, options)
-    )
+
+    event.waitUntil(self.registration.showNotification(data.title, options))
   }
 })
 
 // 알림 클릭 처리
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  
+
   if (event.action === 'explore') {
-    event.waitUntil(
-      clients.openWindow('/gallery')
-    )
+    event.waitUntil(clients.openWindow('/gallery'))
   }
-}) 
+})

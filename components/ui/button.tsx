@@ -19,11 +19,11 @@ const buttonVariants = cva(
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
         // 서예 예술 전용 variants
-        art: 'bg-ink text-paper hover:bg-ink-light hover:shadow-medium focus:ring-ink active:scale-95 transition-all duration-300',
+        art: 'bg-ink text-paper hover:bg-ink-light hover:shadow-medium focus:ring-ink active:scale-95 transition-all duration-300 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700',
         'art-outline':
-          'border-2 border-ink text-ink hover:bg-ink hover:text-paper hover:shadow-medium focus:ring-ink active:scale-95 transition-all duration-300',
+          'border-2 border-ink text-ink hover:bg-ink hover:text-paper hover:shadow-medium focus:ring-ink active:scale-95 transition-all duration-300 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-700 dark:hover:text-neutral-100',
         'art-ghost':
-          'text-ink-light hover:text-ink hover:bg-paper-warm hover:shadow-soft focus:ring-ink active:scale-95 transition-all duration-300',
+          'text-ink-light hover:text-ink hover:bg-paper-warm hover:shadow-soft focus:ring-ink active:scale-95 transition-all duration-300 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-800',
       },
       size: {
         default: 'h-10 px-4 py-2',

@@ -6,19 +6,21 @@
 export const SITE_CONFIG = {
   name: '아남 배옥영 작가 서예 갤러리',
   title: '아남 배옥영 작가 서예 갤러리',
-  description: '아남 배옥영 작가의 현대 서예 작품을 온라인으로 감상할 수 있는 디지털 갤러리. 전통 서예의 정신과 현대적 감각이 조화를 이루는 독창적인 작품들을 만나보세요.',
+  description:
+    '아남 배옥영 작가의 현대 서예 작품을 온라인으로 감상할 수 있는 디지털 갤러리. 전통 서예의 정신과 현대적 감각이 조화를 이루는 독창적인 작품들을 만나보세요.',
   url: 'https://anam.orientalcalligraphy.org',
   siteName: '아남 배옥영 서예 갤러리',
   creator: '아남 배옥영',
   publisher: 'ANAM Art Gallery',
   locale: 'ko_KR',
-  
+
   // Artist Information
   artist: {
     name: '아남 배옥영',
     alternateName: ['배옥영', 'ANAM', 'Bae Ok Young'],
     jobTitle: '현대 서예 작가',
-    description: '한국의 전통 서예와 현대적 감각을 결합한 독창적인 작품 세계를 구축하고 있는 서예 작가',
+    description:
+      '한국의 전통 서예와 현대적 감각을 결합한 독창적인 작품 세계를 구축하고 있는 서예 작가',
     birthPlace: '한국',
     nationality: '한국',
     knowsAbout: ['현대 서예', '캘리그래피', '전통 서예', '한국 서예'],
@@ -102,10 +104,7 @@ export const STRUCTURED_DATA = {
     knowsAbout: SITE_CONFIG.artist.knowsAbout,
     image: `${SITE_CONFIG.url}${SITE_CONFIG.artist.image}`,
     url: `${SITE_CONFIG.url}${SITE_CONFIG.artist.profileUrl}`,
-    sameAs: [
-      SITE_CONFIG.social.instagram,
-      SITE_CONFIG.social.website,
-    ],
+    sameAs: [SITE_CONFIG.social.instagram, SITE_CONFIG.social.website],
   },
 
   website: {
@@ -127,7 +126,8 @@ export const STRUCTURED_DATA = {
   artGallery: {
     '@type': 'ArtGallery',
     name: SITE_CONFIG.siteName,
-    description: '전통 서예와 현대적 감각이 조화를 이루는 독창적인 작품들을 전시하는 온라인 갤러리',
+    description:
+      '전통 서예와 현대적 감각이 조화를 이루는 독창적인 작품들을 전시하는 온라인 갤러리',
     url: SITE_CONFIG.url,
     image: `${SITE_CONFIG.url}${SITE_CONFIG.images.artist}`,
     artform: SITE_CONFIG.gallery.artform,

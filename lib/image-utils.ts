@@ -94,7 +94,7 @@ export function generateAltText(
   if (type === 'artwork') {
     return `아남 배옥영 작가의 서예 작품 "${title}"`
   }
-      return `아남 배옥영 작가 ${title}`
+  return `아남 배옥영 작가 ${title}`
 }
 
 /**

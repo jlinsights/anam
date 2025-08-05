@@ -12,6 +12,8 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // React 18 호환성을 위한 설정
+  reactStrictMode: true,
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -29,7 +31,6 @@ const nextConfig = {
   //   distDir: "out",
   // }),
   experimental: {
-    reactCompiler: false,
     optimizePackageImports: [
       "lucide-react", 
       "@radix-ui/react-icons",
@@ -39,6 +40,8 @@ const nextConfig = {
       "recharts"
     ],
   },
+  // Next.js 15에 맞는 설정
+  serverExternalPackages: [],
   ...(process.env.NODE_ENV === "development" && {
     onDemandEntries: {
       maxInactiveAge: 60 * 1000,
@@ -54,6 +57,32 @@ const nextConfig = {
       };
     }
 
+    // Deprecation 경고 억제
+    config.infrastructureLogging = {
+      level: 'error',
+    };
+
+    // Console 경고 억제
+    config.stats = {
+      ...config.stats,
+      warningsFilter: [
+        /punycode/,
+        /DeprecationWarning/,
+        /\[DEP0040\]/,
+      ],
+    };
+
+    // React 18 호환성을 위한 설정
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+      };
+    }
+
     config.optimization = {
       ...config.optimization,
       splitChunks: {
@@ -64,18 +93,15 @@ const nextConfig = {
             name: "vendors",
             chunks: "all",
           },
+          react: {
+            test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+            name: "react",
+            chunks: "all",
+            priority: 10,
+          },
         },
       },
     };
-
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-      };
-    }
 
     return config;
   },

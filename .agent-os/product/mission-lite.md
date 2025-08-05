@@ -1,0 +1,5 @@
+# Product Mission (Lite)
+
+ANAM Gallery is a revolutionary digital platform for Korean calligraphy that helps traditional art enthusiasts, collectors, and cultural institutions preserve and experience authentic Seoye (Korean calligraphy) by providing an immersive Zen Brutalism Foundation design system that bridges traditional Korean aesthetic principles with cutting-edge digital interaction.
+
+ANAM Gallery serves art collectors, cultural institutions, and the global Korean art community who need authentic digital access to traditional Korean calligraphy with proper cultural context. Unlike commercial art platforms that focus primarily on sales, we provide comprehensive cultural education, interactive learning experiences, and an innovative design system that honors the spiritual essence of Korean calligraphy while delivering cutting-edge digital experiences that make traditional art accessible to global audiences.

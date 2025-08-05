@@ -83,10 +83,13 @@ export function UIProvider({ children }: { children: ReactNode }) {
   // 액션 함수들
   const actions: UIActions = {
     setTheme: (theme) => {
-      setState(prev => {
+      setState((prev) => {
         if (theme === 'system') {
-          const systemTheme = typeof window !== 'undefined' && 
-            window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+          const systemTheme =
+            typeof window !== 'undefined' &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light'
           return { ...prev, theme, resolvedTheme: systemTheme }
         } else {
           return { ...prev, theme, resolvedTheme: theme }
@@ -95,84 +98,87 @@ export function UIProvider({ children }: { children: ReactNode }) {
     },
 
     setResolvedTheme: (resolvedTheme) => {
-      setState(prev => ({ ...prev, resolvedTheme }))
+      setState((prev) => ({ ...prev, resolvedTheme }))
     },
 
     toggleTheme: () => {
-      setState(prev => {
+      setState((prev) => {
         const newTheme = prev.resolvedTheme === 'light' ? 'dark' : 'light'
         return { ...prev, theme: newTheme, resolvedTheme: newTheme }
       })
     },
 
     setLanguage: (language) => {
-      setState(prev => ({ ...prev, language }))
+      setState((prev) => ({ ...prev, language }))
     },
 
     toggleMobileMenu: () => {
-      setState(prev => ({ ...prev, isMobileMenuOpen: !prev.isMobileMenuOpen }))
+      setState((prev) => ({
+        ...prev,
+        isMobileMenuOpen: !prev.isMobileMenuOpen,
+      }))
     },
 
     closeMobileMenu: () => {
-      setState(prev => ({ ...prev, isMobileMenuOpen: false }))
+      setState((prev) => ({ ...prev, isMobileMenuOpen: false }))
     },
 
     toggleSearch: () => {
-      setState(prev => ({ ...prev, isSearchOpen: !prev.isSearchOpen }))
+      setState((prev) => ({ ...prev, isSearchOpen: !prev.isSearchOpen }))
     },
 
     closeSearch: () => {
-      setState(prev => ({ ...prev, isSearchOpen: false }))
+      setState((prev) => ({ ...prev, isSearchOpen: false }))
     },
 
     setGalleryFilter: (filter) => {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
-        galleryFilter: { ...prev.galleryFilter, ...filter }
+        galleryFilter: { ...prev.galleryFilter, ...filter },
       }))
     },
 
     resetGalleryFilter: () => {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
-        galleryFilter: { sortBy: 'year', sortOrder: 'desc' }
+        galleryFilter: { sortBy: 'year', sortOrder: 'desc' },
       }))
     },
 
     setSelectedArtwork: (id) => {
-      setState(prev => ({ ...prev, selectedArtworkId: id }))
+      setState((prev) => ({ ...prev, selectedArtworkId: id }))
     },
 
     openLightbox: (artworkId) => {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         selectedArtworkId: artworkId,
-        isLightboxOpen: true
+        isLightboxOpen: true,
       }))
     },
 
     closeLightbox: () => {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         isLightboxOpen: false,
-        selectedArtworkId: null
+        selectedArtworkId: null,
       }))
     },
 
     setLoading: (loading, message = '') => {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         isLoading: loading,
-        loadingMessage: message
+        loadingMessage: message,
       }))
     },
 
     setError: (error) => {
-      setState(prev => ({ ...prev, error }))
+      setState((prev) => ({ ...prev, error }))
     },
 
     clearError: () => {
-      setState(prev => ({ ...prev, error: null }))
+      setState((prev) => ({ ...prev, error: null }))
     },
 
     reset: () => {
@@ -186,9 +192,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <UIContext.Provider value={contextValue}>
-      {children}
-    </UIContext.Provider>
+    <UIContext.Provider value={contextValue}>{children}</UIContext.Provider>
   )
 }
 

@@ -181,11 +181,12 @@ export const translations: Record<Locale, TranslationStructure> = {
       reset: '초기화',
     },
     meta: {
-          defaultTitle: '아남 배옥영 개인전 - 먹, 그리고...',
-    defaultDescription: '아남 배옥영 작가의 현대 서예 개인전. 인생의 여정을 담은 깊이 있는 서예 작품을 온라인으로 감상하세요.',
-    exhibitionTitle: '아남 배옥영 개인전 - 전시',
-    galleryTitle: '아남 배옥영 개인전 - 갤러리',
-    artistTitle: '아남 배옥영 개인전 - 작가',
+      defaultTitle: '아남 배옥영 개인전 - 먹, 그리고...',
+      defaultDescription:
+        '아남 배옥영 작가의 현대 서예 개인전. 인생의 여정을 담은 깊이 있는 서예 작품을 온라인으로 감상하세요.',
+      exhibitionTitle: '아남 배옥영 개인전 - 전시',
+      galleryTitle: '아남 배옥영 개인전 - 갤러리',
+      artistTitle: '아남 배옥영 개인전 - 작가',
     },
   },
   en: {
@@ -275,7 +276,8 @@ export const translations: Record<Locale, TranslationStructure> = {
     },
     meta: {
       defaultTitle: 'Anam Bae Ok Young Solo Exhibition - Ink, and...',
-      defaultDescription: 'Solo exhibition of contemporary calligraphy by artist Anam Bae Ok Young. Experience profound calligraphy works depicting the journey of life online.',
+      defaultDescription:
+        'Solo exhibition of contemporary calligraphy by artist Anam Bae Ok Young. Experience profound calligraphy works depicting the journey of life online.',
       exhibitionTitle: 'Anam Bae Ok Young Solo Exhibition - Exhibition',
       galleryTitle: 'Anam Bae Ok Young Solo Exhibition - Gallery',
       artistTitle: 'Anam Bae Ok Young Solo Exhibition - Artist',
@@ -368,7 +370,8 @@ export const translations: Record<Locale, TranslationStructure> = {
     },
     meta: {
       defaultTitle: '希欄孔慶順個展 - 道',
-      defaultDescription: '作家希欄孔慶順の現代書道個展。人生の旅路を込めた深みのある書道作品をオンラインでご鑑賞ください。',
+      defaultDescription:
+        '作家希欄孔慶順の現代書道個展。人生の旅路を込めた深みのある書道作品をオンラインでご鑑賞ください。',
       exhibitionTitle: '希欄孔慶順個展 - 展示',
       galleryTitle: '希欄孔慶順個展 - ギャラリー',
       artistTitle: '希欄孔慶順個展 - 作家',
@@ -461,7 +464,8 @@ export const translations: Record<Locale, TranslationStructure> = {
     },
     meta: {
       defaultTitle: '熙欄孔慶順个展 - 道',
-      defaultDescription: '艺术家熙欄孔慶順的现代书法个展。在线欣赏蕴含人生旅程的深邃书法作品。',
+      defaultDescription:
+        '艺术家熙欄孔慶順的现代书法个展。在线欣赏蕴含人生旅程的深邃书法作品。',
       exhibitionTitle: '熙欄孔慶順个展 - 展览',
       galleryTitle: '熙欄孔慶順个展 - 画廊',
       artistTitle: '熙欄孔慶順个展 - 艺术家',

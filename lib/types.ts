@@ -7,9 +7,11 @@ export interface Artwork {
   dimensions: string
   aspectRatio: string // CSS aspect-ratio 값 (예: "2/1", "1/1", "5/7")
   description: string
-  imageUrl: string
+  imageUrl: string // 레거시 지원용 (점진적 마이그레이션)
   imageUrlQuery?: string
   artistNote?: string
+  // 최적화된 이미지 시스템
+  imageId?: string // optimized 폴더의 이미지 ID (예: "01", "05-대 copy")
   // Airtable 연동을 위한 추가 필드들
   featured?: boolean
   category?: string

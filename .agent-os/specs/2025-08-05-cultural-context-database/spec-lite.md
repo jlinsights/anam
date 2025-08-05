@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Implement a comprehensive cultural context database system that provides philosophical, historical, and technical context for each of the 58 Korean calligraphy artworks in the ANAM Gallery. This transforms the gallery from simple viewing into an educational platform that preserves and teaches traditional Korean calligraphy culture to global audiences through structured cultural metadata, expert content management, and engaging educational displays.

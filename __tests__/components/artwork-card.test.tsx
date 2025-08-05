@@ -1,13 +1,17 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { ArtworkCard, ArtworkGrid, ArtworkCardSkeleton } from '@/components/artwork-card'
+import {
+  ArtworkCard,
+  ArtworkGrid,
+  ArtworkCardSkeleton,
+} from '@/components/artwork-card'
 import { mockArtwork } from '../lib/hooks/artwork.mock'
 import type { Artwork } from '@/lib/types'
 
 // Mock the optimized image component
 jest.mock('@/components/optimized-image', () => ({
   GalleryGridImage: ({ artwork, className, priority }: any) => (
-    <div 
-      data-testid="gallery-image" 
+    <div
+      data-testid='gallery-image'
       className={className}
       data-priority={priority}
       data-artwork-title={artwork.title}
@@ -20,7 +24,7 @@ jest.mock('@/components/optimized-image', () => ({
 // Mock Next.js Link
 jest.mock('next/link', () => {
   return ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href} data-testid="artwork-link">
+    <a href={href} data-testid='artwork-link'>
       {children}
     </a>
   )
@@ -39,7 +43,9 @@ describe('ArtworkCard', () => {
 
     it('아트워크 연도가 표시되어야 한다', () => {
       render(<ArtworkCard {...defaultProps} />)
-      expect(screen.getByText(mockArtwork.year?.toString() || '')).toBeInTheDocument()
+      expect(
+        screen.getByText(mockArtwork.year?.toString() || '')
+      ).toBeInTheDocument()
     })
 
     it('올바른 링크를 가져야 한다', () => {
@@ -57,19 +63,23 @@ describe('ArtworkCard', () => {
 
   describe('Variant 스타일링', () => {
     it('minimal variant를 올바르게 적용해야 한다', () => {
-      const { container } = render(<ArtworkCard {...defaultProps} variant="minimal" />)
+      const { container } = render(
+        <ArtworkCard {...defaultProps} variant='minimal' />
+      )
       const card = container.querySelector('.bg-transparent')
       expect(card).toBeInTheDocument()
     })
 
     it('featured variant를 올바르게 적용해야 한다', () => {
-      const { container } = render(<ArtworkCard {...defaultProps} variant="featured" />)
+      const { container } = render(
+        <ArtworkCard {...defaultProps} variant='featured' />
+      )
       const card = container.querySelector('.card-art-elevated')
       expect(card).toBeInTheDocument()
     })
 
     it('compact variant를 올바르게 적용해야 한다', () => {
-      render(<ArtworkCard {...defaultProps} variant="compact" />)
+      render(<ArtworkCard {...defaultProps} variant='compact' />)
       expect(screen.getByText(mockArtwork.title)).toBeInTheDocument()
     })
   })
@@ -79,7 +89,9 @@ describe('ArtworkCard', () => {
       render(<ArtworkCard {...defaultProps} showMetadata={true} />)
       expect(screen.getByText(mockArtwork.title)).toBeInTheDocument()
       if (mockArtwork.year) {
-        expect(screen.getByText(mockArtwork.year.toString())).toBeInTheDocument()
+        expect(
+          screen.getByText(mockArtwork.year.toString())
+        ).toBeInTheDocument()
       }
     })
 
@@ -129,11 +141,11 @@ describe('ArtworkCard', () => {
       const likeButton = screen.getByText('좋아요')
       const shareButton = screen.getByText('공유')
       const detailButton = screen.getByText('상세보기')
-      
+
       fireEvent.click(likeButton)
       fireEvent.click(shareButton)
       fireEvent.click(detailButton)
-      
+
       // 클릭 이벤트가 정상적으로 발생하는지 확인
       expect(likeButton).toBeInTheDocument()
       expect(shareButton).toBeInTheDocument()
@@ -145,13 +157,13 @@ describe('ArtworkCard', () => {
     it('마우스 호버 시 상태가 변경되어야 한다', async () => {
       const { container } = render(<ArtworkCard {...defaultProps} />)
       const card = container.querySelector('.card-art')
-      
+
       if (card) {
         fireEvent.mouseEnter(card)
         await waitFor(() => {
           expect(card).toBeInTheDocument()
         })
-        
+
         fireEvent.mouseLeave(card)
         await waitFor(() => {
           expect(card).toBeInTheDocument()
@@ -204,8 +216,12 @@ describe('ArtworkGrid', () => {
   })
 
   it('올바른 grid columns 클래스를 적용해야 한다', () => {
-    const { container } = render(<ArtworkGrid artworks={mockArtworks} columns={3} />)
-    const grid = container.querySelector('.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3')
+    const { container } = render(
+      <ArtworkGrid artworks={mockArtworks} columns={3} />
+    )
+    const grid = container.querySelector(
+      '.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3'
+    )
     expect(grid).toBeInTheDocument()
   })
 
@@ -219,12 +235,12 @@ describe('ArtworkGrid', () => {
 
     render(<ArtworkGrid artworks={manyArtworks} />)
     const images = screen.getAllByTestId('gallery-image')
-    
+
     // 첫 4개는 priority true
     for (let i = 0; i < 4; i++) {
       expect(images[i]).toHaveAttribute('data-priority', 'true')
     }
-    
+
     // 나머지는 priority false
     for (let i = 4; i < images.length; i++) {
       expect(images[i]).toHaveAttribute('data-priority', 'false')
@@ -246,19 +262,19 @@ describe('ArtworkCardSkeleton', () => {
   })
 
   it('minimal variant 스켈레톤을 렌더링해야 한다', () => {
-    const { container } = render(<ArtworkCardSkeleton variant="minimal" />)
+    const { container } = render(<ArtworkCardSkeleton variant='minimal' />)
     const skeleton = container.querySelector('.animate-pulse')
     expect(skeleton).toBeInTheDocument()
   })
 
   it('featured variant 스켈레톤을 렌더링해야 한다', () => {
-    const { container } = render(<ArtworkCardSkeleton variant="featured" />)
+    const { container } = render(<ArtworkCardSkeleton variant='featured' />)
     const skeleton = container.querySelector('.animate-pulse')
     expect(skeleton).toBeInTheDocument()
   })
 
   it('compact variant 스켈레톤을 렌더링해야 한다', () => {
-    const { container } = render(<ArtworkCardSkeleton variant="compact" />)
+    const { container } = render(<ArtworkCardSkeleton variant='compact' />)
     const skeleton = container.querySelector('.animate-pulse')
     expect(skeleton).toBeInTheDocument()
   })

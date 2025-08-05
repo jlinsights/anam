@@ -1,8 +1,8 @@
 import { renderHook, act } from '@testing-library/react'
-import { 
-  useGalleryFilter, 
-  useGalleryPagination, 
-  useGalleryStats 
+import {
+  useGalleryFilter,
+  useGalleryPagination,
+  useGalleryStats,
 } from '@/lib/hooks/use-gallery-filter'
 import { useUIStore } from '@/lib/store/ui-store'
 import { mockArtworks, mockArtworkWithoutOptionalFields } from './artwork.mock'
@@ -32,7 +32,7 @@ describe('useGalleryFilter', () => {
   describe('기본 필터링', () => {
     it('필터가 없을 때 모든 작품을 반환해야 한다', () => {
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       expect(result.current.filteredArtworks).toHaveLength(mockArtworks.length)
       expect(result.current.totalCount).toBe(mockArtworks.length)
       expect(result.current.hasResults).toBe(true)
@@ -41,7 +41,7 @@ describe('useGalleryFilter', () => {
 
     it('빈 배열이 전달되어도 정상 작동해야 한다', () => {
       const { result } = renderHook(() => useGalleryFilter([]))
-      
+
       expect(result.current.filteredArtworks).toHaveLength(0)
       expect(result.current.totalCount).toBe(0)
       expect(result.current.hasResults).toBe(false)
@@ -59,9 +59,11 @@ describe('useGalleryFilter', () => {
       })
 
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       const filteredResults = result.current.filteredArtworks
-      expect(filteredResults.every(artwork => artwork.year?.toString() === '2024')).toBe(true)
+      expect(
+        filteredResults.every((artwork) => artwork.year?.toString() === '2024')
+      ).toBe(true)
       expect(result.current.isFiltered).toBe(true)
     })
 
@@ -74,7 +76,7 @@ describe('useGalleryFilter', () => {
       })
 
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       expect(result.current.filteredArtworks).toHaveLength(0)
       expect(result.current.hasResults).toBe(false)
       expect(result.current.isFiltered).toBe(true)
@@ -93,10 +95,14 @@ describe('useGalleryFilter', () => {
         },
       })
 
-      const { result } = renderHook(() => useGalleryFilter(artworksWithMissingYear))
-      
+      const { result } = renderHook(() =>
+        useGalleryFilter(artworksWithMissingYear)
+      )
+
       const filteredResults = result.current.filteredArtworks
-      expect(filteredResults.every(artwork => artwork.year?.toString() === '2024')).toBe(true)
+      expect(
+        filteredResults.every((artwork) => artwork.year?.toString() === '2024')
+      ).toBe(true)
     })
   })
 
@@ -110,11 +116,13 @@ describe('useGalleryFilter', () => {
       })
 
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       const filteredResults = result.current.filteredArtworks
-      expect(filteredResults.every(artwork => 
-        artwork.medium?.toLowerCase().includes('먹')
-      )).toBe(true)
+      expect(
+        filteredResults.every((artwork) =>
+          artwork.medium?.toLowerCase().includes('먹')
+        )
+      ).toBe(true)
       expect(result.current.isFiltered).toBe(true)
     })
 
@@ -127,11 +135,13 @@ describe('useGalleryFilter', () => {
       })
 
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       const filteredResults = result.current.filteredArtworks
-      expect(filteredResults.every(artwork => 
-        artwork.medium?.toLowerCase().includes('한지')
-      )).toBe(true)
+      expect(
+        filteredResults.every((artwork) =>
+          artwork.medium?.toLowerCase().includes('한지')
+        )
+      ).toBe(true)
     })
 
     it('재료가 없는 작품을 적절히 처리해야 한다', () => {
@@ -147,12 +157,16 @@ describe('useGalleryFilter', () => {
         },
       })
 
-      const { result } = renderHook(() => useGalleryFilter(artworksWithMissingMedium))
-      
+      const { result } = renderHook(() =>
+        useGalleryFilter(artworksWithMissingMedium)
+      )
+
       const filteredResults = result.current.filteredArtworks
-      expect(filteredResults.every(artwork => 
-        artwork.medium?.toLowerCase().includes('먹')
-      )).toBe(true)
+      expect(
+        filteredResults.every((artwork) =>
+          artwork.medium?.toLowerCase().includes('먹')
+        )
+      ).toBe(true)
     })
   })
 
@@ -166,9 +180,11 @@ describe('useGalleryFilter', () => {
       })
 
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       const filteredResults = result.current.filteredArtworks
-      expect(filteredResults.some(artwork => artwork.title.includes('길'))).toBe(true)
+      expect(
+        filteredResults.some((artwork) => artwork.title.includes('길'))
+      ).toBe(true)
       expect(result.current.isFiltered).toBe(true)
     })
 
@@ -181,11 +197,13 @@ describe('useGalleryFilter', () => {
       })
 
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       const filteredResults = result.current.filteredArtworks
-      expect(filteredResults.some(artwork => 
-        artwork.description?.includes('테스트')
-      )).toBe(true)
+      expect(
+        filteredResults.some((artwork) =>
+          artwork.description?.includes('테스트')
+        )
+      ).toBe(true)
     })
 
     it('작가 노트로 검색할 수 있어야 한다', () => {
@@ -197,11 +215,11 @@ describe('useGalleryFilter', () => {
       })
 
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       const filteredResults = result.current.filteredArtworks
-      expect(filteredResults.some(artwork => 
-        artwork.artistNote?.includes('작가')
-      )).toBe(true)
+      expect(
+        filteredResults.some((artwork) => artwork.artistNote?.includes('작가'))
+      ).toBe(true)
     })
 
     it('여러 필드에서 검색이 가능해야 한다', () => {
@@ -213,7 +231,7 @@ describe('useGalleryFilter', () => {
       })
 
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       const filteredResults = result.current.filteredArtworks
       expect(filteredResults.length).toBeGreaterThan(0)
       expect(result.current.isFiltered).toBe(true)
@@ -230,7 +248,7 @@ describe('useGalleryFilter', () => {
       })
 
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       const sortedResults = result.current.filteredArtworks
       for (let i = 1; i < sortedResults.length; i++) {
         const prevYear = sortedResults[i - 1].year || 0
@@ -248,12 +266,14 @@ describe('useGalleryFilter', () => {
       })
 
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       const sortedResults = result.current.filteredArtworks
       for (let i = 1; i < sortedResults.length; i++) {
         const prevTitle = sortedResults[i - 1].title || ''
         const currentTitle = sortedResults[i].title || ''
-        expect(prevTitle.localeCompare(currentTitle, 'ko-KR')).toBeLessThanOrEqual(0)
+        expect(
+          prevTitle.localeCompare(currentTitle, 'ko-KR')
+        ).toBeLessThanOrEqual(0)
       }
     })
 
@@ -266,12 +286,14 @@ describe('useGalleryFilter', () => {
       })
 
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       const sortedResults = result.current.filteredArtworks
       for (let i = 1; i < sortedResults.length; i++) {
         const prevMedium = sortedResults[i - 1].medium || ''
         const currentMedium = sortedResults[i].medium || ''
-        expect(prevMedium.localeCompare(currentMedium, 'ko-KR')).toBeLessThanOrEqual(0)
+        expect(
+          prevMedium.localeCompare(currentMedium, 'ko-KR')
+        ).toBeLessThanOrEqual(0)
       }
     })
 
@@ -284,7 +306,7 @@ describe('useGalleryFilter', () => {
       })
 
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       const sortedResults = result.current.filteredArtworks
       for (let i = 1; i < sortedResults.length; i++) {
         const prevYear = sortedResults[i - 1].year || 0
@@ -297,30 +319,34 @@ describe('useGalleryFilter', () => {
   describe('사용 가능한 옵션', () => {
     it('사용 가능한 연도 목록을 반환해야 한다', () => {
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       const availableYears = result.current.availableYears
       expect(availableYears).toContain('2024')
       expect(availableYears).toContain('2023')
       expect(availableYears).toContain('2025')
-      
+
       // 내림차순으로 정렬되어야 함
       for (let i = 1; i < availableYears.length; i++) {
-        expect(parseInt(availableYears[i - 1])).toBeGreaterThan(parseInt(availableYears[i]))
+        expect(parseInt(availableYears[i - 1])).toBeGreaterThan(
+          parseInt(availableYears[i])
+        )
       }
     })
 
     it('사용 가능한 재료 목록을 반환해야 한다', () => {
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       const availableMediums = result.current.availableMediums
       expect(availableMediums.length).toBeGreaterThan(0)
-      
+
       // 중복이 없어야 함
       const uniqueMediums = [...new Set(availableMediums)]
       expect(availableMediums).toEqual(uniqueMediums)
-      
+
       // 한국어 정렬되어야 함
-      const sortedMediums = [...availableMediums].sort((a, b) => a.localeCompare(b, 'ko-KR'))
+      const sortedMediums = [...availableMediums].sort((a, b) =>
+        a.localeCompare(b, 'ko-KR')
+      )
       expect(availableMediums).toEqual(sortedMediums)
     })
 
@@ -330,10 +356,14 @@ describe('useGalleryFilter', () => {
         { ...mockArtworkWithoutOptionalFields, year: 0, medium: '' },
       ]
 
-      const { result } = renderHook(() => useGalleryFilter(artworksWithEmptyValues))
-      
-      expect(result.current.availableYears.every(year => year)).toBe(true)
-      expect(result.current.availableMediums.every(medium => medium)).toBe(true)
+      const { result } = renderHook(() =>
+        useGalleryFilter(artworksWithEmptyValues)
+      )
+
+      expect(result.current.availableYears.every((year) => year)).toBe(true)
+      expect(result.current.availableMediums.every((medium) => medium)).toBe(
+        true
+      )
     })
   })
 
@@ -350,20 +380,21 @@ describe('useGalleryFilter', () => {
       })
 
       const { result } = renderHook(() => useGalleryFilter(mockArtworks))
-      
+
       const filteredResults = result.current.filteredArtworks
-      
+
       // 모든 필터 조건을 만족해야 함
-      expect(filteredResults.every(artwork => 
-        artwork.year?.toString() === '2024' &&
-        artwork.medium?.toLowerCase().includes('먹') &&
-        (
-          artwork.title.includes('작품') ||
-          artwork.description?.includes('작품') ||
-          artwork.artistNote?.includes('작품')
+      expect(
+        filteredResults.every(
+          (artwork) =>
+            artwork.year?.toString() === '2024' &&
+            artwork.medium?.toLowerCase().includes('먹') &&
+            (artwork.title.includes('작품') ||
+              artwork.description?.includes('작품') ||
+              artwork.artistNote?.includes('작품'))
         )
-      )).toBe(true)
-      
+      ).toBe(true)
+
       expect(result.current.isFiltered).toBe(true)
     })
   })
@@ -374,10 +405,10 @@ describe('useGalleryPagination', () => {
 
   describe('기본 페이지네이션', () => {
     it('첫 페이지의 아이템들을 반환해야 한다', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useGalleryPagination(items, { itemsPerPage: 2 })
       )
-      
+
       expect(result.current.currentPage).toBe(1)
       expect(result.current.paginatedItems).toHaveLength(2)
       expect(result.current.totalPages).toBe(Math.ceil(items.length / 2))
@@ -386,108 +417,108 @@ describe('useGalleryPagination', () => {
     })
 
     it('페이지를 이동할 수 있어야 한다', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useGalleryPagination(items, { itemsPerPage: 2 })
       )
-      
+
       act(() => {
         result.current.goToPage(2)
       })
-      
+
       expect(result.current.currentPage).toBe(2)
       expect(result.current.hasNextPage).toBe(items.length > 4)
       expect(result.current.hasPrevPage).toBe(true)
     })
 
     it('다음 페이지로 이동할 수 있어야 한다', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useGalleryPagination(items, { itemsPerPage: 2 })
       )
-      
+
       act(() => {
         result.current.nextPage()
       })
-      
+
       expect(result.current.currentPage).toBe(2)
     })
 
     it('이전 페이지로 이동할 수 있어야 한다', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useGalleryPagination(items, { itemsPerPage: 2, initialPage: 2 })
       )
-      
+
       act(() => {
         result.current.prevPage()
       })
-      
+
       expect(result.current.currentPage).toBe(1)
     })
 
     it('첫 페이지로 이동할 수 있어야 한다', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useGalleryPagination(items, { itemsPerPage: 2, initialPage: 3 })
       )
-      
+
       act(() => {
         result.current.goToFirst()
       })
-      
+
       expect(result.current.currentPage).toBe(1)
     })
 
     it('마지막 페이지로 이동할 수 있어야 한다', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useGalleryPagination(items, { itemsPerPage: 2 })
       )
-      
+
       act(() => {
         result.current.goToLast()
       })
-      
+
       expect(result.current.currentPage).toBe(result.current.totalPages)
     })
   })
 
   describe('경계값 처리', () => {
     it('첫 페이지에서 이전 페이지 시도 시 이동하지 않아야 한다', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useGalleryPagination(items, { itemsPerPage: 2 })
       )
-      
+
       act(() => {
         result.current.prevPage()
       })
-      
+
       expect(result.current.currentPage).toBe(1)
     })
 
     it('마지막 페이지에서 다음 페이지 시도 시 이동하지 않아야 한다', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useGalleryPagination(items, { itemsPerPage: items.length })
       )
-      
+
       act(() => {
         result.current.nextPage()
       })
-      
+
       expect(result.current.currentPage).toBe(1)
     })
 
     it('유효하지 않은 페이지 번호를 적절히 처리해야 한다', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useGalleryPagination(items, { itemsPerPage: 2 })
       )
-      
+
       act(() => {
         result.current.goToPage(999)
       })
-      
+
       expect(result.current.currentPage).toBe(result.current.totalPages)
-      
+
       act(() => {
         result.current.goToPage(-1)
       })
-      
+
       expect(result.current.currentPage).toBe(1)
     })
   })
@@ -498,16 +529,16 @@ describe('useGalleryPagination', () => {
         ({ items }) => useGalleryPagination(items, { itemsPerPage: 2 }),
         { initialProps: { items } }
       )
-      
+
       act(() => {
         result.current.goToPage(2)
       })
       expect(result.current.currentPage).toBe(2)
-      
+
       // 아이템 목록 변경
       const newItems = items.slice(0, 2)
       rerender({ items: newItems })
-      
+
       expect(result.current.currentPage).toBe(1)
     })
 
@@ -516,17 +547,19 @@ describe('useGalleryPagination', () => {
         ({ items }) => useGalleryPagination(items, { itemsPerPage: 2 }),
         { initialProps: { items } }
       )
-      
+
       act(() => {
         result.current.goToLast()
       })
       const lastPage = result.current.currentPage
-      
+
       // 아이템 수 감소
       const newItems = items.slice(0, 2)
       rerender({ items: newItems })
-      
-      expect(result.current.currentPage).toBeLessThanOrEqual(result.current.totalPages)
+
+      expect(result.current.currentPage).toBeLessThanOrEqual(
+        result.current.totalPages
+      )
     })
   })
 })
@@ -535,19 +568,19 @@ describe('useGalleryStats', () => {
   describe('기본 통계', () => {
     it('총 작품 수를 반환해야 한다', () => {
       const { result } = renderHook(() => useGalleryStats(mockArtworks))
-      
+
       expect(result.current.totalArtworks).toBe(mockArtworks.length)
     })
 
     it('연도별 작품 수를 계산해야 한다', () => {
       const { result } = renderHook(() => useGalleryStats(mockArtworks))
-      
+
       const artworksByYear = result.current.artworksByYear
-      
+
       // 각 연도별로 올바른 개수가 계산되어야 함
       Object.entries(artworksByYear).forEach(([year, count]) => {
         const expectedCount = mockArtworks.filter(
-          artwork => artwork.year?.toString() === year
+          (artwork) => artwork.year?.toString() === year
         ).length
         expect(count).toBe(expectedCount)
       })
@@ -555,13 +588,13 @@ describe('useGalleryStats', () => {
 
     it('재료별 작품 수를 계산해야 한다', () => {
       const { result } = renderHook(() => useGalleryStats(mockArtworks))
-      
+
       const artworksByMedium = result.current.artworksByMedium
-      
+
       // 각 재료별로 올바른 개수가 계산되어야 함
       Object.entries(artworksByMedium).forEach(([medium, count]) => {
         const expectedCount = mockArtworks.filter(
-          artwork => artwork.medium === medium
+          (artwork) => artwork.medium === medium
         ).length
         expect(count).toBe(expectedCount)
       })
@@ -569,21 +602,21 @@ describe('useGalleryStats', () => {
 
     it('연도 범위를 계산해야 한다', () => {
       const { result } = renderHook(() => useGalleryStats(mockArtworks))
-      
+
       const yearRange = result.current.yearRange
       const years = mockArtworks
-        .map(artwork => artwork.year)
+        .map((artwork) => artwork.year)
         .filter((year): year is number => typeof year === 'number')
-      
+
       expect(yearRange.earliest).toBe(Math.min(...years))
       expect(yearRange.latest).toBe(Math.max(...years))
     })
 
     it('연간 평균 작품 수를 계산해야 한다', () => {
       const { result } = renderHook(() => useGalleryStats(mockArtworks))
-      
+
       const { totalArtworks, yearRange, averagePerYear } = result.current
-      
+
       if (yearRange.earliest && yearRange.latest) {
         const yearSpan = yearRange.latest - yearRange.earliest + 1
         const expectedAverage = totalArtworks / yearSpan
@@ -595,7 +628,7 @@ describe('useGalleryStats', () => {
   describe('빈 데이터 처리', () => {
     it('빈 배열을 적절히 처리해야 한다', () => {
       const { result } = renderHook(() => useGalleryStats([]))
-      
+
       expect(result.current.totalArtworks).toBe(0)
       expect(result.current.artworksByYear).toEqual({})
       expect(result.current.artworksByMedium).toEqual({})
@@ -610,13 +643,19 @@ describe('useGalleryStats', () => {
         { ...mockArtworkWithoutOptionalFields, year: 0, medium: '' },
       ]
 
-      const { result } = renderHook(() => useGalleryStats(artworksWithMissingData))
-      
+      const { result } = renderHook(() =>
+        useGalleryStats(artworksWithMissingData)
+      )
+
       expect(result.current.totalArtworks).toBe(2)
-      
+
       // undefined 값들은 통계에서 제외되어야 함
-      expect(Object.keys(result.current.artworksByYear)).not.toContain('undefined')
-      expect(Object.keys(result.current.artworksByMedium)).not.toContain('undefined')
+      expect(Object.keys(result.current.artworksByYear)).not.toContain(
+        'undefined'
+      )
+      expect(Object.keys(result.current.artworksByMedium)).not.toContain(
+        'undefined'
+      )
     })
   })
 })
