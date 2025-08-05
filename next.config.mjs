@@ -24,12 +24,6 @@ const nextConfig = {
       // 필요시 다른 외부 도메인도 추가
     ],
   },
-  // Vercel 배포를 위해 output: export 제거
-  // ...(process.env.NODE_ENV === "production" && {
-  //   output: "export",
-  //   trailingSlash: true,
-  //   distDir: "out",
-  // }),
   experimental: {
     optimizePackageImports: [
       "lucide-react", 
@@ -49,6 +43,17 @@ const nextConfig = {
     },
   }),
   webpack: (config, { dev, isServer }) => {
+    // React 18 호환성을 위한 설정
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+      };
+    }
+
     // 개발 환경에서 안정성을 위한 설정
     if (dev) {
       config.watchOptions = {
@@ -71,17 +76,6 @@ const nextConfig = {
         /\[DEP0040\]/,
       ],
     };
-
-    // React 18 호환성을 위한 설정
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-        crypto: false,
-      };
-    }
 
     config.optimization = {
       ...config.optimization,

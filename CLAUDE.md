@@ -10,6 +10,31 @@ artist 아남 배옥영 (ANAM Bae Ok Young). The project features an innovative 
 Brutalism Foundation** design system that combines traditional Korean aesthetic
 principles with cutting-edge web technologies.
 
+### 🚀 **BMad-Method Integration (Agent OS)**
+
+The project now includes a comprehensive **bmad-method framework integration** through Agent OS, providing AI-assisted development methodology for creating a professional Korean calligraphy gallery platform:
+
+**Key Features**:
+- **Cultural Context Database**: AI-powered cultural analysis and educational content generation
+- **Gallery Enhancement System**: Professional gallery features and advanced user experience design
+- **Multi-Agent Orchestration**: Coordinated AI agents for specialized domain expertise
+- **Quality Assurance Framework**: Comprehensive validation and expert review processes
+
+**Agent OS Structure**:
+```
+.agent-os/
+├── product/                    # Product specifications
+│   ├── cultural-context-database.md
+│   ├── gallery-enhancement.md
+│   └── integration-plan.md
+├── agents/                     # Specialized AI agents
+│   ├── cultural-context-agent.md
+│   ├── gallery-enhancement-agent.md
+│   └── integration-coordinator.md
+└── workflows/                  # Process workflows
+    └── cultural-analysis.md
+```
+
 ### 🎯 **Zen Brutalism Foundation Design Philosophy**
 
 **Core Concept**: "전통의 깊이와 현대적 몰입감을 동시에 제공하는 UI/UX 디자인"
