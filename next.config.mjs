@@ -54,6 +54,8 @@ const nextConfig = {
       };
     }
 
+    // web-vitals 패키지 관련 설정은 제거 (dynamic import 사용)
+
     // 개발 환경에서 안정성을 위한 설정
     if (dev) {
       config.watchOptions = {
@@ -92,6 +94,13 @@ const nextConfig = {
             name: "react",
             chunks: "all",
             priority: 10,
+          },
+          // web-vitals를 별도 청크로 분리
+          webVitals: {
+            test: /[\\/]node_modules[\\/]web-vitals[\\/]/,
+            name: "web-vitals",
+            chunks: "all",
+            priority: 5,
           },
         },
       },

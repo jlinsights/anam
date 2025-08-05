@@ -199,6 +199,7 @@ const ARTWORK_FIELD_MAP: Record<string, string[]> = {
   featured: ['featured', 'Featured', '추천'],
   category: ['category', 'Category', '카테고리'],
   available: ['available', 'Available', '판매여부'],
+  number: ['number', 'Number', '번호', 'ID', 'id', 'ArtworkNumber', 'artwork_number'],
 }
 
 const ARTIST_FIELD_MAP: Record<string, string[]> = {
@@ -332,6 +333,12 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
       // 디버깅을 위해 첫 번째 레코드의 필드 구조 출력
       if (index === 0) {
         console.log('🔍 Sample record fields:', Object.keys(fields))
+        console.log('🔍 Sample record field values:')
+        Object.entries(fields).forEach(([key, value]) => {
+          if (key.toLowerCase().includes('image') || key.toLowerCase().includes('url')) {
+            console.log(`  ${key}:`, typeof value === 'object' ? JSON.stringify(value, null, 2) : value)
+          }
+        })
       }
 
       // 실제 Airtable 필드명 사용
@@ -363,14 +370,76 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
           fields.aspectRatio ||
           calculateAspectRatio(fields.dimensions || '70 x 140 cm'),
         description: fields.description || '',
+        number: pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number'), // Airtable Number 필드
         imageUrl: (() => {
-          // Use local image path instead of external Airtable URL
+          // 우선순위 1: Airtable Number 필드를 이용한 로컬 이미지 매칭
+          const artworkNumber = pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number')
+          if (artworkNumber) {
+            // 동적 import 대신 상단에서 import한 함수 사용
+            const numberBasedPath = `/Images/Artworks/optimized/${String(artworkNumber).padStart(2, '0')}/${String(artworkNumber).padStart(2, '0')}-medium.jpg`
+            
+            if (index === 0) {
+              console.log('✅ Using number-based image path:', numberBasedPath, '(Number:', artworkNumber, ')')
+            }
+            return numberBasedPath
+          }
+          
+          // 우선순위 2: Airtable Attachment 필드에서 URL 추출
+          const imageField = getFieldValue(fields, [
+            'image',
+            'Image',
+            'images',
+            'Images',
+            '이미지',
+            'artwork_image',
+            'Artwork Image',
+            'artworkImage',
+            'ArtworkImage'
+          ])
+          
+          if (index === 0) {
+            console.log('🖼️ Image field found:', imageField)
+          }
+          
+          // Airtable Attachment 필드는 배열로 오며, 각 요소에 url 속성이 있음
+          if (imageField && Array.isArray(imageField) && imageField.length > 0) {
+            const firstImage = imageField[0]
+            if (firstImage && firstImage.url) {
+              if (index === 0) {
+                console.log('✅ Using Airtable attachment URL:', firstImage.url)
+              }
+              return firstImage.url
+            }
+          }
+          
+          // 우선순위 3: 직접 URL 필드 확인 (문자열로 저장된 경우)
+          const directUrl = getFieldValue(fields, [
+            'imageUrl',
+            'ImageUrl',
+            'imageURL',
+            'ImageURL',
+            'image_url',
+            'Image_Url'
+          ])
+          
+          if (directUrl && typeof directUrl === 'string' && directUrl.startsWith('http')) {
+            if (index === 0) {
+              console.log('✅ Using direct URL field:', directUrl)
+            }
+            return directUrl
+          }
+          
+          // 우선순위 4: 레거시 slug 기반 fallback
           const slug = fields.slug || createSlug(title, year || 2024)
           const yearNum = year ? parseInt(year.toString()) : 2024
-
-          // Use image utility function to generate local path
-          const { getArtworkImageUrl } = require('./image-utils')
-          return getArtworkImageUrl(slug, yearNum, 'medium')
+          // 동적 import 대신 직접 경로 생성
+          const legacyPath = `/Images/Artworks/${yearNum}/${slug}-medium.jpg`
+          
+          if (index === 0) {
+            console.log('⚠️ Using legacy slug-based fallback path:', legacyPath)
+          }
+          
+          return legacyPath
         })(),
         imageUrlQuery: `${title} calligraphy art`,
         artistNote: fields.artistNote || '',
@@ -649,6 +718,31 @@ export async function fetchTreasureArtworks(): Promise<Artwork[]> {
     console.error('Error fetching treasure artworks from Airtable:', error)
     return []
   }
+}
+
+/**
+ * 캐시 클리어 함수 (디버깅용)
+ */
+export function clearAirtableCache(): void {
+  // 메모리 캐시 클리어
+  const keys = ['artworks', 'artist', 'treasure']
+  keys.forEach(key => {
+    setCachedData(key, null)
+  })
+  
+  // 로컬 스토리지 캐시 클리어 (클라이언트 사이드에서만)
+  if (typeof window !== 'undefined') {
+    keys.forEach(key => {
+      localStorage.removeItem(`airtable_${key}`)
+    })
+    
+    // 전역 함수로 노출 (개발 환경에서만)
+    if (process.env.NODE_ENV === 'development') {
+      ;(window as any).clearAirtableCache = clearAirtableCache
+    }
+  }
+  
+  console.log('🧹 Airtable cache cleared')
 }
 
 /**

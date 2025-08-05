@@ -11,9 +11,38 @@ export const IMAGE_SIZE_MAP = {
 } as const
 
 /**
- * 최적화된 이미지 경로 생성 (fallback 지원)
+ * 숫자 기반 최적화된 이미지 경로 생성 (Airtable Number 필드 매칭)
  */
 export function getOptimizedImagePath(
+  artworkNumber: string | number,
+  size: ImageSize = 'medium'
+): string {
+  // 숫자를 2자리 문자열로 변환 (01, 02, 03...)
+  const paddedNumber = String(artworkNumber).padStart(2, '0')
+  
+  // 최적화된 이미지 경로 시도
+  if (size !== 'original') {
+    return `/Images/Artworks/optimized/${paddedNumber}/${paddedNumber}-${size}.jpg`
+  }
+
+  // 원본 이미지 경로
+  return `/Images/Artworks/originals/${paddedNumber}.jpg`
+}
+
+/**
+ * Artwork 이미지 URL 생성 (숫자 기반)
+ */
+export function getArtworkImageUrl(
+  artworkNumber: string | number,
+  size: ImageSize = 'medium'
+): string {
+  return getOptimizedImagePath(artworkNumber, size)
+}
+
+/**
+ * 레거시 호환성을 위한 slug 기반 함수 (deprecated)
+ */
+export function getArtworkImageUrlLegacy(
   slug: string,
   year: string | number,
   size: ImageSize = 'medium'
@@ -30,26 +59,14 @@ export function getOptimizedImagePath(
 }
 
 /**
- * Artwork 이미지 URL 생성 (기존 함수 개선)
- */
-export function getArtworkImageUrl(
-  slug: string,
-  year: string | number,
-  size: ImageSize = 'medium'
-): string {
-  return getOptimizedImagePath(slug, year, size)
-}
-
-/**
- * 사용 용도에 따른 이미지 메타데이터 생성
+ * 사용 용도에 따른 이미지 메타데이터 생성 (숫자 기반)
  */
 export function getArtworkImageMeta(
-  slug: string,
-  year: string | number,
+  artworkNumber: string | number,
   usage: keyof typeof IMAGE_SIZE_MAP
 ) {
   const size = IMAGE_SIZE_MAP[usage]
-  const src = getArtworkImageUrl(slug, year, size)
+  const src = getArtworkImageUrl(artworkNumber, size)
 
   // 사용 용도별 sizes 속성
   const sizesMap = {
@@ -169,13 +186,12 @@ export function checkImageExists(url: string): Promise<boolean> {
  * 여러 이미지 크기 중 존재하는 첫 번째 이미지 URL을 반환합니다.
  */
 export async function getAvailableImageUrl(
-  slug: string,
-  year: string | number
+  artworkNumber: string | number
 ): Promise<string> {
   const sizes: ImageSize[] = ['large', 'medium', 'thumb', 'original']
 
   for (const size of sizes) {
-    const url = getArtworkImageUrl(slug, year, size)
+    const url = getArtworkImageUrl(artworkNumber, size)
     const exists = await checkImageExists(url)
     if (exists) {
       return url
@@ -183,5 +199,26 @@ export async function getAvailableImageUrl(
   }
 
   // 모든 이미지가 없으면 기본 medium 크기 반환
-  return getArtworkImageUrl(slug, year, 'medium')
+  return getArtworkImageUrl(artworkNumber, 'medium')
+}
+
+/**
+ * 레거시 호환성을 위한 slug 기반 함수 (deprecated)
+ */
+export async function getAvailableImageUrlLegacy(
+  slug: string,
+  year: string | number
+): Promise<string> {
+  const sizes: ImageSize[] = ['large', 'medium', 'thumb', 'original']
+
+  for (const size of sizes) {
+    const url = getArtworkImageUrlLegacy(slug, year, size)
+    const exists = await checkImageExists(url)
+    if (exists) {
+      return url
+    }
+  }
+
+  // 모든 이미지가 없으면 기본 medium 크기 반환
+  return getArtworkImageUrlLegacy(slug, year, 'medium')
 }

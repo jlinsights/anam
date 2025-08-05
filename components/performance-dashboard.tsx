@@ -47,7 +47,7 @@ export function PerformanceDashboard({
   useEffect(() => {
     if (!isVisible) return
 
-    // 성능 모니터링 시작
+    // 성능 모니터링 시작 (async로 변경)
     performanceMonitor.startMonitoring({
       onMetricsUpdate: (newMetrics) => {
         setMetrics(newMetrics)
@@ -66,7 +66,7 @@ export function PerformanceDashboard({
           return [...filtered, issue].slice(-10) // 최대 10개 이슈만 유지
         })
       },
-    })
+    }).catch(console.error)
 
     setIsMonitoring(true)
 

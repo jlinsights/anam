@@ -12,6 +12,7 @@ export interface Artwork {
   artistNote?: string
   // 최적화된 이미지 시스템
   imageId?: string // optimized 폴더의 이미지 ID (예: "01", "05-대 copy")
+  number?: number | string // Airtable Number 필드 - 이미지 파일명과 매칭 (01, 02, 03...)
   // Airtable 연동을 위한 추가 필드들
   featured?: boolean
   category?: string

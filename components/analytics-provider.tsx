@@ -21,8 +21,8 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
     // Google Analytics 초기화
     initGA()
 
-    // Web Vitals 추적 시작
-    trackWebVitals()
+    // Web Vitals 추적 시작 (async로 변경)
+    trackWebVitals().catch(console.error)
 
     // 세션 추적 시작
     trackSession()

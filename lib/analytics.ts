@@ -193,7 +193,7 @@ export function monitorMemoryUsage() {
 }
 
 // Google Analytics 4 및 성능 모니터링 시스템
-import { onCLS, onFCP, onLCP, onTTFB, type Metric } from 'web-vitals'
+// web-vitals를 동적 import로 변경하여 클라이언트 사이드에서만 로드
 
 // Analytics 설정
 export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID || ''
@@ -352,32 +352,41 @@ export const getPopularArtworks = (
     .slice(0, limit)
 }
 
-// Web Vitals 성능 모니터링
-export const trackWebVitals = () => {
+// Web Vitals 성능 모니터링 - 동적 import로 변경
+export const trackWebVitals = async () => {
   if (typeof window === 'undefined') return
 
-  // Core Web Vitals 메트릭 수집
-  onCLS((metric: Metric) => {
-    trackEvent(
-      'web_vitals',
-      'performance',
-      'CLS',
-      Math.round(metric.value * 1000)
-    )
-  })
+  try {
+    // web-vitals를 동적으로 import
+    const webVitals = await import('web-vitals')
+    const { onCLS, onFCP, onLCP, onTTFB } = webVitals
+    type Metric = any // web-vitals Metric 타입
 
-  // FID는 더 이상 사용되지 않으므로 INP로 대체하거나 제거
-  onFCP((metric: Metric) => {
-    trackEvent('web_vitals', 'performance', 'FCP', Math.round(metric.value))
-  })
+    // Core Web Vitals 메트릭 수집
+    onCLS((metric: Metric) => {
+      trackEvent(
+        'web_vitals',
+        'performance',
+        'CLS',
+        Math.round(metric.value * 1000)
+      )
+    })
 
-  onLCP((metric: Metric) => {
-    trackEvent('web_vitals', 'performance', 'LCP', Math.round(metric.value))
-  })
+    // FID는 더 이상 사용되지 않으므로 INP로 대체하거나 제거
+    onFCP((metric: Metric) => {
+      trackEvent('web_vitals', 'performance', 'FCP', Math.round(metric.value))
+    })
 
-  onTTFB((metric: Metric) => {
-    trackEvent('web_vitals', 'performance', 'TTFB', Math.round(metric.value))
-  })
+    onLCP((metric: Metric) => {
+      trackEvent('web_vitals', 'performance', 'LCP', Math.round(metric.value))
+    })
+
+    onTTFB((metric: Metric) => {
+      trackEvent('web_vitals', 'performance', 'TTFB', Math.round(metric.value))
+    })
+  } catch (error) {
+    console.warn('Failed to load web-vitals:', error)
+  }
 }
 
 // 사용자 행동 분석을 위한 세션 추적

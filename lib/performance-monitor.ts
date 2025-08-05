@@ -5,7 +5,7 @@
  * - 사용자 경험 품질 지표 추적
  */
 
-import { onCLS, onFCP, onLCP, onTTFB, onINP, type Metric } from 'web-vitals'
+// web-vitals를 동적 import로 변경하여 클라이언트 사이드에서만 로드
 
 // 성능 메트릭 타입 정의
 export interface PerformanceMetrics {
@@ -92,7 +92,7 @@ export class PerformanceMonitor {
   }
 
   // 모니터링 시작
-  startMonitoring(options?: {
+  async startMonitoring(options?: {
     onMetricsUpdate?: (metrics: PerformanceMetrics) => void
     onPerformanceIssue?: (issue: PerformanceIssue) => void
   }) {
@@ -102,8 +102,8 @@ export class PerformanceMonitor {
     this.onPerformanceIssue = options?.onPerformanceIssue
     this.isMonitoring = true
 
-    // Core Web Vitals 수집
-    this.collectWebVitals()
+    // Core Web Vitals 수집 (동적 import)
+    await this.collectWebVitals()
 
     // 네트워크 정보 수집
     this.collectNetworkInfo()
@@ -134,64 +134,72 @@ export class PerformanceMonitor {
     console.log('⏹️ Performance monitoring stopped')
   }
 
-  // Core Web Vitals 수집
-  private collectWebVitals() {
-    // 현재 Web Vitals 값 가져오기
-    onCLS((metric) => {
-      this.metrics.cls = metric.value
-      this.updateMetrics()
-      this.checkThreshold(
-        'CLS',
-        metric.value,
-        PERFORMANCE_THRESHOLDS.CLS_GOOD,
-        PERFORMANCE_THRESHOLDS.CLS_POOR
-      )
-    })
+  // Core Web Vitals 수집 - 동적 import로 변경
+  private async collectWebVitals() {
+    try {
+      const webVitals = await import('web-vitals')
+      const { onCLS, onFCP, onLCP, onTTFB, onINP } = webVitals
+      type Metric = any // web-vitals Metric 타입
 
-    onFCP((metric) => {
-      this.metrics.fcp = metric.value
-      this.updateMetrics()
-      this.checkThreshold(
-        'FCP',
-        metric.value,
-        PERFORMANCE_THRESHOLDS.FCP_GOOD,
-        PERFORMANCE_THRESHOLDS.FCP_POOR
-      )
-    })
+      // 현재 Web Vitals 값 가져오기
+      onCLS((metric: Metric) => {
+        this.metrics.cls = metric.value
+        this.updateMetrics()
+        this.checkThreshold(
+          'CLS',
+          metric.value,
+          PERFORMANCE_THRESHOLDS.CLS_GOOD,
+          PERFORMANCE_THRESHOLDS.CLS_POOR
+        )
+      })
 
-    onLCP((metric) => {
-      this.metrics.lcp = metric.value
-      this.updateMetrics()
-      this.checkThreshold(
-        'LCP',
-        metric.value,
-        PERFORMANCE_THRESHOLDS.LCP_GOOD,
-        PERFORMANCE_THRESHOLDS.LCP_POOR
-      )
-    })
+      onFCP((metric: Metric) => {
+        this.metrics.fcp = metric.value
+        this.updateMetrics()
+        this.checkThreshold(
+          'FCP',
+          metric.value,
+          PERFORMANCE_THRESHOLDS.FCP_GOOD,
+          PERFORMANCE_THRESHOLDS.FCP_POOR
+        )
+      })
 
-    onTTFB((metric) => {
-      this.metrics.ttfb = metric.value
-      this.updateMetrics()
-      this.checkThreshold(
-        'TTFB',
-        metric.value,
-        PERFORMANCE_THRESHOLDS.TTFB_GOOD,
-        PERFORMANCE_THRESHOLDS.TTFB_POOR
-      )
-    })
+      onLCP((metric: Metric) => {
+        this.metrics.lcp = metric.value
+        this.updateMetrics()
+        this.checkThreshold(
+          'LCP',
+          metric.value,
+          PERFORMANCE_THRESHOLDS.LCP_GOOD,
+          PERFORMANCE_THRESHOLDS.LCP_POOR
+        )
+      })
 
-    // INP (Interaction to Next Paint) - FID의 후속 지표
-    onINP((metric) => {
-      this.metrics.inp = metric.value
-      this.updateMetrics()
-      this.checkThreshold(
-        'INP',
-        metric.value,
-        PERFORMANCE_THRESHOLDS.INP_GOOD,
-        PERFORMANCE_THRESHOLDS.INP_POOR
-      )
-    })
+      onTTFB((metric: Metric) => {
+        this.metrics.ttfb = metric.value
+        this.updateMetrics()
+        this.checkThreshold(
+          'TTFB',
+          metric.value,
+          PERFORMANCE_THRESHOLDS.TTFB_GOOD,
+          PERFORMANCE_THRESHOLDS.TTFB_POOR
+        )
+      })
+
+      // INP (Interaction to Next Paint) - FID의 후속 지표
+      onINP((metric: Metric) => {
+        this.metrics.inp = metric.value
+        this.updateMetrics()
+        this.checkThreshold(
+          'INP',
+          metric.value,
+          PERFORMANCE_THRESHOLDS.INP_GOOD,
+          PERFORMANCE_THRESHOLDS.INP_POOR
+        )
+      })
+    } catch (error) {
+      console.warn('Failed to load web-vitals for performance monitoring:', error)
+    }
   }
 
   // 네트워크 정보 수집
