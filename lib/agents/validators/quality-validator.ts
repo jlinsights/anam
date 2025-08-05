@@ -119,7 +119,12 @@ export class QualityValidator {
 
     const results: MultilingualValidationResult = {
       overallScore: 0,
-      languageScores: {},
+      languageScores: {
+        korean: { score: 0, fluency: 0, culturalAdaptation: 0, accuracy: 0, issues: [], suggestions: [] },
+        english: { score: 0, fluency: 0, culturalAdaptation: 0, accuracy: 0, issues: [], suggestions: [] },
+        japanese: { score: 0, fluency: 0, culturalAdaptation: 0, accuracy: 0, issues: [], suggestions: [] },
+        chinese: { score: 0, fluency: 0, culturalAdaptation: 0, accuracy: 0, issues: [], suggestions: [] }
+      },
       consistencyScore: 0,
       culturalAdaptationScore: 0,
       issues: [],
@@ -481,7 +486,12 @@ export class QualityValidator {
     // Mock multilingual validation
     return {
       overallScore: 8.0,
-      languageScores: {},
+      languageScores: {
+        korean: { score: 8.2, fluency: 8.5, culturalAdaptation: 8.0, accuracy: 8.3, issues: [], suggestions: [] },
+        english: { score: 7.8, fluency: 8.0, culturalAdaptation: 7.5, accuracy: 8.0, issues: [], suggestions: [] },
+        japanese: { score: 7.9, fluency: 8.1, culturalAdaptation: 7.8, accuracy: 7.8, issues: [], suggestions: [] },
+        chinese: { score: 8.1, fluency: 8.3, culturalAdaptation: 8.2, accuracy: 7.8, issues: [], suggestions: [] }
+      },
       consistencyScore: 8.5,
       culturalAdaptationScore: 8.2,
       issues: [],

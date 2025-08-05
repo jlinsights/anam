@@ -176,9 +176,12 @@ export class CulturalKnowledgeBase {
     relevantPhilosophy: PhilosophicalConcept[]
     culturalSignificance: CulturalKnowledge[]
   } {
+    const styleInfo = style ? this.getStyleInformation(style) || undefined : undefined
+    const periodInfo = historicalPeriod ? this.getHistoricalPeriodInfo(historicalPeriod) || undefined : undefined
+    
     const context = {
-      styleInfo: style ? this.getStyleInformation(style) : undefined,
-      periodInfo: historicalPeriod ? this.getHistoricalPeriodInfo(historicalPeriod) : undefined,
+      styleInfo,
+      periodInfo,
       relevantPhilosophy: this.getRelevantPhilosophy(textualContent),
       culturalSignificance: this.getHighSignificanceEntries(7)
     }

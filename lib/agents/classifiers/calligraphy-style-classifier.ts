@@ -243,7 +243,7 @@ export class CalligraphyStyleClassifier {
       indicators.push('classical-period-influence')
     }
 
-    if (features.artisticExpression === 'modern' || features.brushPressureVariation === 'dynamic') {
+    if (features.brushPressureVariation === 'dynamic') {
       indicators.push('contemporary-interpretation')
     }
 
@@ -252,7 +252,7 @@ export class CalligraphyStyleClassifier {
       indicators.push('post-15th-century')
     }
 
-    if (features.inkFlowPattern === 'flowing' && features.characterSpacing === 'natural') {
+    if (features.inkFlowPattern === 'flowing' && features.characterSpacing === 'normal') {
       indicators.push('traditional-aesthetics')
     }
 

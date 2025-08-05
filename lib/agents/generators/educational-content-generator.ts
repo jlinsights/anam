@@ -352,7 +352,7 @@ export class EducationalContentGenerator {
           sectionTemplate.title,
           'korean',
           languages,
-          { contentType: 'title' }
+          { contentType: 'explanation' }
         ),
         content: await this.generateSectionContent(
           sectionTemplate,
@@ -388,7 +388,7 @@ export class EducationalContentGenerator {
           '역사적 배경',
           'korean',
           languages,
-          { contentType: 'section_title' }
+          { contentType: 'explanation' }
         ),
         period: culturalContext.historicalAnalysis.historicalContext.period,
         culturalBackground: await this.generateHistoricalBackground(
@@ -432,7 +432,7 @@ export class EducationalContentGenerator {
         '문화적 이해도 퀴즈',
         'korean',
         languages,
-        { contentType: 'interactive_title' }
+        { contentType: 'explanation' }
       ),
       instructions: await this.multilingualAdapter.adaptContent(
         '다음 질문들을 통해 작품의 문화적 의미를 탐험해보세요.',
@@ -457,7 +457,7 @@ export class EducationalContentGenerator {
           '작품 상세 분석',
           'korean',
           languages,
-          { contentType: 'interactive_title' }
+          { contentType: 'explanation' }
         ),
         instructions: await this.multilingualAdapter.adaptContent(
           '작품의 각 부분을 클릭하여 상세한 문화적 설명을 확인하세요.',
@@ -645,7 +645,7 @@ export class EducationalContentGenerator {
       baseContent,
       'korean',
       languages,
-      { contentType: 'section_content', educationLevel: level }
+      { contentType: 'explanation', educationLevel: level }
     )
   }
 
@@ -668,7 +668,7 @@ export class EducationalContentGenerator {
       baseContent,
       'korean',
       languages,
-      { contentType: 'historical_background' }
+      { contentType: 'explanation' }
     )
   }
 
@@ -681,7 +681,7 @@ export class EducationalContentGenerator {
       baseContent,
       'korean',
       languages,
-      { contentType: 'philosophical_context' }
+      { contentType: 'explanation' }
     )
   }
 
@@ -694,7 +694,7 @@ export class EducationalContentGenerator {
       baseContent,
       'korean',
       languages,
-      { contentType: 'artistic_tradition' }
+      { contentType: 'explanation' }
     )
   }
 
@@ -707,7 +707,7 @@ export class EducationalContentGenerator {
       baseContent,
       'korean',
       languages,
-      { contentType: 'modern_relevance' }
+      { contentType: 'explanation' }
     )
   }
 

@@ -45,7 +45,7 @@ export function validateAnalysisRequest(request: any): ValidationResult {
     errors.push('At least one analysis type must be included')
   } else {
     const validAnalysisTypes = ['visual', 'textual', 'cultural', 'historical', 'philosophical']
-    const invalidTypes = request.includedAnalysis.filter(type => !validAnalysisTypes.includes(type))
+    const invalidTypes = request.includedAnalysis.filter((type: string) => !validAnalysisTypes.includes(type))
     if (invalidTypes.length > 0) {
       errors.push(`Invalid analysis types: ${invalidTypes.join(', ')}`)
     }
@@ -57,7 +57,7 @@ export function validateAnalysisRequest(request: any): ValidationResult {
     errors.push('At least one target language must be specified')
   } else {
     const validLanguages: Language[] = ['korean', 'english', 'japanese', 'chinese']
-    const invalidLanguages = request.targetLanguages.filter(lang => !validLanguages.includes(lang))
+    const invalidLanguages = request.targetLanguages.filter((lang: Language) => !validLanguages.includes(lang))
     if (invalidLanguages.length > 0) {
       errors.push(`Invalid languages: ${invalidLanguages.join(', ')}`)
     }
@@ -69,7 +69,7 @@ export function validateAnalysisRequest(request: any): ValidationResult {
     errors.push('At least one education level must be specified')
   } else {
     const validLevels: EducationLevel[] = ['beginner', 'intermediate', 'advanced', 'expert']
-    const invalidLevels = request.educationLevels.filter(level => !validLevels.includes(level))
+    const invalidLevels = request.educationLevels.filter((level: EducationLevel) => !validLevels.includes(level))
     if (invalidLevels.length > 0) {
       errors.push(`Invalid education levels: ${invalidLevels.join(', ')}`)
     }

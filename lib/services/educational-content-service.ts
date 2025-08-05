@@ -79,7 +79,8 @@ export class EducationalContentService {
 
     } catch (error) {
       console.error('Error retrieving educational content:', error)
-      throw new Error(`Failed to retrieve educational content: ${error.message}`)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    throw new Error(`Failed to retrieve educational content: ${errorMessage}`)
     }
   }
 
@@ -112,7 +113,8 @@ export class EducationalContentService {
 
     } catch (error) {
       console.error('Error generating educational content:', error)
-      throw new Error(`Failed to generate educational content: ${error.message}`)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    throw new Error(`Failed to generate educational content: ${errorMessage}`)
     }
   }
 
@@ -157,7 +159,8 @@ export class EducationalContentService {
 
     } catch (error) {
       console.error('Error updating educational content:', error)
-      throw new Error(`Failed to update educational content: ${error.message}`)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    throw new Error(`Failed to update educational content: ${errorMessage}`)
     }
   }
 
@@ -183,7 +186,8 @@ export class EducationalContentService {
 
     } catch (error) {
       console.error('Error deleting educational content:', error)
-      throw new Error(`Failed to delete educational content: ${error.message}`)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    throw new Error(`Failed to delete educational content: ${errorMessage}`)
     }
   }
 
@@ -209,7 +213,8 @@ export class EducationalContentService {
 
     } catch (error) {
       console.error('Error searching educational content:', error)
-      throw new Error(`Failed to search educational content: ${error.message}`)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    throw new Error(`Failed to search educational content: ${errorMessage}`)
     }
   }
 
@@ -382,7 +387,8 @@ export class EducationalContentService {
 
     } catch (error) {
       console.error('Error in batch educational content generation:', error)
-      throw new Error(`Batch generation failed: ${error.message}`)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    throw new Error(`Batch generation failed: ${errorMessage}`)
     }
   }
 

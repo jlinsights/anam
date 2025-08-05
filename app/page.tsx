@@ -1,81 +1,318 @@
 'use client'
 
-import { ZenBrutalistHero } from '@/components/zen-brutalist-hero'
-import { ZenBrutalistFooter } from '@/components/zen-brutalist-footer'
-import { ArtNavigation, NavigationSpacer } from '@/components/art-navigation'
-import { ErrorBoundary } from '@/components/error-boundary'
+import { useEffect, useState, useCallback } from 'react'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
 import type { Artwork } from '@/lib/types'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Calendar, MapPin, ArrowRight } from 'lucide-react'
 
-// 안전한 fallback 데이터
-const safeFallbackArtworks: Artwork[] = [
-  {
-    id: 'fallback-1',
-    title: '전통 서예 작품',
-    slug: 'traditional-calligraphy',
-    year: 2024,
-    medium: '서예',
-    dimensions: '68 x 136 cm',
-    aspectRatio: '4/5',
-    description: '전통 서예의 아름다움을 담은 작품',
-    imageUrl: '/placeholders/placeholder.jpg',
-    featured: true,
-  },
-  {
-    id: 'fallback-2',
-    title: '현대 서예 작품',
-    slug: 'modern-calligraphy',
-    year: 2024,
-    medium: '서예',
-    dimensions: '68 x 136 cm',
-    aspectRatio: '4/5',
-    description: '현대적 감각의 서예 작품',
-    imageUrl: '/placeholders/placeholder.jpg',
-    featured: true,
-  },
-  {
-    id: 'fallback-3',
-    title: '전통과 현대의 조화',
-    slug: 'harmony',
-    year: 2024,
-    medium: '서예',
-    dimensions: '68 x 136 cm',
-    aspectRatio: '4/5',
-    description: '전통과 현대가 조화를 이루는 작품',
-    imageUrl: '/placeholders/placeholder.jpg',
-    featured: true,
-  },
-]
+// Zen Brutalism 헤더 컴포넌트
+function ZenBrutalistHeader() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [isScrolled, setIsScrolled] = useState(false)
 
-// 작품 소개 섹션 - 컴팩트하고 읽기 쉽게 개선
-function FeaturedWorksSection() {
-  const [featuredArtworks, setFeaturedArtworks] = useState<Artwork[]>([])
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width
+    const y = (e.clientY - rect.top) / rect.height
+    setMousePosition({ x, y })
+  }, [])
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 10)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  return (
+    <header 
+      className={`
+        relative bg-paper/95 backdrop-blur-sm border-b-4 border-ink
+        transition-all duration-500 z-50
+        ${isScrolled ? 'shadow-brutal' : ''}
+      `}
+      onMouseMove={handleMouseMove}
+    >
+      {/* Dynamic background effect */}
+      <div 
+        className="absolute inset-0 opacity-5"
+        style={{
+          background: `radial-gradient(circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, 
+            hsl(var(--ink)) 0%, transparent 50%)`
+        }}
+      />
+      
+      <div className="relative max-w-7xl mx-auto px-zen-sm sm:px-zen-md lg:px-zen-lg">
+        <div className="flex justify-between items-center py-zen-md">
+          <motion.div 
+            className="flex items-center"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1 className="text-ink font-calligraphy font-bold text-2xl sm:text-3xl">
+              아남 Oriental Calligraphy
+            </h1>
+            <div className="ml-zen-sm text-ink-light font-display text-sm hidden sm:block">
+              전통과 현대가 만나는 서예의 세계
+            </div>
+          </motion.div>
+          
+          <nav className="hidden md:flex space-x-zen-md">
+            {[
+              { href: '/gallery', label: '갤러리' },
+              { href: '/artist', label: '작가소개' },
+              { href: '/exhibition', label: '전시정보' },
+              { href: '/contact', label: '연락처' }
+            ].map((item, index) => (
+              <motion.div
+                key={item.href}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <Link 
+                  href={item.href} 
+                  className="
+                    text-ink hover:text-gold font-display font-medium
+                    relative group transition-colors duration-300
+                    before:absolute before:bottom-0 before:left-0 
+                    before:w-0 before:h-0.5 before:bg-gold
+                    before:transition-all before:duration-300
+                    hover:before:w-full
+                  "
+                >
+                  {item.label}
+                </Link>
+              </motion.div>
+            ))}
+          </nav>
+          
+          <button className="md:hidden p-zen-xs bg-ink text-paper hover:bg-gold transition-colors duration-300">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+  )
+}
+
+// Zen Brutalism 히어로 섹션
+function ZenBrutalistHeroSection() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [isHovered, setIsHovered] = useState(false)
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width
+    const y = (e.clientY - rect.top) / rect.height
+    setMousePosition({ x, y })
+  }, [])
+
+  return (
+    <motion.section 
+      className="
+        relative min-h-screen flex items-center justify-center overflow-hidden
+        bg-gradient-to-br from-paper via-paper-warm to-paper-cream
+      "
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.2 }}
+    >
+      {/* Dynamic ink flow background */}
+      <motion.div
+        className="absolute inset-0 opacity-10"
+        style={{
+          background: `
+            radial-gradient(
+              circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, 
+              hsl(var(--ink)) 0%, 
+              hsl(var(--gold)) 30%,
+              transparent 70%
+            )
+          `
+        }}
+        animate={{
+          scale: isHovered ? 1.1 : 1,
+          opacity: isHovered ? 0.15 : 0.1
+        }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+      />
+
+      {/* Geometric brutalist elements */}
+      <motion.div
+        className="absolute top-1/4 left-1/4 w-32 h-32 border-4 border-ink opacity-10"
+        animate={{
+          rotate: mousePosition.x * 30,
+          scale: isHovered ? 1.2 : 1
+        }}
+        transition={{ duration: 0.6 }}
+      />
+      
+      <motion.div
+        className="absolute bottom-1/3 right-1/4 w-24 h-24 border-4 border-gold opacity-20"
+        animate={{
+          rotate: mousePosition.y * -20,
+        }}
+        transition={{ duration: 0.4 }}
+      />
+
+      {/* Main content */}
+      <div className="relative z-10 text-center px-zen-md py-zen-xl max-w-6xl mx-auto">
+        {/* Title */}
+        <motion.h1
+          className="
+            font-calligraphy font-bold text-ink mb-zen-lg
+            text-4xl sm:text-5xl md:text-6xl lg:text-7xl
+            drop-shadow-sm
+          "
+          initial={{ y: 60, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, delay: 0.3 }}
+        >
+          <span className="block">아남 배옥영</span>
+          <span className="block text-gold font-display text-2xl sm:text-3xl md:text-4xl mt-zen-sm">
+            Oriental Calligraphy
+          </span>
+        </motion.h1>
+
+        {/* Subtitle */}
+        <motion.p
+          className="
+            font-display text-ink-light text-lg sm:text-xl md:text-2xl 
+            max-w-4xl mx-auto leading-relaxed mb-zen-xl
+          "
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, delay: 0.6 }}
+        >
+          전통 서예의 정신과 현대적 감각이 어우러진 작품 세계<br />
+          <span className="text-base sm:text-lg text-brush font-body">
+            WHERE TRADITION FLOWS INTO CONTEMPORARY
+          </span>
+        </motion.p>
+
+        {/* Action buttons */}
+        <motion.div
+          className="flex flex-col sm:flex-row gap-zen-sm justify-center items-center"
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, delay: 0.9 }}
+        >
+          <Link 
+            href="/gallery" 
+            className="
+              group relative px-zen-lg py-zen-md
+              bg-ink text-paper font-display font-bold
+              hover:bg-gold hover:text-ink
+              transition-all duration-300
+              shadow-brutal hover:shadow-brutal-strong
+              transform hover:-translate-x-1 hover:-translate-y-1
+              border-4 border-ink hover:border-gold
+              min-w-[200px]
+            "
+          >
+            <span className="relative z-10">작품 갤러리</span>
+            <div className="absolute inset-0 bg-gold opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+          </Link>
+          
+          <Link 
+            href="/artist" 
+            className="
+              group relative px-zen-lg py-zen-md
+              bg-paper border-4 border-ink text-ink font-display font-bold
+              hover:bg-ink hover:text-paper
+              transition-all duration-300
+              shadow-brutal-offset hover:shadow-brutal
+              transform hover:translate-x-1 hover:translate-y-1
+              min-w-[200px]
+            "
+          >
+            <span className="relative z-10">작가 소개</span>
+            <div className="absolute inset-0 bg-ink opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+          </Link>
+        </motion.div>
+
+        {/* Cultural element */}
+        <motion.div
+          className="
+            mt-zen-xl pt-zen-lg border-t-2 border-ink/20
+            flex items-center justify-center gap-zen-sm
+          "
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 1.2 }}
+        >
+          <div className="w-12 h-px bg-gold" />
+          <span className="font-calligraphy text-ink font-medium">
+            먹, 그리고... 道
+          </span>
+          <div className="w-12 h-px bg-gold" />
+        </motion.div>
+      </div>
+    </motion.section>
+  )
+}
+
+// Zen Brutalism 추천 작품 섹션
+function ZenBrutalistFeaturedWorksSection() {
+  const [artworks, setArtworks] = useState<Artwork[]>([])
   const [loading, setLoading] = useState(true)
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
   useEffect(() => {
     async function loadArtworks() {
       try {
-        setLoading(true)
         const response = await fetch('/api/artworks')
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-
+        if (!response.ok) throw new Error('Failed to fetch artworks')
+        
         const result = await response.json()
         const allArtworks = result.data || []
-
-        // Featured 작품들만 필터링 - 6개로 줄여서 더 집중감 있게
-        const featured = allArtworks
-          .filter((artwork: Artwork) => artwork.featured)
-          .slice(0, 6)
-
-        setFeaturedArtworks(featured)
+        
+        // 처음 6개 작품만 표시
+        setArtworks(allArtworks.slice(0, 6))
       } catch (error) {
-        console.error('Failed to load featured artworks:', error)
-        // 안전한 fallback 데이터 사용
-        setFeaturedArtworks(safeFallbackArtworks)
+        console.error('Failed to load artworks:', error)
+        // 폴백 데이터
+        setArtworks([
+          {
+            id: '1',
+            title: '전통 서예 작품 1',
+            slug: 'artwork-1',
+            year: 2024,
+            medium: '서예',
+            dimensions: '68 x 136 cm',
+            aspectRatio: '1/1',
+            description: '전통 서예의 아름다움',
+            imageUrl: '/placeholder.jpg',
+          },
+          {
+            id: '2',
+            title: '전통 서예 작품 2',
+            slug: 'artwork-2',
+            year: 2024,
+            medium: '서예',
+            dimensions: '68 x 136 cm',
+            aspectRatio: '1/1',
+            description: '현대적 감각의 서예',
+            imageUrl: '/placeholder.jpg',
+          },
+          {
+            id: '3',
+            title: '전통 서예 작품 3',
+            slug: 'artwork-3',
+            year: 2024,
+            medium: '서예',
+            dimensions: '68 x 136 cm',
+            aspectRatio: '1/1',
+            description: '조화로운 서예 작품',
+            imageUrl: '/placeholder.jpg',
+          }
+        ])
       } finally {
         setLoading(false)
       }
@@ -84,313 +321,308 @@ function FeaturedWorksSection() {
     loadArtworks()
   }, [])
 
-  return (
-    <section className='py-16 bg-paper'>
-      <div className='container mx-auto px-4 max-w-6xl'>
-        {/* 헤더 섹션 - 더 컴팩트하게 */}
-        <div className='text-center mb-12'>
-          <div className='inline-flex items-center px-4 py-2 bg-gold/10 rounded-full mb-4'>
-            <span className='text-gold text-sm font-medium tracking-wide'>
-              Featured Works
-            </span>
-          </div>
-          <h2 className='text-3xl md:text-4xl font-bold text-ink mb-4'>
-            대표 작품
-          </h2>
-          <p className='text-ink-light max-w-2xl mx-auto'>
-            전통 서예의 정신과 현대적 감각이 어우러진 아남 배옥영의 대표
-            작품들을 감상해보세요.
-          </p>
-        </div>
-
-        {/* 작품 그리드 */}
-        {loading ? (
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {[...Array(6)].map((_, index) => (
-              <div
-                key={index}
-                className='bg-background rounded-lg p-4 animate-pulse'
-              >
-                <div className='w-full h-48 bg-gray-200 rounded-lg mb-4'></div>
-                <div className='h-4 bg-gray-200 rounded mb-2'></div>
-                <div className='h-3 bg-gray-200 rounded w-2/3'></div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {featuredArtworks.map((artwork) => (
-              <div
-                key={artwork.id}
-                className='bg-background rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300'
-              >
-                <div className='aspect-[4/5] bg-gray-100 flex items-center justify-center'>
-                  <span className='text-gray-400 text-sm'>{artwork.title}</span>
-                </div>
-                <div className='p-4'>
-                  <h3 className='font-semibold text-ink mb-1'>
-                    {artwork.title}
-                  </h3>
-                  <p className='text-sm text-ink-light'>
-                    {artwork.year} • {artwork.medium}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* 더보기 버튼 */}
-        <div className='text-center mt-8'>
-          <a
-            href='/gallery'
-            className='inline-flex items-center px-6 py-3 bg-gold text-paper rounded-lg font-medium hover:bg-gold-light transition-colors duration-200'
+  if (loading) {
+    return (
+      <section className="py-zen-xl bg-paper-warm">
+        <div className="max-w-7xl mx-auto px-zen-md">
+          <motion.h2 
+            className="font-calligraphy font-bold text-ink text-3xl md:text-4xl text-center mb-zen-lg"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
           >
-            전체 작품 보기
-          </a>
+            추천 작품 • Featured Works
+          </motion.h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-zen-lg">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div 
+                key={i} 
+                className="
+                  bg-paper-cream aspect-square border-4 border-ink/20
+                  animate-pulse shadow-brutal-offset
+                  flex items-center justify-center
+                "
+              >
+                <div className="w-16 h-16 bg-ink/10"></div>
+              </div>
+            ))}
+          </div>
         </div>
+      </section>
+    )
+  }
+
+  return (
+    <section className="py-zen-xl bg-paper-warm">
+      <div className="max-w-7xl mx-auto px-zen-md">
+        {/* Section title */}
+        <motion.div
+          className="text-center mb-zen-xl"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+        >
+          <h2 className="font-calligraphy font-bold text-ink text-3xl md:text-4xl mb-zen-sm">
+            추천 작품
+          </h2>
+          <p className="font-display text-ink-light text-lg">
+            Selected Works • 精選作品
+          </p>
+          <div className="mt-zen-sm flex justify-center">
+            <div className="w-24 h-1 bg-gold"></div>
+          </div>
+        </motion.div>
+
+        {/* Artwork grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-zen-lg">
+          {artworks.map((artwork, index) => (
+            <motion.div
+              key={artwork.id}
+              className="group cursor-pointer"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: index * 0.1 }}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+            >
+              <div className="
+                relative bg-paper aspect-square border-4 border-ink
+                shadow-brutal group-hover:shadow-brutal-strong
+                transition-all duration-300
+                group-hover:-translate-x-2 group-hover:-translate-y-2
+                overflow-hidden
+              ">
+                {/* Artwork display area */}
+                <div className="absolute inset-4 bg-paper-cream flex items-center justify-center">
+                  <span className="font-calligraphy text-ink-light text-sm">
+                    {artwork.title}
+                  </span>
+                </div>
+                
+                {/* Hover overlay */}
+                <motion.div
+                  className="
+                    absolute inset-0 bg-gold/5 
+                    flex items-center justify-center
+                    opacity-0 group-hover:opacity-100
+                    transition-opacity duration-300
+                  "
+                  animate={{
+                    opacity: hoveredIndex === index ? 1 : 0
+                  }}
+                >
+                  <div className="text-center p-zen-sm">
+                    <div className="w-12 h-12 border-2 border-ink mx-auto mb-2"></div>
+                    <span className="font-display text-ink text-xs">작품 보기</span>
+                  </div>
+                </motion.div>
+              </div>
+              
+              {/* Artwork info */}
+              <div className="mt-zen-sm">
+                <h3 className="font-calligraphy font-semibold text-ink mb-1">
+                  {artwork.title}
+                </h3>
+                <p className="font-display text-ink-light text-sm">
+                  {artwork.year} • {artwork.medium}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Call to action */}
+        <motion.div
+          className="text-center mt-zen-xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.8 }}
+        >
+          <Link 
+            href="/gallery" 
+            className="
+              inline-block px-zen-lg py-zen-md
+              bg-ink text-paper font-display font-bold
+              hover:bg-gold hover:text-ink
+              transition-all duration-300
+              shadow-brutal hover:shadow-brutal-strong
+              transform hover:-translate-x-1 hover:-translate-y-1
+              border-4 border-ink hover:border-gold
+            "
+          >
+            전체 작품 갤러리 탐험
+          </Link>
+        </motion.div>
       </div>
     </section>
   )
 }
 
-// 작가 소개 섹션 - 더 클린하고 읽기 쉽게 개선
-function ArtistSection() {
-  const [profileImageUrl, setProfileImageUrl] = useState<string>(
-    '/Images/Artist/artist-large.jpg'
-  )
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function loadProfileImage() {
-      try {
-        const response = await fetch('/api/artist')
-        if (!response.ok) throw new Error('작가 이미지를 불러오지 못했습니다')
-        const result = await response.json()
-        if (result.data?.profileImageUrl) {
-          setProfileImageUrl(result.data.profileImageUrl)
-        }
-      } catch (err: any) {
-        console.log('Using fallback artist image:', err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadProfileImage()
-  }, [])
-
+// Zen Brutalism 작가 소개 섹션
+function ZenBrutalistArtistSection() {
   return (
-    <section className='py-20 bg-stone/5'>
-      <div className='container mx-auto px-4 max-w-6xl'>
-        <div className='grid lg:grid-cols-2 gap-12 items-center'>
-          {/* 텍스트 콘텐츠 */}
-          <div className='space-y-6 lg:order-1'>
-            <div className='inline-flex items-center px-4 py-2 bg-gold/10 rounded-full mb-2'>
-              <span className='text-gold text-sm font-medium tracking-wide'>
-                Artist
-              </span>
+    <section className="py-zen-xl bg-paper">
+      <div className="max-w-7xl mx-auto px-zen-md">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-zen-xl items-center">
+          {/* Artist content */}
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1 }}
+          >
+            <div className="mb-zen-sm">
+              <h3 className="font-calligraphy font-bold text-ink text-3xl md:text-4xl mb-zen-sm">
+                아남 배옥영
+              </h3>
+              <p className="font-display text-gold text-lg font-medium">
+                ANAM Bae Ok Young • 書藝家
+              </p>
             </div>
-
-            <div className='space-y-4'>
-              <h2 className='text-4xl font-bold text-ink'>아남 배옥영</h2>
-              <p className='text-xl text-ink-light font-medium'>한국 서예가</p>
-              <div className='w-16 h-1 bg-gold rounded-full'></div>
+            
+            <div className="space-y-zen-md">
+              <p className="font-display text-ink text-lg leading-relaxed">
+                전통 서예의 깊이와 현대적 감각을 조화시키며, 
+                <strong className="text-gold font-semibold">한국 미학의 정수</strong>를 
+                현대적 언어로 재해석하는 작업을 하고 있습니다.
+              </p>
+              
+              <p className="font-display text-ink-light leading-relaxed">
+                오랜 수행과 연구를 통해 완성된 독창적인 서예 세계를 
+                디지털 갤러리를 통해 널리 공유하고자 합니다.
+              </p>
+              
+              <blockquote className="border-l-4 border-gold pl-zen-md py-zen-sm bg-paper-warm">
+                <p className="font-calligraphy text-ink italic">
+                  "먹과 붓이 만나는 순간, 전통과 현대가 하나가 된다"
+                </p>
+              </blockquote>
             </div>
-
-            <p className='text-lg text-ink-light leading-relaxed max-w-lg'>
-              전통 서예의 깊이와 현대적 감각을 조화시키며, 한국 미학의 정수를
-              현대적 언어로 재해석하는 작업을 하고 있습니다.
-            </p>
-
-            <div className='pt-4'>
-              <a
-                href='/artist'
-                className='inline-flex items-center px-6 py-3 bg-ink text-paper rounded-lg font-medium hover:bg-ink/90 transition-colors duration-200'
+            
+            <motion.div
+              className="mt-zen-lg"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.6 }}
+            >
+              <Link 
+                href="/artist" 
+                className="
+                  inline-block px-zen-lg py-zen-md
+                  bg-paper border-4 border-ink text-ink font-display font-bold
+                  hover:bg-ink hover:text-paper
+                  transition-all duration-300
+                  shadow-brutal-offset hover:shadow-brutal
+                  transform hover:translate-x-1 hover:translate-y-1
+                "
               >
                 작가 소개 더보기
-              </a>
-            </div>
-          </div>
-
-          {/* 프로필 이미지 */}
-          <div className='relative lg:order-2'>
-            <div className='relative bg-white rounded-2xl shadow-xl overflow-hidden'>
-              <div className='aspect-[3/4] relative'>
-                {loading ? (
-                  <div className='w-full h-full bg-stone/20 animate-pulse flex items-center justify-center'>
-                    <div className='text-stone/40'>Loading...</div>
-                  </div>
-                ) : (
-                  <img
-                    src={profileImageUrl}
-                    alt='아남 배옥영 작가 프로필'
-                    className='w-full h-full object-cover'
-                  />
-                )}
-
-                {/* 서명 오버레이 */}
-                <div className='absolute bottom-4 right-4'>
-                  <div className='bg-ink/80 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center'>
-                    <span className='text-paper text-sm font-bold'>芽南</span>
-                  </div>
+              </Link>
+            </motion.div>
+          </motion.div>
+          
+          {/* Artist image */}
+          <motion.div
+            className="flex justify-center"
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, delay: 0.3 }}
+          >
+            <div className="
+              relative bg-paper-cream w-80 h-96 border-4 border-ink
+              shadow-brutal hover:shadow-brutal-strong
+              transition-all duration-300
+              hover:-translate-x-2 hover:-translate-y-2
+              flex items-center justify-center
+              group cursor-pointer
+            ">
+              {/* Portrait placeholder */}
+              <div className="absolute inset-4 bg-paper border-2 border-ink/20 flex flex-col items-center justify-center">
+                <div className="w-24 h-24 border-2 border-ink/30 rounded-full mb-zen-sm flex items-center justify-center">
+                  <span className="font-calligraphy text-ink/60 text-xs">아남</span>
                 </div>
+                <span className="font-display text-ink-light text-sm">작가 프로필</span>
+              </div>
+              
+              {/* Hover effect */}
+              <div className="
+                absolute inset-0 bg-gold/5 opacity-0 group-hover:opacity-100
+                transition-opacity duration-300
+                flex items-center justify-center
+              ">
+                <span className="font-display text-ink text-sm">더 보기</span>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
   )
 }
 
-// 전시 정보 섹션 - 더 클린하고 정돈된 디자인
+// 전시 정보 섹션
 function ExhibitionSection() {
   return (
-    <section className='py-16 bg-paper'>
-      <div className='container mx-auto px-4 max-w-6xl'>
-        {/* 헤더 */}
-        <div className='text-center mb-12'>
-          <div className='inline-flex items-center px-4 py-2 bg-gold/10 rounded-full mb-4'>
-            <span className='text-gold text-sm font-medium tracking-wide'>
-              Exhibition 2026
-            </span>
+    <section className="py-16 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h3 className="text-3xl font-bold text-gray-900 mb-6">먹, 그리고... 道</h3>
+        <p className="text-xl text-gray-600 mb-12">아남 배옥영 개인전</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <h4 className="font-semibold text-gray-900 mb-2">전시 기간</h4>
+            <p className="text-gray-600">2026년 4월 15일 ~ 4월 20일</p>
+            <p className="text-sm text-gray-500">오전 10시 - 오후 6시</p>
           </div>
-          <h2 className='text-3xl font-bold text-ink mb-3'>먹, 그리고... 道</h2>
-          <p className='text-lg text-ink-light max-w-2xl mx-auto leading-relaxed'>
-            아남 배옥영 개인전에 여러분을 초대합니다
-          </p>
-        </div>
-
-        {/* 전시 정보 그리드 */}
-        <div className='grid md:grid-cols-3 gap-8 mb-12'>
-          {/* 전시 기간 */}
-          <div className='bg-white rounded-xl p-6 shadow-md text-center'>
-            <div className='w-14 h-14 bg-ink rounded-full flex items-center justify-center mx-auto mb-4'>
-              <Calendar className='w-6 h-6 text-paper' />
-            </div>
-            <h3 className='text-lg font-semibold text-ink mb-3'>전시 기간</h3>
-            <div className='space-y-1'>
-              <p className='text-base text-ink font-medium'>
-                2026년 4월 15일 ~ 4월 20일
-              </p>
-              <p className='text-ink-light text-sm'>화요일 ~ 일요일 (6일간)</p>
-              <p className='text-ink-lighter text-sm'>오전 10시 - 오후 6시</p>
-            </div>
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <h4 className="font-semibold text-gray-900 mb-2">전시 장소</h4>
+            <p className="text-gray-600">예술의전당 서울서예박물관</p>
+            <p className="text-sm text-gray-500">제1전시실</p>
           </div>
-
-          {/* 전시 장소 */}
-          <div className='bg-white rounded-xl p-6 shadow-md text-center'>
-            <div className='w-14 h-14 bg-ink rounded-full flex items-center justify-center mx-auto mb-4'>
-              <MapPin className='w-6 h-6 text-paper' />
-            </div>
-            <h3 className='text-lg font-semibold text-ink mb-3'>전시 장소</h3>
-            <div className='space-y-1'>
-              <p className='text-base text-ink font-medium'>
-                예술의전당 서울서예박물관
-              </p>
-              <p className='text-ink-light text-sm'>제1전시실</p>
-              <p className='text-ink-lighter text-sm'>서울시 서초구</p>
-            </div>
-          </div>
-
-          {/* 관람 안내 */}
-          <div className='bg-white rounded-xl p-6 shadow-md text-center'>
-            <div className='w-14 h-14 bg-gold rounded-full flex items-center justify-center mx-auto mb-4'>
-              <ArrowRight className='w-6 h-6 text-paper' />
-            </div>
-            <h3 className='text-lg font-semibold text-ink mb-3'>관람 안내</h3>
-            <div className='space-y-1'>
-              <p className='text-base text-ink font-medium'>무료 관람</p>
-              <p className='text-ink-light text-sm'>사전 예약 불필요</p>
-              <p className='text-ink-lighter text-sm'>단체 관람 환영</p>
-            </div>
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <h4 className="font-semibold text-gray-900 mb-2">관람 안내</h4>
+            <p className="text-gray-600">무료 관람</p>
+            <p className="text-sm text-gray-500">사전 예약 불필요</p>
           </div>
         </div>
-
-        {/* CTA 버튼 */}
-        <div className='text-center'>
-          <a
-            href='/exhibition'
-            className='inline-flex items-center px-8 py-3 bg-ink text-paper rounded-lg font-medium hover:bg-ink/90 transition-colors duration-200 shadow-lg hover:shadow-xl'
-          >
-            전시 상세 정보
-          </a>
-        </div>
+        
+        <Link 
+          href="/exhibition" 
+          className="inline-block bg-gray-900 text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+        >
+          전시 상세 정보
+        </Link>
       </div>
     </section>
   )
 }
 
-// Zen Brutalist Hero Section for Main Page
-function MainPageHero() {
-  const [featuredArtworks, setFeaturedArtworks] = useState<Artwork[]>([])
-
-  useEffect(() => {
-    async function loadFeaturedArtworks() {
-      try {
-        const response = await fetch('/api/artworks')
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-
-        const result = await response.json()
-        const allArtworks = result.data || []
-
-        // Featured 작품들을 배경으로 사용
-        const featured = allArtworks
-          .filter((artwork: Artwork) => artwork.featured)
-          .slice(0, 6)
-
-        setFeaturedArtworks(featured)
-      } catch (error) {
-        console.error('Failed to load featured artworks for hero:', error)
-        // 안전한 fallback 데이터 사용
-        setFeaturedArtworks(safeFallbackArtworks)
-      }
-    }
-
-    loadFeaturedArtworks()
-  }, [])
-
+// 푸터
+function Footer() {
   return (
-    <ZenBrutalistHero
-      title="먹, 그리고... 아남 배옥영 개인전"
-      subtitle="Contemporary Calligraphy Solo Exhibition"
-      description="전통 서예의 정신과 현대적 감각이 어우러진 혁신적인 디지털 갤러리"
-      season="autumn"
-    />
+    <footer className="bg-gray-900 text-white py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h3 className="text-xl font-semibold mb-4">Oriental Calligraphy</h3>
+        <p className="text-gray-400 mb-6">
+          전통과 현대가 만나는 서예의 세계
+        </p>
+        <p className="text-gray-500 text-sm">
+          © 2024 아남 배옥영 서예 갤러리. All rights reserved.
+        </p>
+      </div>
+    </footer>
   )
 }
 
-// 메인 페이지 컴포넌트 - 클린한 디자인으로 개선
+// Zen Brutalism 메인 페이지
 export default function HomePage() {
   return (
-    <main className='min-h-screen bg-paper flex flex-col'>
-      {/* 네비게이션 */}
-      <ArtNavigation />
-
-      {/* 히어로 섹션 */}
-      <MainPageHero />
-
-      {/* 네비게이션 스페이서 */}
-      <NavigationSpacer />
-
-      {/* 메인 콘텐츠 섹션들 */}
-      <div className='flex-1'>
-        <FeaturedWorksSection />
-        <ArtistSection />
-        <ExhibitionSection />
-      </div>
-
-      {/* 푸터 */}
-      <footer className="bg-ink text-paper py-zen-xl">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-calligraphy-body text-responsive-base">
-            © 2024 아남 배옥영 서예 갤러리. All rights reserved.
-          </p>
-        </div>
-      </footer>
+    <main className="min-h-screen bg-paper">
+      <ZenBrutalistHeader />
+      <ZenBrutalistHeroSection />
+      <ZenBrutalistFeaturedWorksSection />
+      <ZenBrutalistArtistSection />
+      <ExhibitionSection />
+      <Footer />
     </main>
   )
 }

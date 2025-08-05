@@ -200,7 +200,12 @@ export class CulturalAnalysisEngine {
     )
 
     return {
-      styleClassification,
+      styleClassification: {
+        primaryStyle: styleClassification.primaryStyle,
+        secondaryStyles: styleClassification.alternativeStyles?.map(alt => alt.style) || [],
+        confidence: styleClassification.confidence,
+        styleCharacteristics: styleClassification.styleCharacteristics ? Object.values(styleClassification.styleCharacteristics) : []
+      },
       compositionAnalysis,
       brushworkAnalysis,
       aestheticQualities
@@ -226,7 +231,14 @@ export class CulturalAnalysisEngine {
     )
 
     return {
-      textRecognition,
+      textRecognition: {
+        extractedText: textRecognition.extractedText,
+        confidence: textRecognition.confidence,
+        characters: textRecognition.recognizedCharacters || [],
+        readingDifficulty: textRecognition.readabilityScore > 8 ? 'expert' : 
+                         textRecognition.readabilityScore > 6 ? 'advanced' :
+                         textRecognition.readabilityScore > 4 ? 'intermediate' : 'beginner'
+      },
       semanticAnalysis,
       literaryConnections
     }

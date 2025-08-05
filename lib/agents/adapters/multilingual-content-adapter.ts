@@ -503,7 +503,7 @@ export class MultilingualContentAdapter {
     // Korean adaptation rules (source language)
     this.culturalAdaptationRules.set('korean', {
       formalityLevel: 'formal',
-      culturalReferences: 'implicit',
+      culturalReferences: 'maintain',
       technicalTerms: 'preserve',
       culturalNuances: 'implicit'
     })

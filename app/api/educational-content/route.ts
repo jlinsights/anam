@@ -24,9 +24,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<Educationa
   try {
     const { searchParams } = new URL(request.url)
     const artworkId = searchParams.get('artworkId')
-    const level = searchParams.get('level') as EducationLevel | null
-    const language = searchParams.get('language') as Language | null
-    const contentType = searchParams.get('type')
+    const level = searchParams.get('level') as EducationLevel | undefined
+    const language = searchParams.get('language') as Language | undefined
+    const contentType = searchParams.get('type') || undefined
 
     if (!artworkId) {
       return NextResponse.json({
@@ -154,13 +154,16 @@ export async function PUT(request: NextRequest): Promise<NextResponse<Educationa
 
     const updatedContent = await educationalService.updateEducationalContent(id, updateData)
 
-    return NextResponse.json({
+    const response: EducationalContentResponse = {
       success: true,
       data: updatedContent,
       metadata: {
-        updated: true
+        languagesGenerated: updatedContent.languages,
+        qualityScore: updatedContent.educationalEffectiveness
       }
-    })
+    }
+    
+    return NextResponse.json(response)
 
   } catch (error) {
     console.error('Educational content PUT error:', error)

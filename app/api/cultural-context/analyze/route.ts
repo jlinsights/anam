@@ -58,7 +58,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalysisR
     console.log(`Cultural analysis completed in ${processingTime}ms`)
     console.log(`Confidence score: ${analysisResult.confidenceScore}`)
 
-    return NextResponse.json({
+    const response: AnalysisResponse = {
       success: true,
       data: analysisResult,
       metadata: {
@@ -66,11 +66,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalysisR
         confidenceScore: analysisResult.confidenceScore,
         validationRequired: analysisResult.expertValidationRequired
       }
-    })
+    }
+    
+    return NextResponse.json(response)
 
   } catch (error) {
     console.error('Cultural analysis error:', error)
-    return handleApiError(error)
+    const errorResponse = handleApiError(error)
+    return errorResponse as NextResponse<AnalysisResponse>
   }
 }
 
