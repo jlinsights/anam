@@ -1,0 +1,61 @@
+
+> anam-gallery@0.2.0 optimize-images
+> node scripts/optimize-images.js
+
+🎨 고급 이미지 최적화를 시작합니다...
+📦 JPEG, WebP, AVIF 포맷으로 3가지 크기 생성
+
+📁 총 58개의 원본 이미지를 찾았습니다.
+
+
+🖼️  처리 중: 01.jpg
+
+   📐 thumbnail 크기 (400x500) 생성:
+   ✅ JPEG: 01-thumb.jpg
+      크기: 0.03MB (99.6% 절약)
+   ✅ WEBP: 01-thumb.webp
+      크기: 0.02MB (99.7% 절약)
+   ✅ AVIF: 01-thumb.avif
+      크기: 0.03MB (99.6% 절약)
+
+   📐 medium 크기 (800x1000) 생성:
+   ✅ JPEG: 01-medium.jpg
+      크기: 0.13MB (98.2% 절약)
+   ✅ WEBP: 01-medium.webp
+      크기: 0.09MB (98.7% 절약)
+   ✅ AVIF: 01-medium.avif
+      크기: 0.12MB (98.3% 절약)
+
+   📐 large 크기 (1200x1500) 생성:
+   ✅ JPEG: 01-large.jpg
+      크기: 0.36MB (95.0% 절약)
+   ✅ WEBP: 01-large.webp
+      크기: 0.24MB (96.5% 절약)
+   ✅ AVIF: 01-large.avif
+      크기: 0.28MB (96.0% 절약)
+
+   📊 진행률: 1/58 (1.7%)
+
+🖼️  처리 중: 02.jpg
+
+   📐 thumbnail 크기 (400x500) 생성:
+   ✅ JPEG: 02-thumb.jpg
+      크기: 0.01MB (99.8% 절약)
+   ✅ WEBP: 02-thumb.webp
+      크기: 0.01MB (99.9% 절약)
+   ✅ AVIF: 02-thumb.avif
+      크기: 0.01MB (99.8% 절약)
+
+   📐 medium 크기 (800x1000) 생성:
+   ✅ JPEG: 02-medium.jpg
+      크기: 0.06MB (99.1% 절약)
+   ✅ WEBP: 02-medium.webp
+      크기: 0.04MB (99.4% 절약)
+   ✅ AVIF: 02-medium.avif
+      크기: 0.05MB (99.3% 절약)
+
+   📐 large 크기 (1200x1500) 생성:
+   ✅ JPEG: 02-large.jpg
+      크기: 0.18MB (97.3% 절약)
+   ✅ WEBP: 02-large.webp
+      크기: 0.11MB (98.4% 절약)

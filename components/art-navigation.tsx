@@ -189,7 +189,9 @@ export function ArtNavigation({
                       <p className='text-xs text-ink-lighter mb-2'>
                         아남 배옥영 개인전
                       </p>
-                      <p className='text-xs text-ink-lighter'>먹, 그리고... 道</p>
+                      <p className='text-xs text-ink-lighter'>
+                        먹, 그리고... 道
+                      </p>
                     </div>
                   </div>
                 </div>

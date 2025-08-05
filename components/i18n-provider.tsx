@@ -2,7 +2,13 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import type { Locale } from '@/lib/types'
-import { getStoredLocale, setStoredLocale, getTranslation, formatTranslation, getPlural } from '@/lib/i18n/index'
+import {
+  getStoredLocale,
+  setStoredLocale,
+  getTranslation,
+  formatTranslation,
+  getPlural,
+} from '@/lib/i18n/index'
 
 interface I18nContextType {
   locale: Locale
@@ -20,7 +26,10 @@ interface I18nProviderProps {
   defaultLocale?: Locale
 }
 
-export function I18nProvider({ children, defaultLocale = 'ko' }: I18nProviderProps) {
+export function I18nProvider({
+  children,
+  defaultLocale = 'ko',
+}: I18nProviderProps) {
   const [locale, setLocale] = useState<Locale>(defaultLocale)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -33,7 +42,7 @@ export function I18nProvider({ children, defaultLocale = 'ko' }: I18nProviderPro
   const changeLocale = (newLocale: Locale) => {
     setLocale(newLocale)
     setStoredLocale(newLocale)
-    
+
     // Notify analytics about language change
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'language_change', {
@@ -41,7 +50,7 @@ export function I18nProvider({ children, defaultLocale = 'ko' }: I18nProviderPro
         event_label: `${locale}_to_${newLocale}`,
       })
     }
-    
+
     // Reload page to apply language changes across all components
     setTimeout(() => {
       window.location.reload()
@@ -90,14 +99,14 @@ interface TProps {
 
 export function T({ k, fallback, params, count }: TProps) {
   const { t, tf, tp } = useI18n()
-  
+
   if (count !== undefined) {
     return <>{tp(k, count)}</>
   }
-  
+
   if (params) {
     return <>{tf(k, params)}</>
   }
-  
+
   return <>{t(k, fallback)}</>
 }

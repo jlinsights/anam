@@ -30,7 +30,8 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   const { locale, changeLocale, t } = useI18n()
   const [isOpen, setIsOpen] = useState(false)
 
-  const currentLanguage = languages.find((lang) => lang.code === locale) || languages[0]
+  const currentLanguage =
+    languages.find((lang) => lang.code === locale) || languages[0]
 
   const handleLanguageChange = (newLocale: Locale) => {
     changeLocale(newLocale)
@@ -44,7 +45,10 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
         size='sm'
         onClick={() => setIsOpen(true)}
         className='gap-2'
-        aria-label={t('common.changeLanguage', `언어 변경 (현재: ${currentLanguage.nativeName})`)}
+        aria-label={t(
+          'common.changeLanguage',
+          `언어 변경 (현재: ${currentLanguage.nativeName})`
+        )}
       >
         <Globe className='h-4 w-4' />
         <span className='hidden sm:inline'>{currentLanguage.nativeName}</span>
@@ -53,7 +57,10 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
       <AccessibleModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        title={t('common.selectLanguage', '언어 선택 / Select Language / 言語選択')}
+        title={t(
+          'common.selectLanguage',
+          '언어 선택 / Select Language / 言語選択'
+        )}
         description={t('common.selectLanguageDesc', '원하는 언어를 선택하세요')}
         className='max-w-sm'
       >

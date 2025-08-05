@@ -18,16 +18,16 @@ export function TranslatedContent({
   count,
 }: TranslatedContentProps) {
   const { t, tf, tp } = useI18n()
-  
+
   const key = namespace ? `${namespace}.${textKey}` : textKey
-  
+
   if (count !== undefined) {
     return <>{tp(key, count)}</>
   }
-  
+
   if (params) {
     return <>{tf(key, params)}</>
   }
-  
+
   return <>{t(key, fallback)}</>
 }

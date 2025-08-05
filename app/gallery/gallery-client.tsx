@@ -41,46 +41,43 @@ const sortOptions = [
   { value: 'tags', label: '태그순' },
 ]
 
-// Zen Brutalist 로딩 컴포넌트
+// 클린한 로딩 컴포넌트
 function GalleryLoading() {
   return (
-    <div className='min-h-screen bg-paper relative overflow-hidden flex flex-col'>
-      {/* Zen Loading Background Effects */}
-      <div className='fixed inset-0 pointer-events-none'>
-        <div className='absolute inset-0 zen-breathe-slow opacity-2' />
-        <div className='absolute inset-0 ink-flow-ambient opacity-1' />
-      </div>
-
+    <div className='min-h-screen bg-paper flex flex-col'>
       <ArtNavigation />
       <NavigationSpacer />
 
-      <main className='section-padding relative z-10 flex-1'>
-        <div className='zen-brutalist-layout'>
+      <main className='flex-1 py-8'>
+        <div className='container mx-auto px-4 max-w-6xl'>
           {/* 헤더 스켈레톤 */}
-          <div className='space-y-zen-lg mb-zen-3xl void-contemplative'>
-            <div className='h-4 w-24 bg-stone/20 animate-pulse rounded zen-breathe-slow' />
-            <div className='h-12 w-64 bg-stone/20 animate-pulse rounded zen-breathe-slow' />
-            <div className='h-6 w-96 bg-stone/20 animate-pulse rounded zen-breathe-slow' />
+          <div className='text-center mb-12'>
+            <div className='h-4 w-24 bg-stone/20 animate-pulse rounded mx-auto mb-4' />
+            <div className='h-8 w-48 bg-stone/20 animate-pulse rounded mx-auto mb-3' />
+            <div className='h-5 w-64 bg-stone/20 animate-pulse rounded mx-auto' />
           </div>
 
           {/* 필터 스켈레톤 */}
-          <div className='flex flex-wrap gap-zen-md mb-zen-2xl void-breathing'>
+          <div className='flex flex-wrap gap-3 mb-8 justify-center'>
             {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className='h-10 w-20 bg-stone/20 animate-pulse rounded-lg zen-breathe-deep'
+                className='h-9 w-20 bg-stone/20 animate-pulse rounded-lg'
               />
             ))}
           </div>
 
-          {/* Zen Brutalist 그리드 스켈레톤 */}
-          <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-zen-lg'>
+          {/* 그리드 스켈레톤 */}
+          <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className='zen-brutalist-card void-breathing'>
-                <div className='aspect-[3/4] bg-stone/10 animate-pulse rounded-xl zen-breathe-slow' />
-                <div className='p-zen-md space-y-zen-sm'>
-                  <div className='h-6 bg-stone/10 animate-pulse rounded zen-breathe-slow' />
-                  <div className='h-4 bg-stone/10 animate-pulse rounded w-3/4 zen-breathe-slow' />
+              <div
+                key={i}
+                className='bg-white rounded-xl shadow-sm overflow-hidden'
+              >
+                <div className='aspect-[4/5] bg-stone/20 animate-pulse' />
+                <div className='p-4 space-y-2'>
+                  <div className='h-5 bg-stone/20 animate-pulse rounded' />
+                  <div className='h-4 bg-stone/20 animate-pulse rounded w-3/4' />
                 </div>
               </div>
             ))}
@@ -116,13 +113,17 @@ export default function GalleryClient({
           setArtworks(initialArtworks)
           setFilteredArtworks(initialArtworks)
           // Extract featured artworks for hero background
-          const featured = initialArtworks.filter(artwork => artwork.featured).slice(0, 6)
+          const featured = initialArtworks
+            .filter((artwork) => artwork.featured)
+            .slice(0, 6)
           setFeaturedArtworks(featured)
         } else {
           setArtworks(fallbackArtworksData)
           setFilteredArtworks(fallbackArtworksData)
           // Extract featured artworks for hero background
-          const featured = fallbackArtworksData.filter(artwork => artwork.featured).slice(0, 6)
+          const featured = fallbackArtworksData
+            .filter((artwork) => artwork.featured)
+            .slice(0, 6)
           setFeaturedArtworks(featured)
         }
 
@@ -148,7 +149,9 @@ export default function GalleryClient({
             setFilteredArtworks(result.data)
 
             // Update featured artworks for hero background
-            const featured = result.data.filter((artwork: Artwork) => artwork.featured).slice(0, 6)
+            const featured = result.data
+              .filter((artwork: Artwork) => artwork.featured)
+              .slice(0, 6)
             setFeaturedArtworks(featured)
 
             // Airtable 데이터에서 태그 추출
@@ -286,7 +289,9 @@ export default function GalleryClient({
               <h1 className='zen-typography-hero text-ink stroke-press'>
                 오류가 발생했습니다
               </h1>
-              <p className='zen-typography-body text-ink-light void-breathing'>{error}</p>
+              <p className='zen-typography-body text-ink-light void-breathing'>
+                {error}
+              </p>
               <Button
                 onClick={() => window.location.reload()}
                 className='btn-art px-zen-xl py-zen-md brutal-shadow'
@@ -328,60 +333,51 @@ export default function GalleryClient({
   }
 
   return (
-    <div className='min-h-screen bg-paper relative overflow-hidden flex flex-col'>
-      {/* Zen Brutalism Foundation Background Effects */}
-      <div className='fixed inset-0 pointer-events-none'>
-        <div className='absolute inset-0 zen-breathe-deep opacity-2' />
-        <div className='absolute inset-0 ink-flow-ambient opacity-1' />
-      </div>
-
+    <div className='min-h-screen bg-paper flex flex-col'>
       <ArtNavigation />
-      
-      {/* Zen Brutalist Hero for Gallery */}
+
+      {/* 더 컴팩트한 히어로 섹션 */}
       <ZenBrutalistHero
-        phase="1"
+        phase='1'
         title={{
-          main: "작품 갤러리",
-          sub: "ARTWORK GALLERY",
-          english: "Korean Calligraphy Collection"
+          main: '작품 갤러리',
+          sub: 'ARTWORK GALLERY',
+          english: 'Korean Calligraphy Collection',
         }}
         description={{
-          primary: "아남 배옥영의 서예 작품",
-          secondary: "전통 서예의 정신과 현대적 감각이 어우러진 작품들을 감상해보세요"
+          main: '전통 서예의 정신과 현대적 감각이 어우러진 작품들',
+          sub: '아남 배옥영 작가의 서예 작품을 감상해보세요',
         }}
-        concept="ZEN GALLERY EXPERIENCE"
+        concept='GALLERY COLLECTION'
         navigation={{
           prev: { href: '/', label: '홈' },
-          demo: { href: '/zen-demo', label: 'Zen 체험' }
+          demo: { href: '/zen-demo', label: 'Zen 체험' },
         }}
-        variant="zen"
+        variant='zen'
         enableInteraction={true}
-        className="min-h-[60vh]"
+        className='min-h-[30vh]'
         backgroundArtworks={featuredArtworks}
         showImageCarousel={featuredArtworks.length > 0}
       />
 
       <NavigationSpacer />
 
-      <main className='section-padding relative z-10 flex-1'>
-        <div className='zen-brutalist-layout'>
-
-          {/* Zen Brutalist 필터 및 정렬 */}
-          <div className='mt-zen-lg space-y-zen-md cultural-context'>
-            {/* 통계 정보 */}
-            <div className='flex items-center justify-between void-breathing'>
-              <div className='flex items-center space-x-zen-lg'>
-                <p className='zen-typography-body text-ink-light'>
+      <main className='flex-1 py-8'>
+        <div className='container mx-auto px-4 max-w-6xl'>
+          {/* 필터 및 정렬 - 더 클린하게 */}
+          <div className='mb-8 space-y-6'>
+            {/* 통계 정보와 뷰 모드 */}
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center space-x-4'>
+                <p className='text-lg text-ink font-medium'>
                   총{' '}
-                  <span className='zen-typography-body text-ink font-bold stroke-horizontal'>
-                    {filteredArtworks.length}
-                  </span>
+                  <span className='text-gold'>{filteredArtworks.length}</span>
                   개의 작품
                 </p>
                 {(selectedCategory !== 'all' || selectedTags.length > 0) && (
-                  <div className='flex items-center space-x-zen-sm void-minimal'>
+                  <div className='flex items-center space-x-2'>
                     {selectedCategory !== 'all' && (
-                      <Badge variant='secondary' className='text-xs brutal-typography-accent bg-gold/20 text-gold border-gold/30'>
+                      <Badge className='bg-gold/20 text-gold border-gold/30'>
                         {
                           categoryOptions.find(
                             (cat) => cat.value === selectedCategory
@@ -392,8 +388,8 @@ export default function GalleryClient({
                     {selectedTags.map((tag) => (
                       <Badge
                         key={tag}
-                        variant='secondary'
-                        className='text-xs flex items-center gap-1 bg-ink/10 text-ink border-ink/20'
+                        variant='outline'
+                        className='flex items-center gap-1'
                       >
                         <Tag className='w-3 h-3' />
                         {tag}
@@ -403,22 +399,22 @@ export default function GalleryClient({
                       variant='ghost'
                       size='sm'
                       onClick={clearAllFilters}
-                      className='text-xs text-ink-light hover:text-ink zen-hover-scale'
+                      className='text-sm text-ink-light hover:text-ink'
                     >
-                      <X className='w-3 h-3 mr-1' />
+                      <X className='w-4 h-4 mr-1' />
                       초기화
                     </Button>
                   </div>
                 )}
               </div>
 
-              {/* Zen Brutalist 뷰 모드 토글 */}
-              <div className='flex items-center space-x-zen-sm'>
+              {/* 뷰 모드 토글 */}
+              <div className='flex items-center bg-white rounded-lg p-1 shadow-sm'>
                 <Button
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
                   size='sm'
                   onClick={() => setViewMode('grid')}
-                  className={`p-zen-sm ${viewMode === 'grid' ? 'btn-art brutal-shadow' : 'hover:bg-stone/10'}`}
+                  className={`p-2 ${viewMode === 'grid' ? 'bg-ink text-paper' : 'hover:bg-stone/10'}`}
                 >
                   <Grid className='h-4 w-4' />
                 </Button>
@@ -426,20 +422,20 @@ export default function GalleryClient({
                   variant={viewMode === 'list' ? 'default' : 'ghost'}
                   size='sm'
                   onClick={() => setViewMode('list')}
-                  className={`p-zen-sm ${viewMode === 'list' ? 'btn-art brutal-shadow' : 'hover:bg-stone/10'}`}
+                  className={`p-2 ${viewMode === 'list' ? 'bg-ink text-paper' : 'hover:bg-stone/10'}`}
                 >
                   <List className='h-4 w-4' />
                 </Button>
               </div>
             </div>
 
-            {/* Zen Brutalist 카테고리 필터 */}
-            <div className='space-y-zen-sm void-breathing'>
-              <div className='flex items-center space-x-zen-sm'>
+            {/* 카테고리 필터 - 더 클린하게 */}
+            <div className='space-y-3'>
+              <h3 className='text-sm font-medium text-ink flex items-center gap-2'>
                 <Filter className='h-4 w-4 text-gold' />
-                <span className='brutal-typography-accent text-ink uppercase tracking-wider'>카테고리</span>
-              </div>
-              <div className='flex flex-wrap gap-zen-md'>
+                카테고리
+              </h3>
+              <div className='flex flex-wrap gap-2'>
                 {categoryOptions.map((category) => {
                   const count = getCategoryCount(category.value)
                   if (count === 0 && category.value !== 'all') return null
@@ -454,14 +450,21 @@ export default function GalleryClient({
                       }
                       size='sm'
                       onClick={() => setSelectedCategory(category.value)}
-                      className={
+                      className={`h-9 px-4 ${
                         selectedCategory === category.value
-                          ? 'btn-art px-zen-lg py-zen-sm brutal-shadow zen-hover-scale'
-                          : 'btn-art-outline px-zen-lg py-zen-sm hover:bg-stone/10 zen-hover-scale'
-                      }
+                          ? 'bg-ink text-paper shadow-lg'
+                          : 'bg-white hover:bg-stone/5 border-stone/20'
+                      }`}
                     >
                       {category.label}
-                      <Badge variant='secondary' className='ml-zen-sm text-xs bg-stone/20 text-ink-light'>
+                      <Badge
+                        variant='secondary'
+                        className={`ml-2 text-xs ${
+                          selectedCategory === category.value
+                            ? 'bg-paper/20 text-paper/80'
+                            : 'bg-stone/10 text-ink-light'
+                        }`}
+                      >
                         {count}
                       </Badge>
                     </Button>
@@ -470,19 +473,21 @@ export default function GalleryClient({
               </div>
             </div>
 
-            {/* Zen Brutalist 태그 필터 */}
+            {/* 태그 필터 - 더 클린하게 */}
             {availableTags.length > 0 && (
-              <div className='space-y-zen-sm void-breathing'>
-                <div className='flex items-center space-x-zen-sm'>
-                  <Tag className='h-4 w-4 text-gold' />
-                  <span className='brutal-typography-accent text-ink uppercase tracking-wider'>태그</span>
+              <div className='space-y-3'>
+                <div className='flex items-center gap-2'>
+                  <h3 className='text-sm font-medium text-ink flex items-center gap-2'>
+                    <Tag className='h-4 w-4 text-gold' />
+                    태그
+                  </h3>
                   {selectedTags.length > 0 && (
-                    <Badge variant='outline' className='text-xs bg-gold/10 text-gold border-gold/30'>
+                    <Badge className='bg-gold/10 text-gold border-gold/20 text-xs'>
                       {selectedTags.length}개 선택
                     </Badge>
                   )}
                 </div>
-                <div className='flex flex-wrap gap-zen-sm'>
+                <div className='flex flex-wrap gap-2'>
                   {availableTags.map((tag) => {
                     const count = getTagCount(tag)
                     const isSelected = selectedTags.includes(tag)
@@ -493,13 +498,22 @@ export default function GalleryClient({
                         variant={isSelected ? 'default' : 'outline'}
                         size='sm'
                         onClick={() => toggleTag(tag)}
-                        className={`text-xs ${
-                          isSelected ? 'btn-art px-zen-md py-zen-xs brutal-shadow zen-hover-scale' : 'btn-art-outline px-zen-md py-zen-xs hover:bg-stone/10 zen-hover-scale'
+                        className={`h-8 px-3 text-xs ${
+                          isSelected
+                            ? 'bg-ink text-paper'
+                            : 'bg-white hover:bg-stone/5 border-stone/20'
                         }`}
                       >
                         <Tag className='w-3 h-3 mr-1' />
                         {tag}
-                        <Badge variant='secondary' className='ml-zen-xs text-xs bg-stone/20 text-ink-lighter'>
+                        <Badge
+                          variant='secondary'
+                          className={`ml-1 text-xs ${
+                            isSelected
+                              ? 'bg-paper/20 text-paper/80'
+                              : 'bg-stone/10 text-ink-lighter'
+                          }`}
+                        >
                           {count}
                         </Badge>
                       </Button>
@@ -509,11 +523,13 @@ export default function GalleryClient({
               </div>
             )}
 
-            {/* Zen Brutalist 정렬 옵션 */}
+            {/* Zen Brutalist 정렬 옵션 - 텍스트 개선 */}
             <div className='flex items-center space-x-zen-lg void-breathing'>
               <div className='flex items-center space-x-zen-sm'>
                 <Filter className='h-4 w-4 text-gold' />
-                <span className='brutal-typography-accent text-ink-light uppercase tracking-wider'>정렬</span>
+                <span className='text-sm font-medium text-ink-light uppercase tracking-wider'>
+                  정렬
+                </span>
               </div>
               <div className='flex flex-wrap gap-zen-sm'>
                 {sortOptions.map((option) => (
@@ -523,7 +539,9 @@ export default function GalleryClient({
                     size='sm'
                     onClick={() => setSortBy(option.value)}
                     className={`text-xs ${
-                      sortBy === option.value ? 'btn-art brutal-shadow zen-hover-scale' : 'hover:bg-stone/10 zen-hover-scale'
+                      sortBy === option.value
+                        ? 'btn-art brutal-shadow zen-hover-scale'
+                        : 'hover:bg-stone/10 zen-hover-scale'
                     }`}
                   >
                     {option.label}
@@ -623,9 +641,9 @@ export default function GalleryClient({
       </main>
 
       {/* Zen Brutalist Footer */}
-      <ZenBrutalistFooter 
-        variant="zen" 
-        showPhaseNavigation={true} 
+      <ZenBrutalistFooter
+        variant='zen'
+        showPhaseNavigation={true}
         enableInteraction={true}
       />
     </div>

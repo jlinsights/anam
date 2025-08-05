@@ -26,10 +26,10 @@ export function SiteHeader() {
           aria-label='홈으로 가기'
         >
           <MountainIcon
-            className='h-6 w-6 text-neutral-700 dark:text-neutral-300'
+            className='h-6 w-6 text-neutral-700 dark:text-neutral-200'
             aria-hidden='true'
           />
-          <span className='font-bold sm:inline-block text-neutral-800 dark:text-neutral-200'>
+          <span className='font-bold sm:inline-block text-neutral-800 dark:text-neutral-100'>
             아남
           </span>
         </Link>
@@ -40,13 +40,13 @@ export function SiteHeader() {
         >
           <Link
             href={getLocalizedPath('/gallery')}
-            className='px-2 py-1 text-neutral-600 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-500 rounded'
+            className='px-2 py-1 text-neutral-600 transition-colors hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-500 rounded'
           >
             갤러리
           </Link>
           <Link
             href={getLocalizedPath('/artist')}
-            className='px-2 py-1 text-neutral-600 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-500 rounded'
+            className='px-2 py-1 text-neutral-600 transition-colors hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-500 rounded'
           >
             작가
           </Link>

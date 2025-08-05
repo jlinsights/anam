@@ -3,39 +3,102 @@
 import { ArtNavigation, NavigationSpacer } from '@/components/art-navigation'
 import { ZenBrutalistHero } from '@/components/zen-brutalist-hero'
 import { ZenBrutalistFooter } from '@/components/zen-brutalist-footer'
-import { Artist } from '@/lib/types'
+import { ErrorBoundary } from '@/components/error-boundary'
+import type { Artist, Artwork } from '@/lib/types'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
-  BookOpen,
-  Building,
+  Award,
   Calendar,
   GraduationCap,
-  Instagram,
-  Mail,
+  MapPin,
   Palette,
-  Phone,
-  Trophy,
+  BookOpen,
   Users,
+  Heart,
+  Lightbulb,
+  Brush,
+  Package,
+  Globe,
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useRef, useCallback } from 'react'
+
+// 안전한 fallback 데이터
+const safeFallbackArtworks: Artwork[] = [
+  {
+    id: 'fallback-1',
+    title: '전통 서예 작품',
+    slug: 'traditional-calligraphy',
+    year: 2024,
+    medium: '서예',
+    dimensions: '68 x 136 cm',
+    aspectRatio: '4/5',
+    description: '전통 서예의 아름다움을 담은 작품',
+    imageUrl: '/placeholders/placeholder.jpg',
+    featured: true,
+  },
+  {
+    id: 'fallback-2',
+    title: '현대 서예 작품',
+    slug: 'modern-calligraphy',
+    year: 2024,
+    medium: '서예',
+    dimensions: '68 x 136 cm',
+    aspectRatio: '4/5',
+    description: '현대적 감각의 서예 작품',
+    imageUrl: '/placeholders/placeholder.jpg',
+    featured: true,
+  },
+]
 
 interface ArtistClientProps {
   artist: Artist
 }
 
 export default function ArtistClient({ artist }: ArtistClientProps) {
+  const [featuredArtworks, setFeaturedArtworks] = useState<Artwork[]>([])
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isHovered, setIsHovered] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  useEffect(() => {
+    async function loadFeaturedArtworks() {
+      try {
+        const response = await fetch('/api/artworks')
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const result = await response.json()
+        const allArtworks = result.data || []
+
+        // Featured 작품들을 배경으로 사용
+        const featured = allArtworks
+          .filter((artwork: Artwork) => artwork.featured)
+          .slice(0, 6)
+
+        setFeaturedArtworks(featured)
+      } catch (error) {
+        console.error(
+          'Failed to load featured artworks for artist hero:',
+          error
+        )
+        // 안전한 fallback 데이터 사용
+        setFeaturedArtworks(safeFallbackArtworks)
+      }
+    }
+
+    loadFeaturedArtworks()
+  }, [])
+
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return
-    
+
     const rect = containerRef.current.getBoundingClientRect()
     const x = (e.clientX - rect.left) / rect.width
     const y = (e.clientY - rect.top) / rect.height
-    
+
     setMousePosition({ x, y })
   }, [])
 
@@ -48,22 +111,20 @@ export default function ArtistClient({ artist }: ArtistClientProps) {
       return null
 
     return (
-      <div className='zen-brutalist-card glass-layer-1 zen-hover-scale void-breathing'>
-        <div className='flex items-center gap-zen-md mb-zen-lg'>
-          <div className='p-zen-sm bg-gold/10 rounded-lg text-gold'>
-            {icon}
-          </div>
-          <h3 className='zen-typography-section text-ink stroke-horizontal'>{title}</h3>
+      <div className='zen-brutalist-card glass-layer-1 zen-hover-scale p-zen-md'>
+        <div className='flex items-center gap-zen-sm mb-zen-md'>
+          <div className='p-zen-xs bg-gold/10 rounded-lg text-gold'>{icon}</div>
+          <h3 className='text-base font-semibold text-ink'>{title}</h3>
         </div>
-        <div className='space-y-zen-sm'>
+        <div className='space-y-zen-xs'>
           {Array.isArray(content) ? (
             content.map((item, index) => (
-              <p key={index} className='zen-typography-body text-ink-light leading-relaxed void-minimal'>
+              <p key={index} className='text-sm text-ink-light leading-normal'>
                 {item}
               </p>
             ))
           ) : (
-            <p className='zen-typography-body text-ink-light leading-relaxed whitespace-pre-wrap void-minimal'>
+            <p className='text-sm text-ink-light leading-normal whitespace-pre-wrap'>
               {content}
             </p>
           )}
@@ -79,11 +140,11 @@ export default function ArtistClient({ artist }: ArtistClientProps) {
       hsla(var(--ink) / 0.08) 0%,
       hsla(var(--gold) / 0.05) 40%,
       transparent 70%
-    )`
+    )`,
   }
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className='min-h-screen bg-paper relative overflow-hidden flex flex-col'
       onMouseMove={handleMouseMove}
@@ -94,50 +155,54 @@ export default function ArtistClient({ artist }: ArtistClientProps) {
       <div className='fixed inset-0 pointer-events-none'>
         <div className='absolute inset-0 zen-breathe-deep opacity-2' />
         <div className='absolute inset-0 ink-flow-ambient opacity-1' />
-        <div 
+        <div
           className={`absolute inset-0 transition-opacity duration-2000 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
           style={dynamicBackground}
         />
       </div>
 
       <ArtNavigation />
-      
-      {/* Zen Brutalist Hero for Artist Page */}
+
+      {/* Zen Brutalist Hero for Artist Page - 더 컴팩트화하고 Featured 이미지 배경 추가 */}
       <ZenBrutalistHero
-        phase="1"
+        phase='1'
         title={{
-          main: "아남 배옥영",
-          sub: "ANAM BAE OK YOUNG",
-          english: "Korean Calligraphy Artist"
+          main: '아남 배옥영',
+          sub: 'ANAM BAE OK YOUNG',
+          english: 'Korean Calligraphy Artist',
         }}
         description={{
-          primary: "전통 서예의 정신과 현대적 감각이 조화를 이루는 작가",
-          secondary: "먹과 붓으로 그려내는 한국의 미학, 그 깊이와 아름다움을 탐험합니다"
+          main: '전통 서예의 정신과 현대적 감각이 조화를 이루는 작가',
+          sub:
+            '먹과 붓으로 그려내는 한국의 미학, 그 깊이와 아름다움을 탐험합니다',
         }}
-        concept="ARTIST PROFILE"
+        concept='ARTIST PROFILE'
         navigation={{
           prev: { href: '/gallery', label: '갤러리' },
-          demo: { href: '/zen-demo', label: 'Zen 체험' }
+          demo: { href: '/zen-demo', label: 'Zen 체험' },
         }}
-        variant="zen"
+        variant='zen'
         enableInteraction={true}
-        className="min-h-[60vh]"
+        className='min-h-[35vh]'
+        backgroundArtworks={featuredArtworks}
+        showImageCarousel={featuredArtworks.length > 0}
       />
 
       <NavigationSpacer />
 
       <main className='section-padding relative z-10 flex-1'>
         <div className='zen-brutalist-layout'>
-          {/* 메인 콘텐츠 */}
-          <div className='grid lg:grid-cols-2 gap-zen-2xl mb-zen-3xl temporal-depth'>
+          {/* 메인 콘텐츠 - 반응형 개선 */}
+          <div className='grid lg:grid-cols-2 gap-zen-lg mb-zen-xl temporal-depth'>
             {/* 왼쪽: 프로필 섹션 */}
             <div className='space-y-zen-lg void-contemplative'>
-              {/* 프로필 이미지 */}
+              {/* 프로필 이미지 - 크기 최적화 */}
               <div className='zen-brutalist-card glass-layer-1 cultural-context'>
-                <div className='relative w-full h-[500px] rounded-2xl overflow-hidden mb-zen-lg'>
+                <div className='relative w-full h-[300px] rounded-2xl overflow-hidden mb-zen-md'>
                   <Image
                     src={
-                      artist.profileImageUrl || '/Images/Artist/artist-large.jpg'
+                      artist.profileImageUrl ||
+                      '/Images/Artist/artist-large.jpg'
                     }
                     alt={artist.name}
                     fill
@@ -145,27 +210,25 @@ export default function ArtistClient({ artist }: ArtistClientProps) {
                     priority
                   />
                   {/* Image overlay with traditional ink effect */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/10 via-transparent to-transparent pointer-events-none" />
+                  <div className='absolute inset-0 bg-gradient-to-t from-ink/10 via-transparent to-transparent pointer-events-none' />
                 </div>
-                
-                {/* 연락처 정보 섹션 */}
-                <div className='space-y-zen-md void-breathing'>
-                  <h2 className='zen-typography-hero text-ink stroke-press mb-zen-lg'>
+
+                {/* 연락처 정보 섹션 - 가로 배치로 최적화 */}
+                <div className='space-y-zen-sm void-breathing'>
+                  <h2 className='zen-typography-section text-ink stroke-press mb-zen-md text-center'>
                     {artist.name}
                   </h2>
-                  
-                  <div className='space-y-zen-sm'>
+
+                  {/* 연락처 정보를 가로로 배치 */}
+                  <div className='flex flex-wrap justify-center gap-zen-md'>
                     {/* 인스타그램 */}
                     {artist.socialLinks?.instagram && (
-                      <div className='flex items-center gap-zen-sm zen-hover-scale'>
-                        <div className='p-zen-xs bg-pink-100 rounded-lg'>
-                          <Instagram className='h-4 w-4 text-pink-600' />
-                        </div>
+                      <div className='flex items-center gap-zen-xs zen-hover-scale bg-pink-50 px-zen-sm py-zen-xs rounded-lg'>
                         <Link
                           href={`https://instagram.com/${artist.socialLinks.instagram.replace('@', '')}`}
                           target='_blank'
                           rel='noopener noreferrer'
-                          className='zen-typography-body text-pink-600 hover:text-pink-700 transition-colors font-medium'
+                          className='text-sm text-pink-600 hover:text-pink-700 transition-colors font-medium'
                         >
                           {artist.socialLinks.instagram}
                         </Link>
@@ -173,13 +236,10 @@ export default function ArtistClient({ artist }: ArtistClientProps) {
                     )}
                     {/* 이메일 */}
                     {artist.email && (
-                      <div className='flex items-center gap-zen-sm zen-hover-scale'>
-                        <div className='p-zen-xs bg-blue-50 rounded-lg'>
-                          <Mail className='h-4 w-4 text-blue-600' />
-                        </div>
+                      <div className='flex items-center gap-zen-xs zen-hover-scale bg-blue-50 px-zen-sm py-zen-xs rounded-lg'>
                         <Link
                           href={`mailto:${artist.email}`}
-                          className='zen-typography-body text-ink-light hover:text-ink transition-colors'
+                          className='text-sm text-ink-light hover:text-ink transition-colors'
                         >
                           {artist.email}
                         </Link>
@@ -187,13 +247,10 @@ export default function ArtistClient({ artist }: ArtistClientProps) {
                     )}
                     {/* 전화번호 */}
                     {artist.phone && (
-                      <div className='flex items-center gap-zen-sm zen-hover-scale'>
-                        <div className='p-zen-xs bg-green-50 rounded-lg'>
-                          <Phone className='h-4 w-4 text-green-600' />
-                        </div>
+                      <div className='flex items-center gap-zen-xs zen-hover-scale bg-green-50 px-zen-sm py-zen-xs rounded-lg'>
                         <Link
                           href={`tel:${artist.phone}`}
-                          className='zen-typography-body text-ink-light hover:text-ink transition-colors'
+                          className='text-sm text-ink-light hover:text-ink transition-colors'
                         >
                           {artist.phone}
                         </Link>
@@ -204,15 +261,15 @@ export default function ArtistClient({ artist }: ArtistClientProps) {
               </div>
             </div>
 
-            {/* 오른쪽: 상세 정보 섹션 */}
-            <div className='space-y-zen-lg void-contemplative'>
+            {/* 오른쪽: 상세 정보 섹션 - 타이포그래피 개선 */}
+            <div className='space-y-zen-md void-contemplative'>
               {/* 작가 소개 */}
               {artist.bio && (
-                <div className='zen-brutalist-card glass-layer-1 zen-hover-scale void-breathing'>
-                  <h3 className='zen-typography-section text-ink stroke-horizontal mb-zen-lg'>
+                <div className='zen-brutalist-card glass-layer-1 zen-hover-scale p-zen-lg'>
+                  <h3 className='text-lg font-semibold text-ink mb-zen-md'>
                     작가 소개
                   </h3>
-                  <p className='zen-typography-body text-ink-light leading-relaxed whitespace-pre-wrap void-minimal'>
+                  <p className='text-base text-ink-light leading-relaxed whitespace-pre-wrap'>
                     {artist.bio}
                   </p>
                 </div>
@@ -220,14 +277,16 @@ export default function ArtistClient({ artist }: ArtistClientProps) {
 
               {/* 작품 철학 */}
               {artist.philosophy && (
-                <div className='zen-brutalist-card glass-layer-1 zen-hover-scale void-breathing'>
-                  <div className='flex items-center gap-zen-md mb-zen-lg'>
+                <div className='zen-brutalist-card glass-layer-1 zen-hover-scale p-zen-lg'>
+                  <div className='flex items-center gap-zen-md mb-zen-md'>
                     <div className='p-zen-sm bg-gold/10 rounded-lg text-gold'>
-                      <BookOpen className='h-4 w-4' />
+                      <BookOpen className='h-5 w-5' />
                     </div>
-                    <h3 className='zen-typography-section text-ink stroke-horizontal'>작품 철학</h3>
+                    <h3 className='text-lg font-semibold text-ink'>
+                      작품 철학
+                    </h3>
                   </div>
-                  <p className='zen-typography-body text-ink-light leading-relaxed whitespace-pre-wrap void-minimal'>
+                  <p className='text-base text-ink-light leading-relaxed whitespace-pre-wrap'>
                     {artist.philosophy}
                   </p>
                 </div>
@@ -235,14 +294,16 @@ export default function ArtistClient({ artist }: ArtistClientProps) {
 
               {/* 작가 노트 */}
               {artist.statement && (
-                <div className='zen-brutalist-card glass-layer-1 zen-hover-scale void-breathing'>
-                  <div className='flex items-center gap-zen-md mb-zen-lg'>
+                <div className='zen-brutalist-card glass-layer-1 zen-hover-scale p-zen-lg'>
+                  <div className='flex items-center gap-zen-md mb-zen-md'>
                     <div className='p-zen-sm bg-gold/10 rounded-lg text-gold'>
-                      <Building className='h-4 w-4' />
+                      <MapPin className='h-5 w-5' />
                     </div>
-                    <h3 className='zen-typography-section text-ink stroke-horizontal'>작가 노트</h3>
+                    <h3 className='text-lg font-semibold text-ink'>
+                      작가 노트
+                    </h3>
                   </div>
-                  <p className='zen-typography-body text-ink-light leading-relaxed whitespace-pre-wrap void-minimal'>
+                  <p className='text-base text-ink-light leading-relaxed whitespace-pre-wrap'>
                     {artist.statement}
                   </p>
                 </div>
@@ -250,8 +311,8 @@ export default function ArtistClient({ artist }: ArtistClientProps) {
             </div>
           </div>
 
-          {/* 추가 정보 섹션 */}
-          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-zen-lg temporal-depth'>
+          {/* 추가 정보 섹션 - 그리드 최적화 */}
+          <div className='grid sm:grid-cols-2 lg:grid-cols-4 gap-zen-md temporal-depth'>
             {/* 학력 */}
             {renderSection(
               '학력',
@@ -267,7 +328,11 @@ export default function ArtistClient({ artist }: ArtistClientProps) {
             )}
 
             {/* 수상 */}
-            {renderSection('수상', artist.awards, <Trophy className='h-4 w-4' />)}
+            {renderSection(
+              '수상',
+              artist.awards,
+              <Award className='h-4 w-4' />
+            )}
 
             {/* 강의 */}
             {renderSection(
@@ -280,14 +345,14 @@ export default function ArtistClient({ artist }: ArtistClientProps) {
             {renderSection(
               '출판',
               artist.publications,
-              <BookOpen className='h-4 w-4' />
+              <Package className='h-4 w-4' />
             )}
 
             {/* 소속 */}
             {renderSection(
               '소속',
               artist.memberships,
-              <Building className='h-4 w-4' />
+              <Globe className='h-4 w-4' />
             )}
 
             {/* 컬렉션 */}
@@ -301,9 +366,9 @@ export default function ArtistClient({ artist }: ArtistClientProps) {
       </main>
 
       {/* Zen Brutalist Footer */}
-      <ZenBrutalistFooter 
-        variant="zen" 
-        showPhaseNavigation={true} 
+      <ZenBrutalistFooter
+        variant='zen'
+        showPhaseNavigation={true}
         enableInteraction={true}
       />
     </div>

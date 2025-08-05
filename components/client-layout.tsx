@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react'
 import { AnalyticsProvider } from '@/components/analytics-provider'
 import { I18nProvider } from '@/components/i18n-provider'
-import { PerformanceDashboard, PerformanceFloatingButton } from '@/components/performance-dashboard'
+import {
+  PerformanceDashboard,
+  PerformanceFloatingButton,
+} from '@/components/performance-dashboard'
 import { PWAInstallPrompt } from '@/components/pwa-install-prompt'
 import { ServiceWorkerRegistration } from '@/components/service-worker-registration'
 import { UIProvider } from '@/lib/store/ui-store'
@@ -14,7 +17,8 @@ interface ClientLayoutProps {
 
 export function ClientLayout({ children }: ClientLayoutProps) {
   const [mounted, setMounted] = useState(false)
-  const [showPerformanceDashboard, setShowPerformanceDashboard] = useState(false)
+  const [showPerformanceDashboard, setShowPerformanceDashboard] =
+    useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -36,16 +40,16 @@ export function ClientLayout({ children }: ClientLayoutProps) {
         <AnalyticsProvider>
           <div className='min-h-screen bg-background text-foreground'>
             {children}
-            
+
             {/* PWA 기능 */}
             <ServiceWorkerRegistration />
             <PWAInstallPrompt />
-            
+
             {/* 성능 모니터링 플로팅 버튼 (개발 환경에서만 표시) */}
-            <PerformanceFloatingButton 
-              onClick={() => setShowPerformanceDashboard(true)} 
+            <PerformanceFloatingButton
+              onClick={() => setShowPerformanceDashboard(true)}
             />
-            
+
             {/* 성능 모니터링 대시보드 */}
             <PerformanceDashboard
               isVisible={showPerformanceDashboard}

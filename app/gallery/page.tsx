@@ -5,13 +5,13 @@ import GalleryClient from './gallery-client'
 export const dynamic = 'force-static' // can be revalidated via tag
 
 export const metadata: Metadata = {
-      title: '갤러리 | 아남 배옥영 개인전 | 먹, 그리고...',
+  title: '갤러리 | 아남 배옥영 개인전 | 먹, 그리고...',
   description:
-          "아남 배옥영 작가의 서예 작품을 감상하세요. '먹, 그리고...'를 주제로 한 현대 서예 작품을 온라인으로 만나보실 수 있습니다.",
+    "아남 배옥영 작가의 서예 작품을 감상하세요. '먹, 그리고...'를 주제로 한 현대 서예 작품을 온라인으로 만나보실 수 있습니다.",
   keywords: [
     '갤러리',
     '서예 작품',
-          '아남 배옥영',
+    '아남 배옥영',
     '현대서예',
     '한국서예',
     '먹, 그리고...',

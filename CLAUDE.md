@@ -1,19 +1,54 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with
+code in this repository.
 
 ## Project Overview
 
-**ANAM Gallery** is a Next.js-based digital calligraphy gallery for Korean artist 아남 배옥영 (ANAM Bae Ok Young). The project features an innovative **Zen Brutalism Foundation** design system that combines traditional Korean aesthetic principles with cutting-edge web technologies.
+**ANAM Gallery** is a Next.js-based digital calligraphy gallery for Korean
+artist 아남 배옥영 (ANAM Bae Ok Young). The project features an innovative **Zen
+Brutalism Foundation** design system that combines traditional Korean aesthetic
+principles with cutting-edge web technologies.
+
+### 🚀 **BMad-Method Integration (Agent OS)**
+
+The project now includes a comprehensive **bmad-method framework integration** through Agent OS, providing AI-assisted development methodology for creating a professional Korean calligraphy gallery platform:
+
+**Key Features**:
+- **Cultural Context Database**: AI-powered cultural analysis and educational content generation
+- **Gallery Enhancement System**: Professional gallery features and advanced user experience design
+- **Multi-Agent Orchestration**: Coordinated AI agents for specialized domain expertise
+- **Quality Assurance Framework**: Comprehensive validation and expert review processes
+
+**Agent OS Structure**:
+```
+.agent-os/
+├── product/                    # Product specifications
+│   ├── cultural-context-database.md
+│   ├── gallery-enhancement.md
+│   └── integration-plan.md
+├── agents/                     # Specialized AI agents
+│   ├── cultural-context-agent.md
+│   ├── gallery-enhancement-agent.md
+│   └── integration-coordinator.md
+└── workflows/                  # Process workflows
+    └── cultural-analysis.md
+```
 
 ### 🎯 **Zen Brutalism Foundation Design Philosophy**
 
-**Core Concept**: "전통의 깊이와 현대적 몰입감을 동시에 제공하는 UI/UX 디자인" (UI/UX design that simultaneously provides traditional depth and modern immersion)
+**Core Concept**: "전통의 깊이와 현대적 몰입감을 동시에 제공하는 UI/UX 디자인"
+(UI/UX design that simultaneously provides traditional depth and modern
+immersion)
 
 **3-Phase Evolution System**:
-- **Phase 1**: **백지의 시작** (White Space Foundation) - Zen minimalism + geometric brutalism
-- **Phase 2**: **먹과 유리의 조화** (Ink & Glass Harmony) - Multi-layer glass morphism + fluid ink effects  
-- **Phase 3**: **전통의 깊이** (Traditional Depth) - Korean composition principles + cultural layers
+
+- **Phase 1**: **백지의 시작** (White Space Foundation) - Zen minimalism +
+  geometric brutalism
+- **Phase 2**: **먹과 유리의 조화** (Ink & Glass Harmony) - Multi-layer glass
+  morphism + fluid ink effects
+- **Phase 3**: **전통의 깊이** (Traditional Depth) - Korean composition
+  principles + cultural layers
 
 ## Development Commands
 
@@ -49,7 +84,7 @@ npm run optimize-images  # Optimize artwork images
 # Demo Pages Development
 npm run dev              # Access new demo pages:
                          # /zen-demo (Phase 1)
-                         # /immersive-demo (Phase 2) 
+                         # /immersive-demo (Phase 2)
                          # /cultural-demo (Phase 3)
 
 # Design System Testing
@@ -75,17 +110,20 @@ npm run test -- --testPathPattern=cultural          # Test cultural integration
 ### 🆕 **Zen Brutalism Components**
 
 #### **Hero Components**
+
 - `ZenBrutalistHero` - Base hero component with phase-specific styling
 - `ZenBrutalistHeroPhase1` - Foundation phase hero (zen minimalism)
 - `ZenBrutalistHeroPhase2` - Immersion phase hero (glass morphism)
 - `ZenBrutalistHeroPhase3` - Cultural phase hero (traditional integration)
 
 #### **Artwork Card Components**
+
 - `ZenBrutalistArtworkCard` - Phase 1: Zen + brutal design variants
-- `ImmersiveArtworkCard` - Phase 2: Glass morphism + ink flow effects  
+- `ImmersiveArtworkCard` - Phase 2: Glass morphism + ink flow effects
 - `CulturalArtworkCard` - Phase 3: Traditional composition + seasonal aesthetics
 
 #### **Layout Components**
+
 - `ZenBrutalistFooter` - Enhanced footer with cultural design integration
 - Interactive mouse tracking and dynamic backgrounds
 - Phase navigation with design evolution journey
@@ -158,22 +196,20 @@ The project uses a sophisticated dual-data system:
 ### 🎨 **Zen Brutalism Design System**
 
 #### **Color Palette**
+
 ```css
 /* Traditional Korean Colors */
---ink: 28 25 23           /* 먹색 - primary text */
---paper: 254 252 232      /* 한지색 - background */
---gold: 168 85 27         /* 황금색 - accent */
---stone: 120 113 108      /* 돌색 - secondary */
---brush: 87 83 74         /* 붓색 - neutral */
-
-/* Seasonal Colors (사계절 미학) */
---season-spring: 134 239 172    /* 봄 - spring teal */
---season-summer: 74 222 128     /* 여름 - summer green */
---season-autumn: 251 191 36     /* 가을 - autumn gold */
---season-winter: 156 163 175    /* 겨울 - winter gray */
+--ink: 28 25 23 /* 먹색 - primary text */ --paper: 254 252 232
+  /* 한지색 - background */ --gold: 168 85 27 /* 황금색 - accent */ --stone: 120
+  113 108 /* 돌색 - secondary */ --brush: 87 83 74 /* 붓색 - neutral */
+  /* Seasonal Colors (사계절 미학) */ --season-spring: 134 239 172
+  /* 봄 - spring teal */ --season-summer: 74 222 128 /* 여름 - summer green */
+  --season-autumn: 251 191 36 /* 가을 - autumn gold */ --season-winter: 156 163
+  175 /* 겨울 - winter gray */;
 ```
 
 #### **Typography Hierarchy**
+
 ```css
 /* Zen Typography */
 .zen-typography-display     /* 64px - main titles */
@@ -188,27 +224,29 @@ The project uses a sophisticated dual-data system:
 ```
 
 #### **Spacing System (여백의 미학)**
+
 ```css
 /* Zen Breathing Scale */
---zen-xs: 0.5rem    /* 8px - minimal breathing */
---zen-sm: 1rem      /* 16px - basic breathing */
---zen-md: 2rem      /* 32px - medium breathing */
---zen-lg: 4rem      /* 64px - deep breathing */
---zen-xl: 8rem      /* 128px - meditative breathing */
---zen-2xl: 16rem    /* 256px - absolute silence */
---zen-3xl: 24rem    /* 384px - complete void */
---zen-4xl: 32rem    /* 512px - infinite space */
+--zen-xs: 0.5rem /* 8px - minimal breathing */ --zen-sm: 1rem
+  /* 16px - basic breathing */ --zen-md: 2rem /* 32px - medium breathing */
+  --zen-lg: 4rem /* 64px - deep breathing */ --zen-xl: 8rem
+  /* 128px - meditative breathing */ --zen-2xl: 16rem
+  /* 256px - absolute silence */ --zen-3xl: 24rem /* 384px - complete void */
+  --zen-4xl: 32rem /* 512px - infinite space */;
 ```
 
 #### **Interactive Effects**
+
 - **Mouse Tracking**: Real-time cursor-based background effects
 - **Glass Morphism**: 3-layer independent blur and saturation system
 - **Fluid Ink**: Dynamic gradient animations mimicking traditional brush strokes
-- **Cultural Layers**: Traditional Korean composition principles (삼분법, 음양균형)
+- **Cultural Layers**: Traditional Korean composition principles (삼분법,
+  음양균형)
 
 ### Key Features
 
 #### **🎨 Gallery & Artwork Management**
+
 - **58 Artworks**: Real-time Airtable integration with local fallback
 - **Responsive Grid**: 4x3 (desktop) → 3x4 (tablet) → 2x6 (mobile)
 - **Advanced Search**: Real-time filtering by title, year, medium, category
@@ -216,18 +254,23 @@ The project uses a sophisticated dual-data system:
 - **Artist Notes**: Detailed artwork descriptions and creation intent
 
 #### **🖱️ Interactive Experience**
+
 - **Real-time Mouse Tracking**: Dynamic background effects responding to cursor
 - **Multi-layer Glass Depth**: 3-stage independent blur and transparency
-- **Fluid Ink Animation**: Digital recreation of traditional calligraphy brush strokes
+- **Fluid Ink Animation**: Digital recreation of traditional calligraphy brush
+  strokes
 - **Seasonal Aesthetics**: Four-season color changes and breathing space system
 
 #### **🎯 User Experience (UX)**
+
 - **Progressive Web App**: Mobile app-like installation and offline usage
 - **Dark/Light Theme**: Automatic theme switching based on system preference
 - **WCAG 2.1 AA Compliance**: Full screen reader and keyboard navigation support
-- **Performance Optimization**: WebP image auto-conversion, lazy loading, CDN optimization
+- **Performance Optimization**: WebP image auto-conversion, lazy loading, CDN
+  optimization
 
 #### **🆕 Demo Pages**
+
 - **`/zen-demo`**: Phase 1 zen minimalism showcase
 - **`/immersive-demo`**: Phase 2 immersive glass + ink effects
 - **`/cultural-demo`**: Phase 3 traditional cultural integration
@@ -248,8 +291,10 @@ NEXT_PUBLIC_SITE_URL=https://anam-gallery.vercel.app
 ### Development Workflow
 
 1. **Environment setup**: Node.js 18+, npm install
-2. **Start development**: `npm run dev` (or `npm run dev -- --port 3001` if port 3000 is in use)
-3. **Code quality**: Always run `npm run lint` and `npm run type-check` before commits
+2. **Start development**: `npm run dev` (or `npm run dev -- --port 3001` if port
+   3000 is in use)
+3. **Code quality**: Always run `npm run lint` and `npm run type-check` before
+   commits
 4. **Testing**: Use `npm run test:coverage` to ensure adequate test coverage
 5. **Images**: Use `npm run optimize-images` when adding new artwork images
 6. **🆕 Design System**: Test Zen Brutalism components in demo pages
@@ -260,30 +305,35 @@ NEXT_PUBLIC_SITE_URL=https://anam-gallery.vercel.app
 - **Coverage Target**: 70% minimum across functions, lines, branches, statements
 - **Test Files**: `__tests__/` directory and `*.test.tsx` files
 - **Mocking**: Airtable API calls mocked for reliable testing
-- **🆕 Design System Tests**: Specific tests for Zen Brutalism components and interactions
+- **🆕 Design System Tests**: Specific tests for Zen Brutalism components and
+  interactions
 
 ## Deployment Notes
 
 - **Platform**: Vercel with automatic deployments from git
-- **ISR**: Uses Next.js ISR with `revalidateTag("artworks")` for cache invalidation
+- **ISR**: Uses Next.js ISR with `revalidateTag("artworks")` for cache
+  invalidation
 - **Performance**: Image optimization, bundle splitting, CDN delivery
 - **Security**: CSP headers, XSS protection, secure asset handling
-- **🆕 Build Success**: Recent successful deployment with all Zen Brutalism components
+- **🆕 Build Success**: Recent successful deployment with all Zen Brutalism
+  components
 
 ## Common Development Tasks
 
 ### Adding New Artwork
 
 1. Add optimized images to `/public/Images/Artworks/{year}/`
-2. Update Airtable `Artworks` table OR modify `fallbackArtworksData` in `lib/artworks.ts`
+2. Update Airtable `Artworks` table OR modify `fallbackArtworksData` in
+   `lib/artworks.ts`
 3. Ensure slug follows pattern: `anam-{title}-{year}`
 
 ### 🆕 **Working with Zen Brutalism Components**
 
 #### **Creating New Hero Sections**
+
 ```typescript
 // Use preset configurations
-<ZenBrutalistHeroPhase1 
+<ZenBrutalistHeroPhase1
   navigation={{
     demo: { href: '/zen-demo#showcase', label: '디자인 시스템 탐험' },
     next: { href: '/immersive-demo', label: 'Phase 2' },
@@ -303,6 +353,7 @@ NEXT_PUBLIC_SITE_URL=https://anam-gallery.vercel.app
 ```
 
 #### **Implementing Interactive Artwork Cards**
+
 ```typescript
 // Phase 1: Zen Brutalism
 <ZenBrutalistArtworkCard
@@ -335,18 +386,22 @@ NEXT_PUBLIC_SITE_URL=https://anam-gallery.vercel.app
 ```
 
 #### **Adding Mouse Tracking Interactions**
+
 ```typescript
 const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
-const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-  if (!containerRef.current || !enableInteraction) return
-  
-  const rect = containerRef.current.getBoundingClientRect()
-  const x = (e.clientX - rect.left) / rect.width
-  const y = (e.clientY - rect.top) / rect.height
-  
-  setMousePosition({ x, y })
-}, [enableInteraction])
+const handleMouseMove = useCallback(
+  (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current || !enableInteraction) return
+
+    const rect = containerRef.current.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width
+    const y = (e.clientY - rect.top) / rect.height
+
+    setMousePosition({ x, y })
+  },
+  [enableInteraction]
+)
 
 // Apply dynamic background
 const dynamicBackground = {
@@ -355,7 +410,7 @@ const dynamicBackground = {
     hsla(var(--ink) / 0.08) 0%,
     hsla(var(--gold) / 0.05) 40%,
     transparent 70%
-  )`
+  )`,
 }
 ```
 
@@ -363,8 +418,10 @@ const dynamicBackground = {
 
 - Gallery pagination: 12 items per page
 - Grid responsive breakpoints: `tailwind.config.ts`
-- Card component: `components/artwork-card.tsx` (legacy) or new Zen Brutalist cards
-- **🆕 Demo layouts**: Check `/zen-demo`, `/immersive-demo`, `/cultural-demo` for advanced layouts
+- Card component: `components/artwork-card.tsx` (legacy) or new Zen Brutalist
+  cards
+- **🆕 Demo layouts**: Check `/zen-demo`, `/immersive-demo`, `/cultural-demo`
+  for advanced layouts
 
 ### Theme/Styling Changes
 
@@ -379,18 +436,26 @@ const dynamicBackground = {
 - Bundle analysis available via `@next/bundle-analyzer`
 - Lazy loading implemented for artwork galleries
 - Cache strategies: memory cache + localStorage for client-side data
-- **🆕 Interactive optimizations**: Efficient mouse tracking and animation performance
-- **🆕 Glass morphism performance**: Hardware-accelerated CSS transforms and filters
+- **🆕 Interactive optimizations**: Efficient mouse tracking and animation
+  performance
+- **🆕 Glass morphism performance**: Hardware-accelerated CSS transforms and
+  filters
 
 ## 🆕 **Zen Brutalism Development Guidelines**
 
 ### **Design Principles**
-1. **여백의 미학 (Void Aesthetics)**: Use the 8-stage breathing system for spacing
-2. **브루탈리즘 구조 (Brutal Structure)**: Maintain geometric precision and strong contrasts
-3. **글래스 모피즘 진화 (Glass Morphism Evolution)**: Implement 3-layer depth effects
-4. **문화적 상호작용 (Cultural Interaction)**: Integrate traditional Korean composition principles
+
+1. **여백의 미학 (Void Aesthetics)**: Use the 8-stage breathing system for
+   spacing
+2. **브루탈리즘 구조 (Brutal Structure)**: Maintain geometric precision and
+   strong contrasts
+3. **글래스 모피즘 진화 (Glass Morphism Evolution)**: Implement 3-layer depth
+   effects
+4. **문화적 상호작용 (Cultural Interaction)**: Integrate traditional Korean
+   composition principles
 
 ### **Component Development**
+
 - Always implement both `enableInteraction` prop and non-interactive fallbacks
 - Use consistent variant patterns: `zen|brutal|glass-ink|fusion`
 - Include proper TypeScript interfaces for all props
@@ -398,11 +463,12 @@ const dynamicBackground = {
 - Follow traditional Korean color palette and seasonal aesthetics
 
 ### **Testing Interactive Components**
+
 ```bash
 # Test mouse tracking
 npm run test -- --testNamePattern="mouse tracking"
 
-# Test glass morphism effects  
+# Test glass morphism effects
 npm run test -- --testNamePattern="glass morphism"
 
 # Test cultural integration
@@ -410,6 +476,7 @@ npm run test -- --testNamePattern="cultural"
 ```
 
 ### **Performance Best Practices**
+
 - Use `useCallback` for mouse event handlers
 - Implement `useRef` for DOM element references
 - Apply CSS `transform3d` for hardware acceleration
@@ -421,12 +488,14 @@ npm run test -- --testNamePattern="cultural"
 ### Common Issues
 
 #### **Port 3000 in Use**
+
 ```bash
 # Use alternative port
 npm run dev -- --port 3001
 ```
 
 #### **Build Failures**
+
 ```bash
 # Check for missing dependencies
 npm install
@@ -436,18 +505,21 @@ npm run build
 ```
 
 #### **🆕 Interactive Effects Not Working**
+
 - Ensure `enableInteraction={true}` is set
 - Check browser console for JavaScript errors
 - Verify CSS custom properties are supported
 - Test mouse event handlers with DevTools
 
 #### **🆕 Zen Brutalism Styles Not Applying**
+
 - Verify `tailwind.config.ts` includes Zen Brutalism theme
 - Check `globals.css` for custom CSS classes
 - Ensure proper CSS custom property definitions
 - Test with hard refresh to clear CSS cache
 
 ### **Deployment Checklist**
+
 - [ ] All Zen Brutalism components tested in demo pages
 - [ ] Mouse tracking interactions working across browsers
 - [ ] Glass morphism effects rendering correctly
@@ -459,6 +531,7 @@ npm run build
 ## Recent Updates
 
 ### ✅ **Zen Brutalism Foundation Complete**
+
 - **3-Phase Design System**: Fully implemented and deployed
 - **Interactive Components**: 5 new component families with mouse tracking
 - **Demo Pages**: 3 comprehensive showcases of design evolution
@@ -466,8 +539,9 @@ npm run build
 - **Cultural Integration**: Traditional Korean aesthetics digitally implemented
 
 ### ✅ **Build & Deployment Success**
+
 - **Production Build**: ✓ Compiled successfully in 10.0s
-- **Static Generation**: ✓ Generated 55 static pages  
+- **Static Generation**: ✓ Generated 55 static pages
 - **Airtable Integration**: ✓ Successfully fetched 58 artworks
 - **Vercel Deployment**: ✓ Live at https://anam-gallery.vercel.app
 
@@ -475,4 +549,6 @@ npm run build
 
 ## 🎨 **"전통의 깊이와 현대적 몰입감을 동시에 제공하는 혁신적인 디지털 갤러리"**
 
-The ANAM Gallery now represents a breakthrough in digital art presentation, combining traditional Korean calligraphy aesthetics with cutting-edge web interaction design through the Zen Brutalism Foundation system.
+The ANAM Gallery now represents a breakthrough in digital art presentation,
+combining traditional Korean calligraphy aesthetics with cutting-edge web
+interaction design through the Zen Brutalism Foundation system.

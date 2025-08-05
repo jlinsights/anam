@@ -59,7 +59,9 @@ export function PWAInstallButton() {
             <FadeInContainer>
               <div className='text-center space-y-3'>
                 <div className='w-16 h-16 bg-ink rounded-2xl flex items-center justify-center mx-auto'>
-                  <span className='text-white font-display text-xl'>먹, 그리고...</span>
+                  <span className='text-white font-display text-xl'>
+                    먹, 그리고...
+                  </span>
                 </div>
                 <div>
                   <h3 className='font-display text-xl text-ink'>

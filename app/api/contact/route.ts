@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     const mailOptions = {
       from: `"아남 갤러리 문의" <${process.env.SMTP_USER}>`,
       to: 'heelang@orientalcalligraphy.org',
-              subject: `[아남 갤러리 문의] ${validatedData.subject}`,
+      subject: `[아남 갤러리 문의] ${validatedData.subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">

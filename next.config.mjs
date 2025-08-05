@@ -12,6 +12,8 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // React 18 호환성을 위한 설정
+  reactStrictMode: true,
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -22,14 +24,7 @@ const nextConfig = {
       // 필요시 다른 외부 도메인도 추가
     ],
   },
-  // Vercel 배포를 위해 output: export 제거
-  // ...(process.env.NODE_ENV === "production" && {
-  //   output: "export",
-  //   trailingSlash: true,
-  //   distDir: "out",
-  // }),
   experimental: {
-    reactCompiler: false,
     optimizePackageImports: [
       "lucide-react", 
       "@radix-ui/react-icons",
@@ -39,6 +34,8 @@ const nextConfig = {
       "recharts"
     ],
   },
+  // Next.js 15에 맞는 설정
+  serverExternalPackages: [],
   ...(process.env.NODE_ENV === "development" && {
     onDemandEntries: {
       maxInactiveAge: 60 * 1000,
@@ -46,6 +43,17 @@ const nextConfig = {
     },
   }),
   webpack: (config, { dev, isServer }) => {
+    // React 18 호환성을 위한 설정
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+      };
+    }
+
     // 개발 환경에서 안정성을 위한 설정
     if (dev) {
       config.watchOptions = {
@@ -53,6 +61,21 @@ const nextConfig = {
         ignored: ["**/node_modules/**", "**/.git/**", "**/.next/**"],
       };
     }
+
+    // Deprecation 경고 억제
+    config.infrastructureLogging = {
+      level: 'error',
+    };
+
+    // Console 경고 억제
+    config.stats = {
+      ...config.stats,
+      warningsFilter: [
+        /punycode/,
+        /DeprecationWarning/,
+        /\[DEP0040\]/,
+      ],
+    };
 
     config.optimization = {
       ...config.optimization,
@@ -64,18 +87,15 @@ const nextConfig = {
             name: "vendors",
             chunks: "all",
           },
+          react: {
+            test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+            name: "react",
+            chunks: "all",
+            priority: 10,
+          },
         },
       },
     };
-
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-      };
-    }
 
     return config;
   },

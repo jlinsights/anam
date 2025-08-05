@@ -7,31 +7,58 @@ import {
 import type { Artist, Artwork } from '@/lib/types'
 import { getArtistImageUrl, getArtworkImageUrl } from './image-utils'
 
-// 로컬 작품 이미지 경로 생성 함수
+import {
+  getOptimizedImagePath,
+  getResponsiveImageData,
+  extractArtworkId,
+  type ImageSize,
+  type ResponsiveImageData,
+} from '@/lib/optimized-image-utils'
+
+// 원본 이미지 번호에서 최적화된 이미지 경로 생성
+export function getOptimizedArtworkImagePath(
+  imageId: string,
+  size: ImageSize = 'medium',
+  format: 'jpg' | 'webp' | 'avif' = 'jpg'
+): string {
+  return getOptimizedImagePath(imageId, size, format)
+}
+
+// 작품 이미지 URL 생성 (최적화된 버전, fallback 포함)
+export function getArtworkImageWithFallback(
+  imageId: string,
+  size: ImageSize = 'medium',
+  format: 'jpg' | 'webp' | 'avif' = 'jpg'
+): string {
+  try {
+    return getOptimizedArtworkImagePath(imageId, size, format)
+  } catch (error) {
+    console.warn(`Failed to get optimized image for ${imageId}:`, error)
+    // fallback to placeholder
+    return '/placeholders/placeholder.jpg'
+  }
+}
+
+// 작품 반응형 이미지 데이터 생성
+export function getArtworkResponsiveImageData(
+  imageId: string,
+  title: string,
+  aspectRatio: string = '4/5'
+): ResponsiveImageData {
+  return getResponsiveImageData(imageId, title, aspectRatio)
+}
+
+// 레거시 함수 (하위 호환성)
 export function getLocalArtworkImagePath(
   slug: string,
   year: number,
   size: 'thumb' | 'medium' | 'large' = 'medium'
 ): string {
-  // slug에서 anam- 접두사 제거하고 연도 추출
+  // 새로운 시스템으로 전환 - slug에서 imageId 추출 시도
   const cleanSlug = slug.replace(/^anam-/, '')
+  // 일단 레거시 경로 반환 (점진적 마이그레이션)
   const filename = `anam-${cleanSlug}-${size}.jpg`
-  return `/images/Artworks/${year}/${filename}`
-}
-
-// 작품 이미지 URL 생성 (fallback 포함)
-export function getArtworkImageWithFallback(
-  slug: string,
-  year: number,
-  size: 'thumb' | 'medium' | 'large' = 'medium'
-): string {
-  try {
-    return getLocalArtworkImagePath(slug, year, size)
-  } catch (error) {
-    console.warn(`Failed to get local image for ${slug}:`, error)
-    // fallback to placeholder
-    return '/placeholders/placeholder.jpg'
-  }
+  return `/Images/Artworks/${year}/${filename}`
 }
 
 // 로컬 fallback 데이터
@@ -43,10 +70,7 @@ export const fallbackArtistData: Artist = {
     '전통 서예의 정신을 바탕으로 현대적 감각을 더하여, 과거와 현재가 조화를 이루는 작품을 추구합니다. 각 작품은 선과 공간, 여백의 관계를 탐구하는 과정이며, 전통에 뿌리를 두되 동시대의 감성과 소통하는 새로운 서예의 가능성을 모색합니다.',
   profileImageUrl: getArtistImageUrl('배옥영.jpeg'),
   birthYear: 1980,
-  education: [
-    '서예학과 졸업',
-    '서예학 석사',
-  ],
+  education: ['서예학과 졸업', '서예학 석사'],
   exhibitions: [
     "2024 개인전 '현대 서예의 향기' - 갤러리",
     "2023 단체전 '한국 현대 서예전' - 미술관",
@@ -57,10 +81,7 @@ export const fallbackArtistData: Artist = {
     '2023 현대서예협회 우수상',
     '2022 신진서예가상',
   ],
-  collections: [
-    '미술관 소장',
-    '개인 컬렉션 다수',
-  ],
+  collections: ['미술관 소장', '개인 컬렉션 다수'],
   website: 'https://anam.com',
   socialLinks: {
     instagram: 'https://instagram.com/anam_art',
@@ -69,25 +90,152 @@ export const fallbackArtistData: Artist = {
 }
 
 export const fallbackArtworksData: Artwork[] = [
-  // 2025년 작품
+  // 최적화된 이미지를 사용하는 작품들 (01.jpg ~ 08.jpg는 이미 최적화됨)
   {
-    id: '25',
-    slug: 'anam-journey-2025',
-    title: '여행 (Journey)',
+    id: '1',
+    slug: 'anam-01-2025',
+    title: '작품 01',
     year: 2025,
     medium: '화선지에 먹 (Ink on Mulberry Paper)',
     dimensions: '70 x 140 cm',
-    aspectRatio: '1/2',
+    aspectRatio: '4/5',
+    description: '전통 서예의 아름다움을 현대적 감각으로 재해석한 작품입니다.',
+    imageUrl: getOptimizedArtworkImagePath('01', 'medium'),
+    imageId: '01',
+    imageUrlQuery: 'korean calligraphy modern traditional',
+    artistNote: '전통과 현대의 조화를 추구한 작품입니다.',
+    featured: true,
+    category: 'recent',
+    available: true,
+    tags: ['전통', '현대', '조화'],
+  },
+  {
+    id: '2',
+    slug: 'anam-02-2025',
+    title: '작품 02',
+    year: 2025,
+    medium: '화선지에 먹 (Ink on Mulberry Paper)',
+    dimensions: '90 x 90 cm',
+    aspectRatio: '1/1',
     description:
-      '인생의 여행길에서 마주하는 다양한 풍경과 감정을 담은 작품입니다.',
-    imageUrl: getArtworkImageUrl('anam-journey-2025', 2025, 'medium'),
-    imageUrlQuery: 'journey calligraphy life path',
-    artistNote:
-      '길 위에서 느끼는 모든 순간들이 하나의 작품으로 완성되었습니다.',
+      '먹의 농담과 선의 강약을 통해 내면의 세계를 표현한 작품입니다.',
+    imageUrl: getOptimizedArtworkImagePath('02', 'medium'),
+    imageId: '02',
+    imageUrlQuery: 'ink gradation line strength',
+    artistNote: '내면의 감정을 선과 먹으로 표현했습니다.',
     featured: false,
     category: 'recent',
     available: true,
-    tags: ['여행', '인생', '길', '감정'],
+    tags: ['먹', '선', '내면'],
+  },
+  {
+    id: '3',
+    slug: 'anam-03-2025',
+    title: '작품 03',
+    year: 2025,
+    medium: '화선지에 먹 (Ink on Mulberry Paper)',
+    dimensions: '70 x 100 cm',
+    aspectRatio: '7/10',
+    description: '여백의 미학을 극대화하여 공간의 깊이를 탐구한 작품입니다.',
+    imageUrl: getOptimizedArtworkImagePath('03', 'medium'),
+    imageId: '03',
+    imageUrlQuery: 'white space aesthetics depth',
+    artistNote: '여백이 주는 무한한 가능성을 담았습니다.',
+    featured: true,
+    category: 'recent',
+    available: true,
+    tags: ['여백', '공간', '깊이'],
+  },
+  {
+    id: '4',
+    slug: 'anam-04-2025',
+    title: '작품 04',
+    year: 2025,
+    medium: '화선지에 먹 (Ink on Mulberry Paper)',
+    dimensions: '140 x 70 cm',
+    aspectRatio: '2/1',
+    description: '역동적인 붓질로 생명력과 에너지를 표현한 작품입니다.',
+    imageUrl: getOptimizedArtworkImagePath('04', 'medium'),
+    imageId: '04',
+    imageUrlQuery: 'dynamic brushwork vitality energy',
+    artistNote: '생명의 역동성을 붓끝에 담았습니다.',
+    featured: false,
+    category: 'recent',
+    available: true,
+    tags: ['역동', '생명력', '에너지'],
+  },
+  {
+    id: '5',
+    slug: 'anam-05-2025',
+    title: '대 (大)',
+    year: 2025,
+    medium: '화선지에 먹 (Ink on Mulberry Paper)',
+    dimensions: '100 x 70 cm',
+    aspectRatio: '10/7',
+    description:
+      '큰 뜻과 넓은 마음을 상징하는 대(大)자를 현대적으로 해석한 작품입니다.',
+    imageUrl: getOptimizedArtworkImagePath('05-대 copy', 'medium'),
+    imageId: '05-대 copy',
+    imageUrlQuery: 'big great character modern interpretation',
+    artistNote: '큰 마음, 큰 뜻을 담아 써내려간 작품입니다.',
+    featured: true,
+    category: 'character',
+    available: true,
+    tags: ['대', '큰마음', '의미'],
+  },
+  {
+    id: '6',
+    slug: 'anam-06-2024',
+    title: '작품 06',
+    year: 2024,
+    medium: '화선지에 먹 (Ink on Mulberry Paper)',
+    dimensions: '70 x 70 cm',
+    aspectRatio: '1/1',
+    description: '정방형 화면에서 균형과 조화를 탐구한 작품입니다.',
+    imageUrl: getOptimizedArtworkImagePath('06', 'medium'),
+    imageId: '06',
+    imageUrlQuery: 'square balance harmony',
+    artistNote: '균형 잡힌 구성으로 안정감을 추구했습니다.',
+    featured: false,
+    category: '2024',
+    available: true,
+    tags: ['균형', '조화', '안정'],
+  },
+  {
+    id: '7',
+    slug: 'anam-07-2024',
+    title: '작품 07',
+    year: 2024,
+    medium: '화선지에 먹 (Ink on Mulberry Paper)',
+    dimensions: '50 x 70 cm',
+    aspectRatio: '5/7',
+    description: '섬세한 붓질로 정교함과 우아함을 표현한 작품입니다.',
+    imageUrl: getOptimizedArtworkImagePath('07', 'medium'),
+    imageId: '07',
+    imageUrlQuery: 'delicate brushwork elegance',
+    artistNote: '섬세함 속에서 찾은 아름다움을 표현했습니다.',
+    featured: false,
+    category: '2024',
+    available: true,
+    tags: ['섬세', '정교', '우아'],
+  },
+  {
+    id: '8',
+    slug: 'anam-08-2024',
+    title: '작품 08',
+    year: 2024,
+    medium: '화선지에 먹 (Ink on Mulberry Paper)',
+    dimensions: '90 x 120 cm',
+    aspectRatio: '3/4',
+    description: '대담한 구성과 강인한 선으로 힘찬 기운을 표현한 작품입니다.',
+    imageUrl: getOptimizedArtworkImagePath('08', 'medium'),
+    imageId: '08',
+    imageUrlQuery: 'bold composition strong lines',
+    artistNote: '강인한 의지와 에너지를 선에 담았습니다.',
+    featured: true,
+    category: '2024',
+    available: true,
+    tags: ['대담', '강인', '의지'],
   },
   {
     id: '24',
@@ -99,11 +247,7 @@ export const fallbackArtworksData: Artwork[] = [
     aspectRatio: '10/7',
     description:
       '자신만의 방식으로 피어나는 꽃처럼, 각자의 고유한 아름다움을 표현한 작품입니다.',
-    imageUrl: getArtworkImageUrl(
-      'anam-bloom-as-you-are-2025',
-      2025,
-      'medium'
-    ),
+    imageUrl: getArtworkImageUrl('anam-bloom-as-you-are-2025', 2025, 'medium'),
     imageUrlQuery: 'bloom authentic self calligraphy',
     artistNote:
       '억지로 만들어진 아름다움이 아닌, 자연스러운 본질의 아름다움을 추구했습니다.',
@@ -257,11 +401,7 @@ export const fallbackArtworksData: Artwork[] = [
     aspectRatio: '1/1',
     description:
       '자연이 들려주는 미세한 소리와 움직임을 서예로 표현한 작품입니다.',
-    imageUrl: getArtworkImageUrl(
-      'anam-whisper-of-nature-2024',
-      2024,
-      'medium'
-    ),
+    imageUrl: getArtworkImageUrl('anam-whisper-of-nature-2024', 2024, 'medium'),
     imageUrlQuery: 'nature whisper natural sounds calligraphy',
     artistNote: '자연과의 교감 속에서 느끼는 평온함과 경이로움을 담았습니다.',
     featured: false,
@@ -374,7 +514,8 @@ export const fallbackArtworksData: Artwork[] = [
     dimensions: '70 x 70 cm',
     aspectRatio: '1/1',
     description: '보물 시리즈의 일곱 번째 작품으로, 지혜의 가치를 탐구합니다.',
-    imageUrl: getArtworkImageUrl('anam-treasure-7-2022', 2022, 'medium'),
+    imageUrl: getOptimizedArtworkImagePath('10', 'medium'),
+    imageId: '10',
     imageUrlQuery: 'treasure 7 wisdom value calligraphy',
     artistNote: '물질적 가치를 넘어선 정신적 보물의 의미를 담았습니다.',
     featured: false,
@@ -392,7 +533,8 @@ export const fallbackArtworksData: Artwork[] = [
     aspectRatio: '1/1',
     description:
       '보물 시리즈의 여섯 번째 작품으로, 인간관계의 소중함을 표현합니다.',
-    imageUrl: getArtworkImageUrl('anam-treasure-6-2022', 2022, 'medium'),
+    imageUrl: getOptimizedArtworkImagePath('09', 'medium'),
+    imageId: '09',
     imageUrlQuery: 'treasure 6 relationships human connection calligraphy',
     artistNote:
       '사람과 사람 사이의 진실한 연결이 가장 큰 보물임을 깨달았습니다.',
@@ -504,11 +646,7 @@ export const fallbackArtworksData: Artwork[] = [
     aspectRatio: '7/10',
     description:
       '흑과 백의 대비를 통해 삶의 이중성과 조화를 표현한 작품입니다.',
-    imageUrl: getArtworkImageUrl(
-      'anam-black-and-white-2021',
-      2021,
-      'medium'
-    ),
+    imageUrl: getArtworkImageUrl('anam-black-and-white-2021', 2021, 'medium'),
     imageUrlQuery: 'black white contrast duality life calligraphy',
     artistNote:
       '상반된 것들이 만나 이루는 완전한 조화의 아름다움을 추구했습니다.',

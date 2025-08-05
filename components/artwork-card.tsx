@@ -1,6 +1,6 @@
 'use client'
 
-import { GalleryGridImage } from '@/components/optimized-image'
+import { GalleryArtworkImage } from '@/components/optimized-artwork-image'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import type { Artwork } from '@/lib/types'
@@ -51,33 +51,47 @@ export function ArtworkCard({
       <CardContent className='p-0'>
         <Link href={`/gallery/${artwork.slug}`} className='block'>
           {/* 최적화된 이미지 컴포넌트 */}
-          <GalleryGridImage
-            artwork={artwork}
-            className={cn(
-              imageAspectRatio[variant],
-              'w-full rounded-t-lg transition-transform duration-300',
-              isHovered && 'scale-105'
-            )}
-            priority={priority}
-          />
+          {artwork.imageId ? (
+            <GalleryArtworkImage
+              artworkId={artwork.imageId}
+              title={artwork.title}
+              className={cn(
+                imageAspectRatio[variant],
+                'w-full rounded-t-lg transition-transform duration-300',
+                isHovered && 'scale-105'
+              )}
+            />
+          ) : (
+            <div
+              className={cn(
+                imageAspectRatio[variant],
+                'w-full rounded-t-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center'
+              )}
+            >
+              <span className='text-stone-500 text-sm'>이미지 준비중</span>
+            </div>
+          )}
 
           {/* 컨텐츠 영역 */}
           {showMetadata && (
             <div className='p-4 space-y-3'>
               {/* 제목 */}
-              <h3 className='font-display font-medium text-ink leading-tight line-clamp-2'>
+              <h3 className='font-display font-medium text-ink leading-tight line-clamp-2 dark:text-neutral-100'>
                 {artwork.title}
               </h3>
 
               {/* 메타데이터 */}
-              <div className='flex items-center justify-between text-responsive-sm text-ink-light'>
+              <div className='flex items-center justify-between text-responsive-sm text-ink-light dark:text-neutral-300'>
                 <div className='flex items-center gap-2'>
                   <Calendar className='w-4 h-4' />
                   <span>{artwork.year}</span>
                 </div>
 
                 {artwork.featured && (
-                  <Badge variant='secondary' className='text-xs'>
+                  <Badge
+                    variant='secondary'
+                    className='text-xs dark:text-neutral-200 dark:bg-neutral-700'
+                  >
                     대표작
                   </Badge>
                 )}
@@ -85,7 +99,7 @@ export function ArtworkCard({
 
               {/* 재질/크기 정보 */}
               {variant !== 'compact' && (
-                <div className='text-responsive-xs text-ink-lighter space-y-1'>
+                <div className='text-responsive-xs text-ink-lighter dark:text-neutral-400 space-y-1'>
                   {artwork.medium && (
                     <p className='line-clamp-1'>{artwork.medium}</p>
                   )}
@@ -97,7 +111,7 @@ export function ArtworkCard({
 
               {/* 액션 버튼들 */}
               {showActions && (
-                <div className='flex items-center justify-between pt-2 border-t border-stone-light'>
+                <div className='flex items-center justify-between pt-2 border-t border-stone-light dark:border-neutral-700'>
                   <div className='flex items-center gap-3'>
                     <button className='flex items-center gap-1 text-responsive-xs text-ink-light hover:text-ink transition-colors focus-art'>
                       <Heart className='w-4 h-4' />

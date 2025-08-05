@@ -10,7 +10,8 @@ jest.mock('@/lib/airtable', () => ({
   fetchArtworksFromAirtable: jest.fn(),
 }))
 
-const mockFetchArtworksFromAirtable = require('@/lib/airtable').fetchArtworksFromAirtable
+const mockFetchArtworksFromAirtable =
+  require('@/lib/airtable').fetchArtworksFromAirtable
 
 // Mock console methods to avoid cluttering test output
 const originalConsole = { ...console }
@@ -48,7 +49,9 @@ describe('/api/artworks', () => {
     it('특정 slug로 작품을 조회할 수 있어야 한다', async () => {
       mockFetchArtworksFromAirtable.mockResolvedValue(mockArtworks)
 
-      const request = new NextRequest('http://localhost:3000/api/artworks?slug=way-dao')
+      const request = new NextRequest(
+        'http://localhost:3000/api/artworks?slug=way-dao'
+      )
       const response = await GET(request)
       const data = await response.json()
 
@@ -62,7 +65,9 @@ describe('/api/artworks', () => {
     it('존재하지 않는 slug 조회 시 null을 반환해야 한다', async () => {
       mockFetchArtworksFromAirtable.mockResolvedValue(mockArtworks)
 
-      const request = new NextRequest('http://localhost:3000/api/artworks?slug=non-existent')
+      const request = new NextRequest(
+        'http://localhost:3000/api/artworks?slug=non-existent'
+      )
       const response = await GET(request)
       const data = await response.json()
 
@@ -85,7 +90,9 @@ describe('/api/artworks', () => {
     })
 
     it('Airtable 오류 시 적절한 에러 응답을 반환해야 한다', async () => {
-      mockFetchArtworksFromAirtable.mockRejectedValue(new Error('Airtable connection failed'))
+      mockFetchArtworksFromAirtable.mockRejectedValue(
+        new Error('Airtable connection failed')
+      )
 
       const request = new NextRequest('http://localhost:3000/api/artworks')
       const response = await GET(request)
@@ -125,9 +132,12 @@ describe('/api/artworks', () => {
     it('캐시를 새로고침할 수 있어야 한다', async () => {
       mockFetchArtworksFromAirtable.mockResolvedValue(mockArtworks)
 
-      const request = new NextRequest('http://localhost:3000/api/artworks?action=refresh', {
-        method: 'POST'
-      })
+      const request = new NextRequest(
+        'http://localhost:3000/api/artworks?action=refresh',
+        {
+          method: 'POST',
+        }
+      )
       const response = await POST(request)
       const data = await response.json()
 
@@ -141,46 +151,63 @@ describe('/api/artworks', () => {
     it('featured 작품 개수를 올바르게 계산해야 한다', async () => {
       mockFetchArtworksFromAirtable.mockResolvedValue(mockArtworks)
 
-      const request = new NextRequest('http://localhost:3000/api/artworks?action=refresh', {
-        method: 'POST'
-      })
+      const request = new NextRequest(
+        'http://localhost:3000/api/artworks?action=refresh',
+        {
+          method: 'POST',
+        }
+      )
       const response = await POST(request)
       const data = await response.json()
 
-      const expectedFeaturedCount = mockArtworks.filter(artwork => artwork.featured).length
+      const expectedFeaturedCount = mockArtworks.filter(
+        (artwork) => artwork.featured
+      ).length
       expect(data.data.featuredCount).toBe(expectedFeaturedCount)
     })
 
     it('잘못된 action 파라미터 시 에러를 반환해야 한다', async () => {
-      const request = new NextRequest('http://localhost:3000/api/artworks?action=invalid', {
-        method: 'POST'
-      })
+      const request = new NextRequest(
+        'http://localhost:3000/api/artworks?action=invalid',
+        {
+          method: 'POST',
+        }
+      )
       const response = await POST(request)
       const data = await response.json()
 
       expect(response.status).toBe(200)
       expect(data.success).toBe(false)
-      expect(data.message).toBe('Invalid action. Use ?action=refresh to refresh cache')
+      expect(data.message).toBe(
+        'Invalid action. Use ?action=refresh to refresh cache'
+      )
     })
 
     it('action 파라미터가 없을 때 에러를 반환해야 한다', async () => {
       const request = new NextRequest('http://localhost:3000/api/artworks', {
-        method: 'POST'
+        method: 'POST',
       })
       const response = await POST(request)
       const data = await response.json()
 
       expect(response.status).toBe(200)
       expect(data.success).toBe(false)
-      expect(data.message).toBe('Invalid action. Use ?action=refresh to refresh cache')
+      expect(data.message).toBe(
+        'Invalid action. Use ?action=refresh to refresh cache'
+      )
     })
 
     it('캐시 새로고침 중 Airtable 오류 시 적절한 에러 응답을 반환해야 한다', async () => {
-      mockFetchArtworksFromAirtable.mockRejectedValue(new Error('Airtable connection failed'))
+      mockFetchArtworksFromAirtable.mockRejectedValue(
+        new Error('Airtable connection failed')
+      )
 
-      const request = new NextRequest('http://localhost:3000/api/artworks?action=refresh', {
-        method: 'POST'
-      })
+      const request = new NextRequest(
+        'http://localhost:3000/api/artworks?action=refresh',
+        {
+          method: 'POST',
+        }
+      )
       const response = await POST(request)
       const data = await response.json()
 
@@ -209,9 +236,12 @@ describe('/api/artworks', () => {
       mockFetchArtworksFromAirtable.mockResolvedValueOnce(secondDataset)
 
       // 캐시 새로고침
-      const postRequest = new NextRequest('http://localhost:3000/api/artworks?action=refresh', {
-        method: 'POST'
-      })
+      const postRequest = new NextRequest(
+        'http://localhost:3000/api/artworks?action=refresh',
+        {
+          method: 'POST',
+        }
+      )
       await POST(postRequest)
 
       // 새로고침 후 GET 요청
@@ -250,7 +280,9 @@ describe('/api/artworks', () => {
     it('slug로 조회한 작품이 올바른 구조를 가져야 한다', async () => {
       mockFetchArtworksFromAirtable.mockResolvedValue(mockArtworks)
 
-      const request = new NextRequest('http://localhost:3000/api/artworks?slug=way-dao')
+      const request = new NextRequest(
+        'http://localhost:3000/api/artworks?slug=way-dao'
+      )
       const response = await GET(request)
       const data = await response.json()
 

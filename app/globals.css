@@ -15,44 +15,50 @@
      * HEELANG 디자인 토큰 시스템
      * =========================================== */
 
-    /* shadcn/ui 기본 색상 */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.75rem;
+    /* shadcn/ui 기본 색상 - 시인성 최적화 (WCAG AAA 대비비 7:1+ 준수) */
+    --background: oklch(0.99 0.002 100); /* 순백색 배경 - 최대 밝기 */
+    --foreground: oklch(0.15 0.004 260); /* 진한 남색 텍스트 - 최대 대비 */
+    --card: oklch(0.98 0.003 50); /* 아주 연한 크림 카드 배경 */
+    --card-foreground: oklch(
+      0.12 0.006 260
+    ); /* 카드 내 텍스트 - 더 진한 남색 */
+    --popover: oklch(0.99 0.001 0); /* 팝오버 순백 배경 */
+    --popover-foreground: oklch(0.1 0.008 260); /* 팝오버 텍스트 - 최대 대비 */
+    --primary: oklch(0.25 0.08 30); /* 진한 갈색 - 전통적이면서 가독성 높음 */
+    --primary-foreground: oklch(
+      0.98 0.002 50
+    ); /* 프라이머리 버튼 내 흰색 텍스트 */
+    --secondary: oklch(0.92 0.015 80); /* 연한 베이지 - 부드러운 보조색 */
+    --secondary-foreground: oklch(
+      0.2 0.02 30
+    ); /* 세컨더리 위 진한 갈색 텍스트 */
+    --muted: oklch(0.94 0.008 60); /* 음소거된 연한 배경 */
+    --muted-foreground: oklch(0.35 0.015 280); /* 음소거된 텍스트 - 중간 대비 */
+    --accent: oklch(0.3 0.06 40); /* 강조색 - 진한 황토색 */
+    --accent-foreground: oklch(0.97 0.003 40); /* 강조색 위 밝은 텍스트 */
+    --destructive: oklch(0.45 0.15 15); /* 경고색 - 진한 적갈색 */
+    --destructive-foreground: oklch(0.98 0.005 15); /* 경고 텍스트 - 밝은 색 */
+    --border: oklch(0.25 0.02 280); /* 진한 테두리 - 명확한 구분 */
+    --input: oklch(0.25 0.02 280); /* 입력 필드 테두리 */
+    --ring: oklch(0.3 0.08 40); /* 포커스 링 - 강조색과 동일 */
+    --radius: 0px;
 
-    /* 차트 색상 */
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    /* 차트 색상 - 시인성 최적화 */
+    --chart-1: oklch(0.35 0.12 30); /* 진한 갈색 */
+    --chart-2: oklch(0.4 0.1 120); /* 진한 녹색 */
+    --chart-3: oklch(0.3 0.08 260); /* 진한 남색 */
+    --chart-4: oklch(0.38 0.1 15); /* 진한 적갈색 */
+    --chart-5: oklch(0.32 0.09 300); /* 진한 자주색 */
 
     /* 사이드바 색상 */
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-foreground: oklch(0 0 0);
+    --sidebar-primary: oklch(0.6489 0.237 26.9728);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.5635 0.2408 260.8178);
+    --sidebar-accent-foreground: oklch(1 0 0);
+    --sidebar-border: oklch(0 0 0);
+    --sidebar-ring: oklch(0.6489 0.237 26.9728);
 
     /* ===========================================
      * 서예 예술 전용 색상 시스템
@@ -85,69 +91,69 @@
      * Zen Brutalism 디자인 토큰 시스템
      * =========================================== */
     /* Zen Brutalism Spacing Scale */
-    --space-zen-xs: 0.5rem;    /* 8px - 미세한 호흡 */
-    --space-zen-sm: 1rem;      /* 16px - 기본 호흡 */
-    --space-zen-md: 2rem;      /* 32px - 중간 호흡 */
-    --space-zen-lg: 4rem;      /* 64px - 깊은 호흡 */
-    --space-zen-xl: 8rem;      /* 128px - 명상적 호흡 */
-    --space-zen-2xl: 16rem;    /* 256px - 절대적 침묵 */
-    --space-zen-3xl: 24rem;    /* 384px - 완전한 여백 */
-    --space-zen-4xl: 32rem;    /* 512px - 무한의 공간 */
-    
+    --space-zen-xs: 0.5rem; /* 8px - 미세한 호흡 */
+    --space-zen-sm: 1rem; /* 16px - 기본 호흡 */
+    --space-zen-md: 2rem; /* 32px - 중간 호흡 */
+    --space-zen-lg: 4rem; /* 64px - 깊은 호흡 */
+    --space-zen-xl: 8rem; /* 128px - 명상적 호흡 */
+    --space-zen-2xl: 16rem; /* 256px - 절대적 침묵 */
+    --space-zen-3xl: 24rem; /* 384px - 완전한 여백 */
+    --space-zen-4xl: 32rem; /* 512px - 무한의 공간 */
+
     /* Brutalist Elements */
     --brutal-border: 4px;
     --brutal-shadow: 8px 8px 0px hsl(var(--ink));
     --brutal-shadow-strong: 16px 16px 0px hsl(var(--ink));
     --brutal-offset: 4px 4px 0px hsl(var(--ink-light));
-    
+
     /* ===========================================
      * Phase 3: Traditional Korean Composition Principles
      * =========================================== */
-    
+
     /* 삼분법 (Rule of Thirds) Korean Traditional Composition */
     --composition-golden-ratio: 1.618;
     --composition-thirds-h: 33.333%;
     --composition-thirds-v: 33.333%;
     --composition-balance-left: 38.2%;
     --composition-balance-right: 61.8%;
-    
+
     /* 여백의 미학 (Aesthetics of Empty Space) */
-    --void-minimal: 2rem;      /* 최소 여백 */
-    --void-breathing: 4rem;    /* 호흡하는 여백 */
+    --void-minimal: 2rem; /* 최소 여백 */
+    --void-breathing: 4rem; /* 호흡하는 여백 */
     --void-contemplative: 8rem; /* 사색적 여백 */
-    --void-infinite: 16rem;    /* 무한의 여백 */
-    --void-cosmic: 24rem;      /* 우주적 여백 */
-    
+    --void-infinite: 16rem; /* 무한의 여백 */
+    --void-cosmic: 24rem; /* 우주적 여백 */
+
     /* 음양(陰陽) Balance System */
-    --yin-opacity: 0.382;      /* 음의 투명도 */
-    --yang-opacity: 0.618;     /* 양의 투명도 */
+    --yin-opacity: 0.382; /* 음의 투명도 */
+    --yang-opacity: 0.618; /* 양의 투명도 */
     --balance-transition: 2400ms; /* 음양 전환 시간 */
-    
+
     /* 계절 미학 (Seasonal Aesthetics) */
-    --season-spring: 120deg;   /* 봄 - 청록 */
-    --season-summer: 150deg;   /* 여름 - 녹색 */
-    --season-autumn: 30deg;    /* 가을 - 황금 */
-    --season-winter: 240deg;   /* 겨울 - 푸른회색 */
-    
+    --season-spring: 120deg; /* 봄 - 청록 */
+    --season-summer: 150deg; /* 여름 - 녹색 */
+    --season-autumn: 30deg; /* 가을 - 황금 */
+    --season-winter: 240deg; /* 겨울 - 푸른회색 */
+
     /* 전통 깊이감 (Traditional Depth Layers) */
-    --depth-foreground: 10;    /* 전경 - 주요 내용 */
-    --depth-middle: 5;         /* 중경 - 보조 요소 */
-    --depth-background: 1;     /* 배경 - 분위기 */
-    --depth-cultural: 0.5;     /* 문화적 맥락 */
-    --depth-temporal: 0.1;     /* 시간적 차원 */
-    
+    --depth-foreground: 10; /* 전경 - 주요 내용 */
+    --depth-middle: 5; /* 중경 - 보조 요소 */
+    --depth-background: 1; /* 배경 - 분위기 */
+    --depth-cultural: 0.5; /* 문화적 맥락 */
+    --depth-temporal: 0.1; /* 시간적 차원 */
+
     /* 서예 필획 미학 (Calligraphy Stroke Aesthetics) */
-    --stroke-press: cubic-bezier(0.25, 0.46, 0.45, 0.94);  /* 점 */
-    --stroke-horizontal: cubic-bezier(0.4, 0, 0.2, 1);     /* 일 */
+    --stroke-press: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 점 */
+    --stroke-horizontal: cubic-bezier(0.4, 0, 0.2, 1); /* 일 */
     --stroke-vertical: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 궐 */
     --stroke-hook: cubic-bezier(0.68, -0.55, 0.265, 1.55); /* 갈고리 */
-    --stroke-curve: cubic-bezier(0.23, 1, 0.32, 1);        /* 곡선 */
-    
+    --stroke-curve: cubic-bezier(0.23, 1, 0.32, 1); /* 곡선 */
+
     /* Glass Morphism Base */
     --glass-backdrop: blur(20px) saturate(180%);
     --glass-backdrop-strong: blur(40px) saturate(200%);
     --glass-backdrop-immersive: blur(60px) saturate(220%);
-    
+
     /* Advanced Ink Morphism System */
     --ink-gradient-primary: radial-gradient(
       ellipse 200% 100% at 50% 0%,
@@ -171,7 +177,7 @@
       hsla(var(--ink) / 0.25) 270deg,
       hsla(var(--ink) / 0.3) 360deg
     );
-    
+
     /* Multi-Layer Glass Depth */
     --glass-layer-1: hsla(var(--paper) / 0.05);
     --glass-layer-2: hsla(var(--paper-warm) / 0.08);
@@ -179,7 +185,7 @@
     --glass-border-1: hsla(var(--ink) / 0.1);
     --glass-border-2: hsla(var(--ink-light) / 0.15);
     --glass-border-3: hsla(var(--ink-lighter) / 0.2);
-    
+
     /* Fluid Animation Variables */
     --ink-flow-duration: 3000ms;
     --glass-morph-duration: 2000ms;
@@ -205,77 +211,148 @@
       hsl(var(--stone-light)) 0%,
       hsl(var(--paper-warm)) 100%
     );
+    --sidebar: oklch(0.9551 0 0);
+    --font-sans: DM Sans, sans-serif;
+    --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-mono: Space Mono, monospace;
+    --shadow-color: hsl(0 0% 0%);
+    --shadow-opacity: 1;
+    --shadow-blur: 0px;
+    --shadow-spread: 0px;
+    --shadow-offset-x: 4px;
+    --shadow-offset-y: 4px;
+    --letter-spacing: 0em;
+    --spacing: 0.25rem;
+    --shadow-2xs: 4px 4px 0px 0px hsl(0 0% 0% / 0.5);
+    --shadow-xs: 4px 4px 0px 0px hsl(0 0% 0% / 0.5);
+    --shadow-sm:
+      4px 4px 0px 0px hsl(0 0% 0% / 1), 4px 1px 2px -1px hsl(0 0% 0% / 1);
+    --shadow:
+      4px 4px 0px 0px hsl(0 0% 0% / 1), 4px 1px 2px -1px hsl(0 0% 0% / 1);
+    --shadow-md:
+      4px 4px 0px 0px hsl(0 0% 0% / 1), 4px 2px 4px -1px hsl(0 0% 0% / 1);
+    --shadow-lg:
+      4px 4px 0px 0px hsl(0 0% 0% / 1), 4px 4px 6px -1px hsl(0 0% 0% / 1);
+    --shadow-xl:
+      4px 4px 0px 0px hsl(0 0% 0% / 1), 4px 8px 10px -1px hsl(0 0% 0% / 1);
+    --shadow-2xl: 4px 4px 0px 0px hsl(0 0% 0% / 2.5);
+    --tracking-normal: 0em;
+
+    /* ===========================================
+     * 계절별 색상 팔레트 - 한국 전통 사계절 미학
+     * =========================================== */
+    
+    /* 봄 (Spring) - 벚꽃과 새싹의 색상 */
+    --spring-primary: 350 85% 85%; /* 벚꽃색 */
+    --spring-secondary: 120 45% 75%; /* 새싹색 */
+    --spring-accent: 45 90% 65%; /* 봄 햇살색 */
+    --spring-muted: 30 25% 92%; /* 봄 안개색 */
+    
+    /* 여름 (Summer) - 푸른 하늘과 녹음의 색상 */
+    --summer-primary: 210 85% 75%; /* 하늘색 */
+    --summer-secondary: 150 60% 70%; /* 녹음색 */
+    --summer-accent: 60 90% 60%; /* 여름 햇살색 */
+    --summer-muted: 200 30% 90%; /* 여름 구름색 */
+    
+    /* 가을 (Autumn) - 단풍과 황금빛의 색상 */
+    --autumn-primary: 25 85% 65%; /* 단풍색 */
+    --autumn-secondary: 45 80% 70%; /* 황금빛 */
+    --autumn-accent: 15 90% 55%; /* 가을 석양색 */
+    --autumn-muted: 30 40% 85%; /* 가을 안개색 */
+    
+    /* 겨울 (Winter) - 눈과 얼음의 색상 */
+    --winter-primary: 220 25% 95%; /* 눈색 */
+    --winter-secondary: 200 40% 80%; /* 얼음색 */
+    --winter-accent: 240 60% 70%; /* 겨울 하늘색 */
+    --winter-muted: 220 20% 88%; /* 겨울 안개색 */
+    
+    /* 계절 전환 애니메이션용 색상 */
+    --season-transition-duration: 0.8s;
+    --season-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
     /* ===========================================
-     * 다크모드 색상 시스템
+     * 다크모드 색상 시스템 - 시인성 최적화 (WCAG AAA 대비비 7:1+ 준수)
      * =========================================== */
 
-    /* shadcn/ui 다크모드 색상 */
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    /* shadcn/ui 다크모드 색상 - 최대 대비비 */
+    --background: oklch(0.08 0.004 260); /* 진한 남색 배경 - 최대 어둠 */
+    --foreground: oklch(0.98 0.002 50); /* 상아색 텍스트 - 최대 밝기 */
+    --card: oklch(0.12 0.006 260); /* 카드 - 약간 밝은 배경 */
+    --card-foreground: oklch(
+      0.96 0.003 50
+    ); /* 카드 내 텍스트 - 더 밝은 상아색 */
+    --popover: oklch(0.1 0.005 260); /* 팝오버 - 어두운 남색 */
+    --popover-foreground: oklch(
+      0.97 0.003 50
+    ); /* 팝오버 텍스트 - 더 밝은 상아색 */
+    --primary: oklch(0.75 0.12 30); /* 밝은 갈색 - 다크모드에서 눈에 띄는 색 */
+    --primary-foreground: oklch(
+      0.08 0.004 260
+    ); /* 프라이머리 위 어두운 텍스트 */
+    --secondary: oklch(0.18 0.02 280); /* 어두운 보조색 */
+    --secondary-foreground: oklch(0.94 0.004 50); /* 세컨더리 위 밝은 텍스트 */
+    --muted: oklch(0.15 0.008 260); /* 음소거된 어두운 배경 */
+    --muted-foreground: oklch(
+      0.85 0.015 50
+    ); /* 음소거된 텍스트 - 더 밝게 조정 */
+    --accent: oklch(0.8 0.08 40); /* 강조색 - 밝은 황토색 */
+    --accent-foreground: oklch(0.1 0.006 260); /* 강조색 위 어두운 텍스트 */
+    --destructive: oklch(0.65 0.18 15); /* 경고색 - 밝은 적갈색 */
+    --destructive-foreground: oklch(
+      0.08 0.004 260
+    ); /* 경고 텍스트 - 어두운 색 */
+    --border: oklch(0.85 0.02 50); /* 밝은 테두리 - 명확한 구분 */
+    --input: oklch(0.85 0.02 50); /* 입력 필드 테두리 */
+    --ring: oklch(0.8 0.08 40); /* 포커스 링 - 강조색과 동일 */
 
-    /* 다크모드 차트 색상 */
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    /* 다크모드 차트 색상 - 시인성 최적화 */
+    --chart-1: oklch(0.75 0.15 30); /* 밝은 갈색 */
+    --chart-2: oklch(0.7 0.12 120); /* 밝은 녹색 */
+    --chart-3: oklch(0.8 0.1 260); /* 밝은 남색 */
+    --chart-4: oklch(0.72 0.13 15); /* 밝은 적갈색 */
+    --chart-5: oklch(0.78 0.11 300); /* 밝은 자주색 */
 
-    /* 다크모드 사이드바 색상 */
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* 다크모드 사이드바 색상 - 시인성 최적화 */
+    --sidebar-background: oklch(0.1 0.005 260); /* 어두운 남색 배경 */
+    --sidebar-foreground: oklch(0.97 0.003 50); /* 더 밝은 상아색 텍스트 */
+    --sidebar-primary: oklch(0.75 0.12 30); /* 밝은 갈색 */
+    --sidebar-primary-foreground: oklch(0.08 0.004 260); /* 어두운 텍스트 */
+    --sidebar-accent: oklch(0.8 0.08 40); /* 밝은 황토색 */
+    --sidebar-accent-foreground: oklch(0.1 0.006 260); /* 어두운 텍스트 */
+    --sidebar-border: oklch(0.85 0.02 50); /* 밝은 테두리 */
+    --sidebar-ring: oklch(0.8 0.08 40); /* 포커스 링 */
 
     /* ===========================================
-     * 서예 다크모드 색상 시스템
+     * 서예 다크모드 색상 시스템 - 한국 전통 색상 최적화
      * =========================================== */
-    /* 다크모드 먹(墨) 색상 */
-    --ink: 210 40% 98%;
-    --ink-light: 215 20.2% 65.1%;
-    --ink-lighter: 210 15% 55%;
-    --ink-dark: 210 40% 98%;
+    /* 다크모드 먹(墨) 색상 - 더 밝게 조정하여 대비 향상 */
+    --ink: 50 8% 95%; /* 더 밝은 상아색 - 텍스트용 */
+    --ink-light: 50 6% 80%; /* 더 밝은 중간 텍스트 */
+    --ink-lighter: 50 4% 70%; /* 더 밝은 보조 텍스트 */
+    --ink-dark: 50 10% 98%; /* 가장 밝은 텍스트 */
 
-    --paper: 222.2 84% 4.9%;
-    --paper-warm: 217.2 32.6% 17.5%;
-    --paper-cream: 220 25% 12%;
-    --paper-aged: 215 20% 8%;
+    /* 다크모드 한지(韓紙) 색상 - 어둡게 조정 */
+    --paper: 260 15% 8%; /* 진한 남색 배경 */
+    --paper-warm: 280 12% 12%; /* 약간 따뜻한 배경 */
+    --paper-cream: 40 8% 15%; /* 크림색 배경 */
+    --paper-aged: 260 10% 10%; /* 연륜감 있는 배경 */
 
-    --brush: 210 30% 75%;
-    --brush-light: 210 20% 85%;
-    --brush-dark: 210 40% 65%;
+    /* 다크모드 붓(筆) 색상 - 더 밝게 조정 */
+    --brush: 30 10% 75%; /* 더 밝은 회갈색 */
+    --brush-light: 30 8% 85%; /* 더 밝은 연한 회갈색 */
+    --brush-dark: 30 12% 65%; /* 더 밝은 진한 회갈색 */
 
-    --stone: 217.2 20% 25%;
-    --stone-light: 217.2 15% 35%;
-    --stone-dark: 217.2 25% 15%;
+    /* 다크모드 돌(石) 색상 - 더 밝게 조정 */
+    --stone: 280 8% 70%; /* 더 밝은 회색 */
+    --stone-light: 280 6% 80%; /* 더 밝은 연한 회색 */
+    --stone-dark: 280 10% 60%; /* 더 밝은 진한 회색 */
 
-    /* 다크모드 금(金) 색상 */
-    --gold: 45 100% 70%;
-    --gold-light: 45 100% 80%;
-    --gold-dark: 45 100% 50%;
+    /* 다크모드 금(金) 색상 - 더 밝게 유지하되 대비 향상 */
+    --gold: 45 85% 80%; /* 더 밝은 금색 - 강조용 */
+    --gold-light: 45 80% 90%; /* 더 밝은 연한 금색 */
+    --gold-dark: 45 90% 70%; /* 더 밝은 진한 금색 */
 
     /* ===========================================
      * 다크모드 그라디언트 시스템
@@ -297,6 +374,46 @@
       hsl(var(--stone-dark)) 0%,
       hsl(var(--paper-warm)) 100%
     );
+    --radius: 0px;
+    --sidebar: oklch(0 0 0);
+    --font-sans: DM Sans, sans-serif;
+    --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-mono: Space Mono, monospace;
+    --shadow-color: hsl(0 0% 0%);
+    --shadow-opacity: 1;
+    --shadow-blur: 0px;
+    --shadow-spread: 0px;
+    --shadow-offset-x: 4px;
+    --shadow-offset-y: 4px;
+    --letter-spacing: 0em;
+    --spacing: 0.25rem;
+    --shadow-2xs: 4px 4px 0px 0px hsl(0 0% 0% / 0.5);
+    --shadow-xs: 4px 4px 0px 0px hsl(0 0% 0% / 0.5);
+    --shadow-sm:
+      4px 4px 0px 0px hsl(0 0% 0% / 1), 4px 1px 2px -1px hsl(0 0% 0% / 1);
+    --shadow:
+      4px 4px 0px 0px hsl(0 0% 0% / 1), 4px 1px 2px -1px hsl(0 0% 0% / 1);
+    --shadow-md:
+      4px 4px 0px 0px hsl(0 0% 0% / 1), 4px 2px 4px -1px hsl(0 0% 0% / 1);
+    --shadow-lg:
+      4px 4px 0px 0px hsl(0 0% 0% / 1), 4px 4px 6px -1px hsl(0 0% 0% / 1);
+    --shadow-xl:
+      4px 4px 0px 0px hsl(0 0% 0% / 1), 4px 8px 10px -1px hsl(0 0% 0% / 1);
+    --shadow-2xl: 4px 4px 0px 0px hsl(0 0% 0% / 2.5);
+  }
+  .theme {
+    --font-sans: DM Sans, sans-serif;
+    --font-mono: Space Mono, monospace;
+    --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    --radius: 0px;
+    --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
+    --tracking-tight: calc(var(--tracking-normal) - 0.025em);
+    --tracking-wide: calc(var(--tracking-normal) + 0.025em);
+    --tracking-wider: calc(var(--tracking-normal) + 0.05em);
+    --tracking-widest: calc(var(--tracking-normal) + 0.1em);
+  }
+  body {
+    letter-spacing: var(--tracking-normal);
   }
 }
 
@@ -556,47 +673,107 @@
    * =========================================== */
 
   /* Zen Spacing Utilities */
-  .p-zen-xs { padding: var(--space-zen-xs); }
-  .p-zen-sm { padding: var(--space-zen-sm); }
-  .p-zen-md { padding: var(--space-zen-md); }
-  .p-zen-lg { padding: var(--space-zen-lg); }
-  .p-zen-xl { padding: var(--space-zen-xl); }
-  .p-zen-2xl { padding: var(--space-zen-2xl); }
-  .p-zen-3xl { padding: var(--space-zen-3xl); }
-  .p-zen-4xl { padding: var(--space-zen-4xl); }
+  .p-zen-xs {
+    padding: var(--space-zen-xs);
+  }
+  .p-zen-sm {
+    padding: var(--space-zen-sm);
+  }
+  .p-zen-md {
+    padding: var(--space-zen-md);
+  }
+  .p-zen-lg {
+    padding: var(--space-zen-lg);
+  }
+  .p-zen-xl {
+    padding: var(--space-zen-xl);
+  }
+  .p-zen-2xl {
+    padding: var(--space-zen-2xl);
+  }
+  .p-zen-3xl {
+    padding: var(--space-zen-3xl);
+  }
+  .p-zen-4xl {
+    padding: var(--space-zen-4xl);
+  }
 
-  .m-zen-xs { margin: var(--space-zen-xs); }
-  .m-zen-sm { margin: var(--space-zen-sm); }
-  .m-zen-md { margin: var(--space-zen-md); }
-  .m-zen-lg { margin: var(--space-zen-lg); }
-  .m-zen-xl { margin: var(--space-zen-xl); }
-  .m-zen-2xl { margin: var(--space-zen-2xl); }
-  .m-zen-3xl { margin: var(--space-zen-3xl); }
-  .m-zen-4xl { margin: var(--space-zen-4xl); }
+  .m-zen-xs {
+    margin: var(--space-zen-xs);
+  }
+  .m-zen-sm {
+    margin: var(--space-zen-sm);
+  }
+  .m-zen-md {
+    margin: var(--space-zen-md);
+  }
+  .m-zen-lg {
+    margin: var(--space-zen-lg);
+  }
+  .m-zen-xl {
+    margin: var(--space-zen-xl);
+  }
+  .m-zen-2xl {
+    margin: var(--space-zen-2xl);
+  }
+  .m-zen-3xl {
+    margin: var(--space-zen-3xl);
+  }
+  .m-zen-4xl {
+    margin: var(--space-zen-4xl);
+  }
 
-  .gap-zen-xs { gap: var(--space-zen-xs); }
-  .gap-zen-sm { gap: var(--space-zen-sm); }
-  .gap-zen-md { gap: var(--space-zen-md); }
-  .gap-zen-lg { gap: var(--space-zen-lg); }
-  .gap-zen-xl { gap: var(--space-zen-xl); }
-  .gap-zen-2xl { gap: var(--space-zen-2xl); }
+  .gap-zen-xs {
+    gap: var(--space-zen-xs);
+  }
+  .gap-zen-sm {
+    gap: var(--space-zen-sm);
+  }
+  .gap-zen-md {
+    gap: var(--space-zen-md);
+  }
+  .gap-zen-lg {
+    gap: var(--space-zen-lg);
+  }
+  .gap-zen-xl {
+    gap: var(--space-zen-xl);
+  }
+  .gap-zen-2xl {
+    gap: var(--space-zen-2xl);
+  }
 
-  .space-y-zen-xs > * + * { margin-top: var(--space-zen-xs); }
-  .space-y-zen-sm > * + * { margin-top: var(--space-zen-sm); }
-  .space-y-zen-md > * + * { margin-top: var(--space-zen-md); }
-  .space-y-zen-lg > * + * { margin-top: var(--space-zen-lg); }
-  .space-y-zen-xl > * + * { margin-top: var(--space-zen-xl); }
-  .space-y-zen-2xl > * + * { margin-top: var(--space-zen-2xl); }
+  .space-y-zen-xs > * + * {
+    margin-top: var(--space-zen-xs);
+  }
+  .space-y-zen-sm > * + * {
+    margin-top: var(--space-zen-sm);
+  }
+  .space-y-zen-md > * + * {
+    margin-top: var(--space-zen-md);
+  }
+  .space-y-zen-lg > * + * {
+    margin-top: var(--space-zen-lg);
+  }
+  .space-y-zen-xl > * + * {
+    margin-top: var(--space-zen-xl);
+  }
+  .space-y-zen-2xl > * + * {
+    margin-top: var(--space-zen-2xl);
+  }
 
   /* Zen Typography System */
   .zen-typography-display {
     @apply font-display text-8xl leading-none tracking-tight font-light;
-    font-feature-settings: "kern" 1, "liga" 1;
+    font-feature-settings:
+      "kern" 1,
+      "liga" 1;
   }
 
   .zen-typography-hero {
     @apply font-display text-6xl leading-tight tracking-wide font-normal;
-    font-feature-settings: "kern" 1, "liga" 1;
+    font-feature-settings:
+      "kern" 1,
+      "liga" 1;
   }
 
   .zen-typography-section {
@@ -643,21 +820,22 @@
     background: var(--ink-gradient-primary);
     backdrop-filter: var(--glass-backdrop);
     border: 1px solid var(--glass-border-1);
-    box-shadow: 
+    box-shadow:
       0 8px 32px hsla(var(--ink) / 0.12),
       inset 0 1px 0 hsla(255, 255, 255, 0.1);
     transition: all var(--glass-morph-duration) cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   .ink-glass-primary::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: var(--glass-layer-1);
     backdrop-filter: blur(8px);
     border-radius: inherit;
     opacity: 0;
-    transition: opacity var(--glass-morph-duration) cubic-bezier(0.23, 1, 0.32, 1);
+    transition: opacity var(--glass-morph-duration)
+      cubic-bezier(0.23, 1, 0.32, 1);
     pointer-events: none;
   }
 
@@ -670,7 +848,7 @@
     background: var(--ink-gradient-flow);
     backdrop-filter: var(--glass-backdrop-strong);
     border: 2px solid var(--glass-border-2);
-    box-shadow: 
+    box-shadow:
       0 16px 64px hsla(var(--ink) / 0.2),
       0 4px 16px hsla(var(--ink) / 0.1),
       inset 0 1px 0 hsla(255, 255, 255, 0.15);
@@ -678,25 +856,27 @@
   }
 
   .ink-glass-elevated::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: var(--glass-layer-2);
     backdrop-filter: blur(16px) saturate(150%);
     border-radius: inherit;
     opacity: 0;
-    transition: opacity var(--glass-morph-duration) cubic-bezier(0.23, 1, 0.32, 1);
+    transition: opacity var(--glass-morph-duration)
+      cubic-bezier(0.23, 1, 0.32, 1);
     pointer-events: none;
   }
 
   .ink-glass-elevated::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: 2px;
     background: var(--ink-gradient-primary);
     border-radius: inherit;
     opacity: 0;
-    transition: opacity var(--glass-morph-duration) cubic-bezier(0.23, 1, 0.32, 1);
+    transition: opacity var(--glass-morph-duration)
+      cubic-bezier(0.23, 1, 0.32, 1);
     pointer-events: none;
     z-index: -1;
   }
@@ -714,7 +894,7 @@
     background: var(--ink-gradient-immersive);
     backdrop-filter: var(--glass-backdrop-immersive);
     border: 3px solid var(--glass-border-3);
-    box-shadow: 
+    box-shadow:
       0 24px 96px hsla(var(--ink) / 0.3),
       0 8px 24px hsla(var(--ink) / 0.15),
       inset 0 1px 0 hsla(255, 255, 255, 0.2);
@@ -723,7 +903,7 @@
   }
 
   .ink-glass-immersive::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: var(--glass-layer-3);
@@ -735,7 +915,7 @@
   }
 
   .ink-glass-immersive::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: 3px;
     background: var(--ink-gradient-flow);
@@ -792,7 +972,7 @@
   }
 
   .ink-ripple-effect::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: radial-gradient(
@@ -816,7 +996,8 @@
   }
 
   .depth-layer-shift {
-    animation: depth-layer-shift var(--depth-transition-duration) ease-in-out infinite;
+    animation: depth-layer-shift var(--depth-transition-duration) ease-in-out
+      infinite;
   }
 
   .ink-brush-flow {
@@ -897,7 +1078,7 @@
   }
 
   .fluid-ink-transition::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: var(--ink-gradient-flow);
@@ -908,11 +1089,12 @@
 
   .fluid-ink-transition:hover::before {
     opacity: 1;
-    animation: ink-flow-ambient calc(var(--ink-flow-duration) * 0.5) ease-in-out infinite;
+    animation: ink-flow-ambient calc(var(--ink-flow-duration) * 0.5) ease-in-out
+      infinite;
   }
 
   .fluid-ink-transition::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: var(--ink-gradient-immersive);
@@ -924,7 +1106,8 @@
 
   .fluid-ink-transition:hover::after {
     opacity: 0.6;
-    animation: zen-breathe-deep calc(var(--ink-flow-duration) * 2) ease-in-out infinite;
+    animation: zen-breathe-deep calc(var(--ink-flow-duration) * 2) ease-in-out
+      infinite;
   }
 
   /* ===========================================
@@ -1025,31 +1208,57 @@
   /* 삼분법 레이아웃 (Rule of Thirds Layout) */
   .composition-thirds {
     display: grid;
-    grid-template-columns: var(--composition-thirds-h) 1fr var(--composition-thirds-h);
-    grid-template-rows: var(--composition-thirds-v) 1fr var(--composition-thirds-v);
+    grid-template-columns: var(--composition-thirds-h) 1fr var(
+        --composition-thirds-h
+      );
+    grid-template-rows: var(--composition-thirds-v) 1fr var(
+        --composition-thirds-v
+      );
     width: 100%;
     height: 100%;
   }
 
   .composition-golden {
     display: grid;
-    grid-template-columns: var(--composition-balance-left) var(--composition-balance-right);
+    grid-template-columns: var(--composition-balance-left) var(
+        --composition-balance-right
+      );
     width: 100%;
     height: 100%;
   }
 
   /* 여백의 미학 (Aesthetics of Empty Space) */
-  .void-minimal { padding: var(--void-minimal); }
-  .void-breathing { padding: var(--void-breathing); }
-  .void-contemplative { padding: var(--void-contemplative); }
-  .void-infinite { padding: var(--void-infinite); }
-  .void-cosmic { padding: var(--void-cosmic); }
+  .void-minimal {
+    padding: var(--void-minimal);
+  }
+  .void-breathing {
+    padding: var(--void-breathing);
+  }
+  .void-contemplative {
+    padding: var(--void-contemplative);
+  }
+  .void-infinite {
+    padding: var(--void-infinite);
+  }
+  .void-cosmic {
+    padding: var(--void-cosmic);
+  }
 
-  .margin-void-minimal { margin: var(--void-minimal); }
-  .margin-void-breathing { margin: var(--void-breathing); }
-  .margin-void-contemplative { margin: var(--void-contemplative); }
-  .margin-void-infinite { margin: var(--void-infinite); }
-  .margin-void-cosmic { margin: var(--void-cosmic); }
+  .margin-void-minimal {
+    margin: var(--void-minimal);
+  }
+  .margin-void-breathing {
+    margin: var(--void-breathing);
+  }
+  .margin-void-contemplative {
+    margin: var(--void-contemplative);
+  }
+  .margin-void-infinite {
+    margin: var(--void-infinite);
+  }
+  .margin-void-cosmic {
+    margin: var(--void-cosmic);
+  }
 
   /* 음양 균형 (Yin-Yang Balance) */
   .yin-element {
@@ -1065,7 +1274,8 @@
   }
 
   .yin-yang-balance {
-    animation: yin-yang-balance var(--balance-transition) ease-in-out infinite alternate;
+    animation: yin-yang-balance var(--balance-transition) ease-in-out infinite
+      alternate;
   }
 
   /* 계절 미학 (Seasonal Aesthetics) */
@@ -1090,11 +1300,21 @@
   }
 
   /* 전통 깊이감 (Traditional Depth Layers) */
-  .depth-foreground { z-index: var(--depth-foreground); }
-  .depth-middle { z-index: var(--depth-middle); }
-  .depth-background { z-index: var(--depth-background); }
-  .depth-cultural { z-index: var(--depth-cultural); }
-  .depth-temporal { z-index: var(--depth-temporal); }
+  .depth-foreground {
+    z-index: var(--depth-foreground);
+  }
+  .depth-middle {
+    z-index: var(--depth-middle);
+  }
+  .depth-background {
+    z-index: var(--depth-background);
+  }
+  .depth-cultural {
+    z-index: var(--depth-cultural);
+  }
+  .depth-temporal {
+    z-index: var(--depth-temporal);
+  }
 
   .cultural-depth-shift {
     animation: cultural-depth-shift 10000ms ease-in-out infinite;
@@ -1137,12 +1357,16 @@
   }
 
   .cultural-context::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
-    background: 
+    background:
       linear-gradient(45deg, transparent 60%, hsla(var(--ink) / 0.05) 80%),
-      radial-gradient(circle at 30% 70%, hsla(var(--gold) / 0.03) 0%, transparent 60%);
+      radial-gradient(
+        circle at 30% 70%,
+        hsla(var(--gold) / 0.03) 0%,
+        transparent 60%
+      );
     pointer-events: none;
     z-index: -1;
   }
@@ -1224,12 +1448,15 @@
   /* 통합 문화적 경험 (Integrated Cultural Experience) */
   .cultural-immersion {
     position: relative;
-    background: 
+    background:
       var(--ink-gradient-immersive),
-      radial-gradient(circle at var(--composition-balance-left) var(--composition-thirds-v), 
-        hsla(var(--gold) / 0.1) 0%, transparent 50%);
+      radial-gradient(
+        circle at var(--composition-balance-left) var(--composition-thirds-v),
+        hsla(var(--gold) / 0.1) 0%,
+        transparent 50%
+      );
     backdrop-filter: var(--glass-backdrop-immersive);
-    animation: 
+    animation:
       cultural-layer-flow 12000ms ease-in-out infinite,
       seasonal-shift 8000ms ease-in-out infinite reverse;
     transform-style: preserve-3d;
@@ -1237,32 +1464,35 @@
   }
 
   .cultural-immersion::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
-    background: 
-      conic-gradient(from 0deg at var(--composition-balance-right) var(--composition-thirds-v),
-        hsla(var(--ink) / 0.15) 0deg,
-        hsla(var(--ink-light) / 0.1) 90deg,
-        hsla(var(--gold) / 0.08) 180deg,
-        hsla(var(--brush) / 0.12) 270deg,
-        hsla(var(--ink) / 0.15) 360deg);
-    animation: yin-yang-balance var(--balance-transition) ease-in-out infinite alternate;
+    background: conic-gradient(
+      from 0deg at var(--composition-balance-right) var(--composition-thirds-v),
+      hsla(var(--ink) / 0.15) 0deg,
+      hsla(var(--ink-light) / 0.1) 90deg,
+      hsla(var(--gold) / 0.08) 180deg,
+      hsla(var(--brush) / 0.12) 270deg,
+      hsla(var(--ink) / 0.15) 360deg
+    );
+    animation: yin-yang-balance var(--balance-transition) ease-in-out infinite
+      alternate;
     pointer-events: none;
     z-index: var(--depth-cultural);
   }
 
   .cultural-immersion::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
-    background: 
-      linear-gradient(135deg, 
-        transparent 0%, 
-        hsla(var(--paper-warm) / 0.05) var(--composition-thirds-h), 
-        transparent var(--composition-balance-left),
-        hsla(var(--stone-light) / 0.03) var(--composition-balance-right),
-        transparent 100%);
+    background: linear-gradient(
+      135deg,
+      transparent 0%,
+      hsla(var(--paper-warm) / 0.05) var(--composition-thirds-h),
+      transparent var(--composition-balance-left),
+      hsla(var(--stone-light) / 0.03) var(--composition-balance-right),
+      transparent 100%
+    );
     animation: void-breathing 5000ms ease-in-out infinite;
     pointer-events: none;
     z-index: var(--depth-temporal);
@@ -1376,7 +1606,8 @@
 
 /* Advanced Ink Flow Animations */
 @keyframes ink-flow-ambient {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
     filter: hue-rotate(0deg) brightness(1);
     transform: scale(1) rotate(0deg);
@@ -1414,7 +1645,8 @@
 }
 
 @keyframes glass-morph {
-  0%, 100% {
+  0%,
+  100% {
     backdrop-filter: blur(20px) saturate(180%);
     border-color: hsla(var(--ink) / 0.1);
   }
@@ -1425,7 +1657,8 @@
 }
 
 @keyframes depth-layer-shift {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateZ(0) scale(1);
     opacity: 0.6;
   }
@@ -1455,7 +1688,8 @@
 }
 
 @keyframes zen-breathe-deep {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1) translateY(0) rotate(0deg);
     filter: brightness(1) saturate(1);
   }
@@ -1488,7 +1722,8 @@
     opacity: 0.8;
   }
   66% {
-    transform: translateX(var(--composition-thirds-h)) translateY(var(--composition-thirds-v));
+    transform: translateX(var(--composition-thirds-h))
+      translateY(var(--composition-thirds-v));
     opacity: 0.9;
   }
   100% {
@@ -1629,7 +1864,8 @@
 
 /* 여백의 호흡 애니메이션 (Breathing Space) */
 @keyframes void-breathing {
-  0%, 100% {
+  0%,
+  100% {
     padding: var(--void-minimal);
     margin: var(--void-minimal);
   }
@@ -1650,33 +1886,53 @@
 /* 문화적 레이어 전환 (Cultural Layer Transition) */
 @keyframes cultural-layer-flow {
   0% {
-    background-image: 
+    background-image:
       linear-gradient(var(--season-winter), transparent 30%),
-      radial-gradient(circle at 30% 30%, hsla(var(--ink) / 0.1) 0%, transparent 50%);
+      radial-gradient(
+        circle at 30% 30%,
+        hsla(var(--ink) / 0.1) 0%,
+        transparent 50%
+      );
     backdrop-filter: blur(4px) sepia(0.1);
   }
   25% {
-    background-image: 
+    background-image:
       linear-gradient(var(--season-spring), transparent 30%),
-      radial-gradient(circle at 70% 30%, hsla(var(--ink-light) / 0.15) 0%, transparent 50%);
+      radial-gradient(
+        circle at 70% 30%,
+        hsla(var(--ink-light) / 0.15) 0%,
+        transparent 50%
+      );
     backdrop-filter: blur(8px) sepia(0.2);
   }
   50% {
-    background-image: 
+    background-image:
       linear-gradient(var(--season-summer), transparent 30%),
-      radial-gradient(circle at 70% 70%, hsla(var(--gold) / 0.1) 0%, transparent 50%);
+      radial-gradient(
+        circle at 70% 70%,
+        hsla(var(--gold) / 0.1) 0%,
+        transparent 50%
+      );
     backdrop-filter: blur(12px) sepia(0.3);
   }
   75% {
-    background-image: 
+    background-image:
       linear-gradient(var(--season-autumn), transparent 30%),
-      radial-gradient(circle at 30% 70%, hsla(var(--brush) / 0.2) 0%, transparent 50%);
+      radial-gradient(
+        circle at 30% 70%,
+        hsla(var(--brush) / 0.2) 0%,
+        transparent 50%
+      );
     backdrop-filter: blur(8px) sepia(0.2);
   }
   100% {
-    background-image: 
+    background-image:
       linear-gradient(var(--season-winter), transparent 30%),
-      radial-gradient(circle at 30% 30%, hsla(var(--ink) / 0.1) 0%, transparent 50%);
+      radial-gradient(
+        circle at 30% 30%,
+        hsla(var(--ink) / 0.1) 0%,
+        transparent 50%
+      );
     backdrop-filter: blur(4px) sepia(0.1);
   }
 }
@@ -1734,5 +1990,816 @@
 
   .btn-art {
     @apply border-2 border-ink;
+  }
+}
+/* 
+ ---break---
+ */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ===========================================
+ * 다크모드 가독성 개선 유틸리티
+ * =========================================== */
+.dark-text-primary {
+  @apply dark:text-neutral-100;
+}
+
+.dark-text-secondary {
+  @apply dark:text-neutral-200;
+}
+
+.dark-text-muted {
+  @apply dark:text-neutral-300;
+}
+
+.dark-text-accent {
+  @apply dark:text-neutral-50;
+}
+
+.dark-bg-elevated {
+  @apply dark:bg-neutral-900;
+}
+
+.dark-border-enhanced {
+  @apply dark:border-neutral-700;
+}
+
+.dark-hover-enhanced {
+  @apply dark:hover:text-neutral-50 dark:hover:bg-neutral-800;
+}
+
+/* 다크모드에서 텍스트 대비 강화 */
+.dark-contrast-high {
+  @apply dark:text-neutral-50 dark:bg-neutral-900;
+}
+
+.dark-contrast-medium {
+  @apply dark:text-neutral-200 dark:bg-neutral-800;
+}
+
+.dark-contrast-low {
+  @apply dark:text-neutral-300 dark:bg-neutral-700;
+}
+
+/* 다크모드 포커스 개선 */
+.dark-focus-ring {
+  @apply dark:focus:ring-neutral-400 dark:focus:ring-offset-neutral-900;
+}
+
+/* 다크모드 링크 스타일 */
+.dark-link {
+  @apply dark:text-neutral-200 dark:hover:text-neutral-50 dark:underline-offset-4;
+}
+
+/* 다크모드 카드 스타일 */
+.dark-card {
+  @apply dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-100;
+}
+
+/* 다크모드 버튼 스타일 */
+.dark-button {
+  @apply dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700 dark:border-neutral-600;
+}
+
+/* ===========================================
+ * 접근성 및 사용성 개선
+ * =========================================== */
+
+/* ===========================================
+ * Contact 페이지 레이아웃 개선
+ * =========================================== */
+.contact-grid {
+  @apply grid lg:grid-cols-2 gap-zen-lg;
+}
+
+/* 균형잡힌 Contact 레이아웃 */
+.contact-balanced-grid {
+  @apply grid lg:grid-cols-5 gap-zen-md;
+}
+
+.contact-info-balanced {
+  @apply lg:col-span-2;
+}
+
+.contact-form-balanced {
+  @apply lg:col-span-3;
+}
+
+/* 컴팩트한 Contact 카드 */
+.contact-card-balanced {
+  @apply card-art glass-layer-1 hover-scale void-contemplative;
+  @apply min-h-[500px] flex flex-col;
+}
+
+.contact-info-card {
+  @apply card-art glass-layer-1 hover-scale void-contemplative;
+}
+
+.contact-form-card {
+  @apply card-art glass-layer-2 hover-scale void-contemplative;
+}
+
+/* Contact 아이템 컴팩트 스타일 */
+.contact-item-compact {
+  @apply flex items-start gap-zen-sm void-breathing;
+}
+
+.contact-item-icon-compact {
+  @apply p-zen-xs rounded-lg mt-zen-xs flex-shrink-0;
+}
+
+.contact-item-content-compact {
+  @apply flex-1 min-w-0;
+}
+
+.contact-item-title-compact {
+  @apply text-sm font-medium text-ink dark:text-neutral-100 mb-zen-xs;
+}
+
+.contact-item-text-compact {
+  @apply text-xs text-ink-light dark:text-neutral-300 void-minimal;
+}
+
+/* Contact 폼 컴팩트 스타일 */
+.contact-form-compact {
+  @apply space-y-zen-sm;
+}
+
+.contact-form-field-compact {
+  @apply space-y-zen-xs;
+}
+
+.contact-form-input-compact {
+  @apply h-10 text-sm;
+}
+
+.contact-form-textarea-compact {
+  @apply h-24 text-sm resize-none;
+}
+
+.contact-form-button-compact {
+  @apply h-10 text-sm font-medium;
+}
+
+/* 반응형 Contact 레이아웃 */
+@media (max-width: 1024px) {
+  .contact-balanced-grid {
+    @apply grid-cols-1 gap-zen-md;
+  }
+
+  .contact-info-balanced,
+  .contact-form-balanced {
+    @apply col-span-1;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-card-balanced {
+    @apply min-h-[400px];
+  }
+}
+
+/* ===========================================
+ * 다크모드에서 텍스트 대비 강화
+ * =========================================== */
+
+/* ===========================================
+ * Contact 페이지 레이아웃 개선 - 컴팩트 버전
+ * =========================================== */
+
+/* 균형잡힌 Contact 레이아웃 - 더 컴팩트 */
+.contact-balanced-grid {
+  @apply grid lg:grid-cols-3 gap-zen-sm;
+}
+
+.contact-info-balanced {
+  @apply lg:col-span-1;
+}
+
+.contact-form-balanced {
+  @apply lg:col-span-2;
+}
+
+/* 컴팩트한 Contact 카드 */
+.contact-card-balanced {
+  @apply card-art glass-layer-1 hover-scale void-contemplative;
+  @apply min-h-[400px] flex flex-col;
+}
+
+.contact-info-card {
+  @apply card-art glass-layer-1 hover-scale void-contemplative;
+}
+
+.contact-form-card {
+  @apply card-art glass-layer-2 hover-scale void-contemplative;
+}
+
+/* Contact 아이템 컴팩트 스타일 */
+.contact-item-compact {
+  @apply flex items-start gap-zen-sm void-breathing;
+}
+
+.contact-item-icon-compact {
+  @apply p-zen-xs rounded-lg flex-shrink-0;
+}
+
+.contact-item-content-compact {
+  @apply flex-1 min-w-0;
+}
+
+.contact-item-title-compact {
+  @apply text-sm font-medium text-ink dark:text-neutral-100 mb-zen-xs;
+}
+
+.contact-item-text-compact {
+  @apply text-sm text-ink-light dark:text-neutral-300 break-words;
+}
+
+/* 전화번호 줄바꿈 방지 */
+.contact-phone-number {
+  @apply text-sm text-ink-light dark:text-neutral-300;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Contact 폼 컴팩트 스타일 */
+.contact-form-compact {
+  @apply space-y-zen-md;
+}
+
+.form-field-compact {
+  @apply space-y-zen-xs;
+}
+
+.form-label-compact {
+  @apply text-sm font-medium text-ink dark:text-neutral-100;
+}
+
+.form-input-compact {
+  @apply w-full px-zen-sm py-zen-xs text-sm;
+}
+
+.form-textarea-compact {
+  @apply w-full px-zen-sm py-zen-xs text-sm min-h-[80px] resize-none;
+}
+
+/* 반응형 개선 */
+@media (max-width: 1024px) {
+  .contact-balanced-grid {
+    @apply grid-cols-1 gap-zen-md;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-card-balanced {
+    @apply min-h-[350px];
+  }
+}
+
+/* ===========================================
+ * 서예 특화 타이포그래피 시스템 개선
+ * =========================================== */
+
+/* 기본 서예 스타일 */
+.text-calligraphy {
+  font-family: 'Noto Serif KR', serif;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  line-height: 1.8;
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: 'liga' 1, 'kern' 1;
+  font-feature-settings: 'liga' 1, 'kern' 1;
+}
+
+/* 선적 서예 스타일 */
+.text-zen {
+  font-family: 'Noto Serif KR', serif;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  line-height: 2;
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: 'liga' 1, 'kern' 1;
+  font-feature-settings: 'liga' 1, 'kern' 1;
+}
+
+/* 새로운 서예 스타일 추가 */
+.text-calligraphy-bold {
+  font-family: 'Noto Serif KR', serif;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: 'liga' 1, 'kern' 1;
+  font-feature-settings: 'liga' 1, 'kern' 1;
+}
+
+.text-calligraphy-light {
+  font-family: 'Noto Serif KR', serif;
+  font-weight: 200;
+  letter-spacing: 0.08em;
+  line-height: 2.2;
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: 'liga' 1, 'kern' 1;
+  font-feature-settings: 'liga' 1, 'kern' 1;
+}
+
+.text-calligraphy-ink {
+  font-family: 'Noto Serif KR', serif;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 1.7;
+  color: hsl(var(--ink));
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: 'liga' 1, 'kern' 1;
+  font-feature-settings: 'liga' 1, 'kern' 1;
+}
+
+.text-calligraphy-gold {
+  font-family: 'Noto Serif KR', serif;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  line-height: 1.9;
+  color: hsl(var(--gold));
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: 'liga' 1, 'kern' 1;
+  font-feature-settings: 'liga' 1, 'kern' 1;
+}
+
+/* 서예 제목 스타일 */
+.text-calligraphy-title {
+  font-family: 'Noto Serif KR', serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: 'liga' 1, 'kern' 1;
+  font-feature-settings: 'liga' 1, 'kern' 1;
+}
+
+/* 서예 본문 스타일 */
+.text-calligraphy-body {
+  font-family: 'Noto Serif KR', serif;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  line-height: 1.8;
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: 'liga' 1, 'kern' 1;
+  font-feature-settings: 'liga' 1, 'kern' 1;
+}
+
+/* 서예 캡션 스타일 */
+.text-calligraphy-caption {
+  font-family: 'Noto Serif KR', serif;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  line-height: 1.6;
+  font-size: 0.875rem;
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: 'liga' 1, 'kern' 1;
+  font-feature-settings: 'liga' 1, 'kern' 1;
+}
+
+/* ===========================================
+ * 계절별 색상 유틸리티 클래스
+ * =========================================== */
+
+/* 봄 색상 */
+.text-spring-primary { color: hsl(var(--spring-primary)); }
+.text-spring-secondary { color: hsl(var(--spring-secondary)); }
+.text-spring-accent { color: hsl(var(--spring-accent)); }
+.text-spring-muted { color: hsl(var(--spring-muted)); }
+
+.bg-spring-primary { background-color: hsl(var(--spring-primary)); }
+.bg-spring-secondary { background-color: hsl(var(--spring-secondary)); }
+.bg-spring-accent { background-color: hsl(var(--spring-accent)); }
+.bg-spring-muted { background-color: hsl(var(--spring-muted)); }
+
+.border-spring-primary { border-color: hsl(var(--spring-primary)); }
+.border-spring-secondary { border-color: hsl(var(--spring-secondary)); }
+.border-spring-accent { border-color: hsl(var(--spring-accent)); }
+.border-spring-muted { border-color: hsl(var(--spring-muted)); }
+
+/* 여름 색상 */
+.text-summer-primary { color: hsl(var(--summer-primary)); }
+.text-summer-secondary { color: hsl(var(--summer-secondary)); }
+.text-summer-accent { color: hsl(var(--summer-accent)); }
+.text-summer-muted { color: hsl(var(--summer-muted)); }
+
+.bg-summer-primary { background-color: hsl(var(--summer-primary)); }
+.bg-summer-secondary { background-color: hsl(var(--summer-secondary)); }
+.bg-summer-accent { background-color: hsl(var(--summer-accent)); }
+.bg-summer-muted { background-color: hsl(var(--summer-muted)); }
+
+.border-summer-primary { border-color: hsl(var(--summer-primary)); }
+.border-summer-secondary { border-color: hsl(var(--summer-secondary)); }
+.border-summer-accent { border-color: hsl(var(--summer-accent)); }
+.border-summer-muted { border-color: hsl(var(--summer-muted)); }
+
+/* 가을 색상 */
+.text-autumn-primary { color: hsl(var(--autumn-primary)); }
+.text-autumn-secondary { color: hsl(var(--autumn-secondary)); }
+.text-autumn-accent { color: hsl(var(--autumn-accent)); }
+.text-autumn-muted { color: hsl(var(--autumn-muted)); }
+
+.bg-autumn-primary { background-color: hsl(var(--autumn-primary)); }
+.bg-autumn-secondary { background-color: hsl(var(--autumn-secondary)); }
+.bg-autumn-accent { background-color: hsl(var(--autumn-accent)); }
+.bg-autumn-muted { background-color: hsl(var(--autumn-muted)); }
+
+.border-autumn-primary { border-color: hsl(var(--autumn-primary)); }
+.border-autumn-secondary { border-color: hsl(var(--autumn-secondary)); }
+.border-autumn-accent { border-color: hsl(var(--autumn-accent)); }
+.border-autumn-muted { border-color: hsl(var(--autumn-muted)); }
+
+/* 겨울 색상 */
+.text-winter-primary { color: hsl(var(--winter-primary)); }
+.text-winter-secondary { color: hsl(var(--winter-secondary)); }
+.text-winter-accent { color: hsl(var(--winter-accent)); }
+.text-winter-muted { color: hsl(var(--winter-muted)); }
+
+.bg-winter-primary { background-color: hsl(var(--winter-primary)); }
+.bg-winter-secondary { background-color: hsl(var(--winter-secondary)); }
+.bg-winter-accent { background-color: hsl(var(--winter-accent)); }
+.bg-winter-muted { background-color: hsl(var(--winter-muted)); }
+
+.border-winter-primary { border-color: hsl(var(--winter-primary)); }
+.border-winter-secondary { border-color: hsl(var(--winter-secondary)); }
+.border-winter-accent { border-color: hsl(var(--winter-accent)); }
+.border-winter-muted { border-color: hsl(var(--winter-muted)); }
+
+/* 계절 전환 애니메이션 */
+.seasonal-transition {
+  transition: all var(--season-transition-duration) var(--season-transition-easing);
+}
+
+.seasonal-transition-color {
+  transition: color var(--season-transition-duration) var(--season-transition-easing),
+              background-color var(--season-transition-duration) var(--season-transition-easing),
+              border-color var(--season-transition-duration) var(--season-transition-easing);
+}
+
+/* ===========================================
+ * 성능 최적화 - CSS 번들 크기 최적화
+ * =========================================== */
+
+/* 사용하지 않는 애니메이션 제거 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 고대비 모드 최적화 */
+@media (prefers-contrast: high) {
+  .card-art {
+    border: 2px solid hsl(var(--ink));
+    background: hsl(var(--paper));
+  }
+  
+  .btn-art {
+    border: 2px solid hsl(var(--ink));
+    background: hsl(var(--ink));
+    color: hsl(var(--paper));
+  }
+  
+  * {
+    outline: 1px solid hsl(var(--ink));
+  }
+  
+  body {
+    background: hsl(var(--paper));
+    color: hsl(var(--ink));
+  }
+}
+
+/* 다크 모드 최적화 */
+.dark-text-primary {
+  color: hsl(var(--ink));
+}
+
+.dark-text-secondary {
+  color: hsl(var(--ink-light));
+}
+
+.dark-text-muted {
+  color: hsl(var(--ink-lighter));
+}
+
+.dark-text-accent {
+  color: hsl(var(--gold));
+}
+
+.dark-bg-elevated {
+  background: hsl(var(--paper));
+}
+
+.dark-border-enhanced {
+  border-color: hsl(var(--ink));
+}
+
+.dark-hover-enhanced {
+  background: hsl(var(--ink));
+  color: hsl(var(--paper));
+}
+
+.dark-contrast-high {
+  background: hsl(var(--ink));
+  color: hsl(var(--paper));
+}
+
+.dark-contrast-medium {
+  background: hsl(var(--paper));
+  color: hsl(var(--ink));
+}
+
+.dark-contrast-low {
+  background: hsl(var(--stone));
+  color: hsl(var(--ink));
+}
+
+.dark-focus-ring {
+  outline: 2px solid hsl(var(--ink));
+  outline-offset: 2px;
+}
+
+.dark-link {
+  color: hsl(var(--gold));
+  text-decoration: underline;
+}
+
+.dark-card {
+  background: hsl(var(--paper));
+  border: 1px solid hsl(var(--ink));
+}
+
+.dark-button {
+  background: hsl(var(--ink));
+  color: hsl(var(--paper));
+  border: 1px solid hsl(var(--ink));
+}
+
+/* 성능 최적화된 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 서예 전용 애니메이션 최적화 */
+@keyframes brushIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) rotate(-5deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes inkDrop {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes paperFold {
+  0% {
+    opacity: 0;
+    transform: rotateX(90deg);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateX(0deg);
+  }
+}
+
+@keyframes zenFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* 성능 최적화된 애니메이션 클래스 */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.8s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.8s ease-out;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.8s ease-out;
+}
+
+.animate-brush-in {
+  animation: brushIn 1.2s ease-out;
+}
+
+.animate-ink-drop {
+  animation: inkDrop 2s ease-out;
+}
+
+.animate-paper-fold {
+  animation: paperFold 1s ease-out;
+}
+
+.animate-zen-float {
+  animation: zenFloat 3s ease-in-out infinite;
+}
+
+/* 호버 효과 최적화 */
+.hover-lift {
+  transition: transform 0.3s ease-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+.hover-glow {
+  transition: box-shadow 0.3s ease-out;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.hover-scale {
+  transition: transform 0.3s ease-out;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+/* 포커스 스타일 최적화 */
+.focus-art {
+  outline: none;
+  transition: box-shadow 0.2s ease-out;
+}
+
+.focus-art:focus {
+  box-shadow: 0 0 0 3px hsl(var(--ink));
+}
+
+/* 반응형 텍스트 최적화 */
+.text-responsive-xs {
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
+}
+
+.text-responsive-sm {
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+}
+
+.text-responsive-base {
+  font-size: clamp(1rem, 3vw, 1.125rem);
+}
+
+.text-responsive-lg {
+  font-size: clamp(1.125rem, 4vw, 1.5rem);
+}
+
+.text-responsive-xl {
+  font-size: clamp(1.25rem, 5vw, 2rem);
+}
+
+.text-responsive-2xl {
+  font-size: clamp(1.5rem, 6vw, 3rem);
+}
+
+.text-responsive-3xl {
+  font-size: clamp(2rem, 8vw, 6rem);
+}
+
+/* 아트워크 컨테이너 최적화 */
+.artwork-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.artwork-image {
+  width: 100%;
+  height: auto;
+  transition: transform 0.3s ease-out;
+  will-change: transform;
+}
+
+/* 모바일 최적화 */
+@media (max-width: 768px) {
+  .section-padding {
+    padding: 2rem 1rem;
+  }
+  
+  .container-art {
+    padding: 0 1rem;
+  }
+  
+  .text-responsive-3xl {
+    font-size: clamp(1.5rem, 6vw, 3rem);
+  }
+}
+
+/* 성능 최적화된 접근성 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .card-art {
+    border: 2px solid hsl(var(--ink));
+    background: hsl(var(--paper));
+  }
+  
+  .btn-art {
+    border: 2px solid hsl(var(--ink));
+    background: hsl(var(--ink));
+    color: hsl(var(--paper));
+  }
+  
+  * {
+    outline: 1px solid hsl(var(--ink));
+  }
+  
+  body {
+    background: hsl(var(--paper));
+    color: hsl(var(--ink));
   }
 }

@@ -62,7 +62,7 @@ function SponsorLogo({
 
 export function SiteFooter() {
   return (
-    <footer className='bg-ink text-paper dark:bg-ink-dark py-12'>
+    <footer className='bg-ink text-paper dark:bg-neutral-900 dark:text-neutral-100 py-12'>
       <div className='container mx-auto px-4'>
         {/* 회사 정보 및 메뉴 링크 */}
         <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12'>
@@ -79,25 +79,25 @@ export function SiteFooter() {
               />
             </Link>
             <div className='mt-4 space-y-1'>
-              <p className='text-xs text-paper/70 dark:text-paper/70'>
+              <p className='text-xs text-paper/70 dark:text-neutral-300'>
                 고유번호: 209-82-11380
               </p>
-              <p className='text-xs text-paper/70 dark:text-paper/70'>
+              <p className='text-xs text-paper/70 dark:text-neutral-300'>
                 ☎︎ 0502-5550-8700
               </p>
-              <p className='text-xs text-paper/70 dark:text-paper/70'>
+              <p className='text-xs text-paper/70 dark:text-neutral-300'>
                 FAX: 0504-256-6600
               </p>
-              <p className='text-xs text-paper/70 dark:text-paper/70'>
+              <p className='text-xs text-paper/70 dark:text-neutral-300'>
                 info@orientalcalligraphy.org
               </p>
-              <p className='text-xs text-paper/70 dark:text-paper/70'>
+              <p className='text-xs text-paper/70 dark:text-neutral-300'>
                 서울시 성북구 보문로 57-1,
               </p>
-              <p className='text-xs text-paper/70 dark:text-paper/70'>
+              <p className='text-xs text-paper/70 dark:text-neutral-300'>
                 중앙빌딩 6층 (보문동7가)
               </p>
-              <p className='text-xs text-paper/70 dark:text-paper/70'>
+              <p className='text-xs text-paper/70 dark:text-neutral-300'>
                 무통장 입금계좌: 신한은행 100-028-611714
               </p>
             </div>

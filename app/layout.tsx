@@ -2,7 +2,10 @@ import { ClientLayout } from '@/components/client-layout'
 import type { Metadata } from 'next'
 import { Inter, Noto_Serif_KR } from 'next/font/google'
 import './globals.css'
-import { SITE_CONFIG, generateStructuredData } from '@/lib/constants/site-config'
+import {
+  SITE_CONFIG,
+  generateStructuredData,
+} from '@/lib/constants/site-config'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -72,7 +75,7 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  verification: SITE_CONFIG.verification.google 
+  verification: SITE_CONFIG.verification.google
     ? { google: SITE_CONFIG.verification.google }
     : undefined,
 }
@@ -89,13 +92,28 @@ export default function RootLayout({
         <link rel='manifest' href={SITE_CONFIG.pwa.manifestPath} />
 
         {/* PWA 메타 태그 */}
-        <meta name='application-name' content={SITE_CONFIG.pwa.applicationName} />
+        <meta
+          name='application-name'
+          content={SITE_CONFIG.pwa.applicationName}
+        />
         <meta name='apple-mobile-web-app-capable' content='yes' />
-        <meta name='apple-mobile-web-app-status-bar-style' content={SITE_CONFIG.pwa.appleStatusBarStyle} />
-        <meta name='apple-mobile-web-app-title' content={SITE_CONFIG.pwa.name} />
+        <meta
+          name='apple-mobile-web-app-status-bar-style'
+          content={SITE_CONFIG.pwa.appleStatusBarStyle}
+        />
+        <meta
+          name='apple-mobile-web-app-title'
+          content={SITE_CONFIG.pwa.name}
+        />
         <meta name='mobile-web-app-capable' content='yes' />
-        <meta name='msapplication-config' content={SITE_CONFIG.pwa.browserconfigPath} />
-        <meta name='msapplication-TileColor' content={SITE_CONFIG.theme.color} />
+        <meta
+          name='msapplication-config'
+          content={SITE_CONFIG.pwa.browserconfigPath}
+        />
+        <meta
+          name='msapplication-TileColor'
+          content={SITE_CONFIG.theme.color}
+        />
         <meta name='theme-color' content={SITE_CONFIG.theme.color} />
 
         {/* Apple Touch 아이콘 */}

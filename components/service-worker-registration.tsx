@@ -19,7 +19,7 @@ export function ServiceWorkerRegistration() {
 async function registerSW() {
   try {
     console.log('🔧 서비스 워커 등록 시작...')
-    
+
     const registration = await navigator.serviceWorker.register('/sw.js', {
       scope: '/',
     })
@@ -28,7 +28,7 @@ async function registerSW() {
 
     registration.addEventListener('updatefound', () => {
       console.log('🔄 서비스 워커 업데이트 발견')
-      
+
       const newWorker = registration.installing
       if (newWorker) {
         newWorker.addEventListener('statechange', () => {
@@ -49,7 +49,6 @@ async function registerSW() {
       console.log('🔄 서비스 워커 컨트롤러 변경됨')
       window.location.reload()
     })
-
   } catch (error) {
     console.error('❌ 서비스 워커 등록 실패:', error)
   }

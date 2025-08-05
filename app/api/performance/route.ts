@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
-    
+
     // 성능 데이터 검증
     if (!data.type || !data.data) {
       return NextResponse.json(
@@ -18,9 +18,9 @@ export async function POST(request: NextRequest) {
         type: data.type,
         timestamp: new Date().toISOString(),
         url: data.data.url,
-        metrics: data.data.name ? 
-          `${data.data.name}: ${Math.round(data.data.value)}${data.data.name === 'CLS' ? '' : 'ms'}` :
-          'Custom metrics',
+        metrics: data.data.name
+          ? `${data.data.name}: ${Math.round(data.data.value)}${data.data.name === 'CLS' ? '' : 'ms'}`
+          : 'Custom metrics',
         userAgent: data.data.userAgent?.substring(0, 50) + '...',
       })
     }
@@ -29,7 +29,6 @@ export async function POST(request: NextRequest) {
     if (process.env.NODE_ENV === 'production') {
       // 여기에 실제 분석 서비스 로직 추가
       // 예: Google Analytics, DataDog, New Relic 등
-      
       // 예시: 로그 파일에 저장하거나 데이터베이스에 저장
       // await savePerformanceData(data)
     }
@@ -43,17 +42,17 @@ export async function POST(request: NextRequest) {
       analysis,
       timestamp: new Date().toISOString(),
     })
-
   } catch (error) {
     console.error('Failed to process performance data:', error)
-    
+
     return NextResponse.json(
       {
         success: false,
         message: 'Failed to process performance data',
-        error: process.env.NODE_ENV === 'development' ? 
-          (error as Error).message : 
-          'Internal server error'
+        error:
+          process.env.NODE_ENV === 'development'
+            ? (error as Error).message
+            : 'Internal server error',
       },
       { status: 500 }
     )
@@ -65,27 +64,27 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const timeframe = searchParams.get('timeframe') || '24h'
-    
+
     // 실제 환경에서는 데이터베이스에서 조회
     const mockStats = generateMockPerformanceStats(timeframe)
-    
+
     return NextResponse.json({
       success: true,
       data: mockStats,
       timeframe,
       generated_at: new Date().toISOString(),
     })
-
   } catch (error) {
     console.error('Failed to fetch performance stats:', error)
-    
+
     return NextResponse.json(
       {
         success: false,
         message: 'Failed to fetch performance statistics',
-        error: process.env.NODE_ENV === 'development' ? 
-          (error as Error).message : 
-          'Internal server error'
+        error:
+          process.env.NODE_ENV === 'development'
+            ? (error as Error).message
+            : 'Internal server error',
       },
       { status: 500 }
     )
@@ -102,7 +101,7 @@ function analyzePerformanceData(data: any) {
 
   if (data.type === 'web-vital') {
     const { name, value, rating } = data.data
-    
+
     analysis.metric = name
     analysis.value = value
     analysis.rating = rating
@@ -112,10 +111,14 @@ function analyzePerformanceData(data: any) {
       case 'LCP':
         if (value > 4000) {
           analysis.score = 'poor'
-          analysis.recommendations.push('이미지 최적화 및 서버 응답 시간 개선이 필요합니다.')
+          analysis.recommendations.push(
+            '이미지 최적화 및 서버 응답 시간 개선이 필요합니다.'
+          )
         } else if (value > 2500) {
           analysis.score = 'needs-improvement'
-          analysis.recommendations.push('이미지 lazy loading 및 CDN 사용을 고려하세요.')
+          analysis.recommendations.push(
+            '이미지 lazy loading 및 CDN 사용을 고려하세요.'
+          )
         } else {
           analysis.score = 'good'
         }
@@ -124,10 +127,14 @@ function analyzePerformanceData(data: any) {
       case 'FID':
         if (value > 300) {
           analysis.score = 'poor'
-          analysis.recommendations.push('JavaScript 번들 크기 줄이기 및 코드 분할이 필요합니다.')
+          analysis.recommendations.push(
+            'JavaScript 번들 크기 줄이기 및 코드 분할이 필요합니다.'
+          )
         } else if (value > 100) {
           analysis.score = 'needs-improvement'
-          analysis.recommendations.push('비필수 JavaScript 지연 로딩을 고려하세요.')
+          analysis.recommendations.push(
+            '비필수 JavaScript 지연 로딩을 고려하세요.'
+          )
         } else {
           analysis.score = 'good'
         }
@@ -136,7 +143,9 @@ function analyzePerformanceData(data: any) {
       case 'CLS':
         if (value > 0.25) {
           analysis.score = 'poor'
-          analysis.recommendations.push('이미지와 광고에 명시적인 크기를 설정하세요.')
+          analysis.recommendations.push(
+            '이미지와 광고에 명시적인 크기를 설정하세요.'
+          )
         } else if (value > 0.1) {
           analysis.score = 'needs-improvement'
           analysis.recommendations.push('웹폰트 로딩 최적화를 고려하세요.')
@@ -148,7 +157,9 @@ function analyzePerformanceData(data: any) {
       case 'FCP':
         if (value > 3000) {
           analysis.score = 'poor'
-          analysis.recommendations.push('CSS 및 JavaScript 최적화가 필요합니다.')
+          analysis.recommendations.push(
+            'CSS 및 JavaScript 최적화가 필요합니다.'
+          )
         } else if (value > 1800) {
           analysis.score = 'needs-improvement'
           analysis.recommendations.push('중요한 리소스의 우선순위를 높이세요.')
@@ -188,7 +199,9 @@ function generateMockPerformanceStats(timeframe: string) {
     },
     trends: {
       daily: Array.from({ length: 7 }, (_, i) => ({
-        date: new Date(Date.now() - (6 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        date: new Date(Date.now() - (6 - i) * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split('T')[0],
         lcp: 2000 + Math.random() * 600,
         fid: 80 + Math.random() * 40,
         cls: 0.07 + Math.random() * 0.06,
