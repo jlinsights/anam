@@ -1,0 +1,129 @@
+'use client'
+
+import { useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import type { Artwork, Artist } from '@/lib/types'
+import { useGalleryStore, useModalState } from '@/lib/stores/gallery-store'
+
+// Import individual section components
+import { HeroSection } from './HeroSection'
+import { GallerySection } from './GallerySection'
+import { ArtistSection } from './ArtistSection'
+import { ExhibitionSection } from './ExhibitionSection'
+import { ContactSection } from './ContactSection'
+import { Navigation } from './Navigation'
+import { ArtworkModal } from './ArtworkModal'
+
+interface SinglePageLayoutProps {
+  initialArtworks: Artwork[]
+  artist?: Artist
+}
+
+export default function SinglePageLayout({ initialArtworks, artist }: SinglePageLayoutProps) {
+  // Zustand store state and actions
+  const {
+    currentSection,
+    setCurrentSection,
+    navigateToSection,
+    setArtworks,
+    setArtist,
+    openModal,
+    closeModal,
+    trackSectionView
+  } = useGalleryStore()
+  
+  const { isOpen: isModalOpen, artwork: selectedArtwork } = useModalState()
+
+  // Initialize store with server data
+  useEffect(() => {
+    setArtworks(initialArtworks)
+    if (artist) {
+      setArtist(artist)
+    }
+  }, [initialArtworks, artist, setArtworks, setArtist])
+
+  // Handle artwork selection
+  const handleArtworkSelect = (artwork: Artwork) => {
+    openModal(artwork)
+  }
+
+  // Intersection observer for active section tracking
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.5,
+      rootMargin: '-50px 0px'
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const sectionId = entry.target.id
+          setCurrentSection(sectionId)
+          trackSectionView(sectionId)
+        }
+      })
+    }, observerOptions)
+
+    // Observe all sections
+    const sections = ['hero', 'gallery', 'artist', 'exhibition', 'contact']
+    sections.forEach(sectionId => {
+      const element = document.getElementById(sectionId)
+      if (element) observer.observe(element)
+    })
+
+    return () => observer.disconnect()
+  }, [setCurrentSection, trackSectionView])
+
+  return (
+    <>
+      {/* Fixed Navigation */}
+      <Navigation 
+        currentSection={currentSection}
+        onNavigate={navigateToSection}
+      />
+
+      {/* Single Page Sections */}
+      <main className="min-h-screen bg-paper">
+        {/* Hero Section */}
+        <section id="hero" className="min-h-screen">
+          <HeroSection onNavigate={navigateToSection} />
+        </section>
+
+        {/* Gallery Section */}
+        <section id="gallery" className="min-h-screen py-zen-xl">
+          <GallerySection 
+            artworks={initialArtworks}
+            onArtworkSelect={handleArtworkSelect}
+          />
+        </section>
+
+        {/* Artist Section */}
+        <section id="artist" className="min-h-screen py-zen-xl">
+          <ArtistSection artist={artist} />
+        </section>
+
+        {/* Exhibition Section */}
+        <section id="exhibition" className="min-h-screen py-zen-xl">
+          <ExhibitionSection />
+        </section>
+
+        {/* Contact Section */}
+        <section id="contact" className="min-h-screen py-zen-xl">
+          <ContactSection />
+        </section>
+      </main>
+
+      {/* Artwork Modal */}
+      <AnimatePresence>
+        {isModalOpen && selectedArtwork && (
+          <ArtworkModal
+            artwork={selectedArtwork}
+            onClose={closeModal}
+            artworks={initialArtworks}
+            onArtworkChange={(artwork) => openModal(artwork)}
+          />
+        )}
+      </AnimatePresence>
+    </>
+  )
+}
