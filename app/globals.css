@@ -2,6 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Enhanced Gallery Animations for BMAD UX Improvements */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0); /* Use translate3d for hardware acceleration */
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+  will-change: opacity, transform; /* Optimize for animations */
+}
+
+/* Performance optimized animations */
+@keyframes smooth-scale {
+  from {
+    transform: scale3d(1, 1, 1);
+  }
+  to {
+    transform: scale3d(1.02, 1.02, 1);
+  }
+}
+
+/* Hardware-accelerated transforms for gallery cards */
+.gallery-card-transform {
+  will-change: transform, box-shadow;
+  transform: translate3d(0, 0, 0); /* Force hardware acceleration */
+  backface-visibility: hidden; /* Prevent flickering */
+}
+
+/* Text shadow utility for better overlay readability */
+.text-shadow-sm {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Line clamp utilities for consistent text truncation */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Performance optimizations for smooth scrolling and interactions */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Optimize images for better loading performance */
+img {
+  image-rendering: -webkit-optimize-contrast; /* Better image quality on webkit */
+  image-rendering: crisp-edges; /* Sharp edges for artwork */
+}
+
 /* 
  * HEELANG 프로젝트 - 통합 CSS 시스템
  * 서예 예술에 최적화된 디자인 토큰과 스타일
@@ -2802,4 +2867,29 @@
     background: hsl(var(--paper));
     color: hsl(var(--ink));
   }
+}
+
+
+/* Gallery animations for ANAM project */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

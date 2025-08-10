@@ -2,6 +2,11 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { Search, Filter, X, Calendar, Palette, Ruler } from 'lucide-react'
+import { Artwork } from '@/lib/types'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { AccessibleModal } from '@/components/accessibility'
 
 interface SearchFilterProps {
   artworks: Artwork[]

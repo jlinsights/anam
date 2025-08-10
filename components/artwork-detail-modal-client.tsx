@@ -1,5 +1,8 @@
 'use client'
 
+import { useState } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
 import { ArtworkDetailClient } from '@/components/artwork-detail-client'
 import { GalleryDetailImage } from '@/components/optimized-image'
 import { Button } from '@/components/ui/button'
