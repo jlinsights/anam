@@ -1,77 +1,71 @@
+'use client'
+
 import { getArtworks } from '@/lib/artworks'
 import { fetchArtist } from '@/lib/artist'
 import type { Metadata } from 'next'
 import type { Artwork, Artist } from '@/lib/types'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export const dynamic = 'force-static'
-export const revalidate = 3600
+// Metadata is handled in layout.tsx
 
-export const metadata: Metadata = {
-  title: '아남 배옥영 작가 서예 갤러리 | 현대 한국 서예의 새로운 지평',
-  description: '아남 배옥영 작가의 현대 서예 58점 전시. 전통 서예와 현대적 감각이 조화를 이루는 독창적 작품. 갤러리, 작가 소개, 전시 정보, 연락처를 한 곳에서 만나보세요.',
-  keywords: [
-    '아남',
-    '배옥영',
-    '현대서예',
-    '서예',
-    '캘리그래피',
-    '한국서예',
-    '전통예술',
-    '현대작가',
-    '서예전시',
-    '붓글씨',
-    '먹그림',
-    '한국화',
-    '동양서예',
-    '서예갤러리',
-    'Oriental Calligraphy',
-    'Korean Art',
-    'ANAM',
-    'Bae Ok Young'
-  ],
-  openGraph: {
-    title: '아남 배옥영 | 현대 한국 서예 갤러리',
-    description: '전통과 현대가 만나는 서예의 새로운 지평. 58점의 독창적 작품을 원페이지로 감상하세요.',
-    url: 'https://anam.orientalcalligraphy.org',
-    siteName: '먹, 그리고... 展',
-    type: 'website',
-    locale: 'ko_KR',
-    images: [
-      {
-        url: '/Images/Artist/배옥영.jpeg',
-        width: 1200,
-        height: 630,
-        alt: '아남 배옥영 작가',
-        type: 'image/jpeg',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: '아남 배옥영 | 현대 한국 서예 갤러리',
-    description: '전통과 현대가 만나는 서예의 새로운 지평',
-    images: ['/Images/Artist/배옥영.jpeg'],
-  },
-  alternates: {
-    canonical: 'https://anam.orientalcalligraphy.org',
-  },
-  robots: {
-    index: true,
-    follow: true,
-    'max-image-preview': 'large',
-    'max-snippet': -1,
-    'max-video-preview': -1,
-  },
-}
+export default function HomePage() {
+  const [artworks, setArtworks] = useState<Artwork[]>([])
+  const [artist, setArtist] = useState<Artist | undefined>()
+  const [displayedArtworks, setDisplayedArtworks] = useState<Artwork[]>([])
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [loading, setLoading] = useState(true)
 
-export default async function HomePage() {
-  // Fetch data in parallel
-  const [artworks, artist] = await Promise.all([
-    getArtworks(),
-    fetchArtist('fallback-artist').catch(() => undefined)
-  ])
+  // Fetch data on client side
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [artworksData, artistData] = await Promise.all([
+          fetch('/api/artworks').then(res => res.json()),
+          fetch('/api/artist').then(res => res.json()).catch(() => undefined)
+        ])
+        
+        setArtworks(artworksData)
+        setArtist(artistData)
+        
+        // Initialize with first 8 random artworks
+        if (artworksData && artworksData.length > 0) {
+          const shuffled = [...artworksData].sort(() => 0.5 - Math.random())
+          setDisplayedArtworks(shuffled.slice(0, 8))
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // Auto-rotate artworks every 5 seconds
+  useEffect(() => {
+    if (artworks.length <= 8) return
+
+    const interval = setInterval(() => {
+      setCurrentIndex(prev => (prev + 1) % artworks.length)
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [artworks.length])
+
+  // Update displayed artworks when currentIndex changes
+  useEffect(() => {
+    if (artworks.length > 8) {
+      const newDisplayed = []
+      for (let i = 0; i < 8; i++) {
+        const index = (currentIndex + i) % artworks.length
+        newDisplayed.push(artworks[index])
+      }
+      setDisplayedArtworks(newDisplayed)
+    }
+  }, [currentIndex, artworks])
 
   return (
     <div className="min-h-screen bg-white">
@@ -87,38 +81,107 @@ export default async function HomePage() {
       <main className="container mx-auto px-4 py-12">
         {/* Gallery Grid */}
         <section id="gallery" className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">작품 갤러리</h2>
-          {artworks && artworks.length > 0 ? (
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">작품 갤러리</h2>
+              <p className="text-gray-600 mt-2">
+                {loading ? '작품을 불러오는 중...' : `전체 ${artworks.length}개 작품 중 8개 전시`}
+              </p>
+            </div>
+            {artworks.length > 8 && (
+              <div className="flex items-center gap-2">
+                <div className="flex space-x-1">
+                  {Array.from({ length: Math.ceil(artworks.length / 8) }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                        Math.floor(currentIndex / 8) === i ? 'bg-gray-900' : 'bg-gray-300'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs text-gray-500 ml-2">자동 순환 중</span>
+              </div>
+            )}
+          </div>
+          
+          {loading ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="aspect-square bg-gray-100 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : displayedArtworks.length > 0 ? (
             <>
-              <p className="text-gray-600 mb-8">{artworks.length}개의 작품</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {artworks.map((artwork) => (
-                  <div key={artwork.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="aspect-square bg-gray-50 flex items-center justify-center">
+              {/* 4x2 Grid (2x4 on mobile) */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
+                {displayedArtworks.map((artwork, index) => (
+                  <Link 
+                    key={`${artwork.id}-${currentIndex}`}
+                    href={`/gallery/${artwork.slug || artwork.id}`}
+                    className="group cursor-pointer opacity-0 animate-fade-in"
+                    style={{
+                      animationDelay: `${index * 150}ms`,
+                      animationFillMode: 'forwards'
+                    }}
+                  >
+                    <div className="aspect-square bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-500 hover:scale-105">
                       {artwork.imageUrl ? (
-                        <Image
-                          src={artwork.imageUrl}
-                          alt={artwork.title}
-                          width={300}
-                          height={300}
-                          className="w-full h-full object-cover"
-                        />
+                        <div className="relative w-full h-full overflow-hidden">
+                          <Image
+                            src={artwork.imageUrl}
+                            alt={artwork.title}
+                            width={300}
+                            height={300}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            loading="eager"
+                          />
+                          {/* Hover Overlay */}
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+                            <div className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center px-2">
+                              <h3 className="font-medium text-sm mb-1 line-clamp-2">{artwork.title}</h3>
+                              <p className="text-xs opacity-90">{artwork.year}년</p>
+                              <p className="text-xs opacity-75 mt-1">{artwork.medium}</p>
+                            </div>
+                          </div>
+                          {/* Click indicator */}
+                          <div className="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <svg className="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </div>
+                        </div>
                       ) : (
-                        <div className="text-gray-400">이미지 없음</div>
+                        <div className="w-full h-full bg-gray-50 flex items-center justify-center text-gray-400 text-sm">
+                          이미지 없음
+                        </div>
                       )}
                     </div>
-                    <div className="p-4">
-                      <h3 className="font-medium text-gray-900">{artwork.title}</h3>
-                      <p className="text-sm text-gray-500">{artwork.year}년</p>
-                      <p className="text-sm text-gray-500">{artwork.medium}</p>
-                    </div>
-                  </div>
+                  </Link>
                 ))}
+              </div>
+              
+              {/* Gallery Navigation */}
+              <div className="flex justify-center items-center gap-4">
+                <Link 
+                  href="/gallery" 
+                  className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                >
+                  전체 갤러리 보기
+                </Link>
+                {artworks.length > 8 && (
+                  <button
+                    onClick={() => setCurrentIndex(prev => (prev + 8) % artworks.length)}
+                    className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    다음 8개 작품
+                  </button>
+                )}
               </div>
             </>
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-500">작품을 불러오는 중입니다...</p>
+              <p className="text-gray-500">표시할 작품이 없습니다.</p>
             </div>
           )}
         </section>
