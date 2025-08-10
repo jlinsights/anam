@@ -6,16 +6,34 @@
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translate3d(0, 20px, 0); /* Use translate3d for hardware acceleration */
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 .animate-fade-in {
   animation: fade-in 0.6s ease-out forwards;
+  will-change: opacity, transform; /* Optimize for animations */
+}
+
+/* Performance optimized animations */
+@keyframes smooth-scale {
+  from {
+    transform: scale3d(1, 1, 1);
+  }
+  to {
+    transform: scale3d(1.02, 1.02, 1);
+  }
+}
+
+/* Hardware-accelerated transforms for gallery cards */
+.gallery-card-transform {
+  will-change: transform, box-shadow;
+  transform: translate3d(0, 0, 0); /* Force hardware acceleration */
+  backface-visibility: hidden; /* Prevent flickering */
 }
 
 /* Text shadow utility for better overlay readability */
@@ -36,6 +54,17 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+/* Performance optimizations for smooth scrolling and interactions */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Optimize images for better loading performance */
+img {
+  image-rendering: -webkit-optimize-contrast; /* Better image quality on webkit */
+  image-rendering: crisp-edges; /* Sharp edges for artwork */
 }
 
 /* 
