@@ -1,5 +1,8 @@
 'use client'
 
+import { useState } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Logo } from '@/components/logo'
 import { SimpleThemeToggle } from '@/components/simple-theme-toggle'
 import { Button } from '@/components/ui/button'

@@ -1,5 +1,7 @@
 'use client'
 
+import { memo, useState, useCallback } from 'react'
+import Link from 'next/link'
 import { GalleryArtworkImage } from '@/components/optimized-artwork-image'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
