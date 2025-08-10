@@ -133,7 +133,7 @@ export const fallbackArtworksData: Artwork[] = Array.from({ length: 58 }, (_, in
     dimensions: dimension,
     aspectRatio,
     description: `${title} - 전통 서예의 정신을 바탕으로 현대적 감각을 더한 작품입니다. 선과 공간, 여백의 관계를 탐구하며 내면의 세계를 표현합니다.`,
-    imageUrl: getOptimizedArtworkImagePath(slug, 'medium'),
+    imageUrl: `/Images/Artworks/optimized/${slug}/${slug}-medium.jpg`,
     imageId: slug,
     imageUrlQuery: `${title} korean calligraphy art`,
     artistNote: `${title}의 의미를 현대적 서예로 해석한 작품입니다.`,
