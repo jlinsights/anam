@@ -35,11 +35,9 @@ export async function generateMetadata({ params }: ArtworkPageProps): Promise<Me
 }
 
 export async function generateStaticParams() {
-  // Generate static params for first 10 artworks only (testing)
-  const testSlugs = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
-  return testSlugs.map(slug => ({
-    slug: slug
-  }))
+  // Temporarily disable static params to prevent build errors with Korean characters
+  // Dynamic rendering will be used instead
+  return []
 }
 
 export default async function ArtworkPage({ params }: ArtworkPageProps) {

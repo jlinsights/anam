@@ -226,7 +226,8 @@ const ARTWORK_FIELD_MAP: Record<string, string[]> = {
   year: ['year', 'Year', '년도'],
   medium: ['medium', 'Medium', '재료'],
   dimensions: ['dimensions', 'Dimensions', '크기'],
-  description: ['description', 'Description', '설명'],
+  description: ['description', 'Description', '설명', 'desc'],
+  artistNote: ['artistNote', 'ArtistNote', 'artist_note', 'Artist Note', '작가노트', '작가 노트'],
   tags: ['tags', 'Tags', '태그'],
   featured: ['featured', 'Featured', '추천'],
   category: ['category', 'Category', '카테고리'],
@@ -410,11 +411,11 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
         title,
         year: year ? parseInt(year.toString()) : 2024,
         medium: mediumValue,
-        dimensions: fields.dimensions || '70 x 140 cm',
+        dimensions: pickField<string>(fields, ARTWORK_FIELD_MAP, 'dimensions') || '70 x 140 cm',
         aspectRatio:
           fields.aspectRatio ||
-          calculateAspectRatio(fields.dimensions || '70 x 140 cm'),
-        description: fields.description || '',
+          calculateAspectRatio(pickField<string>(fields, ARTWORK_FIELD_MAP, 'dimensions') || '70 x 140 cm'),
+        description: pickField<string>(fields, ARTWORK_FIELD_MAP, 'description') || '',
         number: pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number'), // Airtable Number 필드
         imageUrl: (() => {
           // 우선순위 1: Airtable Number 필드를 이용한 로컬 이미지 매칭
@@ -487,11 +488,11 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
           return legacyPath
         })(),
         imageUrlQuery: `${title} calligraphy art`,
-        artistNote: fields.artistNote || '',
-        featured: fields.featured || false,
-        category: fields.category || '회화',
-        available: fields.available !== false,
-        tags: fields.tags || [],
+        artistNote: pickField<string>(fields, ARTWORK_FIELD_MAP, 'artistNote') || '',
+        featured: pickField<boolean>(fields, ARTWORK_FIELD_MAP, 'featured') || false,
+        category: pickField<string>(fields, ARTWORK_FIELD_MAP, 'category') || '회화',
+        available: pickField<boolean>(fields, ARTWORK_FIELD_MAP, 'available') !== false,
+        tags: parseTagsField(pickField<any>(fields, ARTWORK_FIELD_MAP, 'tags')),
         price: fields.price || undefined,
         exhibition: fields.exhibition || '',
         createdAt: record.createdTime || new Date().toISOString(),
