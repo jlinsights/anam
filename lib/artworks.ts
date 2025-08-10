@@ -94,68 +94,57 @@ export const fallbackArtistData: Artist = {
   },
 }
 
-export const fallbackArtworksData: Artwork[] = [
-  {
-    id: '1',
-    slug: '01',
-    title: '작품 01',
-    year: 2025,
-    medium: '화선지에 먹',
-    dimensions: '70 x 140 cm',
-    aspectRatio: '1/2',
-    description: '전통 서예의 아름다움을 현대적 감각으로 재해석한 작품입니다.',
-    imageUrl: getOptimizedArtworkImagePath('01', 'medium'),
-    imageId: '01',
-    imageUrlQuery: 'korean calligraphy modern traditional',
-    artistNote: '전통과 현대의 조화를 추구한 작품입니다.',
-    featured: true,
-    category: 'recent',
+// Generate comprehensive fallback data for 58 artworks matching Number-based slugs
+export const fallbackArtworksData: Artwork[] = Array.from({ length: 58 }, (_, index) => {
+  const id = (index + 1).toString()
+  const slug = (index + 1).toString().padStart(2, '0') // 01, 02, 03, etc.
+  const year = 2021 + Math.floor(index / 15) // Distribute across years 2021-2024
+  
+  // Vary the content to make it realistic
+  const titles = [
+    '묵향', '선율', '여백의 미', '먹빛', '정적', '화합', '조화', '평온', '깊이', '흐름',
+    '생명력', '기운', '순간', '영원', '자연', '마음', '정신', '혼', '꿈', '현실',
+    '전통', '현대', '만남', '이별', '그리움', '희망', '사랑', '평화', '자유', '해방',
+    '창조', '탄생', '성장', '변화', '완성', '시작', '끝', '순환', '영혼', '정수',
+    '본질', '진리', '지혜', '통찰', '깨달음', '명상', '수행', '도', '길', '여정',
+    '목적', '의미', '가치', '소중함', '아름다움', '숭고함', '거룩함', '신성함'
+  ]
+  
+  const mediums = ['화선지에 먹', '한지에 먹', '화선지에 먹과 채색', '화선지에 수묵']
+  const dimensions = [
+    '70 x 140 cm', '90 x 90 cm', '70 x 100 cm', '50 x 70 cm', '100 x 70 cm',
+    '140 x 70 cm', '80 x 120 cm', '60 x 90 cm'
+  ]
+  
+  const title = titles[index] || `작품 ${slug}`
+  const medium = mediums[index % mediums.length]
+  const dimension = dimensions[index % dimensions.length]
+  
+  // Calculate aspect ratio from dimensions
+  const [width, height] = dimension.split(' x ').map(d => parseInt(d))
+  const aspectRatio = `${width}/${height}`
+  
+  return {
+    id,
+    slug,
+    title,
+    year,
+    medium,
+    dimensions: dimension,
+    aspectRatio,
+    description: `${title} - 전통 서예의 정신을 바탕으로 현대적 감각을 더한 작품입니다. 선과 공간, 여백의 관계를 탐구하며 내면의 세계를 표현합니다.`,
+    imageUrl: getOptimizedArtworkImagePath(slug, 'medium'),
+    imageId: slug,
+    imageUrlQuery: `${title} korean calligraphy art`,
+    artistNote: `${title}의 의미를 현대적 서예로 해석한 작품입니다.`,
+    featured: index < 3, // First 3 are featured
+    category: year >= 2024 ? 'recent' : year >= 2022 ? 'contemporary' : 'classic',
     available: true,
-    tags: ['전통', '현대', '조화'],
-    createdAt: '2025-01-01T00:00:00Z',
-    updatedAt: '2025-01-01T00:00:00Z',
-  },
-  {
-    id: '2',
-    slug: '02',
-    title: '작품 02',
-    year: 2025,
-    medium: '화선지에 먹',
-    dimensions: '90 x 90 cm',
-    aspectRatio: '1/1',
-    description: '먹의 농담과 선의 강약을 통해 내면의 세계를 표현한 작품입니다.',
-    imageUrl: getOptimizedArtworkImagePath('02', 'medium'),
-    imageId: '02',
-    imageUrlQuery: 'ink lines inner world calligraphy',
-    artistNote: '먹의 다양한 톤으로 감정의 깊이를 표현했습니다.',
-    featured: false,
-    category: 'recent',
-    available: true,
-    tags: ['먹', '선', '내면'],
-    createdAt: '2025-01-02T00:00:00Z',
-    updatedAt: '2025-01-02T00:00:00Z',
-  },
-  {
-    id: '3',
-    slug: '03',
-    title: '작품 03',
-    year: 2025,
-    medium: '화선지에 먹',
-    dimensions: '70 x 100 cm',
-    aspectRatio: '7/10',
-    description: '여백의 미학을 통해 보여주는 공간의 깊이와 침묵의 소리',
-    imageUrl: getOptimizedArtworkImagePath('03', 'medium'),
-    imageId: '03',
-    imageUrlQuery: 'space void depth silence calligraphy',
-    artistNote: '여백을 통해 무한한 공간감을 표현하고자 했습니다.',
-    featured: false,
-    category: 'recent',
-    available: true,
-    tags: ['여백', '공간', '깊이'],
-    createdAt: '2025-01-03T00:00:00Z',
-    updatedAt: '2025-01-03T00:00:00Z',
+    tags: [title.length > 2 ? title.substring(0, 2) : title, medium.includes('채색') ? '채색' : '수묵', year.toString()],
+    createdAt: `${year}-01-${(index % 28 + 1).toString().padStart(2, '0')}T00:00:00Z`,
+    updatedAt: `${year}-01-${(index % 28 + 1).toString().padStart(2, '0')}T00:00:00Z`,
   }
-]
+})
 
 /**
  * 작품 데이터를 가져오는 메인 함수 (Airtable → fallback 순서)
