@@ -38,6 +38,11 @@ export default function SinglePageLayout({ initialArtworks, artist }: SinglePage
   
   const { isOpen: isModalOpen, artwork: selectedArtwork } = useModalState()
 
+  // Debug logging
+  useEffect(() => {
+    console.log('SinglePageLayout mounted', { artworks: initialArtworks?.length, artist: !!artist })
+  }, [])
+
   // Initialize store with server data
   useEffect(() => {
     try {
@@ -106,56 +111,61 @@ export default function SinglePageLayout({ initialArtworks, artist }: SinglePage
     return () => observer.disconnect()
   }, [setCurrentSection, trackSectionView])
 
-  return (
-    <>
-      {/* Fixed Navigation */}
-      <Navigation 
-        currentSection={currentSection}
-        onNavigate={navigateToSection}
-      />
+  try {
+    return (
+      <>
+        {/* Fixed Navigation */}
+        <Navigation 
+          currentSection={currentSection}
+          onNavigate={navigateToSection}
+        />
 
-      {/* Single Page Sections */}
-      <main className="min-h-screen bg-paper">
-        {/* Hero Section */}
-        <section id="hero" className="min-h-screen">
-          <HeroSection onNavigate={navigateToSection} />
-        </section>
+        {/* Single Page Sections */}
+        <main className="min-h-screen bg-white">
+          {/* Hero Section */}
+          <section id="hero" className="min-h-screen">
+            <HeroSection onNavigate={navigateToSection} />
+          </section>
 
-        {/* Gallery Section */}
-        <section id="gallery" className="min-h-screen py-zen-xl">
-          <GallerySection 
-            artworks={initialArtworks}
-            onArtworkSelect={handleArtworkSelect}
-          />
-        </section>
+          {/* Gallery Section */}
+          <section id="gallery" className="min-h-screen py-32">
+            <GallerySection 
+              artworks={initialArtworks}
+              onArtworkSelect={handleArtworkSelect}
+            />
+          </section>
 
-        {/* Artist Section */}
-        <section id="artist" className="min-h-screen py-zen-xl">
-          <ArtistSection artist={artist} />
-        </section>
+          {/* Artist Section */}
+          <section id="artist" className="min-h-screen py-32">
+            <ArtistSection artist={artist} />
+          </section>
 
-        {/* Exhibition Section */}
-        <section id="exhibition" className="min-h-screen py-zen-xl">
-          <ExhibitionSection />
-        </section>
+          {/* Exhibition Section */}
+          <section id="exhibition" className="min-h-screen py-32">
+            <ExhibitionSection />
+          </section>
 
-        {/* Contact Section */}
-        <section id="contact" className="min-h-screen py-zen-xl">
-          <ContactSection />
-        </section>
-      </main>
+          {/* Contact Section */}
+          <section id="contact" className="min-h-screen py-32">
+            <ContactSection />
+          </section>
+        </main>
 
-      {/* Artwork Modal */}
-      <AnimatePresence>
-        {isModalOpen && selectedArtwork && (
-          <ArtworkModal
-            artwork={selectedArtwork}
-            onClose={closeModal}
-            artworks={initialArtworks}
-            onArtworkChange={(artwork) => openModal(artwork)}
-          />
-        )}
-      </AnimatePresence>
-    </>
-  )
+        {/* Artwork Modal */}
+        <AnimatePresence>
+          {isModalOpen && selectedArtwork && (
+            <ArtworkModal
+              artwork={selectedArtwork}
+              onClose={closeModal}
+              artworks={initialArtworks}
+              onArtworkChange={(artwork) => openModal(artwork)}
+            />
+          )}
+        </AnimatePresence>
+      </>
+    )
+  } catch (error) {
+    console.error('SinglePageLayout render error:', error)
+    throw error
+  }
 }
