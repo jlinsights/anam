@@ -329,14 +329,35 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
           preferences: state.preferences,
           modalHistory: state.modalHistory.slice(-5), // Persist only last 5
           performance: {
-            ...state.performance,
+            sectionViewTimes: state.performance.sectionViewTimes,
+            totalSessionTime: state.performance.totalSessionTime,
             artworksViewed: Array.from(state.performance.artworksViewed) // Serialize Set
           }
         }),
-        onRehydrateStorage: (state) => {
-          // Convert persisted array back to Set
-          if (state?.performance?.artworksViewed && Array.isArray(state.performance.artworksViewed)) {
-            state.performance.artworksViewed = new Set(state.performance.artworksViewed)
+        onRehydrateStorage: () => {
+          return (state) => {
+            try {
+              // Convert persisted array back to Set
+              if (state?.performance?.artworksViewed && Array.isArray(state.performance.artworksViewed)) {
+                state.performance.artworksViewed = new Set(state.performance.artworksViewed)
+              }
+              
+              // Ensure lastSectionChange is properly initialized
+              if (!state?.performance?.lastSectionChange) {
+                if (state?.performance) {
+                  state.performance.lastSectionChange = Date.now()
+                }
+              }
+            } catch (error) {
+              console.warn('Error rehydrating gallery store:', error)
+              // Reset performance state on error
+              if (state?.performance) {
+                state.performance = {
+                  ...initialState.performance,
+                  lastSectionChange: Date.now()
+                }
+              }
+            }
           }
         }
       }

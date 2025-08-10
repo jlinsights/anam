@@ -96,21 +96,32 @@ export function ProgressiveImage({
       return blurDataURL
     }
     
-    // Generate a simple gradient placeholder
-    const canvas = document.createElement('canvas')
-    canvas.width = 40
-    canvas.height = 30
-    const ctx = canvas.getContext('2d')
-    
-    if (ctx) {
-      const gradient = ctx.createLinearGradient(0, 0, 40, 30)
-      gradient.addColorStop(0, '#f3f4f6')
-      gradient.addColorStop(1, '#e5e7eb')
-      ctx.fillStyle = gradient
-      ctx.fillRect(0, 0, 40, 30)
+    // Only generate canvas placeholder on client side
+    if (typeof window === 'undefined') {
+      return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCA0MCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjZjNmNGY2Ii8+Cjwvc3ZnPgo='
     }
     
-    return canvas.toDataURL()
+    try {
+      // Generate a simple gradient placeholder
+      const canvas = document.createElement('canvas')
+      canvas.width = 40
+      canvas.height = 30
+      const ctx = canvas.getContext('2d')
+      
+      if (ctx) {
+        const gradient = ctx.createLinearGradient(0, 0, 40, 30)
+        gradient.addColorStop(0, '#f3f4f6')
+        gradient.addColorStop(1, '#e5e7eb')
+        ctx.fillStyle = gradient
+        ctx.fillRect(0, 0, 40, 30)
+        return canvas.toDataURL()
+      }
+    } catch (error) {
+      console.warn('Error generating placeholder:', error)
+    }
+    
+    // Fallback SVG placeholder
+    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCA0MCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjZjNmNGY2Ii8+Cjwvc3ZnPgo='
   }
 
   const placeholderSrc = generatePlaceholder()

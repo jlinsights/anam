@@ -41,5 +41,5 @@ export default async function SinglePageHome() {
     fetchArtist('fallback-artist').catch(() => undefined)
   ])
 
-  return <SinglePageLayout initialArtworks={artworks} artist={artist} />
+  return <SinglePageLayout initialArtworks={artworks} artist={artist || undefined} />
 }
