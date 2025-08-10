@@ -140,6 +140,13 @@ function getFieldValue(fields: any, fieldNames: string[]): any {
 
 // 슬러그 생성 함수
 function createSlug(title: string, year: number | string): string {
+  if (!title || title.trim() === '') {
+    return `anam-untitled-${year || 2024}`
+  }
+  
+  // Clean and normalize the year
+  const cleanYear = year && year.toString().trim() !== '' ? year : 2024
+  
   const cleanTitle = title
     .toLowerCase()
     .replace(/[^\w\s가-힣]/g, '') // Remove special characters
@@ -148,12 +155,29 @@ function createSlug(title: string, year: number | string): string {
     .replace(/^-+|-+$/g, '') // Remove leading and trailing dashes
     .trim()
   
-  // Ensure we don't have empty title
+  // Ensure we don't have empty title after cleaning
   const finalTitle = cleanTitle || 'untitled'
   
-  // Create final slug and ensure no trailing dashes
-  const slug = `anam-${finalTitle}-${year}`
-  return slug.replace(/-+/g, '-').replace(/-+$/, '') // Clean up and remove trailing dash
+  // Create final slug - make sure year is valid
+  let slug = `anam-${finalTitle}-${cleanYear}`
+  
+  // Final cleanup to ensure no trailing dashes or invalid characters
+  slug = slug
+    .replace(/-+/g, '-') // Replace multiple dashes with single dash
+    .replace(/^-+|-+$/g, '') // Remove leading and trailing dashes
+    .replace(/[^a-zA-Z0-9가-힣\-]/g, '') // Remove any remaining invalid characters
+  
+  // Final check to ensure we don't have trailing dashes
+  while (slug.endsWith('-')) {
+    slug = slug.slice(0, -1)
+  }
+  
+  // Ensure we have a valid slug
+  if (!slug || slug === 'anam' || slug === 'anam-') {
+    slug = `anam-untitled-${cleanYear}`
+  }
+  
+  return slug
 }
 
 // 종횡비 계산 함수
@@ -367,9 +391,15 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
         fields.medium ||
         '화선지에 먹') as string
 
+      // Use Number field for slug to match image filenames
+      const artworkNumber = pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number')
+      const slug = artworkNumber 
+        ? String(artworkNumber).padStart(2, '0') // Ensure 2-digit format (01, 02, etc.)
+        : createSlug(title, year || 2024) // Fallback to title-based slug
+      
       const artwork: Artwork = {
         id: record.id,
-        slug: fields.slug || createSlug(title, year || 2024),
+        slug: slug,
         title,
         year: year ? parseInt(year.toString()) : 2024,
         medium: mediumValue,

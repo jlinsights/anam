@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: ArtworkPageProps): Promise<Me
       title: `${artwork.title} | 아남 배옥영`,
       description: artwork.description || `${artwork.year}년 작품`,
       images: [{
-        url: `/Images/Artworks/${artwork.year}/${artwork.slug}-large.jpg`,
+        url: `/Images/Artworks/optimized/${artwork.slug.padStart(2, '0')}/${artwork.slug.padStart(2, '0')}-large.jpg`,
         width: 1200,
         height: 1200,
         alt: artwork.title
