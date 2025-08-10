@@ -1,6 +1,7 @@
 import { getArtworks } from '@/lib/artworks'
 import { fetchArtist } from '@/lib/artist'
 import { SinglePageLayout } from '@/components/single-page'
+import SimpleFallbackLayout from '@/components/simple-fallback-layout'
 import { ErrorBoundary } from '@/components/error-boundary'
 import type { Metadata } from 'next'
 
@@ -73,7 +74,9 @@ export default async function HomePage() {
   ])
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary
+      fallback={<SimpleFallbackLayout initialArtworks={artworks} artist={artist || undefined} />}
+    >
       <SinglePageLayout initialArtworks={artworks} artist={artist || undefined} />
     </ErrorBoundary>
   )
