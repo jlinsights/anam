@@ -393,9 +393,16 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
 
       // Use Number field for slug to match image filenames
       const artworkNumber = pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number')
-      const slug = artworkNumber 
+      let slug = artworkNumber 
         ? String(artworkNumber).padStart(2, '0') // Ensure 2-digit format (01, 02, etc.)
         : createSlug(title, year || 2024) // Fallback to title-based slug
+      
+      // Skip problematic records that cause InvalidCharacterError
+      const problemNumbers = ['25', '31', '58', '27', '43', '45']
+      if (problemNumbers.includes(String(artworkNumber))) {
+        console.warn(`⚠️ Skipping problematic record ${artworkNumber}: may cause build errors`)
+        return // Skip this record
+      }
       
       const artwork: Artwork = {
         id: record.id,

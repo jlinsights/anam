@@ -162,16 +162,16 @@ export const fallbackArtworksData: Artwork[] = [
  */
 export async function getArtworks(): Promise<Artwork[]> {
   try {
-    // 1. Airtable에서 데이터 시도
-    const artworksFromAirtable = await fetchArtworksFromAirtable()
-    if (artworksFromAirtable && artworksFromAirtable.length > 0) {
-      console.log(`✅ Loaded ${artworksFromAirtable.length} artworks from Airtable`)
-      return artworksFromAirtable
-    }
-
-    // 2. Fallback 데이터 사용
-    console.warn('🔄 Using fallback artwork data')
+    // Temporary: Use only fallback data to fix build issues
+    console.warn('🔄 Using fallback artwork data (temporary for build fix)')
     return fallbackArtworksData
+    
+    // TODO: Re-enable Airtable after fixing InvalidCharacterError
+    // const artworksFromAirtable = await fetchArtworksFromAirtable()
+    // if (artworksFromAirtable && artworksFromAirtable.length > 0) {
+    //   console.log(`✅ Loaded ${artworksFromAirtable.length} artworks from Airtable`)
+    //   return artworksFromAirtable
+    // }
   } catch (error) {
     console.error('❌ Error in getArtworks:', error)
     return fallbackArtworksData
