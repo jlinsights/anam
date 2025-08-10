@@ -106,16 +106,16 @@ export function useCoreWebVitals() {
 
     const loadWebVitals = async () => {
       try {
-        const { getCLS, getFCP, getFID, getLCP, getTTFB } = await import('web-vitals')
+        const { onCLS, onFCP, onINP, onLCP, onTTFB } = await import('web-vitals')
         
         if (!mounted) return
 
         // Set up metric collection
-        getCLS(metric => updateMetric('cls', metric.value))
-        getFCP(metric => updateMetric('fcp', metric.value))
-        getFID(metric => updateMetric('fid', metric.value))
-        getLCP(metric => updateMetric('lcp', metric.value))
-        getTTFB(metric => updateMetric('ttfb', metric.value))
+        onCLS((metric: any) => updateMetric('cls', metric.value))
+        onFCP((metric: any) => updateMetric('fcp', metric.value))
+        onINP((metric: any) => updateMetric('inp', metric.value))
+        onLCP((metric: any) => updateMetric('lcp', metric.value))
+        onTTFB((metric: any) => updateMetric('ttfb', metric.value))
 
         // INP measurement (newer metric)
         if ('PerformanceObserver' in window) {

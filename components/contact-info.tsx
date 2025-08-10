@@ -1,6 +1,9 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Clock, Loader2, Mail, MapPin, Phone, Globe } from 'lucide-react'
+import { Artist } from '@/lib/types'
+import { ErrorBoundary } from '@/components/error-boundary'
 
 interface ContactInfoProps {
   className?: string
