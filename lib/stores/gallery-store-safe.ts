@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import type { Artwork, Artist } from '@/lib/types'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 // Gallery state interface
 interface GalleryState {
@@ -294,3 +294,43 @@ export const useGalleryFilters = () => useGalleryStore(
 export const usePreferences = () => useGalleryStore(
   useCallback((state) => state.preferences, [])
 )
+
+// Safe wrapper hook to prevent hydration issues
+export function useSafeGalleryStore() {
+  const [mounted, setMounted] = useState(false)
+  
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  
+  const store = useGalleryStore()
+  
+  // Return default state during SSR
+  if (!mounted) {
+    return {
+      ...initialState,
+      // Safe no-op functions
+      setCurrentSection: () => {},
+      navigateToSection: () => {},
+      setArtworks: () => {},
+      selectArtwork: () => {},
+      nextArtwork: () => {},
+      previousArtwork: () => {},
+      closeArtwork: () => {},
+      setSearchTerm: () => {},
+      setSelectedYear: () => {},
+      setSelectedMedium: () => {},
+      clearFilters: () => {},
+      updateFilteredArtworks: () => {},
+      openModal: () => {},
+      closeModal: () => {},
+      setArtist: () => {},
+      updatePreferences: () => {},
+      trackSectionView: () => {},
+      trackArtworkView: () => {},
+      reset: () => {}
+    }
+  }
+  
+  return store
+}
