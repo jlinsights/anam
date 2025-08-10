@@ -35,9 +35,20 @@ export async function generateMetadata({ params }: ArtworkPageProps): Promise<Me
 }
 
 export async function generateStaticParams() {
-  // Temporarily disable static params to prevent build errors with Korean characters
-  // Dynamic rendering will be used instead
-  return []
+  try {
+    const artworks = await getArtworks()
+    
+    // Generate params for all artworks with valid slugs
+    return artworks
+      .filter(artwork => artwork.slug && artwork.slug.length > 0)
+      .map((artwork) => ({
+        slug: artwork.slug,
+      }))
+  } catch (error) {
+    console.error('Error generating static params:', error)
+    // Return empty array on error to allow dynamic rendering
+    return []
+  }
 }
 
 export default async function ArtworkPage({ params }: ArtworkPageProps) {

@@ -23,12 +23,21 @@ export function GallerySection({ artworks, onArtworkSelect }: GallerySectionProp
 
   // Handle artwork click - navigate to detail page
   const handleArtworkClick = (artwork: Artwork, event: React.MouseEvent) => {
+    // Ensure we have a valid slug
+    if (!artwork.slug) {
+      console.error('Artwork missing slug:', artwork)
+      return
+    }
+    
+    // Sanitize slug to ensure it's URL-safe
+    const safeSlug = encodeURIComponent(artwork.slug)
+    
     // Check if user is holding Ctrl/Cmd key to open in new tab
     if (event.ctrlKey || event.metaKey) {
-      window.open(`/gallery/${artwork.slug}`, '_blank')
+      window.open(`/gallery/${safeSlug}`, '_blank')
     } else {
       // Navigate to the artwork detail page using the slug
-      router.push(`/gallery/${artwork.slug}`)
+      router.push(`/gallery/${safeSlug}`)
     }
   }
 

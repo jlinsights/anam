@@ -398,11 +398,18 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
         ? String(artworkNumber).padStart(2, '0') // Ensure 2-digit format (01, 02, etc.)
         : createSlug(title, year || 2024) // Fallback to title-based slug
       
-      // Skip problematic records that cause InvalidCharacterError
-      const problemNumbers = ['25', '31', '58', '27', '43', '45']
+      // Skip problematic records that cause InvalidCharacterError during build
+      const problemNumbers = ['25', '31', '27', '43', '45'] // Removed 58 to test
       if (problemNumbers.includes(String(artworkNumber))) {
         console.warn(`⚠️ Skipping problematic record ${artworkNumber}: may cause build errors`)
         return // Skip this record
+      }
+      
+      // Validate slug format - ensure it's safe for URLs
+      if (slug && !/^[a-zA-Z0-9\-_]+$/.test(slug)) {
+        console.warn(`⚠️ Invalid slug format for artwork ${artworkNumber}: ${slug}`)
+        // Use number-based slug as fallback
+        slug = String(artworkNumber).padStart(2, '0')
       }
       
       const artwork: Artwork = {
