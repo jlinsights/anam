@@ -1,4 +1,5 @@
 import { fetchArtworksFromAirtable } from '@/lib/airtable'
+import { fallbackArtworksData } from '@/lib/artworks'
 import type { Artwork } from '@/lib/types'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -26,16 +27,16 @@ async function getCachedArtworks(): Promise<Artwork[]> {
       console.log(`✅ Cached ${artworks.length} artworks from Airtable`)
       return artworks
     } else {
-      console.warn('⚠️ No artworks from Airtable')
-      cachedArtworks = []
+      console.warn('⚠️ No artworks from Airtable, using fallback data')
+      cachedArtworks = fallbackArtworksData
       cacheTimestamp = now
-      return []
+      return fallbackArtworksData
     }
   } catch (error) {
-    console.error('❌ Error fetching artworks:', error)
-    cachedArtworks = []
+    console.error('❌ Error fetching artworks, using fallback data:', error)
+    cachedArtworks = fallbackArtworksData
     cacheTimestamp = now
-    return []
+    return fallbackArtworksData
   }
 }
 
@@ -53,36 +54,35 @@ export async function GET(request: NextRequest) {
 
     const artworks = await getCachedArtworks()
 
-    if (!artworks || artworks.length === 0) {
-      return NextResponse.json({
-        success: false,
-        message: 'No artworks available',
-        data: slug ? null : [],
-      })
-    }
+    // getCachedArtworks() now always returns fallback data, so artworks should never be empty
+    // But let's add a final safety net just in case
+    const finalArtworks = (artworks && artworks.length > 0) ? artworks : fallbackArtworksData
 
     // 특정 slug가 요청된 경우
     if (slug) {
-      const artwork = artworks.find((artwork: Artwork) => artwork.slug === slug)
+      const artwork = finalArtworks.find((artwork: Artwork) => artwork.slug === slug)
       return NextResponse.json({
-        success: true,
+        success: !!artwork,
+        message: artwork ? 'Artwork found' : 'Artwork not found',
         data: artwork || null,
-      })
+      }, { status: artwork ? 200 : 404 })
     }
 
     // 모든 작품 반환
     return NextResponse.json({
       success: true,
-      data: artworks,
+      message: `Found ${finalArtworks.length} artworks`,
+      data: finalArtworks,
     })
   } catch (error) {
     console.error('Failed to fetch artworks:', error)
 
+    // Even on error, return fallback data instead of null
     return NextResponse.json({
       success: false,
-      message: 'Failed to fetch artworks',
-      data: null,
-    })
+      message: 'Using fallback data due to error',
+      data: fallbackArtworksData,
+    }, { status: 200 }) // Return 200 with fallback data instead of error status
   }
 }
 
