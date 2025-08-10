@@ -69,17 +69,17 @@ export const fallbackArtworksData: Artwork[] = Array.from({ length: 58 }, (_, in
   const slug = (index + 1).toString().padStart(2, '0') // 01, 02, 03, etc.
   const year = 2021 + Math.floor(index / 15) // Distribute across years 2021-2024
   
-  // Vary the content to make it realistic
+  // Simple English titles to avoid InvalidCharacterError during build
   const titles = [
-    '묵향', '선율', '여백의 미', '먹빛', '정적', '화합', '조화', '평온', '깊이', '흐름',
-    '생명력', '기운', '순간', '영원', '자연', '마음', '정신', '혼', '꿈', '현실',
-    '전통', '현대', '만남', '이별', '그리움', '희망', '사랑', '평화', '자유', '해방',
-    '창조', '탄생', '성장', '변화', '완성', '시작', '끝', '순환', '영혼', '정수',
-    '본질', '진리', '지혜', '통찰', '깨달음', '명상', '수행', '도', '길', '여정',
-    '목적', '의미', '가치', '소중함', '아름다움', '숭고함', '거룩함', '신성함'
+    'Harmony', 'Serenity', 'Tranquility', 'Balance', 'Flow', 'Essence', 'Spirit', 'Peace', 'Depth', 'Grace',
+    'Vitality', 'Energy', 'Moment', 'Eternal', 'Nature', 'Heart', 'Mind', 'Soul', 'Dream', 'Reality',
+    'Tradition', 'Modern', 'Meeting', 'Farewell', 'Longing', 'Hope', 'Love', 'Freedom', 'Release', 'Creation',
+    'Birth', 'Growth', 'Change', 'Completion', 'Beginning', 'End', 'Cycle', 'Essence', 'Truth', 'Wisdom',
+    'Insight', 'Enlightenment', 'Meditation', 'Practice', 'Path', 'Journey', 'Purpose', 'Meaning', 'Value', 'Beauty',
+    'Sublime', 'Sacred', 'Divine', 'Light', 'Shadow', 'Void', 'Silence', 'Breath'
   ]
   
-  const mediums = ['화선지에 먹', '한지에 먹', '화선지에 먹과 채색', '화선지에 수묵']
+  const mediums = ['Ink on paper', 'Ink on hanji', 'Ink and color on paper', 'Traditional ink']
   const dimensions = [
     '70 x 140 cm', '90 x 90 cm', '70 x 100 cm', '50 x 70 cm', '100 x 70 cm',
     '140 x 70 cm', '80 x 120 cm', '60 x 90 cm'
@@ -101,15 +101,15 @@ export const fallbackArtworksData: Artwork[] = Array.from({ length: 58 }, (_, in
     medium,
     dimensions: dimension,
     aspectRatio,
-    description: `${title} - 전통 서예의 정신을 바탕으로 현대적 감각을 더한 작품입니다. 선과 공간, 여백의 관계를 탐구하며 내면의 세계를 표현합니다.`,
+    description: `${title} - A contemporary calligraphy work that explores the relationship between tradition and modernity through the expressive power of ink and void space.`,
     imageUrl: getOptimizedArtworkImagePath(slug, 'medium'),
     imageId: slug,
     imageUrlQuery: `${title} korean calligraphy art`,
-    artistNote: `${title}의 의미를 현대적 서예로 해석한 작품입니다.`,
+    artistNote: `A modern interpretation of ${title} through contemporary calligraphic expression.`,
     featured: index < 3, // First 3 are featured
     category: year >= 2024 ? 'recent' : year >= 2022 ? 'contemporary' : 'classic',
     available: true,
-    tags: [title.length > 2 ? title.substring(0, 2) : title, medium.includes('채색') ? '채색' : '수묵', year.toString()],
+    tags: [title.length > 2 ? title.substring(0, 2) : title, medium.includes('color') ? 'color' : 'ink', year.toString()],
     createdAt: `${year}-01-${(index % 28 + 1).toString().padStart(2, '0')}T00:00:00Z`,
     updatedAt: `${year}-01-${(index % 28 + 1).toString().padStart(2, '0')}T00:00:00Z`,
   }

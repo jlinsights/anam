@@ -35,18 +35,11 @@ export async function generateMetadata({ params }: ArtworkPageProps): Promise<Me
 }
 
 export async function generateStaticParams() {
-  // Temporarily disable static params to fix build
-  // TODO: Re-enable after fixing InvalidCharacterError
-  return []
-  
-  // const artworks = await getArtworks()
-  // const problemSlugs = ['31', '25', '58', '27', '43', '45']
-  // const validArtworks = artworks.filter(artwork => 
-  //   artwork.slug && !problemSlugs.includes(artwork.slug)
-  // )
-  // return validArtworks.map(artwork => ({
-  //   slug: artwork.slug
-  // }))
+  // Generate static params for first 10 artworks only (testing)
+  const testSlugs = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
+  return testSlugs.map(slug => ({
+    slug: slug
+  }))
 }
 
 export default async function ArtworkPage({ params }: ArtworkPageProps) {
