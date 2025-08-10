@@ -12,45 +12,14 @@ function createLegacyImagePath(slug: string, year: number, size: string = 'mediu
   return `/Images/Artworks/${year}/${slug}-${size}.jpg`
 }
 
-import {
-  getOptimizedImagePath,
-  getResponsiveImageData,
-  extractArtworkId,
-  type ImageSize,
-  type ResponsiveImageData,
-} from '@/lib/optimized-image-utils'
-
-// 원본 이미지 번호에서 최적화된 이미지 경로 생성
+// Simple optimized image path generation (removed complex imports to fix build issues)
 export function getOptimizedArtworkImagePath(
   imageId: string,
-  size: ImageSize = 'medium',
+  size: 'thumb' | 'medium' | 'large' = 'medium',
   format: 'jpg' | 'webp' | 'avif' = 'jpg'
 ): string {
-  return getOptimizedImagePath(imageId, size, format)
-}
-
-// 작품 이미지 URL 생성 (최적화된 버전, fallback 포함)
-export function getArtworkImageWithFallback(
-  imageId: string,
-  size: ImageSize = 'medium',
-  format: 'jpg' | 'webp' | 'avif' = 'jpg'
-): string {
-  try {
-    return getOptimizedArtworkImagePath(imageId, size, format)
-  } catch (error) {
-    console.warn(`Failed to get optimized image for ${imageId}:`, error)
-    // fallback to placeholder
-    return '/placeholders/placeholder.jpg'
-  }
-}
-
-// 작품 반응형 이미지 데이터 생성
-export function getArtworkResponsiveImageData(
-  imageId: string,
-  title: string,
-  aspectRatio: string = '4/5'
-): ResponsiveImageData {
-  return getResponsiveImageData(imageId, title, aspectRatio)
+  const extension = format === 'jpg' ? 'jpg' : format
+  return `/Images/Artworks/optimized/${imageId}/${imageId}-${size}.${extension}`
 }
 
 // 레거시 함수 (하위 호환성)
@@ -133,7 +102,7 @@ export const fallbackArtworksData: Artwork[] = Array.from({ length: 58 }, (_, in
     dimensions: dimension,
     aspectRatio,
     description: `${title} - 전통 서예의 정신을 바탕으로 현대적 감각을 더한 작품입니다. 선과 공간, 여백의 관계를 탐구하며 내면의 세계를 표현합니다.`,
-    imageUrl: `/Images/Artworks/optimized/${slug}/${slug}-medium.jpg`,
+    imageUrl: getOptimizedArtworkImagePath(slug, 'medium'),
     imageId: slug,
     imageUrlQuery: `${title} korean calligraphy art`,
     artistNote: `${title}의 의미를 현대적 서예로 해석한 작품입니다.`,
