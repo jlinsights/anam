@@ -1,7 +1,6 @@
 import { getArtworks } from '@/lib/artworks'
 import { fetchArtist } from '@/lib/artist'
 import { SinglePageLayout } from '@/components/single-page'
-import DebugSinglePageLayout from '@/components/debug-single-page-layout'
 import SimpleFallbackLayout from '@/components/simple-fallback-layout'
 import { ErrorBoundary } from '@/components/error-boundary'
 import type { Metadata } from 'next'
