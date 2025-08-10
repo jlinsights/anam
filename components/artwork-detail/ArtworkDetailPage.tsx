@@ -174,7 +174,7 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
                 <blockquote className="font-display text-ink-light italic leading-relaxed">
                   "{artwork.artistNote}"
                 </blockquote>
-                {artist && (
+                {artist?.name && (
                   <cite className="block mt-zen-sm text-sm text-ink-light">
                     - {artist.name}
                   </cite>
