@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Artwork, Artist } from '@/lib/types'
 import { useGalleryStore, useModalState } from '@/lib/stores/gallery-store'
@@ -20,6 +21,9 @@ interface SinglePageLayoutProps {
 }
 
 export default function SinglePageLayout({ initialArtworks, artist }: SinglePageLayoutProps) {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
   // Zustand store state and actions
   const {
     currentSection,
@@ -41,6 +45,23 @@ export default function SinglePageLayout({ initialArtworks, artist }: SinglePage
       setArtist(artist)
     }
   }, [initialArtworks, artist, setArtworks, setArtist])
+
+  // Handle URL parameters for direct artwork links
+  useEffect(() => {
+    const artworkId = searchParams.get('artwork')
+    if (artworkId && initialArtworks.length > 0) {
+      const artwork = initialArtworks.find(a => a.id === artworkId)
+      if (artwork) {
+        openModal(artwork)
+        navigateToSection('gallery')
+        
+        // Clean up URL parameter after opening modal
+        const url = new URL(window.location.href)
+        url.searchParams.delete('artwork')
+        router.replace(url.pathname + url.hash, { scroll: false })
+      }
+    }
+  }, [searchParams, initialArtworks, openModal, navigateToSection, router])
 
   // Handle artwork selection
   const handleArtworkSelect = (artwork: Artwork) => {

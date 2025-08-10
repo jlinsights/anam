@@ -95,6 +95,7 @@ export const SITE_CONFIG = {
 export const STRUCTURED_DATA = {
   person: {
     '@type': 'Person',
+    '@id': `${SITE_CONFIG.url}/#artist`,
     name: SITE_CONFIG.artist.name,
     alternateName: SITE_CONFIG.artist.alternateName,
     jobTitle: SITE_CONFIG.artist.jobTitle,
@@ -103,12 +104,13 @@ export const STRUCTURED_DATA = {
     nationality: SITE_CONFIG.artist.nationality,
     knowsAbout: SITE_CONFIG.artist.knowsAbout,
     image: `${SITE_CONFIG.url}${SITE_CONFIG.artist.image}`,
-    url: `${SITE_CONFIG.url}${SITE_CONFIG.artist.profileUrl}`,
+    url: `${SITE_CONFIG.url}/#artist`,
     sameAs: [SITE_CONFIG.social.instagram, SITE_CONFIG.social.website],
   },
 
   website: {
     '@type': 'WebSite',
+    '@id': SITE_CONFIG.url,
     name: SITE_CONFIG.siteName,
     description: SITE_CONFIG.description,
     url: SITE_CONFIG.url,
@@ -121,10 +123,19 @@ export const STRUCTURED_DATA = {
       '@type': 'Person',
       name: SITE_CONFIG.artist.name,
     },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${SITE_CONFIG.url}/#gallery?search={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
   },
 
   artGallery: {
     '@type': 'ArtGallery',
+    '@id': `${SITE_CONFIG.url}/#gallery`,
     name: SITE_CONFIG.siteName,
     description:
       '전통 서예와 현대적 감각이 조화를 이루는 독창적인 작품들을 전시하는 온라인 갤러리',
@@ -133,8 +144,48 @@ export const STRUCTURED_DATA = {
     artform: SITE_CONFIG.gallery.artform,
     artist: {
       '@type': 'Person',
+      '@id': `${SITE_CONFIG.url}/#artist`,
       name: SITE_CONFIG.artist.name,
     },
+    numberOfItems: 58,
+    openingHours: 'Mo-Su 00:00-24:00',
+    priceRange: 'Free',
+  },
+
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '홈',
+        item: SITE_CONFIG.url,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: '갤러리',
+        item: `${SITE_CONFIG.url}/#gallery`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: '작가소개',
+        item: `${SITE_CONFIG.url}/#artist`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: '전시정보',
+        item: `${SITE_CONFIG.url}/#exhibition`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 5,
+        name: '연락처',
+        item: `${SITE_CONFIG.url}/#contact`,
+      },
+    ],
   },
 } as const
 
@@ -146,6 +197,7 @@ export function generateStructuredData() {
       STRUCTURED_DATA.person,
       STRUCTURED_DATA.website,
       STRUCTURED_DATA.artGallery,
+      STRUCTURED_DATA.breadcrumb,
     ],
   }
 }
