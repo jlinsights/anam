@@ -1,6 +1,7 @@
 import { getArtworks } from '@/lib/artworks'
 import { fetchArtist } from '@/lib/artist'
 import { SinglePageLayout } from '@/components/single-page'
+import { ErrorBoundary } from '@/components/error-boundary'
 import type { Metadata } from 'next'
 
 export const dynamic = 'force-static'
@@ -71,5 +72,9 @@ export default async function HomePage() {
     fetchArtist('fallback-artist').catch(() => undefined)
   ])
 
-  return <SinglePageLayout initialArtworks={artworks} artist={artist || undefined} />
+  return (
+    <ErrorBoundary>
+      <SinglePageLayout initialArtworks={artworks} artist={artist || undefined} />
+    </ErrorBoundary>
+  )
 }

@@ -55,10 +55,12 @@ export default function SinglePageLayout({ initialArtworks, artist }: SinglePage
         openModal(artwork)
         navigateToSection('gallery')
         
-        // Clean up URL parameter after opening modal
-        const url = new URL(window.location.href)
-        url.searchParams.delete('artwork')
-        router.replace(url.pathname + url.hash, { scroll: false })
+        // Clean up URL parameter after opening modal (client-side only)
+        if (typeof window !== 'undefined') {
+          const url = new URL(window.location.href)
+          url.searchParams.delete('artwork')
+          router.replace(url.pathname + url.hash, { scroll: false })
+        }
       }
     }
   }, [searchParams, initialArtworks, openModal, navigateToSection, router])
@@ -70,6 +72,11 @@ export default function SinglePageLayout({ initialArtworks, artist }: SinglePage
 
   // Intersection observer for active section tracking
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') {
+      return
+    }
+
     const observerOptions = {
       threshold: 0.5,
       rootMargin: '-50px 0px'

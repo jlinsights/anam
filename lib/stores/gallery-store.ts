@@ -145,10 +145,13 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
         navigateToSection: (section) => {
           set({ isNavigating: true })
           
-          // Smooth scroll to section
-          const element = document.getElementById(section)
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          // Only run DOM operations on client side
+          if (typeof window !== 'undefined') {
+            // Smooth scroll to section
+            const element = document.getElementById(section)
+            if (element) {
+              element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }
           }
           
           setTimeout(() => {
@@ -335,26 +338,53 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
           }
         }),
         onRehydrateStorage: () => {
-          return (state) => {
-            try {
-              // Convert persisted array back to Set
-              if (state?.performance?.artworksViewed && Array.isArray(state.performance.artworksViewed)) {
-                state.performance.artworksViewed = new Set(state.performance.artworksViewed)
-              }
-              
-              // Ensure lastSectionChange is properly initialized
-              if (!state?.performance?.lastSectionChange) {
-                if (state?.performance) {
-                  state.performance.lastSectionChange = Date.now()
+          return (state, error) => {
+            if (error) {
+              console.warn('Error during store rehydration:', error)
+              return
+            }
+            
+            // Safely rehydrate state
+            if (state) {
+              try {
+                // Convert persisted array back to Set
+                if (state.performance?.artworksViewed && Array.isArray(state.performance.artworksViewed)) {
+                  state.performance.artworksViewed = new Set(state.performance.artworksViewed)
+                } else if (!state.performance?.artworksViewed) {
+                  // Initialize as empty Set if missing
+                  if (state.performance) {
+                    state.performance.artworksViewed = new Set()
+                  }
                 }
-              }
-            } catch (error) {
-              console.warn('Error rehydrating gallery store:', error)
-              // Reset performance state on error
-              if (state?.performance) {
-                state.performance = {
-                  ...initialState.performance,
-                  lastSectionChange: Date.now()
+                
+                // Ensure lastSectionChange is properly initialized
+                if (!state.performance?.lastSectionChange) {
+                  if (state.performance) {
+                    state.performance.lastSectionChange = Date.now()
+                  }
+                }
+                
+                // Ensure all required state is present
+                if (!state.preferences) {
+                  state.preferences = initialState.preferences
+                }
+                
+                if (!state.performance) {
+                  state.performance = {
+                    ...initialState.performance,
+                    lastSectionChange: Date.now()
+                  }
+                }
+              } catch (error) {
+                console.warn('Error rehydrating gallery store:', error)
+                // Reset to safe defaults on error
+                if (state.performance) {
+                  state.performance = {
+                    lastSectionChange: Date.now(),
+                    sectionViewTimes: {},
+                    totalSessionTime: 0,
+                    artworksViewed: new Set()
+                  }
                 }
               }
             }
