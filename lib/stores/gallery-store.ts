@@ -301,16 +301,16 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
           set((state) => ({
             performance: {
               ...state.performance,
-              artworksViewed: new Set([...state.performance.artworksViewed, artworkId])
+              artworksViewed: new Set([...(state.performance.artworksViewed || []), artworkId])
             }
           }))
         },
 
         getViewingStats: () => {
           const state = get()
-          const sectionsVisited = Object.keys(state.performance.sectionViewTimes).length
-          const artworksViewed = state.performance.artworksViewed.size
-          const totalTime = state.performance.totalSessionTime
+          const sectionsVisited = Object.keys(state.performance?.sectionViewTimes || {}).length
+          const artworksViewed = (state.performance?.artworksViewed || new Set()).size
+          const totalTime = state.performance?.totalSessionTime || 0
           const averageViewTime = sectionsVisited > 0 ? totalTime / sectionsVisited : 0
           
           return {

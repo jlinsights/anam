@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Artwork, Artist } from '@/lib/types'
-import { useGalleryStore, useModalState } from '@/lib/stores/gallery-store'
+import { useGalleryStore, useModalState } from '@/lib/stores/gallery-store-safe'
 
 // Import individual section components
 import { HeroSection } from './HeroSection'
