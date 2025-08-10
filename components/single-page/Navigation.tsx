@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useCurrentSection, useGalleryStore } from '@/lib/stores/gallery-store'
+import { useCurrentSection, useGalleryStore } from '@/lib/stores/gallery-store-safe'
 
 interface NavigationProps {
   currentSection: string

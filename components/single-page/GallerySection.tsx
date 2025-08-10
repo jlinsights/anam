@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import type { Artwork } from '@/lib/types'
-import { useGalleryStore, useArtworks, useGalleryFilters } from '@/lib/stores/gallery-store'
+import { useGalleryStore, useArtworks, useGalleryFilters } from '@/lib/stores/gallery-store-safe'
 import { ArtworkImage } from '@/components/common/ProgressiveImage'
 
 interface GallerySectionProps {

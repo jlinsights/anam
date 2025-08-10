@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Artwork } from '@/lib/types'
-import { useGalleryStore, useArtworks } from '@/lib/stores/gallery-store'
+import { useGalleryStore, useArtworks } from '@/lib/stores/gallery-store-safe'
 import { ArtworkImage } from '@/components/common/ProgressiveImage'
 import { useArtworkSwipe } from '@/hooks/useSwipeGestures'
 
