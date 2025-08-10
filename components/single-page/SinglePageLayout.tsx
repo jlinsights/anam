@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Artwork, Artist } from '@/lib/types'
-import { useGalleryStore, useModalState } from '@/lib/stores/gallery-store-safe'
+import { useSafeGalleryStore, useModalState } from '@/lib/stores/gallery-store-safe'
 
 // Import individual section components
 import { HeroSection } from './HeroSection'
@@ -24,7 +24,7 @@ export default function SinglePageLayout({ initialArtworks, artist }: SinglePage
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  // Zustand store state and actions
+  // Zustand store state and actions (using safe wrapper)
   const {
     currentSection,
     setCurrentSection,
@@ -34,15 +34,19 @@ export default function SinglePageLayout({ initialArtworks, artist }: SinglePage
     openModal,
     closeModal,
     trackSectionView
-  } = useGalleryStore()
+  } = useSafeGalleryStore()
   
   const { isOpen: isModalOpen, artwork: selectedArtwork } = useModalState()
 
   // Initialize store with server data
   useEffect(() => {
-    setArtworks(initialArtworks)
-    if (artist) {
-      setArtist(artist)
+    try {
+      setArtworks(initialArtworks)
+      if (artist) {
+        setArtist(artist)
+      }
+    } catch (error) {
+      console.error('Error initializing gallery store:', error)
     }
   }, [initialArtworks, artist, setArtworks, setArtist])
 
