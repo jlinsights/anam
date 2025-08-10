@@ -2,11 +2,6 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { Search, Filter, X, Calendar, Palette, Ruler } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Artwork } from '@/lib/types'
-import { cn } from '@/lib/utils'
-import { AccessibleModal } from '@/components/accessibility'
 
 interface SearchFilterProps {
   artworks: Artwork[]
@@ -360,3 +355,4 @@ export function SearchFilter({
     </div>
   )
 }
+

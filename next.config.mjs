@@ -28,11 +28,30 @@ const nextConfig = {
     optimizePackageImports: [
       "lucide-react", 
       "@radix-ui/react-icons",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-toast",
+      "@radix-ui/react-select",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-context-menu",
+      "@radix-ui/react-accordion",
+      "@radix-ui/react-tooltip",
+      "@radix-ui/react-scroll-area",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-alert-dialog",
       "framer-motion",
       "zustand",
       "date-fns",
-      "recharts"
+      "next-themes",
+      "class-variance-authority",
+      "clsx",
+      "tailwind-merge",
+      "react-hook-form",
+      "@hookform/resolvers",
+      "zod",
+      "sonner"
     ],
+    // Enable additional optimizations
+    esmExternals: true,
   },
   // Next.js 15에 맞는 설정
   serverExternalPackages: [],
@@ -83,27 +102,59 @@ const nextConfig = {
       ...config.optimization,
       splitChunks: {
         chunks: "all",
+        minSize: 20000,
+        maxSize: 244000,
         cacheGroups: {
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
           vendor: {
             test: /[\\/]node_modules[\\/]/,
             name: "vendors",
             chunks: "all",
+            priority: -10,
           },
           react: {
             test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
             name: "react",
             chunks: "all",
             priority: 10,
+            enforce: true,
           },
-          // web-vitals를 별도 청크로 분리
+          // Radix UI components
+          radix: {
+            test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
+            name: "radix-ui",
+            chunks: "all",
+            priority: 8,
+          },
+          // Framer Motion
+          framerMotion: {
+            test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
+            name: "framer-motion",
+            chunks: "all",
+            priority: 7,
+          },
+          // Lucide icons
+          lucide: {
+            test: /[\\/]node_modules[\\/]lucide-react[\\/]/,
+            name: "lucide-react",
+            chunks: "all",
+            priority: 6,
+          },
+          // Web vitals (lazy loaded)
           webVitals: {
             test: /[\\/]node_modules[\\/]web-vitals[\\/]/,
             name: "web-vitals",
-            chunks: "all",
+            chunks: "async",
             priority: 5,
           },
         },
       },
+      usedExports: true,
+      sideEffects: false,
     };
 
     return config;
@@ -116,6 +167,26 @@ const nextConfig = {
   },
   compress: true,
   poweredByHeader: false,
+  // Production optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn']
+    } : false,
+  },
+  // Bundle optimization
+  modularizeImports: {
+    'lucide-react': {
+      transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
+      preventFullImport: true,
+    },
+    'date-fns': {
+      transform: 'date-fns/{{member}}',
+    },
+    'framer-motion': {
+      transform: 'framer-motion/dist/es/{{member}}',
+      skipDefaultConversion: true,
+    },
+  },
   async redirects() {
     return [];
   },
@@ -131,7 +202,7 @@ const nextConfig = {
               "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob:",
+              "img-src 'self' data: blob: https://imagedelivery.net https://fonts.gstatic.com",
               "connect-src 'self'",
               "media-src 'self'",
               "object-src 'none'",

@@ -4,8 +4,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ArrowRight, ChevronRight } from 'lucide-react'
-import Link from 'next/link'
-import { ReactNode } from 'react'
 
 interface SectionHeaderProps {
   title: string
@@ -328,3 +326,4 @@ export function Stats({ stats, variant = 'default', className }: StatsProps) {
     </div>
   )
 }
+

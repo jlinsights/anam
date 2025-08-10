@@ -1,9 +1,6 @@
 'use client'
 
 import { Clock, Loader2, Mail, MapPin, Phone, Globe } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { ErrorBoundary } from '@/components/error-boundary'
-import type { Artist } from '@/lib/types'
 
 interface ContactInfoProps {
   className?: string
@@ -219,3 +216,4 @@ function ContactItem({
 
   return contentElement
 }
+

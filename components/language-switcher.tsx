@@ -6,7 +6,6 @@ import { useI18n } from '@/components/i18n-provider'
 import type { Locale } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { Check, Globe } from 'lucide-react'
-import { useState } from 'react'
 
 interface Language {
   code: Locale
@@ -132,3 +131,4 @@ export function useLocale() {
   console.warn('useLocale is deprecated, please use useI18n hook instead')
   return { locale: 'ko' as Locale, changeLocale: () => {} }
 }
+

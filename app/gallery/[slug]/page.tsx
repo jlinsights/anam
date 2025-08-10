@@ -1,21 +1,65 @@
-import { redirect } from 'next/navigation'
-import { getArtworkBySlug } from '@/lib/artworks'
+import { notFound } from 'next/navigation'
+import { getArtworkBySlug, getArtworks } from '@/lib/artworks'
+import { fetchArtist } from '@/lib/artist'
+import { ArtworkDetailPage } from '@/components/artwork-detail/ArtworkDetailPage'
+import type { Metadata } from 'next'
 
 interface ArtworkPageProps {
   params: Promise<{ slug: string }>
 }
 
-export default async function ArtworkPage({ params }: ArtworkPageProps) {
+export async function generateMetadata({ params }: ArtworkPageProps): Promise<Metadata> {
   const { slug } = await params
-  
-  // Try to find the artwork to verify it exists
   const artwork = await getArtworkBySlug(slug)
   
   if (!artwork) {
-    // If artwork doesn't exist, redirect to gallery section
-    redirect('/#gallery')
+    return {
+      title: '작품을 찾을 수 없습니다 | 아남 갤러리'
+    }
+  }
+
+  return {
+    title: `${artwork.title} (${artwork.year}) | 아남 배옥영 서예 갤러리`,
+    description: `${artwork.title} - ${artwork.year}년 작품. ${artwork.description || '아남 배옥영 작가의 현대 서예 작품입니다.'}`,
+    openGraph: {
+      title: `${artwork.title} | 아남 배옥영`,
+      description: artwork.description || `${artwork.year}년 작품`,
+      images: [{
+        url: `/Images/Artworks/${artwork.year}/${artwork.slug}-large.jpg`,
+        width: 1200,
+        height: 1200,
+        alt: artwork.title
+      }]
+    }
+  }
+}
+
+export async function generateStaticParams() {
+  const artworks = await getArtworks()
+  return artworks.map(artwork => ({
+    slug: artwork.slug
+  }))
+}
+
+export default async function ArtworkPage({ params }: ArtworkPageProps) {
+  const { slug } = await params
+  
+  // Get artwork and artist data
+  const [artwork, allArtworks, artist] = await Promise.all([
+    getArtworkBySlug(slug),
+    getArtworks(),
+    fetchArtist('fallback-artist').catch(() => undefined)
+  ])
+  
+  if (!artwork) {
+    notFound()
   }
   
-  // Redirect to single-page gallery with artwork ID
-  redirect(`/#gallery?artwork=${artwork.id}`)
+  return (
+    <ArtworkDetailPage 
+      artwork={artwork}
+      allArtworks={allArtworks}
+      artist={artist || undefined}
+    />
+  )
 }

@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 import type { Artwork } from '@/lib/types'
 import { useGalleryStore, useArtworks, useGalleryFilters } from '@/lib/stores/gallery-store-safe'
 import { ArtworkImage } from '@/components/common/ProgressiveImage'
@@ -13,11 +14,23 @@ interface GallerySectionProps {
 
 export function GallerySection({ artworks, onArtworkSelect }: GallerySectionProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const router = useRouter()
   
   // Use store for filters and search
   const filteredArtworks = useArtworks()
   const { searchTerm, selectedYear, selectedMedium } = useGalleryFilters()
   const { setSearchTerm, setSelectedYear, clearFilters } = useGalleryStore()
+
+  // Handle artwork click - navigate to detail page
+  const handleArtworkClick = (artwork: Artwork, event: React.MouseEvent) => {
+    // Check if user is holding Ctrl/Cmd key to open in new tab
+    if (event.ctrlKey || event.metaKey) {
+      window.open(`/gallery/${artwork.slug}`, '_blank')
+    } else {
+      // Navigate to the artwork detail page using the slug
+      router.push(`/gallery/${artwork.slug}`)
+    }
+  }
 
   // Get unique years for filter
   const availableYears = useMemo(() => {
@@ -134,7 +147,7 @@ export function GallerySection({ artworks, onArtworkSelect }: GallerySectionProp
             viewport={{ once: true }}
             onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
-            onClick={() => onArtworkSelect(artwork)}
+            onClick={(event) => handleArtworkClick(artwork, event)}
           >
             <div className="
               relative bg-paper aspect-square border-2 border-ink
@@ -165,10 +178,13 @@ export function GallerySection({ artworks, onArtworkSelect }: GallerySectionProp
                 }}
               >
                 <div className="text-center p-2">
-                  <div className="w-6 h-6 border border-ink mx-auto mb-1 flex items-center justify-center">
-                    <span className="text-xs">👁</span>
+                  <div className="w-8 h-8 border border-ink mx-auto mb-1 flex items-center justify-center bg-paper/80">
+                    <span className="text-xs">🖼</span>
                   </div>
-                  <span className="font-display text-ink text-xs">보기</span>
+                  <span className="font-display text-ink text-xs font-medium">상세보기</span>
+                  <div className="text-[10px] text-ink-light mt-1">
+                    클릭하여 작품 페이지로
+                  </div>
                 </div>
               </motion.div>
             </div>

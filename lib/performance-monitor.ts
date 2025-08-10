@@ -91,15 +91,30 @@ export class PerformanceMonitor {
     return PerformanceMonitor.instance
   }
 
-  // 모니터링 시작
+  // Debounce utility to prevent excessive callback invocations
+  private debounce<T extends (...args: any[]) => void>(
+    func: T | undefined,
+    wait: number
+  ): T | undefined {
+    if (!func) return undefined
+    
+    let timeout: NodeJS.Timeout
+    return ((...args: Parameters<T>) => {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => func(...args), wait)
+    }) as T
+  }
+
+  // 모니터링 시작 - useEffect 의존성 최적화를 위한 debounced callbacks
   async startMonitoring(options?: {
     onMetricsUpdate?: (metrics: PerformanceMetrics) => void
     onPerformanceIssue?: (issue: PerformanceIssue) => void
   }) {
     if (this.isMonitoring || typeof window === 'undefined') return
 
-    this.onMetricsUpdate = options?.onMetricsUpdate
-    this.onPerformanceIssue = options?.onPerformanceIssue
+    // Debounce callbacks to prevent excessive re-renders
+    this.onMetricsUpdate = this.debounce(options?.onMetricsUpdate, 100)
+    this.onPerformanceIssue = this.debounce(options?.onPerformanceIssue, 200)
     this.isMonitoring = true
 
     // Core Web Vitals 수집 (동적 import)
@@ -309,10 +324,15 @@ export class PerformanceMonitor {
     this.observers.push(observer)
   }
 
-  // 메모리 사용량 모니터링
+  // 메모리 사용량 모니터링 - throttled to prevent excessive checks
+  private lastMemoryCheck = 0
   private monitorMemoryUsage() {
     if ('memory' in performance) {
       const checkMemory = () => {
+        const now = performance.now()
+        // Throttle memory checks to every 5 seconds minimum
+        if (now - this.lastMemoryCheck < 5000) return
+        this.lastMemoryCheck = now
         const memory = (performance as any).memory
         const usedMB = memory.usedJSHeapSize / (1024 * 1024)
 
@@ -426,9 +446,31 @@ export class PerformanceMonitor {
     )
   }
 
-  // 메트릭 업데이트
+  // 메트릭 업데이트 - 마지막 메트릭과 비교하여 실제 변경시에만 업데이트
+  private lastMetricsSnapshot: PerformanceMetrics = {}
+  
   private updateMetrics() {
-    this.onMetricsUpdate?.(this.metrics)
+    // Shallow comparison to prevent unnecessary updates
+    if (this.hasMetricsChanged()) {
+      this.lastMetricsSnapshot = { ...this.metrics }
+      this.onMetricsUpdate?.(this.metrics)
+    }
+  }
+
+  private hasMetricsChanged(): boolean {
+    const currentKeys = Object.keys(this.metrics)
+    const lastKeys = Object.keys(this.lastMetricsSnapshot)
+    
+    if (currentKeys.length !== lastKeys.length) return true
+    
+    for (const key of currentKeys) {
+      if (this.metrics[key as keyof PerformanceMetrics] !== 
+          this.lastMetricsSnapshot[key as keyof PerformanceMetrics]) {
+        return true
+      }
+    }
+    
+    return false
   }
 
   // 성능 이슈 보고

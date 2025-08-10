@@ -6,9 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import { Menu, X } from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useState } from 'react'
 
 interface NavigationItem {
   href: string
@@ -208,3 +205,4 @@ export function ArtNavigation({
 export function NavigationSpacer({ className }: { className?: string }) {
   return <div className={cn('h-24 md:h-28', className)} />
 }
+

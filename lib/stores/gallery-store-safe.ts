@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import type { Artwork, Artist } from '@/lib/types'
+import { useCallback } from 'react'
 
 // Gallery state interface
 interface GalleryState {
@@ -267,17 +268,29 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
   )
 )
 
-// Selector hooks for performance
-export const useCurrentSection = () => useGalleryStore(state => state.currentSection)
-export const useArtworks = () => useGalleryStore(state => state.filteredArtworks)
-export const useSelectedArtwork = () => useGalleryStore(state => state.selectedArtwork)
-export const useModalState = () => useGalleryStore(state => ({ 
-  isOpen: state.isModalOpen, 
-  artwork: state.selectedArtwork 
-}))
-export const useGalleryFilters = () => useGalleryStore(state => ({
-  searchTerm: state.searchTerm,
-  selectedYear: state.selectedYear,
-  selectedMedium: state.selectedMedium
-}))
-export const usePreferences = () => useGalleryStore(state => state.preferences)
+// Optimized selector hooks for performance - prevent over-subscription
+export const useCurrentSection = () => useGalleryStore(
+  useCallback((state) => state.currentSection, [])
+)
+export const useArtworks = () => useGalleryStore(
+  useCallback((state) => state.filteredArtworks, [])
+)
+export const useSelectedArtwork = () => useGalleryStore(
+  useCallback((state) => state.selectedArtwork, [])
+)
+export const useModalState = () => useGalleryStore(
+  useCallback((state) => ({ 
+    isOpen: state.isModalOpen, 
+    artwork: state.selectedArtwork 
+  }), [])
+)
+export const useGalleryFilters = () => useGalleryStore(
+  useCallback((state) => ({
+    searchTerm: state.searchTerm,
+    selectedYear: state.selectedYear,
+    selectedMedium: state.selectedMedium
+  }), [])
+)
+export const usePreferences = () => useGalleryStore(
+  useCallback((state) => state.preferences, [])
+)

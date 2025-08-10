@@ -4,9 +4,6 @@ import { ArtworkDetailClient } from '@/components/artwork-detail-client'
 import { GalleryDetailImage } from '@/components/optimized-image'
 import { Button } from '@/components/ui/button'
 import { Calendar, CheckCircle, Palette, Ruler, XCircle } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useState } from 'react'
 
 interface ArtworkDetailModalClientProps {
   artwork: any
@@ -218,3 +215,4 @@ export default function ArtworkDetailModalClient({
     </div>
   )
 }
+

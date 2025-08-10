@@ -54,7 +54,7 @@ export function ProgressiveImage({
     }
   }, [fallbackSrc, currentSrc, onError])
 
-  // Intersection observer for lazy loading
+  // Enhanced intersection observer for better Core Web Vitals
   useEffect(() => {
     if (priority || !imgRef.current) return
 
@@ -64,15 +64,20 @@ export function ProgressiveImage({
           if (entry.isIntersecting) {
             const img = entry.target as HTMLImageElement
             if (img.dataset.src) {
-              img.src = img.dataset.src
-              img.removeAttribute('data-src')
+              // Preload image to improve LCP
+              const preloadImg = new Image()
+              preloadImg.onload = () => {
+                img.src = img.dataset.src!
+                img.removeAttribute('data-src')
+              }
+              preloadImg.src = img.dataset.src
               observer.unobserve(img)
             }
           }
         })
       },
       {
-        rootMargin: '50px 0px',
+        rootMargin: '100px 0px', // Increased for better UX
         threshold: 0.01
       }
     )
@@ -243,11 +248,17 @@ export function ArtworkImage({
   const src = generateImageUrl(artwork, size)
   const fallbackSrc = generateImageUrl(artwork, 'thumb')
   
-  // Generate blur data URL for better loading experience
+  // Enhanced blur data URL with Korean traditional colors
   const blurDataURL = `data:image/svg+xml;base64,${btoa(`
-    <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
-      <rect width="100%" height="100%" fill="#f3f4f6"/>
-      <text x="50%" y="50%" text-anchor="middle" font-family="serif" font-size="16" fill="#9ca3af">
+    <svg width="400" height="500" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:rgb(254,252,232);stop-opacity:1" />
+          <stop offset="100%" style="stop-color:rgb(120,113,108);stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grad)"/>
+      <text x="50%" y="50%" text-anchor="middle" font-family="serif" font-size="14" fill="#6b7280">
         ${artwork.title}
       </text>
     </svg>

@@ -142,10 +142,18 @@ function getFieldValue(fields: any, fieldNames: string[]): any {
 function createSlug(title: string, year: number | string): string {
   const cleanTitle = title
     .toLowerCase()
-    .replace(/[^\w\s가-힣]/g, '')
-    .replace(/\s+/g, '-')
+    .replace(/[^\w\s가-힣]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with dashes
+    .replace(/-+/g, '-') // Replace multiple dashes with single dash
+    .replace(/^-+|-+$/g, '') // Remove leading and trailing dashes
     .trim()
-  return `anam-${cleanTitle}-${year}`
+  
+  // Ensure we don't have empty title
+  const finalTitle = cleanTitle || 'untitled'
+  
+  // Create final slug and ensure no trailing dashes
+  const slug = `anam-${finalTitle}-${year}`
+  return slug.replace(/-+/g, '-').replace(/-+$/, '') // Clean up and remove trailing dash
 }
 
 // 종횡비 계산 함수

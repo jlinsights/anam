@@ -69,3 +69,4 @@ export default function OfflinePage() {
 }
 
 export const dynamic = 'force-static'
+

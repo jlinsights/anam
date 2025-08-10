@@ -2,7 +2,6 @@
 
 import { useTheme } from 'next-themes'
 import { Sun, Moon } from 'lucide-react'
-import { useEffect, useState } from 'react'
 
 export function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme()
@@ -34,3 +33,4 @@ export function ThemeToggle() {
     </button>
   )
 }
+

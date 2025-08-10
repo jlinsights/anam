@@ -128,41 +128,64 @@ export function preloadImage(src: string): Promise<void> {
 }
 
 /**
- * 작품 이미지 일괄 프리로딩
+ * Smart artwork image preloading with network awareness
  */
 export async function preloadArtworkImages(
   artworkIds: string[],
-  size: ImageSize = 'thumb'
+  size: ImageSize = 'thumb',
+  priority: boolean = false
 ): Promise<void> {
+  // Network-aware optimization
+  const connection = (navigator as any).connection
+  const isSlowConnection = connection && (connection.effectiveType === '2g' || connection.effectiveType === 'slow-2g')
+  
+  if (isSlowConnection && !priority) {
+    // Skip preloading on slow connections unless priority
+    return
+  }
+
   const format = getBestImageFormat()
-  const preloadPromises = artworkIds.map((id) =>
+  const limit = priority ? artworkIds.length : Math.min(6, artworkIds.length) // Limit non-priority preloading
+  
+  const preloadPromises = artworkIds.slice(0, limit).map((id) =>
     preloadImage(getOptimizedImagePath(id, size, format))
   )
 
   try {
-    await Promise.allSettled(preloadPromises)
+    if (priority) {
+      await Promise.all(preloadPromises) // Wait for priority images
+    } else {
+      Promise.allSettled(preloadPromises) // Don't block for non-priority
+    }
   } catch (error) {
     console.warn('Some images failed to preload:', error)
   }
 }
 
 /**
- * 이미지 지연 로딩을 위한 Intersection Observer 생성
+ * Enhanced intersection observer for Core Web Vitals optimization
  */
 export function createImageObserver(
-  callback: (entry: IntersectionObserverEntry) => void
+  callback: (entry: IntersectionObserverEntry) => void,
+  options?: {
+    rootMargin?: string
+    threshold?: number
+    priority?: boolean
+  }
 ): IntersectionObserver | null {
   if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
     return null
   }
+
+  const { rootMargin = '100px 0px', threshold = 0.1, priority = false } = options || {}
 
   return new IntersectionObserver(
     (entries) => {
       entries.forEach(callback)
     },
     {
-      rootMargin: '50px 0px',
-      threshold: 0.1,
+      rootMargin: priority ? '200px 0px' : rootMargin, // Larger margin for priority images
+      threshold,
     }
   )
 }
@@ -184,12 +207,29 @@ export function estimateImageSize(
 }
 
 /**
- * 레이지 로딩을 위한 블러 플레이스홀더 생성
+ * Enhanced blur placeholder with Korean traditional aesthetics
  */
 export function generateBlurDataURL(
   width: number = 8,
-  height: number = 10
+  height: number = 10,
+  title?: string
 ): string {
+  if (typeof window === 'undefined') {
+    // Server-side fallback SVG
+    return `data:image/svg+xml;base64,${btoa(`
+      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:rgb(254,252,232);stop-opacity:1" />
+            <stop offset="100%" style="stop-color:rgb(120,113,108);stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grad)"/>
+        ${title ? `<text x="50%" y="50%" text-anchor="middle" font-size="1" fill="#9ca3af">${title}</text>` : ''}
+      </svg>
+    `)}`
+  }
+
   const canvas = document.createElement('canvas')
   canvas.width = width
   canvas.height = height
@@ -197,13 +237,62 @@ export function generateBlurDataURL(
   const ctx = canvas.getContext('2d')
   if (!ctx) return ''
 
-  // 한국 전통 색상으로 그라데이션 생성
-  const gradient = ctx.createLinearGradient(0, 0, 0, height)
+  // Enhanced Korean traditional gradient
+  const gradient = ctx.createRadialGradient(width/2, height/3, 0, width/2, height, Math.max(width, height))
   gradient.addColorStop(0, 'rgb(254, 252, 232)') // 한지색
+  gradient.addColorStop(0.6, 'rgb(168, 85, 27)') // 황금색
   gradient.addColorStop(1, 'rgb(120, 113, 108)') // 돌색
 
   ctx.fillStyle = gradient
   ctx.fillRect(0, 0, width, height)
 
-  return canvas.toDataURL('image/jpeg', 0.1)
+  // Add subtle noise for better blur effect
+  const imageData = ctx.getImageData(0, 0, width, height)
+  const data = imageData.data
+  for (let i = 0; i < data.length; i += 4) {
+    const noise = (Math.random() - 0.5) * 10
+    data[i] = Math.max(0, Math.min(255, data[i] + noise))     // R
+    data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise)) // G
+    data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise)) // B
+  }
+  ctx.putImageData(imageData, 0, 0)
+
+  return canvas.toDataURL('image/jpeg', 0.15)
+}
+
+/**
+ * Generate optimized blur placeholder for specific artwork
+ */
+export function generateArtworkBlurPlaceholder(
+  artworkId: string,
+  title: string
+): string {
+  // Use artwork-specific dimensions (4:5 aspect ratio)
+  return generateBlurDataURL(8, 10, title)
+}
+
+/**
+ * Critical image preloading for LCP optimization
+ */
+export function preloadCriticalImages(imageSources: string[]): void {
+  if (typeof window === 'undefined') return
+
+  imageSources.forEach((src, index) => {
+    const link = document.createElement('link')
+    link.rel = 'preload'
+    link.as = 'image'
+    link.href = src
+    if (index === 0) link.fetchPriority = 'high' // First image highest priority
+    document.head.appendChild(link)
+  })
+}
+
+/**
+ * Layout shift prevention with aspect ratio containers
+ */
+export function getAspectRatioStyle(width: number, height: number): React.CSSProperties {
+  return {
+    aspectRatio: `${width} / ${height}`,
+    containIntrinsicSize: `${width}px ${height}px`
+  }
 }

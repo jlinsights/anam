@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button'
 import { Share } from 'lucide-react'
-import { useEffect, useState } from 'react'
 
 interface ArtworkDetailClientProps {
   title: string
@@ -87,3 +86,4 @@ export function ArtworkDetailClient({ title, slug }: ArtworkDetailClientProps) {
     </Button>
   )
 }
+

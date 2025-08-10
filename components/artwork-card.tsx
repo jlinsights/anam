@@ -6,8 +6,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import type { Artwork } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { Calendar, Eye, Heart, Share2 } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
 
 interface ArtworkCardProps {
   artwork: Artwork
@@ -18,7 +16,7 @@ interface ArtworkCardProps {
   priority?: boolean
 }
 
-export function ArtworkCard({
+export const ArtworkCard = memo(function ArtworkCard({
   artwork,
   variant = 'default',
   className,
@@ -27,6 +25,15 @@ export function ArtworkCard({
   priority = false,
 }: ArtworkCardProps) {
   const [isHovered, setIsHovered] = useState(false)
+
+  // Memoized event handlers to prevent unnecessary re-renders
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true)
+  }, [])
+
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false)
+  }, [])
 
   const cardVariants = {
     default: 'card-art hover-lift',
@@ -45,8 +52,8 @@ export function ArtworkCard({
   return (
     <Card
       className={cn(cardVariants[variant], className)}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <CardContent className='p-0'>
         <Link href={`/gallery/${artwork.slug}`} className='block'>
@@ -55,6 +62,7 @@ export function ArtworkCard({
             <GalleryArtworkImage
               artworkId={artwork.imageId}
               title={artwork.title}
+              priority={priority}
               className={cn(
                 imageAspectRatio[variant],
                 'w-full rounded-t-lg transition-transform duration-300',
@@ -134,7 +142,7 @@ export function ArtworkCard({
       </CardContent>
     </Card>
   )
-}
+})
 
 // 카테고리 라벨 변환 함수
 function getCategoryLabel(category: string): string {
@@ -162,7 +170,7 @@ interface ArtworkGridProps {
   showActions?: boolean
 }
 
-export function ArtworkGrid({
+export const ArtworkGrid = memo(function ArtworkGrid({
   artworks,
   variant = 'default',
   columns = 4,
@@ -198,10 +206,10 @@ export function ArtworkGrid({
       ))}
     </div>
   )
-}
+})
 
 // 로딩 스켈레톤 컴포넌트
-export function ArtworkCardSkeleton({
+export const ArtworkCardSkeleton = memo(function ArtworkCardSkeleton({
   variant = 'default',
 }: {
   variant?: 'default' | 'minimal' | 'featured' | 'compact'
@@ -240,4 +248,5 @@ export function ArtworkCardSkeleton({
       </CardContent>
     </Card>
   )
-}
+})
+

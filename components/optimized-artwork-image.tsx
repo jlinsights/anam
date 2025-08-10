@@ -181,11 +181,13 @@ export function GalleryArtworkImage({
   title,
   className,
   onClick,
+  priority = false,
 }: {
   artworkId: string
   title: string
   className?: string
   onClick?: () => void
+  priority?: boolean
 }) {
   return (
     <OptimizedArtworkImage
@@ -198,7 +200,8 @@ export function GalleryArtworkImage({
         className
       )}
       onClick={onClick}
-      enableLazyLoading={true}
+      priority={priority}
+      enableLazyLoading={!priority}
       showLoadingState={true}
     />
   )

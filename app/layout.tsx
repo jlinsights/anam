@@ -144,32 +144,92 @@ export default function RootLayout({
         />
         <link rel='shortcut icon' href='/favicon.ico' />
 
-        {/* 폰트 프리로딩 최적화 */}
+        {/* 리소스 힌트 최적화 - LCP 개선 */}
         <link rel='preconnect' href='https://fonts.googleapis.com' />
         <link
           rel='preconnect'
           href='https://fonts.gstatic.com'
           crossOrigin='anonymous'
         />
-        {/* 폰트 폴백 CSS - CLS 최소화 */}
+        <link rel='preconnect' href='https://imagedelivery.net' />
+        <link rel='dns-prefetch' href='https://fonts.googleapis.com' />
+        <link rel='dns-prefetch' href='https://fonts.gstatic.com' />
+        <link rel='dns-prefetch' href='https://imagedelivery.net' />
+        
+        {/* Hero/Featured 이미지 프리로드 */}
+        <link rel='preload' as='image' href='/Images/hero-image.jpg' />
+        <link rel='preload' as='image' href='/Images/Artworks/featured/featured-01.webp' type='image/webp' />
+        <link rel='preload' as='image' href='/Images/artist-profile.jpg' />
+        
+        {/* 중요 CSS 프리로드 */}
+        <link rel='preload' href='/fonts/noto-serif-kr-subset.woff2' as='font' type='font/woff2' crossOrigin='anonymous' />
+        <link rel='preload' href='/css/critical.css' as='style' />
+        {/* Critical CSS - LCP 및 CLS 최적화 */}
         <style
           dangerouslySetInnerHTML={{
             __html: `
+            /* Optimized font fallbacks for CLS prevention */
             @font-face {
               font-family: 'Inter-fallback';
               src: local('system-ui'), local('arial');
               ascent-override: 90.2%;
               descent-override: 22.5%;
               line-gap-override: 0%;
-              font-display: swap;
+              font-display: optional;
+              size-adjust: 100%;
             }
             @font-face {
               font-family: 'NotoSerifKR-fallback';
-              src: local('serif'), local('Times New Roman');
+              src: local('serif'), local('Times New Roman'), local('Noto Serif CJK KR');
               ascent-override: 116%;
               descent-override: 29%;
               line-gap-override: 0%;
-              font-display: swap;
+              font-display: optional;
+              size-adjust: 100%;
+            }
+            
+            /* Critical above-the-fold styles - LCP 최적화 */
+            * { box-sizing: border-box; }
+            body { 
+              margin: 0; 
+              padding: 0; 
+              font-family: var(--font-inter), 'Inter-fallback', system-ui, sans-serif;
+              line-height: 1.6;
+              text-rendering: optimizeSpeed;
+            }
+            #main-content { min-height: 100vh; contain: layout; }
+            .container-art { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+            
+            /* 이미지 최적화 - CLS 방지 */
+            img { 
+              max-width: 100%; 
+              height: auto; 
+              font-size: 0;
+              vertical-align: middle;
+            }
+            .aspect-square { aspect-ratio: 1 / 1; }
+            .aspect-[3/4] { aspect-ratio: 3 / 4; }
+            .aspect-[4/5] { aspect-ratio: 4 / 5; }
+            
+            /* Hero 섹션 최적화 */
+            .hero-container {
+              min-height: 70vh;
+              display: flex;
+              align-items: center;
+              contain: layout style paint;
+            }
+            
+            /* 스켈레톤 로더 애니메이션 */
+            @keyframes shimmer {
+              0% { transform: translateX(-100%); }
+              100% { transform: translateX(100%); }
+            }
+            .skeleton {
+              position: relative;
+              overflow: hidden;
+              background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+              background-size: 200% 100%;
+              animation: shimmer 1.5s infinite;
             }
           `,
           }}

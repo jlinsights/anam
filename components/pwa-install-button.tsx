@@ -3,12 +3,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Download, Check, Smartphone, Monitor } from 'lucide-react'
-import { usePWA } from '@/hooks/use-pwa'
-import {
-  AnimatedModal,
-  HoverCard,
-  FadeInContainer,
-} from '@/components/animations'
 
 export function PWAInstallButton() {
   const { canInstall, isInstalled, installPWA } = usePWA()
@@ -198,3 +192,4 @@ export function PWAInstallPrompt() {
     </div>
   )
 }
+

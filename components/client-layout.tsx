@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { AnalyticsProvider } from '@/components/analytics-provider'
+// Remove unused providers for bundle optimization
+// import { AnalyticsProvider } from '@/components/analytics-provider'
 import { I18nProvider } from '@/components/i18n-provider'
-import {
-  PerformanceDashboard,
-  PerformanceFloatingButton,
-} from '@/components/performance-dashboard'
+// import {
+//   PerformanceDashboard,
+//   PerformanceFloatingButton,
+// } from '@/components/performance-dashboard'
 import { PWAInstallPrompt } from '@/components/pwa-install-prompt'
 import { ServiceWorkerRegistration } from '@/components/service-worker-registration'
 import { UIProvider } from '@/lib/store/ui-store'
@@ -17,8 +18,7 @@ interface ClientLayoutProps {
 
 export function ClientLayout({ children }: ClientLayoutProps) {
   const [mounted, setMounted] = useState(false)
-  const [showPerformanceDashboard, setShowPerformanceDashboard] =
-    useState(false)
+  // Performance monitoring removed for optimization
 
   useEffect(() => {
     setMounted(true)
@@ -37,26 +37,15 @@ export function ClientLayout({ children }: ClientLayoutProps) {
   return (
     <UIProvider>
       <I18nProvider>
-        <AnalyticsProvider>
-          <div className='min-h-screen bg-background text-foreground'>
-            {children}
+        <div className='min-h-screen bg-background text-foreground'>
+          {children}
 
-            {/* PWA 기능 */}
-            <ServiceWorkerRegistration />
-            <PWAInstallPrompt />
+          {/* PWA 기능 */}
+          <ServiceWorkerRegistration />
+          <PWAInstallPrompt />
 
-            {/* 성능 모니터링 플로팅 버튼 (개발 환경에서만 표시) */}
-            <PerformanceFloatingButton
-              onClick={() => setShowPerformanceDashboard(true)}
-            />
-
-            {/* 성능 모니터링 대시보드 */}
-            <PerformanceDashboard
-              isVisible={showPerformanceDashboard}
-              onClose={() => setShowPerformanceDashboard(false)}
-            />
-          </div>
-        </AnalyticsProvider>
+          {/* Performance monitoring removed for bundle optimization */}
+        </div>
       </I18nProvider>
     </UIProvider>
   )
