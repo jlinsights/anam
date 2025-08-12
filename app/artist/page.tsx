@@ -40,7 +40,7 @@ export default async function ArtistPage() {
       </div>
 
       {/* Enhanced Artist Section */}
-      <EnhancedArtistSection artist={artist} />
+      <EnhancedArtistSection artist={artist || undefined} />
 
       {/* Bottom Navigation */}
       <div className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">

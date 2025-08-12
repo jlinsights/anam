@@ -73,8 +73,8 @@ export function useGalleryPerformance({
 
     viewedArtworksRef.current.add(artworkId)
     
-    // Report to performance monitor
-    performanceMonitor.trackArtworkView?.(artworkId)
+    // Simple tracking without performance monitor methods
+    console.debug('Artwork viewed:', artworkId)
   }, [trackArtworkViews])
 
   // Track section changes
@@ -84,8 +84,8 @@ export function useGalleryPerformance({
     const now = performance.now()
     sectionTimesRef.current.set(section, now)
     
-    // Report to performance monitor
-    performanceMonitor.trackSectionView?.(section)
+    // Simple tracking without performance monitor methods
+    console.debug('Section changed:', section)
   }, [])
 
   // Calculate current performance score
