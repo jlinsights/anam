@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { useRouter } from 'next/navigation'
 import type { Artwork } from '@/lib/types'
 import { useGalleryStore, useArtworks, useGalleryFilters } from '@/lib/stores/gallery-store-safe'
-import { ArtworkImage } from '@/components/common/ProgressiveImage'
+import { ArtworkGridPortrait, ArtworkCardPortraitSkeleton } from '@/components/artwork-card-portrait'
 
 interface GallerySectionProps {
   artworks: Artwork[]
@@ -13,33 +12,10 @@ interface GallerySectionProps {
 }
 
 export function GallerySection({ artworks, onArtworkSelect }: GallerySectionProps) {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
-  const router = useRouter()
-  
   // Use store for filters and search
   const filteredArtworks = useArtworks()
   const { searchTerm, selectedYear, selectedMedium } = useGalleryFilters()
   const { setSearchTerm, setSelectedYear, clearFilters } = useGalleryStore()
-
-  // Handle artwork click - navigate to detail page
-  const handleArtworkClick = (artwork: Artwork, event: React.MouseEvent) => {
-    // Ensure we have a valid slug
-    if (!artwork.slug) {
-      console.error('Artwork missing slug:', artwork)
-      return
-    }
-    
-    // Sanitize slug to ensure it's URL-safe
-    const safeSlug = encodeURIComponent(artwork.slug)
-    
-    // Check if user is holding Ctrl/Cmd key to open in new tab
-    if (event.ctrlKey || event.metaKey) {
-      window.open(`/gallery/${safeSlug}`, '_blank')
-    } else {
-      // Navigate to the artwork detail page using the slug
-      router.push(`/gallery/${safeSlug}`)
-    }
-  }
 
   // Get unique years for filter
   const availableYears = useMemo(() => {
@@ -144,62 +120,18 @@ export function GallerySection({ artworks, onArtworkSelect }: GallerySectionProp
         </p>
       </motion.div>
 
-      {/* Artwork grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-zen-sm md:gap-zen-md">
-        {filteredArtworks.map((artwork, index) => (
-          <motion.div
-            key={artwork.id}
-            className="group cursor-pointer"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: index * 0.05 }}
-            viewport={{ once: true }}
-            onMouseEnter={() => setHoveredIndex(index)}
-            onMouseLeave={() => setHoveredIndex(null)}
-            onClick={(event) => handleArtworkClick(artwork, event)}
-          >
-            <div className="
-              relative bg-paper aspect-square border-2 border-ink
-              shadow-brutal-sm group-hover:shadow-brutal
-              transition-all duration-300
-              group-hover:-translate-x-1 group-hover:-translate-y-1
-              overflow-hidden
-            ">
-              {/* Progressive artwork image */}
-              <ArtworkImage
-                artwork={artwork}
-                size="thumb"
-                className="absolute inset-2 rounded"
-                placeholderClassName="bg-paper-cream"
-                priority={index < 12} // Prioritize first 12 images
-              />
-              
-              {/* Hover overlay */}
-              <motion.div
-                className="
-                  absolute inset-0 bg-gold/10 
-                  flex items-center justify-center
-                  opacity-0 group-hover:opacity-100
-                  transition-opacity duration-300
-                "
-                animate={{
-                  opacity: hoveredIndex === index ? 1 : 0
-                }}
-              >
-                <div className="text-center p-2">
-                  <div className="w-8 h-8 border border-ink mx-auto mb-1 flex items-center justify-center bg-paper/80">
-                    <span className="text-xs">🖼</span>
-                  </div>
-                  <span className="font-display text-ink text-xs font-medium">상세보기</span>
-                  <div className="text-[10px] text-ink-light mt-1">
-                    클릭하여 작품 페이지로
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+      {/* Artwork grid with 9:16 portrait layout */}
+      <ArtworkGridPortrait 
+        artworks={filteredArtworks}
+        showMetadata={true}
+        columns={{
+          mobile: 2,
+          tablet: 3, 
+          desktop: 4,
+          wide: 5
+        }}
+        className="mb-zen-lg"
+      />
 
       {/* No results message */}
       {filteredArtworks.length === 0 && (
