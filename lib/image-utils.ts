@@ -98,7 +98,7 @@ export function getArtworkImageMeta(
  * 아티스트 이미지 URL 생성
  */
 export function getArtistImageUrl(filename: string): string {
-  return `/images/artist/${filename}`
+  return `/Images/Artist/${filename}`
 }
 
 /**
