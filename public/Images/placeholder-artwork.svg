@@ -1,0 +1,18 @@
+<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fefcf0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#78716c;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#grad)"/>
+  <rect x="50" y="50" width="300" height="300" fill="none" stroke="#57534e" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="200" y="180" text-anchor="middle" font-family="serif" font-size="18" fill="#78716c">
+    작품 이미지
+  </text>
+  <text x="200" y="220" text-anchor="middle" font-family="serif" font-size="14" fill="#a8a29e">
+    준비 중입니다
+  </text>
+  <circle cx="200" cy="260" r="20" fill="none" stroke="#78716c" stroke-width="2"/>
+  <path d="M188,252 L196,260 L212,244" fill="none" stroke="#78716c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

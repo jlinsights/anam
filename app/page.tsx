@@ -9,6 +9,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { MinimalHeader } from '@/components/layout/MinimalHeader'
 import { HeroSection } from '@/components/sections/HeroSection'
+import UpcomingExhibition from '@/components/exhibition/UpcomingExhibition'
 
 // Metadata is handled in layout.tsx
 
@@ -470,8 +471,11 @@ export default function HomePage() {
         </section>
       </main>
 
+      {/* Upcoming Exhibition Section */}
+      <UpcomingExhibition />
+
       {/* Footer */}
-      <footer className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-16">
+      <footer className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-0">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-gray-600 dark:text-gray-300">
             <p>&copy; 2024 아남 배옥영. All rights reserved.</p>
