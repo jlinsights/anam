@@ -218,6 +218,7 @@ interface ArtworkImageProps extends Omit<ProgressiveImageProps, 'src' | 'alt'> {
   artwork: {
     imageUrl?: string
     number?: number | string
+    slug?: string
     title: string
     year: number
   }
@@ -235,8 +236,17 @@ export function ArtworkImage({
 }: ArtworkImageProps) {
   // Generate optimized image URLs
   const generateImageUrl = (artwork: ArtworkImageProps['artwork'], size: string) => {
+    // 우선순위 1: slug에서 숫자 추출
+    if (artwork.slug && typeof artwork.slug === 'string') {
+      const numberMatch = artwork.slug.match(/anam-(\d+)/)
+      if (numberMatch) {
+        const paddedNumber = numberMatch[1].padStart(2, '0')
+        return `/Images/Artworks/optimized/${paddedNumber}/${paddedNumber}-${size}.jpg`
+      }
+    }
+    
+    // 우선순위 2: number 필드 사용
     if (artwork.number) {
-      // Use optimized image system
       const paddedNumber = String(artwork.number).padStart(2, '0')
       return `/Images/Artworks/optimized/${paddedNumber}/${paddedNumber}-${size}.jpg`
     }

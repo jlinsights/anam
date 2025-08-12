@@ -9,7 +9,7 @@ import { useSafeGalleryStore, useModalState } from '@/lib/stores/gallery-store-s
 // Import individual section components
 import { HeroSection } from './HeroSection'
 import { GallerySection } from './GallerySection'
-import { ArtistSection } from './ArtistSection'
+import { EnhancedArtistSection } from './EnhancedArtistSection'
 import { ExhibitionSection } from './ExhibitionSection'
 import { ContactSection } from './ContactSection'
 import { Navigation } from './Navigation'
@@ -137,7 +137,7 @@ export default function SinglePageLayout({ initialArtworks, artist }: SinglePage
 
           {/* Artist Section */}
           <section id="artist" className="min-h-screen py-32">
-            <ArtistSection artist={artist} />
+            <EnhancedArtistSection artist={artist} />
           </section>
 
           {/* Exhibition Section */}

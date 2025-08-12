@@ -7,7 +7,8 @@ import type { Artwork, Artist } from '@/lib/types'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ThemeToggle } from '@/components/theme-toggle'
+import { MinimalHeader } from '@/components/layout/MinimalHeader'
+import { HeroSection } from '@/components/sections/HeroSection'
 
 // Metadata is handled in layout.tsx
 
@@ -50,11 +51,11 @@ export default function HomePage() {
           if (artistJson.success && artistJson.data) {
             artistData = artistJson.data
           } else {
-            artistData = await fetchArtist('fallback-artist').catch(() => undefined)
+            artistData = await fetchArtist('fallback-artist').catch(() => null) || undefined
           }
         } catch (apiError) {
           console.log('Artist API failed, using static data:', apiError)
-          artistData = await fetchArtist('fallback-artist').catch(() => undefined)
+          artistData = await fetchArtist('fallback-artist').catch(() => null) || undefined
         }
         
         setArtworks(artworksData)
@@ -147,23 +148,35 @@ export default function HomePage() {
     }
   }, [currentIndex, artworks])
 
+  // Get featured artwork for hero
+  const featuredArtwork = displayedArtworks.length > 0 ? displayedArtworks[0] : undefined
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">아남 배옥영 서예 갤러리</h1>
-              <p className="text-gray-600 dark:text-gray-300 mt-2">전통과 현대가 만나는 서예의 새로운 지평</p>
-            </div>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      {/* Minimal Header */}
+      <MinimalHeader />
+      
+      {/* Hero Section */}
+      <HeroSection 
+        title="아남 배옥영"
+        subtitle="전통과 현대가 만나는 서예의 새로운 지평"
+        description="깊이 있는 전통 서예 기법과 현대적 감각이 조화를 이루는 독창적인 작품 세계를 만나보세요."
+        featuredArtwork={featuredArtwork ? {
+          id: featuredArtwork.id,
+          title: featuredArtwork.title,
+          imageUrl: featuredArtwork.imageUrl || '',
+          year: featuredArtwork.year?.toString() || '',
+          medium: featuredArtwork.medium || ''
+        } : undefined}
+        stats={{
+          totalArtworks: artworks.length,
+          yearsActive: 30,
+          exhibitions: 25
+        }}
+      />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-16">
         {/* Gallery Grid */}
         <section id="gallery" className="mb-16">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
