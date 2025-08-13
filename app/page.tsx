@@ -19,6 +19,7 @@ export default function HomePage() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const [mounted, setMounted] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Fetch data using hooks with cancellation support
@@ -36,6 +37,11 @@ export default function HomePage() {
   } = useArtist()
 
   const loading = artworksLoading || artistLoading
+
+  // Handle client-side hydration
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Initialize displayed artworks when data loads
   useEffect(() => {
@@ -75,7 +81,10 @@ export default function HomePage() {
     }
 
     intervalRef.current = setInterval(() => {
-      setCurrentIndex(prev => (prev + 1) % artworks.length)
+      setCurrentIndex(prev => {
+        if (!artworks || artworks.length === 0) return prev
+        return (prev + 1) % artworks.length
+      })
     }, 4000) // Slightly faster rotation for better engagement
   }, [artworks, isPlaying])
 
@@ -129,6 +138,18 @@ export default function HomePage() {
 
   // Get featured artwork for hero
   const featuredArtwork = displayedArtworks.length > 0 ? displayedArtworks[0] : undefined
+
+  // Show loading during SSR or while fetching data
+  if (!mounted || loading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">갤러리를 불러오는 중...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">

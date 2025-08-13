@@ -1,132 +1,154 @@
+/**
+ * Upcoming Exhibition Section Component
+ * Displays upcoming exhibitions with featured exhibition and additional exhibitions grid
+ */
+
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { AccessibleIconButton, FocusTrap, ScreenReaderOnly } from '@/components/accessibility'
-import { X } from 'lucide-react'
+import { Calendar, MapPin, Clock, Users, ExternalLink, X } from 'lucide-react'
 
-interface ExhibitionData {
+// Focus Trap component for modal accessibility
+const FocusTrap: React.FC<{ children: React.ReactNode; isActive: boolean }> = ({ children, isActive }) => {
+  const trapRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!isActive) return
+
+    const focusableElements = trapRef.current?.querySelectorAll(
+      'a, button, textarea, input, select, [tabindex]:not([tabindex="-1"])'
+    )
+    const firstElement = focusableElements?.[0] as HTMLElement
+    const lastElement = focusableElements?.[focusableElements.length - 1] as HTMLElement
+
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault()
+          lastElement?.focus()
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault()
+          firstElement?.focus()
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleTabKey)
+    firstElement?.focus()
+
+    return () => {
+      document.removeEventListener('keydown', handleTabKey)
+    }
+  }, [isActive])
+
+  return <div ref={trapRef}>{children}</div>
+}
+
+// Exhibition type definition
+interface Exhibition {
   id: string
   title: string
   subtitle?: string
   description: string
-  venue: string
-  location: string
+  artist: string
   startDate: string
   endDate: string
-  openingReception?: string
+  venue: string
   imageUrl?: string
+  featured: boolean
   status: 'upcoming' | 'current' | 'past'
-  featured?: boolean
-  artworkCount?: number
   ticketUrl?: string
+  openingReception?: string
+  artworkCount?: number
   galleryHours?: string[]
 }
 
-const sampleExhibitions: ExhibitionData[] = [
+// Sample exhibition data - replace with actual data source
+const sampleExhibitions: Exhibition[] = [
   {
-    id: 'exhibition-2025-spring',
-    title: '선(線)의 여백, 여백의 선',
+    id: '1',
+    title: '서예의 새로운 지평',
     subtitle: '전통과 현대의 만남',
-    description: '한국 전통 서예의 정수를 현대적 감각으로 재해석한 새로운 작품들을 선보입니다. 선과 여백의 조화를 통해 내면의 평온과 현대적 아름다움을 동시에 느낄 수 있는 전시입니다.',
-    venue: '갤러리 현대',
-    location: '서울시 강남구',
-    startDate: '2025-03-15',
+    description: '한국 전통 서예의 아름다움을 현대적 감각으로 재해석한 특별 전시입니다. 작가의 30년 서예 여정을 통해 발전된 독창적인 작품들을 만나보세요.',
+    artist: '아남 배옥영',
+    startDate: '2025-02-15',
     endDate: '2025-04-30',
-    openingReception: '2025-03-15T18:00',
-    imageUrl: '/Images/Exhibition/upcoming-spring-2025.jpg',
-    status: 'upcoming',
+    venue: 'ANAM 갤러리',
+    imageUrl: '/Images/Exhibitions/upcoming-2025.jpg',
     featured: true,
+    status: 'upcoming',
+    ticketUrl: 'https://booking.example.com/exhibition-1',
+    openingReception: '2025-02-15T18:00:00',
     artworkCount: 25,
-    ticketUrl: '#',
-    galleryHours: [
-      '월요일-금요일: 10:00-19:00',
-      '토요일-일요일: 10:00-18:00',
-      '매주 화요일 휴관'
-    ]
+    galleryHours: ['화-일: 오전 10시 - 오후 6시', '월요일 휴관']
   },
   {
-    id: 'exhibition-2025-summer',
-    title: '먹향(墨香)',
-    subtitle: '서예의 향기',
-    description: '먹의 향기와 종이의 질감이 만들어내는 서예 작품의 감성적 매력을 탐구하는 전시입니다.',
-    venue: '한국미술관',
-    location: '서울시 종로구',
-    startDate: '2025-06-01',
-    endDate: '2025-07-15',
-    imageUrl: '/Images/Exhibition/upcoming-summer-2025.jpg',
+    id: '2',
+    title: '먹의 향연',
+    description: '전통 먹과 붓의 조화로 만들어낸 예술 작품들의 향연',
+    artist: '아남 배옥영',
+    startDate: '2025-05-01',
+    endDate: '2025-06-15',
+    venue: 'ANAM 갤러리',
+    featured: false,
     status: 'upcoming',
-    artworkCount: 18,
-    ticketUrl: '#',
-    galleryHours: [
-      '화요일-일요일: 09:00-18:00',
-      '매주 월요일 휴관'
-    ]
+    artworkCount: 18
   }
 ]
 
-export default function UpcomingExhibition() {
-  const [selectedExhibition, setSelectedExhibition] = useState<ExhibitionData | null>(null)
+const UpcomingExhibition: React.FC = () => {
+  const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null)
   const modalRef = useRef<HTMLDivElement>(null)
-  const previousFocusRef = useRef<HTMLElement | null>(null)
 
-  // Handle modal accessibility
+  const handleOpenModal = useCallback((exhibition: Exhibition) => {
+    setSelectedExhibition(exhibition)
+  }, [])
+
+  const handleCloseModal = useCallback(() => {
+    setSelectedExhibition(null)
+  }, [])
+
+  // Close modal on escape key
   useEffect(() => {
-    if (selectedExhibition) {
-      // Store previous focus
-      previousFocusRef.current = document.activeElement as HTMLElement
-      
-      // Prevent body scroll
-      document.body.style.overflow = 'hidden'
-      
-      // Add escape key listener
-      const handleEscapeKey = (event: KeyboardEvent) => {
-        if (event.key === 'Escape') {
-          handleCloseModal()
-        }
-      }
-      
-      document.addEventListener('keydown', handleEscapeKey)
-      
-      return () => {
-        document.removeEventListener('keydown', handleEscapeKey)
-        document.body.style.overflow = 'unset'
-        
-        // Restore focus to previous element
-        if (previousFocusRef.current) {
-          previousFocusRef.current.focus()
-        }
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && selectedExhibition) {
+        handleCloseModal()
       }
     }
+
+    document.addEventListener('keydown', handleEscapeKey)
+    return () => document.removeEventListener('keydown', handleEscapeKey)
+  }, [selectedExhibition, handleCloseModal])
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (selectedExhibition) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
   }, [selectedExhibition])
-
-  const handleOpenModal = (exhibition: ExhibitionData) => {
-    setSelectedExhibition(exhibition)
-  }
-
-  const handleCloseModal = () => {
-    setSelectedExhibition(null)
-  }
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString)
     return date.toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric',
-      weekday: 'short'
+      day: 'numeric'
     })
   }
 
   const formatDateRange = (startDate: string, endDate: string): string => {
-    const start = new Date(startDate)
-    const end = new Date(endDate)
-    
-    if (start.getFullYear() === end.getFullYear() && start.getMonth() === end.getMonth()) {
-      return `${start.getFullYear()}년 ${start.getMonth() + 1}월 ${start.getDate()}일 - ${end.getDate()}일`
-    }
-    
     return `${formatDate(startDate)} - ${formatDate(endDate)}`
   }
 
@@ -174,54 +196,41 @@ export default function UpcomingExhibition() {
                     {featuredExhibition.imageUrl ? (
                       <Image
                         src={featuredExhibition.imageUrl}
-                        alt={`${featuredExhibition.title} 전시 이미지`}
+                        alt={`${featuredExhibition.title} 전시 포스터`}
                         fill
-                        className="object-cover"
                         sizes="(max-width: 768px) 100vw, 50vw"
-                        placeholder="blur"
-                        blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmM2Y0ZjY7c3RvcC1vcGFjaXR5OjEiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNlNWU3ZWI7c3RvcC1vcGFjaXR5OjEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2cpIi8+PC9zdmc+"
-                        onError={(e) => {
-                          console.warn('Exhibition image failed to load:', featuredExhibition.imageUrl)
-                          // Hide the image on error - fallback will show
-                          e.currentTarget.style.display = 'none'
-                        }}
+                        className="object-cover transition-transform duration-500 hover:scale-105"
+                        priority
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
-                        <svg className="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <span className="text-sm">전시 이미지 준비중</span>
+                        <Calendar className="w-16 h-16 mb-4" />
+                        <p className="text-lg font-medium">전시 포스터 준비 중</p>
+                        <p className="text-sm">Coming Soon</p>
                       </div>
                     )}
                   </div>
-                  
+
                   {/* Status Badge */}
                   <div className="absolute top-4 left-4">
                     <div 
-                      className="bg-green-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium"
+                      className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg"
                       role="status"
-                      aria-label={`전시 상태: ${getDaysUntil(featuredExhibition.startDate) > 0 
-                        ? `${getDaysUntil(featuredExhibition.startDate)}일 남음` 
-                        : '진행 중'
-                      }`}
+                      aria-label={`전시 상태: ${featuredExhibition.featured ? '주목 전시' : '예정 전시'}`}
                     >
-                      {getDaysUntil(featuredExhibition.startDate) > 0 
-                        ? `D-${getDaysUntil(featuredExhibition.startDate)}` 
-                        : '진행 중'
-                      }
+                      {featuredExhibition.featured ? '주목 전시' : '예정 전시'}
                     </div>
                   </div>
 
-                  {/* Featured Badge */}
-                  {featuredExhibition.featured && (
+                  {/* Days Until Badge */}
+                  {getDaysUntil(featuredExhibition.startDate) > 0 && (
                     <div className="absolute top-4 right-4">
                       <div 
-                        className="bg-yellow-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium"
-                        role="img"
-                        aria-label="주요 전시"
+                        className="bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg"
+                        role="status"
+                        aria-label={`전시까지 ${getDaysUntil(featuredExhibition.startDate)}일 남음`}
                       >
-                        주요 전시
+                        D-{getDaysUntil(featuredExhibition.startDate)}
                       </div>
                     </div>
                   )}
@@ -231,57 +240,47 @@ export default function UpcomingExhibition() {
                 <div className="p-8 md:p-10 flex flex-col justify-between">
                   <div>
                     <header className="mb-6">
-                      <h2 id="featured-exhibition-title" className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                      <h2 id="featured-exhibition-title" className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                         {featuredExhibition.title}
                       </h2>
                       {featuredExhibition.subtitle && (
-                        <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
+                        <p className="text-xl text-gray-600 dark:text-gray-300 font-medium">
                           {featuredExhibition.subtitle}
                         </p>
                       )}
-                      <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                        {featuredExhibition.description}
-                      </p>
                     </header>
 
-                    {/* Exhibition Details */}
-                    <dl className="space-y-3 mb-6">
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                      {featuredExhibition.description}
+                    </p>
+
+                    <div className="space-y-3 mb-6">
                       <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <dt className="sr-only">전시 기간:</dt>
-                        <dd className="font-medium">
-                          {formatDateRange(featuredExhibition.startDate, featuredExhibition.endDate)}
-                        </dd>
+                        <Calendar className="w-5 h-5 text-blue-600" aria-hidden="true" />
+                        <span className="font-medium">전시 기간:</span>
+                        <span>{formatDateRange(featuredExhibition.startDate, featuredExhibition.endDate)}</span>
                       </div>
 
                       <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <dt className="sr-only">전시 장소:</dt>
-                        <dd>{featuredExhibition.venue}, {featuredExhibition.location}</dd>
+                        <MapPin className="w-5 h-5 text-blue-600" aria-hidden="true" />
+                        <span className="font-medium">전시 장소:</span>
+                        <span>{featuredExhibition.venue}</span>
                       </div>
 
                       {featuredExhibition.artworkCount && (
                         <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
-                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          <dt className="sr-only">작품 수:</dt>
-                          <dd>{featuredExhibition.artworkCount}점 전시</dd>
+                          <Users className="w-5 h-5 text-blue-600" aria-hidden="true" />
+                          <span className="font-medium">전시 작품:</span>
+                          <span>{featuredExhibition.artworkCount}점</span>
                         </div>
                       )}
-                    </dl>
+                    </div>
                   </div>
 
-                  {/* Action Buttons */}
                   <div className="flex flex-col sm:flex-row gap-3">
                     <button
                       onClick={() => handleOpenModal(featuredExhibition)}
-                      className="flex-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors font-medium text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                       aria-describedby="featured-exhibition-title"
                     >
                       상세 정보 보기
@@ -298,68 +297,62 @@ export default function UpcomingExhibition() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Additional Upcoming Exhibitions */}
-            {upcomingExhibitions.length > 1 && (
-              <section aria-labelledby="additional-exhibitions-title">
-                <h2 id="additional-exhibitions-title" className="sr-only">추가 예정 전시</h2>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {upcomingExhibitions
-                    .filter(ex => ex.id !== featuredExhibition.id)
-                    .map((exhibition, index) => (
-                    <article
-                      key={exhibition.id}
-                      className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                      aria-labelledby={`exhibition-${exhibition.id}-title`}
-                    >
-                      <header className="flex justify-between items-start mb-4">
-                        <h3 id={`exhibition-${exhibition.id}-title`} className="text-xl font-bold text-gray-900 dark:text-white line-clamp-2">
-                          {exhibition.title}
-                        </h3>
-                        <div 
-                          className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded text-xs font-medium ml-2"
-                          role="status"
-                          aria-label="예정된 전시"
-                        >
-                          예정
-                        </div>
-                      </header>
-                      
-                      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
-                        {exhibition.description}
-                      </p>
-
-                      <dl className="space-y-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
-                        <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          <dt className="sr-only">전시 기간:</dt>
-                          <dd>{formatDateRange(exhibition.startDate, exhibition.endDate)}</dd>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          </svg>
-                          <dt className="sr-only">전시 장소:</dt>
-                          <dd>{exhibition.venue}</dd>
-                        </div>
-                      </dl>
-
-                      <button
-                        onClick={() => handleOpenModal(exhibition)}
-                        className="w-full text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                        aria-label={`${exhibition.title} 전시 상세 정보 보기`}
-                      >
-                        자세히 보기
-                      </button>
-                    </article>
-                  ))}
-                </div>
-              </section>
-            )}
+            </article>
           </div>
+        )}
+
+        {/* Additional Upcoming Exhibitions */}
+        {upcomingExhibitions.length > 1 && (
+          <section aria-labelledby="additional-exhibitions-title">
+            <h2 id="additional-exhibitions-title" className="sr-only">추가 예정 전시</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {upcomingExhibitions
+                .filter(ex => ex.id !== featuredExhibition.id)
+                .map((exhibition, index) => (
+                  <article
+                    key={exhibition.id}
+                    className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                    aria-labelledby={`exhibition-${exhibition.id}-title`}
+                  >
+                    <header className="flex justify-between items-start mb-4">
+                      <h3 id={`exhibition-${exhibition.id}-title`} className="text-xl font-bold text-gray-900 dark:text-white line-clamp-2">
+                        {exhibition.title}
+                      </h3>
+                      <div 
+                        className="text-sm text-blue-600 dark:text-blue-400 font-medium px-2 py-1 bg-blue-50 dark:bg-blue-900/20 rounded"
+                        role="status"
+                      >
+                        예정
+                      </div>
+                    </header>
+
+                    <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                      {exhibition.description}
+                    </p>
+
+                    <div className="space-y-2 mb-6">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-gray-400" aria-hidden="true" />
+                        <span className="text-sm text-gray-600 dark:text-gray-300">
+                          <strong>전시 기간:</strong>
+                        </span>
+                        <span className="text-sm text-gray-600 dark:text-gray-300">
+                          {formatDateRange(exhibition.startDate, exhibition.endDate)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleOpenModal(exhibition)}
+                      className="w-full text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      aria-label={`${exhibition.title} 전시 상세 정보 보기`}
+                    >
+                      자세히 보기
+                    </button>
+                  </article>
+                ))}
+            </div>
+          </section>
         )}
 
         {/* Modal for Exhibition Details */}
@@ -385,81 +378,81 @@ export default function UpcomingExhibition() {
                         {selectedExhibition.title}
                       </h2>
                       {selectedExhibition.subtitle && (
-                        <p className="text-gray-600 dark:text-gray-300">
+                        <p className="text-lg text-gray-600 dark:text-gray-300">
                           {selectedExhibition.subtitle}
                         </p>
                       )}
                     </div>
-                    <AccessibleIconButton
-                      icon={<X className="w-6 h-6" />}
-                      label="전시 상세 정보 닫기"
+                    <button
                       onClick={handleCloseModal}
-                      className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 p-2 rounded-lg"
-                    />
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      aria-label="전시 상세 정보 닫기"
+                    >
+                      <X className="w-6 h-6" />
+                    </button>
                   </header>
 
-                  <div className="space-y-6">
-                    <p id="modal-exhibition-description" className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                  <div id="modal-exhibition-description" className="space-y-4">
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                       {selectedExhibition.description}
                     </p>
 
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <section aria-labelledby="exhibition-info-title">
-                        <h3 id="exhibition-info-title" className="font-semibold text-gray-900 dark:text-white mb-3">전시 정보</h3>
-                        <dl className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                          <div>
-                            <dt className="font-medium inline">기간: </dt>
-                            <dd className="inline">{formatDateRange(selectedExhibition.startDate, selectedExhibition.endDate)}</dd>
-                          </div>
-                          <div>
-                            <dt className="font-medium inline">장소: </dt>
-                            <dd className="inline">{selectedExhibition.venue}, {selectedExhibition.location}</dd>
-                          </div>
-                          {selectedExhibition.artworkCount && (
-                            <div>
-                              <dt className="font-medium inline">작품 수: </dt>
-                              <dd className="inline">{selectedExhibition.artworkCount}점</dd>
-                            </div>
-                          )}
-                          {selectedExhibition.openingReception && (
-                            <div>
-                              <dt className="font-medium inline">개막식: </dt>
-                              <dd className="inline">{formatDate(selectedExhibition.openingReception.split('T')[0])} 오후 6시</dd>
-                            </div>
-                          )}
-                        </dl>
-                      </section>
+                    <dl className="space-y-3">
+                      <div className="flex flex-wrap gap-2">
+                        <dt className="font-medium text-gray-900 dark:text-white">전시 기간:</dt>
+                        <dd className="text-gray-700 dark:text-gray-300">
+                          {formatDateRange(selectedExhibition.startDate, selectedExhibition.endDate)}
+                        </dd>
+                      </div>
 
-                      {selectedExhibition.galleryHours && (
-                        <section aria-labelledby="gallery-hours-title">
-                          <h3 id="gallery-hours-title" className="font-semibold text-gray-900 dark:text-white mb-3">관람 안내</h3>
-                          <ul className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
-                            {selectedExhibition.galleryHours.map((hours, index) => (
-                              <li key={index}>{hours}</li>
-                            ))}
-                          </ul>
-                        </section>
+                      {selectedExhibition.artworkCount && (
+                        <div className="flex flex-wrap gap-2">
+                          <dt className="font-medium text-gray-900 dark:text-white">전시 작품:</dt>
+                          <dd className="text-gray-700 dark:text-gray-300">{selectedExhibition.artworkCount}점</dd>
+                        </div>
                       )}
-                    </div>
 
-                    <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                      {selectedExhibition.ticketUrl && (
-                        <Link
-                          href={selectedExhibition.ticketUrl}
-                          className="flex-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors font-medium text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                          aria-label={`${selectedExhibition.title} 전시 예매하기`}
-                        >
-                          예매하기
-                        </Link>
+                      {selectedExhibition.openingReception && (
+                        <div className="flex flex-wrap gap-2">
+                          <dt className="font-medium text-gray-900 dark:text-white">오프닝 리셉션:</dt>
+                          <dd className="text-gray-700 dark:text-gray-300">
+                            {formatDate(selectedExhibition.openingReception.split('T')[0])} 오후 6시
+                          </dd>
+                        </div>
                       )}
-                      <button
+                    </dl>
+
+                    {selectedExhibition.galleryHours && (
+                      <div>
+                        <h3 className="font-medium text-gray-900 dark:text-white mb-2">관람 시간</h3>
+                        <ul className="text-gray-700 dark:text-gray-300 space-y-1">
+                          {selectedExhibition.galleryHours.map((hours, index) => (
+                            <li key={index}>{hours}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3 mt-8">
+                    {selectedExhibition.ticketUrl && (
+                      <Link
+                        href={selectedExhibition.ticketUrl}
+                        className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                         onClick={handleCloseModal}
-                        className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                        aria-label="전시 상세 정보 닫기"
+                        aria-label={`${selectedExhibition.title} 전시 예매하기 (새 창에서 열림)`}
                       >
-                        닫기
-                      </button>
-                    </div>
+                        <ExternalLink className="w-4 h-4 inline mr-2" aria-hidden="true" />
+                        예매하기
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleCloseModal}
+                      className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      aria-label="전시 상세 정보 닫기"
+                    >
+                      닫기
+                    </button>
                   </div>
                 </div>
               </div>
@@ -470,3 +463,5 @@ export default function UpcomingExhibition() {
     </section>
   )
 }
+
+export default UpcomingExhibition
