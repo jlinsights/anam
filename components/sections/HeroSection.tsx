@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { ChevronDown, Eye, Calendar, Palette } from 'lucide-react'
+import { useThrottledMouseMove } from '@/lib/hooks/use-throttled-handlers'
 
 interface HeroSectionProps {
   title?: string
@@ -47,15 +48,18 @@ export function HeroSection({
     setIsVisible(true)
   }, [])
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!heroRef.current) return
-    
-    const rect = heroRef.current.getBoundingClientRect()
-    const x = (e.clientX - rect.left) / rect.width
-    const y = (e.clientY - rect.top) / rect.height
-    
-    setMousePosition({ x, y })
-  }, [])
+  const handleMouseMove = useThrottledMouseMove(
+    useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+      if (!heroRef.current) return
+      
+      const rect = heroRef.current.getBoundingClientRect()
+      const x = (e.clientX - rect.left) / rect.width
+      const y = (e.clientY - rect.top) / rect.height
+      
+      setMousePosition({ x, y })
+    }, []),
+    []
+  )
 
   return (
     <section 

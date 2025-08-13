@@ -1,4 +1,5 @@
 import { clearCacheAndRevalidate } from '@/lib/cache'
+import { createErrorResponse, createSuccessResponse, handleAuthError } from '@/lib/error-handler'
 import { NextRequest, NextResponse } from 'next/server'
 
 // Optional secret to protect endpoint
@@ -10,22 +11,21 @@ export async function POST(req: NextRequest) {
     const { tag, secret } = body
 
     if (WEBHOOK_SECRET && secret !== WEBHOOK_SECRET) {
-      return NextResponse.json({ error: 'Invalid secret' }, { status: 401 })
+      return handleAuthError('Invalid secret')
     }
 
     if (!tag || typeof tag !== 'string') {
-      return NextResponse.json({ error: 'Missing tag' }, { status: 400 })
+      return createErrorResponse(
+        new Error('Missing or invalid tag parameter'),
+        400,
+        'Missing tag parameter'
+      )
     }
 
     clearCacheAndRevalidate(tag)
 
-    return NextResponse.json({ revalidated: true, tag })
+    return createSuccessResponse({ revalidated: true, tag }, 'Cache revalidated successfully')
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error?.message || 'Invalid payload' },
-      {
-        status: 400,
-      }
-    )
+    return createErrorResponse(error, 400)
   }
 }

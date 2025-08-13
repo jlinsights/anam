@@ -1,8 +1,15 @@
-import { NextResponse } from 'next/server'
 import { fallbackArtworksData } from '@/lib/artworks'
 import { fetchArtworksFromAirtable } from '@/lib/airtable'
+import { isDebugAllowed } from '@/lib/debug-guard'
+import { createErrorResponse, createSuccessResponse, handleNotFoundError } from '@/lib/error-handler'
+import { NextResponse } from 'next/server'
 
 export async function GET() {
+  // Check if debug routes are allowed
+  if (!isDebugAllowed()) {
+    return handleNotFoundError('Debug endpoint')
+  }
+
   try {
     // Test both data sources
     const airtableData = await fetchArtworksFromAirtable()
@@ -52,12 +59,8 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json(response)
+    return createSuccessResponse(response, 'Debug images information retrieved successfully')
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
-    }, { status: 500 })
+    return createErrorResponse(error, 500, 'Failed to fetch debug images information')
   }
 }

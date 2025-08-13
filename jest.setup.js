@@ -1,4 +1,9 @@
 import '@testing-library/jest-dom'
+import 'jest-axe/extend-expect'
+import { toHaveNoViolations } from 'jest-axe'
+
+// Extend Jest matchers
+expect.extend(toHaveNoViolations)
 
 // Mock IntersectionObserver
 global.IntersectionObserver = jest.fn(() => ({
@@ -157,4 +162,27 @@ beforeAll(() => {
 
 afterAll(() => {
   console.error = originalError
+})
+
+// MSW 설정 (API 모킹을 위한)
+import { setupServer } from 'msw/node'
+
+// MSW 서버 인스턴스를 전역으로 설정
+export const server = setupServer()
+
+// 테스트 시작 전 MSW 서버 시작
+beforeAll(() => {
+  server.listen({
+    onUnhandledRequest: 'bypass',
+  })
+})
+
+// 각 테스트 후 핸들러 초기화
+afterEach(() => {
+  server.resetHandlers()
+})
+
+// 모든 테스트 완료 후 MSW 서버 종료
+afterAll(() => {
+  server.close()
 })

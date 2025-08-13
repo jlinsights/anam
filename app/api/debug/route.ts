@@ -1,7 +1,14 @@
 import { getArtworks } from '@/lib/artworks'
+import { isDebugAllowed } from '@/lib/debug-guard'
+import { createErrorResponse, createSuccessResponse, handleNotFoundError } from '@/lib/error-handler'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
+  // Check if debug routes are allowed
+  if (!isDebugAllowed()) {
+    return handleNotFoundError('Debug endpoint')
+  }
+
   try {
     const artworks = await getArtworks()
     
@@ -21,16 +28,8 @@ export async function GET() {
       }))
     }
     
-    return NextResponse.json(debugInfo, { 
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    })
+    return createSuccessResponse(debugInfo, 'Debug information retrieved successfully')
   } catch (error) {
-    return NextResponse.json({ 
-      error: 'Failed to fetch debug info',
-      message: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 })
+    return createErrorResponse(error, 500, 'Failed to fetch debug info')
   }
 }

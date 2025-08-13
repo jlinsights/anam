@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Artwork, Artist } from '@/lib/types'
 import { ArtworkImage } from '@/components/common/ProgressiveImage'
+import { ArtworkErrorBoundary } from '@/components/error-boundary/ArtworkErrorBoundary'
 
 interface ArtworkDetailPageProps {
   artwork: Artwork
@@ -36,7 +37,8 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
   const nextArtwork = currentIndex < allArtworks.length - 1 ? allArtworks[currentIndex + 1] : null
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <ArtworkErrorBoundary>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header with navigation */}
       <header className="sticky top-0 z-50 bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur-sm border-b-2 border-gray-800 dark:border-gray-200">
         <div className="max-w-7xl mx-auto px-8 py-4">
@@ -98,6 +100,11 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
                 className="absolute inset-4"
                 priority={true}
                 onLoad={() => setImageLoaded(true)}
+                onError={() => {
+                  console.warn('Failed to load artwork image for:', artwork.title)
+                  setImageLoaded(true) // Hide loading state even on error
+                }}
+                fallbackSrc="/Images/placeholder.jpg"
               />
               
               {/* Loading overlay */}
@@ -322,5 +329,6 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
         )}
       </main>
     </div>
+    </ArtworkErrorBoundary>
   )
 }

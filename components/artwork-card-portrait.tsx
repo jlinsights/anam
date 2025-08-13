@@ -65,13 +65,17 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Link href={`/gallery/${artwork.slug}`} className="block">
+      <Link 
+        href={`/gallery/${artwork.slug}`} 
+        className="block focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 rounded"
+        aria-label={`${artwork.title} 작품 상세보기 - ${artwork.year}년${artwork.medium ? `, ${artwork.medium}` : ''}`}
+      >
         {/* Image Container with 9:16 aspect ratio */}
         <div className="
           relative bg-paper border-2 border-ink
-          shadow-brutal-sm group-hover:shadow-brutal
+          shadow-brutal-sm group-hover:shadow-brutal group-focus-within:shadow-brutal
           transition-all duration-300
-          group-hover:-translate-x-1 group-hover:-translate-y-1
+          group-hover:-translate-x-1 group-hover:-translate-y-1 group-focus-within:-translate-x-1 group-focus-within:-translate-y-1
           overflow-hidden
           aspect-[9/16]
         ">
@@ -82,6 +86,7 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
             className="absolute inset-2 rounded object-cover w-full h-full"
             placeholderClassName="bg-paper-cream"
             priority={priority}
+            alt={`${artwork.title} - ${artwork.year}년 작품${artwork.medium ? `, ${artwork.medium}` : ''}`}
           />
           
           {/* Hover overlay */}
@@ -89,7 +94,7 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
             className="
               absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent
               flex items-end justify-center
-              opacity-0 group-hover:opacity-100
+              opacity-0 group-hover:opacity-100 group-focus-within:opacity-100
               transition-opacity duration-300
             "
             animate={{
@@ -97,7 +102,7 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
             }}
           >
             <div className="text-center p-zen-md pb-zen-lg">
-              <div className="w-8 h-8 border border-paper mx-auto mb-2 flex items-center justify-center bg-paper/90 rounded">
+              <div className="w-8 h-8 border border-paper mx-auto mb-2 flex items-center justify-center bg-paper/90 rounded" aria-hidden="true">
                 <span className="text-xs">🖼</span>
               </div>
               <span className="font-display text-paper text-sm font-medium block">작품 상세보기</span>
@@ -112,31 +117,37 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
         {showMetadata && (
           <div className="mt-zen-sm space-y-zen-xs">
             {/* Title */}
-            <h3 className="font-display font-bold text-ink text-lg leading-tight line-clamp-2">
+            <h2 className="font-display font-bold text-ink text-lg leading-tight line-clamp-2">
               {artwork.title}
-            </h3>
+            </h2>
 
-            {/* Year */}
-            <div className="flex items-center gap-2 text-ink-light">
-              <Calendar className="w-4 h-4 flex-shrink-0" />
-              <span className="font-display text-sm">{artwork.year}년</span>
-            </div>
-
-            {/* Medium */}
-            {artwork.medium && (
+            {/* Artwork details */}
+            <dl className="space-y-zen-xs">
+              {/* Year */}
               <div className="flex items-center gap-2 text-ink-light">
-                <Palette className="w-4 h-4 flex-shrink-0" />
-                <span className="font-display text-sm line-clamp-1">{artwork.medium}</span>
+                <Calendar className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                <dt className="sr-only">제작년도:</dt>
+                <dd className="font-display text-sm">{artwork.year}년</dd>
               </div>
-            )}
 
-            {/* Dimensions */}
-            {artwork.dimensions && (
-              <div className="flex items-center gap-2 text-ink-light">
-                <Ruler className="w-4 h-4 flex-shrink-0" />
-                <span className="font-display text-sm line-clamp-1">{artwork.dimensions}</span>
-              </div>
-            )}
+              {/* Medium */}
+              {artwork.medium && (
+                <div className="flex items-center gap-2 text-ink-light">
+                  <Palette className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                  <dt className="sr-only">재료:</dt>
+                  <dd className="font-display text-sm line-clamp-1">{artwork.medium}</dd>
+                </div>
+              )}
+
+              {/* Dimensions */}
+              {artwork.dimensions && (
+                <div className="flex items-center gap-2 text-ink-light">
+                  <Ruler className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                  <dt className="sr-only">크기:</dt>
+                  <dd className="font-display text-sm line-clamp-1">{artwork.dimensions}</dd>
+                </div>
+              )}
+            </dl>
 
             {/* Series or Technique if available */}
             {(artwork.series || artwork.technique) && (
@@ -222,15 +233,20 @@ export const ArtworkGridPortrait = memo(function ArtworkGridPortrait({
   )
 
   return (
-    <div className={gridClasses}>
+    <div 
+      className={gridClasses}
+      role="grid"
+      aria-label={`작품 갤러리 - ${artworks.length}개 작품`}
+    >
       {artworks.map((artwork, index) => (
-        <ArtworkCardPortrait
-          key={artwork.id}
-          artwork={artwork}
-          showMetadata={showMetadata}
-          priority={index < 8} // Prioritize first 8 images for above-fold loading
-          index={index}
-        />
+        <div key={artwork.id} role="gridcell">
+          <ArtworkCardPortrait
+            artwork={artwork}
+            showMetadata={showMetadata}
+            priority={index < 8} // Prioritize first 8 images for above-fold loading
+            index={index}
+          />
+        </div>
       ))}
     </div>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -24,6 +24,7 @@ interface ContactFormProps {
 export function ContactForm({ className = '' }: ContactFormProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const abortControllerRef = useRef<AbortController | null>(null)
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
@@ -42,8 +43,25 @@ export function ContactForm({ className = '' }: ContactFormProps) {
     }))
   }
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
+  }, [])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Cancel any existing request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    
+    // Create new abort controller
+    abortControllerRef.current = new AbortController()
     setIsSubmitting(true)
 
     try {
@@ -53,6 +71,7 @@ export function ContactForm({ className = '' }: ContactFormProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
+        signal: abortControllerRef.current.signal,
       })
 
       if (!response.ok) {
@@ -86,6 +105,12 @@ export function ContactForm({ className = '' }: ContactFormProps) {
         })
       }
     } catch (error) {
+      // Handle AbortError (request was cancelled)
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Contact form submission was cancelled')
+        return
+      }
+      
       console.error('Form submission error:', error)
       toast({
         title: '전송 실패',
@@ -95,6 +120,7 @@ export function ContactForm({ className = '' }: ContactFormProps) {
       })
     } finally {
       setIsSubmitting(false)
+      abortControllerRef.current = null
     }
   }
 

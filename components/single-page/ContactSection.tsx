@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
 export function ContactSection() {
@@ -13,14 +13,32 @@ export function ContactSection() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
+  }, [])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Cancel any existing request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    
+    // Create new abort controller
+    abortControllerRef.current = new AbortController()
     setIsSubmitting(true)
     setSubmitStatus('idle')
 
@@ -31,6 +49,7 @@ export function ContactSection() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
+        signal: abortControllerRef.current.signal,
       })
 
       if (response.ok) {
@@ -46,10 +65,17 @@ export function ContactSection() {
         setSubmitStatus('error')
       }
     } catch (error) {
+      // Handle AbortError (request was cancelled)
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Contact form submission was cancelled')
+        return
+      }
+      
       console.error('Contact form error:', error)
       setSubmitStatus('error')
     } finally {
       setIsSubmitting(false)
+      abortControllerRef.current = null
     }
   }
 

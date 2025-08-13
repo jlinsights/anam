@@ -5,6 +5,7 @@ import { fetchArtist } from '@/lib/artist'
 import type { Metadata } from 'next'
 import type { Artwork, Artist } from '@/lib/types'
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useArtworks, useArtist } from '@/hooks/use-artwork-api'
 import Image from 'next/image'
 import Link from 'next/link'
 import { MinimalHeader } from '@/components/layout/MinimalHeader'
@@ -14,65 +15,44 @@ import UpcomingExhibition from '@/components/exhibition/UpcomingExhibition'
 // Metadata is handled in layout.tsx
 
 export default function HomePage() {
-  const [artworks, setArtworks] = useState<Artwork[]>([])
-  const [artist, setArtist] = useState<Artist | undefined>()
   const [displayedArtworks, setDisplayedArtworks] = useState<Artwork[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [isPlaying, setIsPlaying] = useState(true)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Fetch data on client side
+  // Fetch data using hooks with cancellation support
+  const { 
+    data: artworks, 
+    loading: artworksLoading, 
+    error: artworksError,
+    retry: retryArtworks
+  } = useArtworks()
+  
+  const { 
+    data: artist, 
+    loading: artistLoading, 
+    error: artistError
+  } = useArtist()
+
+  const loading = artworksLoading || artistLoading
+
+  // Initialize displayed artworks when data loads
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Try API first, then fallback to static data
-        let artworksData: Artwork[] = []
-        let artistData: Artist | undefined
+    if (artworks && artworks.length > 0 && displayedArtworks.length === 0) {
+      const shuffled = [...artworks].sort(() => 0.5 - Math.random())
+      setDisplayedArtworks(shuffled.slice(0, 8))
+    }
+  }, [artworks, displayedArtworks.length])
 
-        try {
-          const artworksResponse = await fetch('/api/artworks')
-          const artworksJson = await artworksResponse.json()
-          
-          if (artworksJson.success && artworksJson.data && artworksJson.data.length > 0) {
-            artworksData = artworksJson.data
-          } else {
-            // Fallback to static data
-            artworksData = await getArtworks()
-          }
-        } catch (apiError) {
-          console.log('API failed, using static data:', apiError)
-          artworksData = await getArtworks()
-        }
-
-        try {
-          const artistResponse = await fetch('/api/artist')
-          const artistJson = await artistResponse.json()
-          if (artistJson.success && artistJson.data) {
-            artistData = artistJson.data
-          } else {
-            artistData = await fetchArtist('fallback-artist').catch(() => null) || undefined
-          }
-        } catch (apiError) {
-          console.log('Artist API failed, using static data:', apiError)
-          artistData = await fetchArtist('fallback-artist').catch(() => null) || undefined
-        }
-        
-        setArtworks(artworksData)
-        setArtist(artistData)
-        
-        // Initialize with first 8 random artworks
-        if (artworksData && artworksData.length > 0) {
-          const shuffled = [...artworksData].sort(() => 0.5 - Math.random())
-          setDisplayedArtworks(shuffled.slice(0, 8))
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error)
-        // Final fallback to static data
+  // Fallback to static data if API fails
+  useEffect(() => {
+    if (artworksError && !loading) {
+      console.warn('API failed, attempting to load static data:', artworksError)
+      
+      const loadFallbackData = async () => {
         try {
           const fallbackArtworks = await getArtworks()
-          setArtworks(fallbackArtworks)
           if (fallbackArtworks && fallbackArtworks.length > 0) {
             const shuffled = [...fallbackArtworks].sort(() => 0.5 - Math.random())
             setDisplayedArtworks(shuffled.slice(0, 8))
@@ -80,17 +60,15 @@ export default function HomePage() {
         } catch (fallbackError) {
           console.error('Even fallback failed:', fallbackError)
         }
-      } finally {
-        setLoading(false)
       }
+      
+      loadFallbackData()
     }
-
-    fetchData()
-  }, [])
+  }, [artworksError, loading])
 
   // Enhanced auto-rotation with user control (BMAD: User Ability)
   const startAutoRotation = useCallback(() => {
-    if (artworks.length <= 8 || !isPlaying) return
+    if (!artworks || artworks.length <= 8 || !isPlaying) return
 
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
@@ -99,7 +77,7 @@ export default function HomePage() {
     intervalRef.current = setInterval(() => {
       setCurrentIndex(prev => (prev + 1) % artworks.length)
     }, 4000) // Slightly faster rotation for better engagement
-  }, [artworks.length, isPlaying])
+  }, [artworks, isPlaying])
 
   const stopAutoRotation = useCallback(() => {
     if (intervalRef.current) {
@@ -139,7 +117,7 @@ export default function HomePage() {
 
   // Update displayed artworks when currentIndex changes
   useEffect(() => {
-    if (artworks.length > 8) {
+    if (artworks && artworks.length > 8) {
       const newDisplayed = []
       for (let i = 0; i < 8; i++) {
         const index = (currentIndex + i) % artworks.length
@@ -190,11 +168,11 @@ export default function HomePage() {
                     작품을 불러오는 중...
                   </span>
                 ) : (
-                  `전체 ${artworks.length}개 작품 중 8개 전시`
+                  `전체 ${artworks?.length || 0}개 작품 중 8개 전시`
                 )}
               </p>
               {/* BMAD: Data - Show current position and status */}
-              {!loading && artworks.length > 8 && (
+              {!loading && artworks && artworks.length > 8 && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   현재 {Math.floor(currentIndex / 8) + 1} / {Math.ceil(artworks.length / 8)} 페이지 
                   {isPlaying ? ' • 자동 회전 중' : ' • 일시 정지'}
@@ -203,7 +181,7 @@ export default function HomePage() {
             </div>
             
             {/* BMAD: Ability - Enhanced user controls */}
-            {artworks.length > 8 && (
+            {artworks && artworks.length > 8 && (
               <div className="flex items-center gap-4">
                 {/* Play/Pause Control */}
                 <button
@@ -228,7 +206,7 @@ export default function HomePage() {
                 {/* Page Indicators */}
                 <div className="flex items-center gap-2">
                   <div className="flex space-x-1">
-                    {Array.from({ length: Math.ceil(artworks.length / 8) }).map((_, i) => (
+                    {Array.from({ length: Math.ceil((artworks?.length || 0) / 8) }).map((_, i) => (
                       <button
                         key={i}
                         onClick={() => setCurrentIndex(i * 8)}
@@ -246,7 +224,7 @@ export default function HomePage() {
                 {/* Manual Navigation */}
                 <div className="flex gap-1">
                   <button
-                    onClick={() => setCurrentIndex(prev => prev === 0 ? artworks.length - 8 : Math.max(0, prev - 8))}
+                    onClick={() => setCurrentIndex(prev => prev === 0 ? (artworks?.length || 8) - 8 : Math.max(0, prev - 8))}
                     className="p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                     title="이전 8개 작품"
                   >
@@ -255,7 +233,7 @@ export default function HomePage() {
                     </svg>
                   </button>
                   <button
-                    onClick={() => setCurrentIndex(prev => (prev + 8) >= artworks.length ? 0 : prev + 8)}
+                    onClick={() => setCurrentIndex(prev => (prev + 8) >= (artworks?.length || 8) ? 0 : prev + 8)}
                     className="p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                     title="다음 8개 작품"
                   >
@@ -376,12 +354,12 @@ export default function HomePage() {
                   <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
-                  <span className="text-xs opacity-75 hidden sm:inline">({artworks.length}개 작품)</span>
+                  <span className="text-xs opacity-75 hidden sm:inline">({artworks?.length || 0}개 작품)</span>
                 </Link>
                 
                 {/* Quick action buttons */}
                 <div className="flex items-center gap-2">
-                  {artworks.length > 8 && (
+                  {artworks && artworks.length > 8 && (
                     <button
                       onClick={() => setCurrentIndex(prev => (prev + 8) % artworks.length)}
                       className="flex items-center gap-2 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -395,9 +373,11 @@ export default function HomePage() {
                   
                   <button
                     onClick={() => {
-                      const shuffled = [...artworks].sort(() => 0.5 - Math.random())
-                      setDisplayedArtworks(shuffled.slice(0, 8))
-                      setCurrentIndex(0)
+                      if (artworks) {
+                        const shuffled = [...artworks].sort(() => 0.5 - Math.random())
+                        setDisplayedArtworks(shuffled.slice(0, 8))
+                        setCurrentIndex(0)
+                      }
                     }}
                     className="flex items-center gap-2 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     title="작품을 무작위로 섞어서 다시 표시"
@@ -411,7 +391,7 @@ export default function HomePage() {
               </div>
 
               {/* Enhanced stats and engagement metrics (BMAD: Data visibility) */}
-              {!loading && artworks.length > 0 && (
+              {!loading && artworks && artworks.length > 0 && (
                 <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
                   <div className="text-center space-y-2">
                     <h3 className="text-sm font-medium text-gray-900 dark:text-white">갤러리 현황</h3>

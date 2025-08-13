@@ -2,10 +2,11 @@ import { notFound } from 'next/navigation'
 import { getArtworkBySlug, getArtworks } from '@/lib/artworks'
 import { fetchArtist } from '@/lib/artist'
 import { ArtworkDetailPage } from '@/components/artwork-detail/ArtworkDetailPage'
+import type { Artwork, Artist } from '@/lib/types'
 import type { Metadata } from 'next'
 
 interface ArtworkPageProps {
-  params: Promise<{ slug: string }>
+  params: { slug: string }
 }
 
 // Helper function to sanitize text for metadata
@@ -16,7 +17,7 @@ function sanitizeText(text: string): string {
 }
 
 export async function generateMetadata({ params }: ArtworkPageProps): Promise<Metadata> {
-  const { slug } = await params
+  const { slug } = params
   const artwork = await getArtworkBySlug(slug)
   
   if (!artwork) {
@@ -59,19 +60,40 @@ export async function generateMetadata({ params }: ArtworkPageProps): Promise<Me
 export const dynamic = 'force-dynamic'
 
 export default async function ArtworkPage({ params }: ArtworkPageProps) {
-  const { slug } = await params
+  const { slug } = params
   
   try {
-    // Get artwork and artist data
-    const [artwork, allArtworks, artist] = await Promise.all([
-      getArtworkBySlug(slug),
-      getArtworks(),
-      fetchArtist('fallback-artist').catch(() => undefined)
-    ])
+    console.log(`📄 Loading artwork page for slug: "${slug}"`)
     
-    if (!artwork) {
+    // Validate slug format
+    if (!slug || slug.trim() === '') {
+      console.error('Empty or invalid slug provided')
       notFound()
     }
+    
+    // Get artwork and artist data with timeout
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Request timeout')), 10000)
+    )
+    
+    const [artwork, allArtworks, artist] = await Promise.race([
+      Promise.all([
+        getArtworkBySlug(slug),
+        getArtworks(),
+        fetchArtist('fallback-artist').catch((err) => {
+          console.warn('Failed to fetch artist data:', err)
+          return undefined
+        })
+      ]),
+      timeoutPromise
+    ]) as [Artwork | null, Artwork[], Artist | undefined]
+    
+    if (!artwork) {
+      console.error(`Artwork not found for slug: "${slug}"`)
+      notFound()
+    }
+    
+    console.log(`✅ Successfully loaded artwork: "${artwork.title}" (${artwork.year})`)
     
     // Additional sanitization for artwork data before rendering
     const sanitizedArtwork = {
@@ -81,6 +103,9 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
       artistNote: sanitizeText(artwork.artistNote || ''),
       medium: sanitizeText(artwork.medium || ''),
       dimensions: sanitizeText(artwork.dimensions || ''),
+      // Ensure slug is properly formatted for image generation
+      slug: artwork.slug || slug,
+      id: artwork.id || slug,
     }
     
     return (
@@ -91,7 +116,20 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
       />
     )
   } catch (error) {
-    console.error(`Error rendering artwork page for slug: ${slug}`, error)
+    console.error(`❌ Error rendering artwork page for slug: "${slug}"`, error)
+    
+    // Check if it's a timeout error
+    if (error instanceof Error && error.message === 'Request timeout') {
+      console.error('Request timed out while loading artwork data')
+    }
+    
+    // Log additional debugging information
+    console.error('Error details:', {
+      slug,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      errorStack: error instanceof Error ? error.stack : undefined
+    })
+    
     notFound()
   }
 }

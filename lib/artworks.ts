@@ -63,8 +63,8 @@ export const fallbackArtistData: Artist = {
   },
 }
 
-// Generate comprehensive fallback data for 58 artworks matching Number-based slugs
-export const fallbackArtworksData: Artwork[] = Array.from({ length: 58 }, (_, index) => {
+// Generate comprehensive fallback data for 61 artworks matching Number-based slugs
+export const fallbackArtworksData: Artwork[] = Array.from({ length: 61 }, (_, index) => {
   const id = (index + 1).toString()
   const slug = (index + 1).toString().padStart(2, '0') // 01, 02, 03, etc.
   const year = 2021 + Math.floor(index / 15) // Distribute across years 2021-2024
@@ -76,7 +76,7 @@ export const fallbackArtworksData: Artwork[] = Array.from({ length: 58 }, (_, in
     'Tradition', 'Modern', 'Meeting', 'Farewell', 'Longing', 'Hope', 'Love', 'Freedom', 'Release', 'Creation',
     'Birth', 'Growth', 'Change', 'Completion', 'Beginning', 'End', 'Cycle', 'Essence', 'Truth', 'Wisdom',
     'Insight', 'Enlightenment', 'Meditation', 'Practice', 'Path', 'Journey', 'Purpose', 'Meaning', 'Value', 'Beauty',
-    'Sublime', 'Sacred', 'Divine', 'Light', 'Shadow', 'Void', 'Silence', 'Breath'
+    'Sublime', 'Sacred', 'Divine', 'Light', 'Shadow', 'Void', 'Silence', 'Breath', 'Rhythm', 'Movement', 'Unity'
   ]
   
   const mediums = ['Ink on paper', 'Ink on hanji', 'Ink and color on paper', 'Traditional ink']
@@ -137,12 +137,59 @@ export async function getArtworks(): Promise<Artwork[]> {
 }
 
 /**
- * 특정 slug로 작품 찾기
+ * 특정 slug로 작품 찾기 (Enhanced with better slug matching)
  */
 export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
   try {
+    if (!slug || typeof slug !== 'string') {
+      console.warn('Invalid slug provided to getArtworkBySlug:', slug)
+      return null
+    }
+    
     const artworks = await getArtworks()
-    return artworks.find(artwork => artwork.slug === slug) || null
+    console.log(`🔍 Looking for artwork with slug: "${slug}" in ${artworks.length} artworks`)
+    
+    // Try exact slug match first
+    let found = artworks.find(artwork => artwork.slug === slug)
+    if (found) {
+      console.log(`✅ Found exact slug match for "${slug}":`, found.title)
+      return found
+    }
+    
+    // Try alternative matching patterns for slug format changes
+    if (/^\d{1,2}$/.test(slug)) {
+      // Slug is just a number (e.g., "01", "2", "25")
+      const paddedSlug = slug.padStart(2, '0')
+      found = artworks.find(artwork => 
+        artwork.slug === paddedSlug || 
+        artwork.slug === `anam-${paddedSlug}` ||
+        artwork.number?.toString().padStart(2, '0') === paddedSlug ||
+        artwork.id === slug ||
+        artwork.id === paddedSlug
+      )
+      if (found) {
+        console.log(`✅ Found number-based match for "${slug}":`, found.title)
+        return found
+      }
+    }
+    
+    // Try anam-XX format matching  
+    if (slug.startsWith('anam-')) {
+      const number = slug.replace('anam-', '')
+      found = artworks.find(artwork => 
+        artwork.number?.toString() === number ||
+        artwork.id === number ||
+        artwork.slug === number.padStart(2, '0')
+      )
+      if (found) {
+        console.log(`✅ Found anam-XX format match for "${slug}":`, found.title)
+        return found
+      }
+    }
+    
+    console.warn(`⚠️ No artwork found for slug: "${slug}"`)
+    console.log('Available slugs:', artworks.slice(0, 10).map(a => a.slug))
+    return null
   } catch (error) {
     console.error('❌ Error in getArtworkBySlug:', error)
     return null

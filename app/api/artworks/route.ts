@@ -1,5 +1,6 @@
 import { fetchArtworksFromAirtable } from '@/lib/airtable'
 import { fallbackArtworksData } from '@/lib/artworks'
+import { createErrorResponse, createSuccessResponse, handleExternalServiceError } from '@/lib/error-handler'
 import type { Artwork } from '@/lib/types'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -75,14 +76,8 @@ export async function GET(request: NextRequest) {
       data: finalArtworks,
     })
   } catch (error) {
-    console.error('Failed to fetch artworks:', error)
-
-    // Even on error, return fallback data instead of null
-    return NextResponse.json({
-      success: false,
-      message: 'Using fallback data due to error',
-      data: fallbackArtworksData,
-    }, { status: 200 }) // Return 200 with fallback data instead of error status
+    // Return fallback data with proper error handling
+    return handleExternalServiceError(error, fallbackArtworksData)
   }
 }
 
@@ -113,11 +108,6 @@ export async function POST(request: NextRequest) {
       message: 'Invalid action. Use ?action=refresh to refresh cache',
     })
   } catch (error) {
-    console.error('Failed to refresh cache:', error)
-    return NextResponse.json({
-      success: false,
-      message: 'Failed to refresh cache',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    })
+    return createErrorResponse(error, 500, 'Failed to refresh cache')
   }
 }
