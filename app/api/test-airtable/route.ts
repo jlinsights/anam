@@ -2,6 +2,7 @@ import {
   fetchArtistFromAirtable,
   fetchArtworksFromAirtable,
 } from '@/lib/airtable'
+import { createErrorResponse, createSuccessResponse } from '@/lib/error-handler'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
@@ -16,9 +17,8 @@ export async function GET() {
     const artist = await fetchArtistFromAirtable()
     console.log(`👨‍🎨 Artist found: ${artist ? 'Yes' : 'No'}`)
 
-    return NextResponse.json({
-      success: true,
-      data: {
+    return createSuccessResponse(
+      {
         artworks: {
           count: artworks?.length || 0,
           sample: artworks?.slice(0, 2) || [],
@@ -31,17 +31,9 @@ export async function GET() {
             }
           : null,
       },
-      timestamp: new Date().toISOString(),
-    })
-  } catch (error) {
-    console.error('❌ Airtable test failed:', error)
-    return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString(),
-      },
-      { status: 500 }
+      'Airtable connection test completed successfully'
     )
+  } catch (error) {
+    return createErrorResponse(error, 500, 'Airtable connection test failed')
   }
 }

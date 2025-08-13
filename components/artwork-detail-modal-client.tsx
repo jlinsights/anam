@@ -1,9 +1,13 @@
 'use client'
 
+import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
 import { ArtworkDetailClient } from '@/components/artwork-detail-client'
 import { GalleryDetailImage } from '@/components/optimized-image'
 import { Button } from '@/components/ui/button'
-import { Calendar, CheckCircle, Palette, Ruler, XCircle } from 'lucide-react'
+import { Calendar, CheckCircle, Palette, Ruler, XCircle, X } from 'lucide-react'
+import { AccessibleIconButton, FocusTrap, ScreenReaderOnly } from '@/components/accessibility'
 
 interface ArtworkDetailModalClientProps {
   artwork: any
@@ -15,36 +19,116 @@ export default function ArtworkDetailModalClient({
   recommendedArtworks,
 }: ArtworkDetailModalClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const modalRef = useRef<HTMLDivElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
+
+  // Handle modal accessibility
+  useEffect(() => {
+    if (isModalOpen) {
+      // Store previous focus
+      previousFocusRef.current = document.activeElement as HTMLElement
+      
+      // Prevent body scroll
+      document.body.style.overflow = 'hidden'
+      
+      // Add escape key listener
+      const handleEscapeKey = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          handleCloseModal()
+        }
+      }
+      
+      document.addEventListener('keydown', handleEscapeKey)
+      
+      return () => {
+        document.removeEventListener('keydown', handleEscapeKey)
+        document.body.style.overflow = 'unset'
+        
+        // Restore focus to previous element
+        if (previousFocusRef.current) {
+          previousFocusRef.current.focus()
+        }
+      }
+    }
+  }, [isModalOpen])
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
 
   return (
     <div className='grid grid-cols-1 lg:grid-cols-2 gap-zen-lg max-w-6xl mx-auto'>
       {/* Image Section - 컴팩트화 */}
       <div className='space-y-zen-md'>
         <div className='relative aspect-square rounded-xl overflow-hidden bg-paper border border-stone/20'>
-          <GalleryDetailImage
-            artwork={artwork}
-            className='w-full h-full object-cover zen-hover-scale'
-            onClick={() => setIsModalOpen(true)}
-          />
+          <button
+            onClick={handleOpenModal}
+            className='w-full h-full group focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2'
+            aria-label={`${artwork.title} 확대 이미지 보기`}
+          >
+            <GalleryDetailImage
+              artwork={artwork}
+              className='w-full h-full object-cover zen-hover-scale'
+            />
+            <div className='absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 group-focus:bg-black/20 transition-colors duration-200'>
+              <div className='opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-200 bg-white/90 p-2 rounded-full'>
+                <span className='text-sm font-medium text-gray-900'>확대보기</span>
+              </div>
+            </div>
+          </button>
         </div>
         {/* 모달(라이트박스) 오버레이 */}
         {isModalOpen && (
           <div
+            ref={modalRef}
             className='fixed inset-0 z-50 flex items-center justify-center bg-black/80'
-            onClick={() => setIsModalOpen(false)}
+            role='dialog'
+            aria-modal='true'
+            aria-labelledby='modal-image-title'
+            aria-describedby='modal-image-description'
+            onClick={handleCloseModal}
           >
-            <img
-              src={artwork.imageUrl}
-              alt='작품 전체 이미지'
-              className='max-w-full max-h-full rounded-lg shadow-2xl'
-              onClick={(e) => e.stopPropagation()} // 이미지 클릭 시 모달 닫히지 않게
-            />
-            <button
-              className='absolute top-4 right-4 text-white text-3xl hover:opacity-70 transition-opacity'
-              onClick={() => setIsModalOpen(false)}
-            >
-              ×
-            </button>
+            <FocusTrap isActive={isModalOpen}>
+              <div className='relative max-w-[90vw] max-h-[90vh] flex flex-col items-center'>
+                <img
+                  src={artwork.imageUrl}
+                  alt={`${artwork.title} - 확대 이미지`}
+                  className='max-w-full max-h-full rounded-lg shadow-2xl object-contain'
+                  onClick={(e) => e.stopPropagation()}
+                />
+                
+                {/* Image title and description for screen readers */}
+                <div className='sr-only'>
+                  <h2 id='modal-image-title'>{artwork.title} 확대 이미지</h2>
+                  <p id='modal-image-description'>
+                    {artwork.year}년 작품, {artwork.medium ? `${artwork.medium}, ` : ''}
+                    {artwork.dimensions ? artwork.dimensions : ''}
+                  </p>
+                </div>
+                
+                {/* Accessible close button */}
+                <AccessibleIconButton
+                  icon={<X className='w-6 h-6' />}
+                  label='이미지 확대보기 닫기'
+                  onClick={handleCloseModal}
+                  className='absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm rounded-full p-2'
+                />
+                
+                {/* Image metadata overlay */}
+                <div className='absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm rounded-lg p-4 text-white'>
+                  <h3 className='font-semibold text-lg mb-2'>{artwork.title}</h3>
+                  <div className='flex flex-wrap gap-4 text-sm opacity-90'>
+                    <span>{artwork.year}년</span>
+                    {artwork.medium && <span>{artwork.medium}</span>}
+                    {artwork.dimensions && <span>{artwork.dimensions}</span>}
+                  </div>
+                </div>
+              </div>
+            </FocusTrap>
           </div>
         )}
       </div>
@@ -64,15 +148,17 @@ export default function ArtworkDetailModalClient({
                     ? 'bg-green-50 text-green-700 border border-green-200'
                     : 'bg-red-50 text-red-700 border border-red-200'
                 }`}
+                role='status'
+                aria-label={`작품 상태: ${artwork.available ? '구매가능' : '판매완료'}`}
               >
                 {artwork.available ? (
                   <>
-                    <CheckCircle className='w-4 h-4' />
+                    <CheckCircle className='w-4 h-4' aria-hidden='true' />
                     <span>구매가능</span>
                   </>
                 ) : (
                   <>
-                    <XCircle className='w-4 h-4' />
+                    <XCircle className='w-4 h-4' aria-hidden='true' />
                     <span>판매완료</span>
                   </>
                 )}
@@ -80,70 +166,78 @@ export default function ArtworkDetailModalClient({
             )}
 
             {artwork.price && (
-              <div className='px-zen-md py-zen-xs bg-gold/10 text-gold border border-gold/20 rounded-lg text-sm font-medium'>
+              <div 
+                className='px-zen-md py-zen-xs bg-gold/10 text-gold border border-gold/20 rounded-lg text-sm font-medium'
+                aria-label={`작품 가격: ${artwork.price.toLocaleString()}원`}
+              >
                 {artwork.price.toLocaleString()}원
               </div>
             )}
           </div>
 
-          <div className='flex items-center gap-zen-md text-sm text-ink-light flex-wrap'>
+          {/* 작품 메타데이터 */}
+          <dl className='flex items-center gap-zen-md text-sm text-ink-light flex-wrap'>
             <div className='flex items-center gap-zen-xs'>
-              <Calendar className='w-4 h-4 text-gold' />
-              <span>{artwork.year}년</span>
+              <Calendar className='w-4 h-4 text-gold' aria-hidden='true' />
+              <dt className='sr-only'>제작년도:</dt>
+              <dd>{artwork.year}년</dd>
             </div>
 
             {artwork.medium && (
               <div className='flex items-center gap-zen-xs'>
-                <Palette className='w-4 h-4 text-gold' />
-                <span>{artwork.medium}</span>
+                <Palette className='w-4 h-4 text-gold' aria-hidden='true' />
+                <dt className='sr-only'>재료:</dt>
+                <dd>{artwork.medium}</dd>
               </div>
             )}
 
             {artwork.dimensions && (
               <div className='flex items-center gap-zen-xs'>
-                <Ruler className='w-4 h-4 text-gold' />
-                <span>{artwork.dimensions}</span>
+                <Ruler className='w-4 h-4 text-gold' aria-hidden='true' />
+                <dt className='sr-only'>크기:</dt>
+                <dd>{artwork.dimensions}</dd>
               </div>
             )}
-          </div>
+          </dl>
         </div>
 
         {/* 작품 설명 - 타이포그래피 개선 */}
         {artwork.description && (
-          <div>
-            <h3 className='text-lg font-medium text-ink mb-zen-sm'>
+          <section aria-labelledby='artwork-description-title'>
+            <h2 id='artwork-description-title' className='text-lg font-medium text-ink mb-zen-sm'>
               작품 설명
-            </h3>
+            </h2>
             <p className='text-base text-ink-light leading-relaxed'>
               {artwork.description}
             </p>
-          </div>
+          </section>
         )}
 
         {/* 작가노트(artistNote) - 타이포그래피 개선 */}
         {artwork.artistNote && (
-          <div>
-            <h3 className='text-lg font-medium text-ink mb-zen-sm'>작가노트</h3>
+          <section aria-labelledby='artist-note-title'>
+            <h2 id='artist-note-title' className='text-lg font-medium text-ink mb-zen-sm'>작가노트</h2>
             <p className='text-base text-ink-light leading-relaxed whitespace-pre-line'>
               {artwork.artistNote}
             </p>
-          </div>
+          </section>
         )}
 
         {artwork.tags && artwork.tags.length > 0 && (
-          <div className='space-y-zen-sm'>
-            <h3 className='text-lg font-medium text-ink'>태그</h3>
-            <div className='flex flex-wrap gap-zen-sm'>
+          <section aria-labelledby='artwork-tags-title'>
+            <h2 id='artwork-tags-title' className='text-lg font-medium text-ink mb-zen-sm'>태그</h2>
+            <div className='flex flex-wrap gap-zen-sm' role='list' aria-label='작품 태그 목록'>
               {artwork.tags.map((tag: string, index: number) => (
                 <span
                   key={index}
                   className='px-zen-md py-zen-xs bg-stone/10 text-ink border border-stone/20 rounded-lg text-sm'
+                  role='listitem'
                 >
                   {tag}
                 </span>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
         {/* Action Buttons - 레이아웃 개선 */}
@@ -166,9 +260,9 @@ export default function ArtworkDetailModalClient({
 
       {/* 추천 작품 섹션 - 레이아웃 개선 */}
       {recommendedArtworks.length > 0 && (
-        <div className='lg:col-span-2 mt-zen-2xl'>
+        <section className='lg:col-span-2 mt-zen-2xl' aria-labelledby='recommended-artworks-title'>
           <div className='mb-zen-lg'>
-            <h2 className='text-xl font-semibold text-ink mb-zen-sm'>
+            <h2 id='recommended-artworks-title' className='text-xl font-semibold text-ink mb-zen-sm'>
               다른 작품들
             </h2>
             <p className='text-base text-ink-light'>
@@ -176,17 +270,23 @@ export default function ArtworkDetailModalClient({
             </p>
           </div>
 
-          <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-zen-md'>
-            {recommendedArtworks.map((recommendedArtwork: any) => (
+          <div 
+            className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-zen-md'
+            role='grid'
+            aria-label='추천 작품 갤러리'
+          >
+            {recommendedArtworks.map((recommendedArtwork: any, index: number) => (
               <Link
                 key={recommendedArtwork.id}
                 href={`/gallery/${recommendedArtwork.slug}`}
-                className='group block bg-paper border border-stone/20 rounded-xl overflow-hidden zen-hover-scale'
+                className='group block bg-paper border border-stone/20 rounded-xl overflow-hidden zen-hover-scale focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2'
+                aria-label={`${recommendedArtwork.title}, ${recommendedArtwork.year}년 작품${recommendedArtwork.medium ? `, ${recommendedArtwork.medium}` : ''} - 상세보기`}
+                role='gridcell'
               >
                 <div className='relative aspect-square overflow-hidden'>
                   <Image
                     src={recommendedArtwork.imageUrl}
-                    alt={recommendedArtwork.title}
+                    alt={`${recommendedArtwork.title} - ${recommendedArtwork.year}년 작품`}
                     fill
                     className='object-cover group-hover:scale-105 transition-transform duration-300'
                     sizes='(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw'
@@ -210,7 +310,7 @@ export default function ArtworkDetailModalClient({
               </Link>
             ))}
           </div>
-        </div>
+        </section>
       )}
     </div>
   )

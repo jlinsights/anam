@@ -1,14 +1,44 @@
 /**
- * 고도화된 성능 모니터링 시스템
- * - Real-time 성능 메트릭 수집
- * - 리소스 로딩 최적화 제안
- * - 사용자 경험 품질 지표 추적
+ * Advanced Performance Monitoring System for ANAM Gallery
+ * - Real User Monitoring (RUM) with detailed metrics collection
+ * - Core Web Vitals tracking with performance budgets
+ * - Gallery-specific performance metrics
+ * - Error tracking and performance correlation
+ * - Performance alerts and thresholds
+ * - Bundle analysis and optimization tracking
+ * - Comprehensive performance reports and analytics
  */
 
 // web-vitals를 동적 import로 변경하여 클라이언트 사이드에서만 로드
 
-// 성능 메트릭 타입 정의
-export interface PerformanceMetrics {
+// Gallery-specific performance metrics
+export interface GalleryPerformanceMetrics {
+  // Gallery browsing metrics
+  artworkListLoadTime?: number
+  artworkDetailLoadTime?: number
+  searchResponseTime?: number
+  filterResponseTime?: number
+  imageLoadingTime?: number
+  thumbnailLoadTime?: number
+  infiniteScrollPerformance?: number
+  virtualScrollPerformance?: number
+
+  // User interaction metrics
+  searchInputLatency?: number
+  filterToggleLatency?: number
+  artworkModalOpenTime?: number
+  artworkModalCloseTime?: number
+  navigationLatency?: number
+
+  // Memory and performance
+  galleryMemoryUsage?: number
+  imageMemoryUsage?: number
+  scrollPerformance?: number
+  animationFrameRate?: number
+}
+
+// Enhanced performance metrics
+export interface PerformanceMetrics extends GalleryPerformanceMetrics {
   // Core Web Vitals
   cls?: number
   fcp?: number
@@ -30,13 +60,30 @@ export interface PerformanceMetrics {
   effectiveType?: string
   downlink?: number
   rtt?: number
+  networkLatency?: number
+  bandwidth?: number
 
   // 디바이스 정보
   deviceMemory?: number
   hardwareConcurrency?: number
+  deviceType?: 'mobile' | 'tablet' | 'desktop'
+  screenResolution?: string
+  pixelRatio?: number
 
   // 페이지 로딩 타임라인
   navigationTiming?: NavigationTiming
+
+  // Bundle and optimization metrics
+  bundleSize?: number
+  chunkLoadTime?: number
+  cacheHitRate?: number
+  compressionRatio?: number
+  criticalResourceCount?: number
+
+  // Error correlation metrics
+  errorRate?: number
+  errorCount?: number
+  performanceErrorCorrelation?: number
 }
 
 interface NavigationTiming {
@@ -49,7 +96,35 @@ interface NavigationTiming {
   complete: number
 }
 
-// 성능 경고 임계값
+// Performance budgets and thresholds
+const PERFORMANCE_BUDGETS = {
+  // Gallery-specific budgets
+  GALLERY_LOAD_TIME: 2000, // 2 seconds
+  ARTWORK_DETAIL_LOAD: 1500, // 1.5 seconds
+  SEARCH_RESPONSE: 300, // 300ms
+  FILTER_RESPONSE: 200, // 200ms
+  IMAGE_LOAD_BUDGET: 3000, // 3 seconds for high-res images
+  THUMBNAIL_LOAD_BUDGET: 500, // 500ms for thumbnails
+  MODAL_OPEN_BUDGET: 150, // 150ms for modal opening
+  SCROLL_BUDGET: 16.67, // 60fps (16.67ms per frame)
+  ANIMATION_BUDGET: 16, // 60fps for animations
+
+  // Memory budgets
+  GALLERY_MEMORY_BUDGET: 30 * 1024 * 1024, // 30MB for gallery
+  IMAGE_MEMORY_BUDGET: 50 * 1024 * 1024, // 50MB for images
+  TOTAL_MEMORY_BUDGET: 100 * 1024 * 1024, // 100MB total
+
+  // Bundle budgets
+  MAIN_BUNDLE_BUDGET: 300 * 1024, // 300KB for main bundle
+  CHUNK_BUNDLE_BUDGET: 100 * 1024, // 100KB per chunk
+  TOTAL_BUNDLE_BUDGET: 1024 * 1024, // 1MB total
+
+  // Error thresholds
+  ERROR_RATE_WARNING: 0.01, // 1% error rate
+  ERROR_RATE_CRITICAL: 0.05, // 5% error rate
+}
+
+// Performance thresholds
 const PERFORMANCE_THRESHOLDS = {
   // Core Web Vitals (Google 기준)
   LCP_GOOD: 2500,
@@ -72,6 +147,13 @@ const PERFORMANCE_THRESHOLDS = {
   // 메모리 사용량
   MEMORY_WARNING: 50, // 50MB
   MEMORY_CRITICAL: 100, // 100MB
+
+  // Gallery-specific thresholds
+  GALLERY_LOAD_SLOW: PERFORMANCE_BUDGETS.GALLERY_LOAD_TIME,
+  SEARCH_SLOW: PERFORMANCE_BUDGETS.SEARCH_RESPONSE,
+  FILTER_SLOW: PERFORMANCE_BUDGETS.FILTER_RESPONSE,
+  IMAGE_LOAD_SLOW: PERFORMANCE_BUDGETS.IMAGE_LOAD_BUDGET,
+  MODAL_SLOW: PERFORMANCE_BUDGETS.MODAL_OPEN_BUDGET
 } as const
 
 export class PerformanceMonitor {
@@ -79,10 +161,15 @@ export class PerformanceMonitor {
   private metrics: PerformanceMetrics = {}
   private observers: PerformanceObserver[] = []
   private isMonitoring = false
+  private performanceAlerts: PerformanceAlert[] = []
+  private errorCorrelationData: ErrorCorrelationData[] = []
+  private bundleAnalytics: BundleAnalytics | null = null
 
   // 성능 데이터 수집 콜백
   private onMetricsUpdate?: (metrics: PerformanceMetrics) => void
   private onPerformanceIssue?: (issue: PerformanceIssue) => void
+  private onPerformanceAlert?: (alert: PerformanceAlert) => void
+  private onBudgetExceeded?: (budget: BudgetExceededEvent) => void
 
   static getInstance(): PerformanceMonitor {
     if (!PerformanceMonitor.instance) {
@@ -634,5 +721,707 @@ export function generatePerformanceReport(): {
   }
 }
 
-// 글로벌 성능 모니터 인스턴스
+// Performance alert types
+export interface PerformanceAlert {
+  id: string
+  type: 'budget_exceeded' | 'threshold_exceeded' | 'regression_detected'
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  metric: string
+  value: number
+  threshold: number
+  timestamp: number
+  message: string
+  actionRequired: string[]
+}
+
+// Budget exceeded event
+export interface BudgetExceededEvent {
+  budget: string
+  allocated: number
+  actual: number
+  percentage: number
+  recommendations: string[]
+}
+
+// Error correlation data
+export interface ErrorCorrelationData {
+  timestamp: number
+  errorType: string
+  errorMessage: string
+  performanceMetrics: Partial<PerformanceMetrics>
+  correlation: number
+}
+
+// Bundle analytics
+export interface BundleAnalytics {
+  totalSize: number
+  chunkSizes: Record<string, number>
+  duplicateCode: number
+  unusedCode: number
+  compressionRatio: number
+  loadingPatterns: LoadingPattern[]
+}
+
+// Loading pattern analysis
+export interface LoadingPattern {
+  route: string
+  criticalResources: string[]
+  loadTime: number
+  cacheUtilization: number
+  recommendations: string[]
+}
+
+// Performance regression detection
+export interface PerformanceRegression {
+  metric: string
+  baseline: number
+  current: number
+  degradation: number
+  timestamp: number
+  affectedUsers: number
+}
+
+// Real User Monitoring (RUM) data
+export interface RUMData {
+  sessionId: string
+  userId?: string
+  userAgent: string
+  viewport: { width: number; height: number }
+  connectionType: string
+  deviceType: 'mobile' | 'tablet' | 'desktop'
+  pageMetrics: PerformanceMetrics
+  userJourney: UserInteraction[]
+  errors: ErrorEvent[]
+  timestamp: number
+}
+
+// User interaction tracking
+export interface UserInteraction {
+  type: 'click' | 'scroll' | 'search' | 'filter' | 'navigation'
+  element: string
+  timestamp: number
+  duration: number
+  context: Record<string, any>
+}
+
+// Gallery-specific performance tracking
+export class GalleryPerformanceTracker {
+  private static instance: GalleryPerformanceTracker
+  private interactions: UserInteraction[] = []
+  private performanceEntries: PerformanceEntry[] = []
+
+  static getInstance(): GalleryPerformanceTracker {
+    if (!GalleryPerformanceTracker.instance) {
+      GalleryPerformanceTracker.instance = new GalleryPerformanceTracker()
+    }
+    return GalleryPerformanceTracker.instance
+  }
+
+  // Track gallery loading performance
+  trackGalleryLoad(startTime: number, endTime: number, artworkCount: number): void {
+    const loadTime = endTime - startTime
+    const performanceMonitor = advancedPerformanceMonitor
+    
+    performanceMonitor.updateGalleryMetric('artworkListLoadTime', loadTime)
+    
+    if (loadTime > PERFORMANCE_BUDGETS.GALLERY_LOAD_TIME) {
+      performanceMonitor.triggerAlert({
+        id: `gallery-load-${Date.now()}`,
+        type: 'budget_exceeded',
+        severity: 'medium',
+        metric: 'gallery_load_time',
+        value: loadTime,
+        threshold: PERFORMANCE_BUDGETS.GALLERY_LOAD_TIME,
+        timestamp: Date.now(),
+        message: `Gallery loading exceeded budget: ${loadTime}ms > ${PERFORMANCE_BUDGETS.GALLERY_LOAD_TIME}ms`,
+        actionRequired: [
+          'Optimize image loading strategy',
+          'Implement virtual scrolling',
+          'Reduce initial artwork count',
+          'Add progressive loading'
+        ]
+      })
+    }
+  }
+
+  // Track artwork detail performance
+  trackArtworkDetail(artworkId: string, loadTime: number): void {
+    const performanceMonitor = advancedPerformanceMonitor
+    performanceMonitor.updateGalleryMetric('artworkDetailLoadTime', loadTime)
+    
+    if (loadTime > PERFORMANCE_BUDGETS.ARTWORK_DETAIL_LOAD) {
+      performanceMonitor.triggerBudgetExceeded({
+        budget: 'artwork_detail_load',
+        allocated: PERFORMANCE_BUDGETS.ARTWORK_DETAIL_LOAD,
+        actual: loadTime,
+        percentage: (loadTime / PERFORMANCE_BUDGETS.ARTWORK_DETAIL_LOAD) * 100,
+        recommendations: [
+          'Preload artwork details on hover',
+          'Optimize image sizes',
+          'Cache artwork metadata',
+          'Implement skeleton loading'
+        ]
+      })
+    }
+  }
+
+  // Track search performance
+  trackSearchPerformance(query: string, responseTime: number, resultCount: number): void {
+    const performanceMonitor = advancedPerformanceMonitor
+    performanceMonitor.updateGalleryMetric('searchResponseTime', responseTime)
+    
+    this.interactions.push({
+      type: 'search',
+      element: 'search-input',
+      timestamp: Date.now(),
+      duration: responseTime,
+      context: { query, resultCount }
+    })
+    
+    if (responseTime > PERFORMANCE_BUDGETS.SEARCH_RESPONSE) {
+      performanceMonitor.triggerAlert({
+        id: `search-slow-${Date.now()}`,
+        type: 'threshold_exceeded',
+        severity: responseTime > PERFORMANCE_BUDGETS.SEARCH_RESPONSE * 2 ? 'high' : 'medium',
+        metric: 'search_response_time',
+        value: responseTime,
+        threshold: PERFORMANCE_BUDGETS.SEARCH_RESPONSE,
+        timestamp: Date.now(),
+        message: `Search response time exceeded threshold: ${responseTime}ms`,
+        actionRequired: [
+          'Implement search debouncing',
+          'Add search result caching',
+          'Optimize search algorithm',
+          'Consider server-side search'
+        ]
+      })
+    }
+  }
+
+  // Track filter performance
+  trackFilterPerformance(filters: Record<string, any>, responseTime: number): void {
+    const performanceMonitor = advancedPerformanceMonitor
+    performanceMonitor.updateGalleryMetric('filterResponseTime', responseTime)
+    
+    this.interactions.push({
+      type: 'filter',
+      element: 'filter-controls',
+      timestamp: Date.now(),
+      duration: responseTime,
+      context: { filters }
+    })
+  }
+
+  // Track image loading performance
+  trackImageLoading(imageUrl: string, loadTime: number, size: number): void {
+    const performanceMonitor = advancedPerformanceMonitor
+    const isThumbnail = imageUrl.includes('thumb')
+    
+    if (isThumbnail) {
+      performanceMonitor.updateGalleryMetric('thumbnailLoadTime', loadTime)
+      if (loadTime > PERFORMANCE_BUDGETS.THUMBNAIL_LOAD_BUDGET) {
+        performanceMonitor.triggerBudgetExceeded({
+          budget: 'thumbnail_load_time',
+          allocated: PERFORMANCE_BUDGETS.THUMBNAIL_LOAD_BUDGET,
+          actual: loadTime,
+          percentage: (loadTime / PERFORMANCE_BUDGETS.THUMBNAIL_LOAD_BUDGET) * 100,
+          recommendations: [
+            'Optimize thumbnail compression',
+            'Use WebP format',
+            'Implement lazy loading',
+            'Add blur placeholder'
+          ]
+        })
+      }
+    } else {
+      performanceMonitor.updateGalleryMetric('imageLoadingTime', loadTime)
+      if (loadTime > PERFORMANCE_BUDGETS.IMAGE_LOAD_BUDGET) {
+        performanceMonitor.triggerAlert({
+          id: `image-load-slow-${Date.now()}`,
+          type: 'budget_exceeded',
+          severity: 'medium',
+          metric: 'image_load_time',
+          value: loadTime,
+          threshold: PERFORMANCE_BUDGETS.IMAGE_LOAD_BUDGET,
+          timestamp: Date.now(),
+          message: `Image loading exceeded budget: ${loadTime}ms`,
+          actionRequired: [
+            'Implement progressive JPEG',
+            'Add image optimization',
+            'Use CDN for images',
+            'Consider image format optimization'
+          ]
+        })
+      }
+    }
+  }
+
+  // Track scroll performance
+  trackScrollPerformance(frameDuration: number): void {
+    const performanceMonitor = advancedPerformanceMonitor
+    performanceMonitor.updateGalleryMetric('scrollPerformance', frameDuration)
+    
+    if (frameDuration > PERFORMANCE_BUDGETS.SCROLL_BUDGET) {
+      console.warn(`Scroll performance issue: ${frameDuration}ms frame duration`)
+    }
+  }
+
+  // Get user journey analytics
+  getUserJourney(): UserInteraction[] {
+    return [...this.interactions]
+  }
+
+  // Clear tracking data
+  clearTrackingData(): void {
+    this.interactions = []
+    this.performanceEntries = []
+  }
+}
+
+// Bundle performance analyzer
+export class BundlePerformanceAnalyzer {
+  private static instance: BundlePerformanceAnalyzer
+
+  static getInstance(): BundlePerformanceAnalyzer {
+    if (!BundlePerformanceAnalyzer.instance) {
+      BundlePerformanceAnalyzer.instance = new BundlePerformanceAnalyzer()
+    }
+    return BundlePerformanceAnalyzer.instance
+  }
+
+  // Analyze bundle performance
+  async analyzeBundles(): Promise<BundleAnalytics> {
+    const bundles = await this.getBundleInfo()
+    const analytics: BundleAnalytics = {
+      totalSize: bundles.reduce((sum, bundle) => sum + bundle.size, 0),
+      chunkSizes: bundles.reduce((acc, bundle) => {
+        acc[bundle.name] = bundle.size
+        return acc
+      }, {} as Record<string, number>),
+      duplicateCode: await this.analyzeDuplicateCode(bundles),
+      unusedCode: await this.analyzeUnusedCode(),
+      compressionRatio: await this.analyzeCompressionRatio(bundles),
+      loadingPatterns: await this.analyzeLoadingPatterns()
+    }
+
+    // Check budget violations
+    if (analytics.totalSize > PERFORMANCE_BUDGETS.TOTAL_BUNDLE_BUDGET) {
+      advancedPerformanceMonitor.triggerBudgetExceeded({
+        budget: 'total_bundle_size',
+        allocated: PERFORMANCE_BUDGETS.TOTAL_BUNDLE_BUDGET,
+        actual: analytics.totalSize,
+        percentage: (analytics.totalSize / PERFORMANCE_BUDGETS.TOTAL_BUNDLE_BUDGET) * 100,
+        recommendations: [
+          'Enable code splitting',
+          'Remove unused dependencies',
+          'Implement dynamic imports',
+          'Optimize vendor chunks'
+        ]
+      })
+    }
+
+    return analytics
+  }
+
+  private async getBundleInfo(): Promise<Array<{name: string, size: number}>> {
+    // This would integrate with webpack-bundle-analyzer or similar
+    const entries = performance.getEntriesByType('resource') as PerformanceResourceTiming[]
+    return entries
+      .filter(entry => entry.name.includes('.js'))
+      .map(entry => ({
+        name: this.extractBundleName(entry.name),
+        size: entry.transferSize || entry.encodedBodySize || 0
+      }))
+  }
+
+  private extractBundleName(url: string): string {
+    const match = url.match(/\/([^\/]+)\.js$/)
+    return match ? match[1] : url
+  }
+
+  private async analyzeDuplicateCode(bundles: Array<{name: string, size: number}>): Promise<number> {
+    // Placeholder for duplicate code analysis
+    return 0
+  }
+
+  private async analyzeUnusedCode(): Promise<number> {
+    // Placeholder for unused code analysis
+    return 0
+  }
+
+  private async analyzeCompressionRatio(bundles: Array<{name: string, size: number}>): Promise<number> {
+    const entries = performance.getEntriesByType('resource') as PerformanceResourceTiming[]
+    const jsEntries = entries.filter(entry => entry.name.includes('.js'))
+    
+    if (jsEntries.length === 0) return 1
+    
+    const totalTransferred = jsEntries.reduce((sum, entry) => sum + (entry.transferSize || 0), 0)
+    const totalUncompressed = jsEntries.reduce((sum, entry) => sum + (entry.decodedBodySize || entry.transferSize || 0), 0)
+    
+    return totalUncompressed > 0 ? totalTransferred / totalUncompressed : 1
+  }
+
+  private async analyzeLoadingPatterns(): Promise<LoadingPattern[]> {
+    // Analyze how resources load across different routes
+    const currentRoute = typeof window !== 'undefined' ? window.location.pathname : '/'
+    const entries = performance.getEntriesByType('resource') as PerformanceResourceTiming[]
+    
+    const criticalResources = entries
+      .filter(entry => entry.startTime < 1000) // Loaded within first second
+      .map(entry => entry.name)
+    
+    const avgLoadTime = entries.length > 0 ? 
+      entries.reduce((sum, entry) => sum + entry.duration, 0) / entries.length : 0
+    
+    return [{
+      route: currentRoute,
+      criticalResources,
+      loadTime: avgLoadTime,
+      cacheUtilization: this.calculateCacheUtilization(entries),
+      recommendations: this.generateLoadingRecommendations(entries)
+    }]
+  }
+
+  private calculateCacheUtilization(entries: PerformanceResourceTiming[]): number {
+    const cachedEntries = entries.filter(entry => entry.transferSize === 0)
+    return entries.length > 0 ? cachedEntries.length / entries.length : 0
+  }
+
+  private generateLoadingRecommendations(entries: PerformanceResourceTiming[]): string[] {
+    const recommendations: string[] = []
+    
+    const largeResources = entries.filter(entry => (entry.transferSize || 0) > 100 * 1024)
+    if (largeResources.length > 0) {
+      recommendations.push('Consider code splitting for large resources')
+    }
+    
+    const slowResources = entries.filter(entry => entry.duration > 1000)
+    if (slowResources.length > 0) {
+      recommendations.push('Optimize slow-loading resources')
+    }
+    
+    const uncachedResources = entries.filter(entry => entry.transferSize > 0)
+    if (uncachedResources.length / entries.length > 0.8) {
+      recommendations.push('Improve caching strategy')
+    }
+    
+    return recommendations
+  }
+}
+
+// Error correlation analyzer
+export class ErrorCorrelationAnalyzer {
+  private static instance: ErrorCorrelationAnalyzer
+  private errorData: ErrorCorrelationData[] = []
+
+  static getInstance(): ErrorCorrelationAnalyzer {
+    if (!ErrorCorrelationAnalyzer.instance) {
+      ErrorCorrelationAnalyzer.instance = new ErrorCorrelationAnalyzer()
+    }
+    return ErrorCorrelationAnalyzer.instance
+  }
+
+  // Analyze error-performance correlation
+  analyzeErrorCorrelation(error: Error, metrics: PerformanceMetrics): void {
+    const correlationData: ErrorCorrelationData = {
+      timestamp: Date.now(),
+      errorType: error.constructor.name,
+      errorMessage: error.message,
+      performanceMetrics: { ...metrics },
+      correlation: this.calculateCorrelation(error, metrics)
+    }
+
+    this.errorData.push(correlationData)
+    
+    // Keep only last 100 error entries
+    if (this.errorData.length > 100) {
+      this.errorData = this.errorData.slice(-100)
+    }
+
+    // Send to performance monitoring
+    advancedPerformanceMonitor.reportErrorCorrelation(correlationData)
+  }
+
+  private calculateCorrelation(error: Error, metrics: PerformanceMetrics): number {
+    // Simple correlation calculation based on performance degradation
+    let correlationScore = 0
+    
+    if (metrics.lcp && metrics.lcp > PERFORMANCE_THRESHOLDS.LCP_POOR) {
+      correlationScore += 0.3
+    }
+    
+    if (metrics.fid && metrics.fid > PERFORMANCE_THRESHOLDS.FID_POOR) {
+      correlationScore += 0.2
+    }
+    
+    if (metrics.cls && metrics.cls > PERFORMANCE_THRESHOLDS.CLS_POOR) {
+      correlationScore += 0.2
+    }
+    
+    // Check if error is performance-related
+    const performanceRelatedErrors = ['ChunkLoadError', 'NetworkError', 'TimeoutError']
+    if (performanceRelatedErrors.some(type => error.message.includes(type))) {
+      correlationScore += 0.3
+    }
+    
+    return Math.min(correlationScore, 1)
+  }
+
+  // Get error correlation insights
+  getCorrelationInsights(): {
+    highCorrelationErrors: ErrorCorrelationData[]
+    performanceImpactingErrors: string[]
+    recommendations: string[]
+  } {
+    const highCorrelationErrors = this.errorData.filter(data => data.correlation > 0.7)
+    
+    const errorTypes = this.errorData.reduce((acc, data) => {
+      acc[data.errorType] = (acc[data.errorType] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
+    
+    const performanceImpactingErrors = Object.entries(errorTypes)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 5)
+      .map(([type]) => type)
+    
+    const recommendations = this.generateCorrelationRecommendations(highCorrelationErrors)
+    
+    return {
+      highCorrelationErrors,
+      performanceImpactingErrors,
+      recommendations
+    }
+  }
+
+  private generateCorrelationRecommendations(errors: ErrorCorrelationData[]): string[] {
+    const recommendations: string[] = []
+    
+    if (errors.some(e => e.errorType === 'ChunkLoadError')) {
+      recommendations.push('Implement retry logic for chunk loading failures')
+      recommendations.push('Add fallback loading strategies')
+    }
+    
+    if (errors.some(e => e.performanceMetrics.lcp && e.performanceMetrics.lcp > 4000)) {
+      recommendations.push('Optimize Largest Contentful Paint to reduce error correlation')
+    }
+    
+    if (errors.some(e => e.performanceMetrics.cls && e.performanceMetrics.cls > 0.25)) {
+      recommendations.push('Fix layout shift issues to prevent interaction errors')
+    }
+    
+    return recommendations
+  }
+}
+
+// Performance regression detector
+export class PerformanceRegressionDetector {
+  private static instance: PerformanceRegressionDetector
+  private baselines: Map<string, number> = new Map()
+  private history: Map<string, number[]> = new Map()
+
+  static getInstance(): PerformanceRegressionDetector {
+    if (!PerformanceRegressionDetector.instance) {
+      PerformanceRegressionDetector.instance = new PerformanceRegressionDetector()
+    }
+    return PerformanceRegressionDetector.instance
+  }
+
+  // Set performance baseline
+  setBaseline(metric: string, value: number): void {
+    this.baselines.set(metric, value)
+  }
+
+  // Check for performance regression
+  checkRegression(metric: string, currentValue: number): PerformanceRegression | null {
+    const baseline = this.baselines.get(metric)
+    if (!baseline) return null
+
+    const degradation = ((currentValue - baseline) / baseline) * 100
+    
+    // Consider it a regression if performance degraded by more than 20%
+    if (degradation > 20) {
+      const regression: PerformanceRegression = {
+        metric,
+        baseline,
+        current: currentValue,
+        degradation,
+        timestamp: Date.now(),
+        affectedUsers: 1 // Would be calculated from real user data
+      }
+
+      advancedPerformanceMonitor.triggerAlert({
+        id: `regression-${metric}-${Date.now()}`,
+        type: 'regression_detected',
+        severity: degradation > 50 ? 'critical' : 'high',
+        metric,
+        value: currentValue,
+        threshold: baseline,
+        timestamp: Date.now(),
+        message: `Performance regression detected in ${metric}: ${degradation.toFixed(1)}% degradation`,
+        actionRequired: [
+          'Investigate recent code changes',
+          'Check for infrastructure issues',
+          'Review performance optimizations',
+          'Consider rollback if critical'
+        ]
+      })
+
+      return regression
+    }
+
+    return null
+  }
+
+  // Update metric history
+  updateHistory(metric: string, value: number): void {
+    if (!this.history.has(metric)) {
+      this.history.set(metric, [])
+    }
+    
+    const history = this.history.get(metric)!
+    history.push(value)
+    
+    // Keep only last 50 values
+    if (history.length > 50) {
+      history.shift()
+    }
+    
+    // Update baseline to rolling average
+    const average = history.reduce((sum, val) => sum + val, 0) / history.length
+    this.setBaseline(metric, average)
+  }
+}
+
+// Enhanced performance monitor with new capabilities
+export class AdvancedPerformanceMonitor extends PerformanceMonitor {
+  private galleryTracker = GalleryPerformanceTracker.getInstance()
+  private bundleAnalyzer = BundlePerformanceAnalyzer.getInstance()
+  private errorCorrelator = ErrorCorrelationAnalyzer.getInstance()
+  private regressionDetector = PerformanceRegressionDetector.getInstance()
+
+  // Gallery-specific monitoring methods
+  updateGalleryMetric(metric: keyof GalleryPerformanceMetrics, value: number): void {
+    this.metrics[metric] = value
+    this.updateMetrics()
+    
+    // Check for regressions
+    this.regressionDetector.updateHistory(metric, value)
+    this.regressionDetector.checkRegression(metric, value)
+  }
+
+  // Trigger performance alert
+  triggerAlert(alert: PerformanceAlert): void {
+    this.performanceAlerts.push(alert)
+    console.warn('🚨 Performance Alert:', alert)
+    this.onPerformanceAlert?.(alert)
+    
+    // Send to analytics
+    this.sendPerformanceData('performance-alert', alert)
+  }
+
+  // Trigger budget exceeded event
+  triggerBudgetExceeded(event: BudgetExceededEvent): void {
+    console.warn('💰 Budget Exceeded:', event)
+    this.onBudgetExceeded?.(event)
+    
+    // Send to analytics
+    this.sendPerformanceData('budget-exceeded', event)
+  }
+
+  // Report error correlation
+  reportErrorCorrelation(data: ErrorCorrelationData): void {
+    this.errorCorrelationData.push(data)
+    
+    if (data.correlation > 0.7) {
+      this.triggerAlert({
+        id: `error-correlation-${Date.now()}`,
+        type: 'threshold_exceeded',
+        severity: 'high',
+        metric: 'error_correlation',
+        value: data.correlation,
+        threshold: 0.7,
+        timestamp: Date.now(),
+        message: `High error-performance correlation detected: ${data.errorType}`,
+        actionRequired: [
+          'Investigate performance impact of errors',
+          'Implement error prevention strategies',
+          'Monitor user experience degradation'
+        ]
+      })
+    }
+  }
+
+  // Get comprehensive performance report
+  async getAdvancedReport(): Promise<{
+    score: number
+    metrics: PerformanceMetrics
+    alerts: PerformanceAlert[]
+    bundleAnalytics: BundleAnalytics
+    correlationInsights: ReturnType<ErrorCorrelationAnalyzer['getCorrelationInsights']>
+    userJourney: UserInteraction[]
+    recommendations: string[]
+  }> {
+    const baseReport = generatePerformanceReport()
+    const bundleAnalytics = await this.bundleAnalyzer.analyzeBundles()
+    const correlationInsights = this.errorCorrelator.getCorrelationInsights()
+    const userJourney = this.galleryTracker.getUserJourney()
+    
+    return {
+      ...baseReport,
+      alerts: this.performanceAlerts,
+      bundleAnalytics,
+      correlationInsights,
+      userJourney,
+      recommendations: [
+        ...baseReport.recommendations,
+        ...correlationInsights.recommendations
+      ]
+    }
+  }
+
+  // Real User Monitoring data collection
+  collectRUMData(): RUMData {
+    return {
+      sessionId: this.generateSessionId(),
+      userAgent: navigator.userAgent,
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight
+      },
+      connectionType: this.metrics.connectionType || 'unknown',
+      deviceType: this.detectDeviceType(),
+      pageMetrics: { ...this.metrics },
+      userJourney: this.galleryTracker.getUserJourney(),
+      errors: [], // Would be populated by error tracking
+      timestamp: Date.now()
+    }
+  }
+
+  private generateSessionId(): string {
+    return Math.random().toString(36).substring(2, 15) + 
+           Math.random().toString(36).substring(2, 15)
+  }
+
+  private detectDeviceType(): 'mobile' | 'tablet' | 'desktop' {
+    const width = window.innerWidth
+    if (width < 768) return 'mobile'
+    if (width < 1024) return 'tablet'
+    return 'desktop'
+  }
+}
+
+// Export enhanced performance monitor instance
+export const advancedPerformanceMonitor = new AdvancedPerformanceMonitor()
+
+// Export gallery tracker for component use
+export const galleryPerformanceTracker = GalleryPerformanceTracker.getInstance()
+
+// Export bundle analyzer
+export const bundlePerformanceAnalyzer = BundlePerformanceAnalyzer.getInstance()
+
+// Export error correlator
+export const errorCorrelationAnalyzer = ErrorCorrelationAnalyzer.getInstance()
+
+// 글로벌 성능 모니터 인스턴스 (backward compatibility)
 export const performanceMonitor = PerformanceMonitor.getInstance()

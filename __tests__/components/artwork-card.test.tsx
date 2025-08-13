@@ -1,4 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { axe, toHaveNoViolations } from 'jest-axe'
 import {
   ArtworkCard,
   ArtworkGrid,
@@ -6,6 +8,9 @@ import {
 } from '@/components/artwork-card'
 import { mockArtwork } from '../lib/hooks/artwork.mock'
 import type { Artwork } from '@/lib/types'
+
+// Add jest-axe matchers
+expect.extend(toHaveNoViolations)
 
 // Mock the optimized image component
 jest.mock('@/components/optimized-image', () => ({
@@ -198,6 +203,32 @@ describe('ArtworkCard', () => {
       const image = screen.getByTestId('gallery-image')
       expect(image).toHaveAttribute('data-artwork-title', mockArtwork.title)
     })
+
+    it('접근성 위반이 없어야 한다', async () => {
+      const { container } = render(<ArtworkCard {...defaultProps} />)
+      const results = await axe(container)
+      expect(results).toHaveNoViolations()
+    })
+
+    it('키보드 네비게이션이 가능해야 한다', async () => {
+      const user = userEvent.setup()
+      render(<ArtworkCard {...defaultProps} showActions={true} />)
+      
+      // Tab through interactive elements
+      await user.tab()
+      expect(screen.getByTestId('artwork-link')).toHaveFocus()
+      
+      await user.tab()
+      expect(screen.getByText('좋아요')).toHaveFocus()
+      
+      await user.tab()
+      expect(screen.getByText('공유')).toHaveFocus()
+    })
+
+    it('스크린 리더를 위한 숨겨진 텍스트가 있어야 한다', () => {
+      render(<ArtworkCard {...defaultProps} />)
+      expect(screen.getByText(mockArtwork.title)).toBeInTheDocument()
+    })
   })
 })
 
@@ -251,6 +282,20 @@ describe('ArtworkGrid', () => {
     const { container } = render(<ArtworkGrid artworks={[]} />)
     const grid = container.querySelector('.grid')
     expect(grid?.children).toHaveLength(0)
+  })
+
+  describe('접근성', () => {
+    it('그리드에 접근성 위반이 없어야 한다', async () => {
+      const { container } = render(<ArtworkGrid artworks={mockArtworks} />)
+      const results = await axe(container)
+      expect(results).toHaveNoViolations()
+    })
+
+    it('적절한 ARIA 속성을 가져야 한다', () => {
+      const { container } = render(<ArtworkGrid artworks={mockArtworks} />)
+      const grid = container.querySelector('.grid')
+      expect(grid).toHaveAttribute('role', 'list')
+    })
   })
 })
 

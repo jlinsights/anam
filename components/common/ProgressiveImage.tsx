@@ -218,8 +218,10 @@ interface ArtworkImageProps extends Omit<ProgressiveImageProps, 'src' | 'alt'> {
   artwork: {
     imageUrl?: string
     number?: number | string
+    slug?: string
     title: string
     year: number
+    id?: string
   }
   size?: 'thumb' | 'medium' | 'large'
   quality?: number
@@ -233,36 +235,82 @@ export function ArtworkImage({
   alt,
   ...props 
 }: ArtworkImageProps) {
-  // Generate optimized image URLs
+  // Generate optimized image URLs with enhanced error handling
   const generateImageUrl = (artwork: ArtworkImageProps['artwork'], size: string) => {
-    if (artwork.number) {
-      // Use optimized image system
-      const paddedNumber = String(artwork.number).padStart(2, '0')
-      return `/Images/Artworks/optimized/${paddedNumber}/${paddedNumber}-${size}.jpg`
+    try {
+      // 우선순위 1: slug에서 숫자 추출 (new format: "01", "02", etc.)
+      if (artwork.slug && typeof artwork.slug === 'string') {
+        // Try direct number format first (01, 02, 03...)
+        if (/^\d{1,2}$/.test(artwork.slug)) {
+          const paddedNumber = artwork.slug.padStart(2, '0')
+          return `/Images/Artworks/optimized/${paddedNumber}/${paddedNumber}-${size}.jpg`
+        }
+        // Try anam-XX format
+        const numberMatch = artwork.slug.match(/anam-(\d+)/)
+        if (numberMatch) {
+          const paddedNumber = numberMatch[1].padStart(2, '0')
+          return `/Images/Artworks/optimized/${paddedNumber}/${paddedNumber}-${size}.jpg`
+        }
+      }
+      
+      // 우선순위 2: number 필드 사용
+      if (artwork.number) {
+        const paddedNumber = String(artwork.number).padStart(2, '0')
+        return `/Images/Artworks/optimized/${paddedNumber}/${paddedNumber}-${size}.jpg`
+      }
+      
+      // 우선순위 3: id 필드에서 숫자 추출
+      if (artwork.id && typeof artwork.id === 'string') {
+        const idNumber = parseInt(artwork.id)
+        if (!isNaN(idNumber)) {
+          const paddedNumber = idNumber.toString().padStart(2, '0')
+          return `/Images/Artworks/optimized/${paddedNumber}/${paddedNumber}-${size}.jpg`
+        }
+      }
+      
+      console.warn('Could not generate image URL for artwork:', {
+        title: artwork.title,
+        slug: artwork.slug,
+        number: artwork.number,
+        id: artwork.id
+      })
+      // Fallback to legacy system or placeholder
+      return artwork.imageUrl || '/images/placeholder-artwork.svg'
+    } catch (error) {
+      console.error('Error generating image URL:', error, 'for artwork:', artwork.title)
+      return '/images/placeholder-artwork.svg'
     }
-    
-    // Fallback to legacy system
-    return artwork.imageUrl || '/Images/placeholder.jpg'
   }
 
   const src = generateImageUrl(artwork, size)
   const fallbackSrc = generateImageUrl(artwork, 'thumb')
   
-  // Enhanced blur data URL with Korean traditional colors
-  const blurDataURL = `data:image/svg+xml;base64,${btoa(`
-    <svg width="400" height="500" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" style="stop-color:rgb(254,252,232);stop-opacity:1" />
-          <stop offset="100%" style="stop-color:rgb(120,113,108);stop-opacity:1" />
-        </linearGradient>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#grad)"/>
-      <text x="50%" y="50%" text-anchor="middle" font-family="serif" font-size="14" fill="#6b7280">
-        ${artwork.title}
-      </text>
-    </svg>
-  `)}`
+  // Enhanced blur data URL with Korean traditional colors (SSR-safe)
+  const generateBlurDataURL = () => {
+    const svgString = `
+      <svg width="400" height="500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:rgb(254,252,232);stop-opacity:1" />
+            <stop offset="100%" style="stop-color:rgb(120,113,108);stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grad)"/>
+        <text x="50%" y="50%" text-anchor="middle" font-family="serif" font-size="14" fill="#6b7280">
+          ${artwork.title || 'Loading...'}
+        </text>
+      </svg>
+    `.trim()
+    
+    // Use Buffer.from for Node.js SSR compatibility
+    if (typeof window === 'undefined') {
+      return `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}`
+    } else {
+      return `data:image/svg+xml;base64,${btoa(svgString)}`
+    }
+  }
+
+  const blurDataURL = generateBlurDataURL()
 
   return (
     <ProgressiveImage

@@ -1,3 +1,4 @@
+import { createErrorResponse, createSuccessResponse, handleValidationError } from '@/lib/error-handler'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
@@ -77,23 +78,19 @@ export async function POST(request: NextRequest) {
     // 이메일 전송
     await transporter.sendMail(mailOptions)
 
-    return NextResponse.json(
-      { message: '문의가 성공적으로 전송되었습니다.' },
-      { status: 200 }
+    return createSuccessResponse(
+      { sent: true },
+      '문의가 성공적으로 전송되었습니다.'
     )
   } catch (error) {
-    console.error('Contact form error:', error)
-
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: '입력 데이터가 올바르지 않습니다.', details: error.errors },
-        { status: 400 }
-      )
+      return handleValidationError(error)
     }
 
-    return NextResponse.json(
-      { error: '문의 전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },
-      { status: 500 }
+    return createErrorResponse(
+      error,
+      500,
+      '문의 전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
     )
   }
 }

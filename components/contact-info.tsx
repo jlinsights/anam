@@ -1,46 +1,16 @@
 'use client'
 
 import { Clock, Loader2, Mail, MapPin, Phone, Globe } from 'lucide-react'
+import { Artist } from '@/lib/types'
+import { ErrorBoundary } from '@/components/error-boundary'
+import { useArtist } from '@/hooks/use-artwork-api'
 
 interface ContactInfoProps {
   className?: string
 }
 
 export function ContactInfo({ className = '' }: ContactInfoProps) {
-  const [artist, setArtist] = useState<Artist | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    async function fetchArtist() {
-      try {
-        setIsLoading(true)
-        setError(null)
-
-        const response = await fetch('/api/artist')
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-
-        const result = await response.json()
-
-        if (result.success && result.data) {
-          setArtist(result.data)
-        } else {
-          console.warn('Failed to fetch artist data:', result.message)
-          setError('작가 정보를 불러올 수 없습니다.')
-        }
-      } catch (error) {
-        console.error('Error fetching artist data:', error)
-        setError('연락처 정보를 불러오는 중 오류가 발생했습니다.')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchArtist()
-  }, [])
+  const { data: artist, loading: isLoading, error, retry } = useArtist()
 
   if (isLoading) {
     return (
@@ -80,7 +50,7 @@ export function ContactInfo({ className = '' }: ContactInfoProps) {
               {error}
             </p>
             <button
-              onClick={() => window.location.reload()}
+              onClick={retry}
               className='text-xs text-gold hover:text-gold/80 underline'
             >
               다시 시도

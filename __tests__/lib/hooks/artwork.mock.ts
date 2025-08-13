@@ -1,4 +1,4 @@
-import type { Artwork } from '@/lib/types'
+import type { Artwork, Artist } from '@/lib/types'
 
 export const mockArtwork: Artwork = {
   id: '1',
@@ -69,4 +69,60 @@ export const mockArtworkWithoutOptionalFields: Artwork = {
   aspectRatio: '1/1',
   description: '기본 작품',
   imageUrl: '/images/default.jpg',
+}
+
+export const mockArtist: Artist = {
+  id: '1',
+  name: '배옥영',
+  bio: '한국의 현대 서예가로, 전통 서예와 현대적 감각을 결합한 독특한 작품 세계를 구축하고 있습니다.',
+  statement: '서예는 단순한 글씨가 아닌, 마음과 정신을 표현하는 예술입니다.',
+  profileImageUrl: '/Images/Artist/artist.png',
+  birthYear: 1970,
+  education: [
+    '서울대학교 동양화과 졸업',
+    '중국 베이징대학 서예과 석사',
+  ],
+  exhibitions: [
+    '2024 개인전 - 갤러리 현대',
+    '2023 그룹전 - 국립현대미술관',
+    '2022 개인전 - 아람미술관',
+  ],
+  awards: [
+    '2024 대한민국서예대전 대상',
+    '2023 김정호서예상',
+    '2022 전국서예공모전 금상',
+  ],
+  collections: [
+    '국립현대미술관',
+    '서울시립미술관',
+    '부산시립미술관',
+  ],
+  website: 'https://anam-gallery.com',
+  email: 'artist@anam-gallery.com',
+  phone: '+82-10-1234-5678',
+  socialLinks: {
+    instagram: '@anam_artist',
+    facebook: 'anam.artist',
+    website: 'https://anam-gallery.com',
+  },
+  birthPlace: '서울, 대한민국',
+  currentLocation: '서울, 대한민국',
+  specialties: ['한글서예', '한문서예', '현대서예'],
+  influences: ['김정희', '원교', '조맹부'],
+  teachingExperience: [
+    '서울대학교 미술대학 겸임교수 (2020-현재)',
+    '홍익대학교 미술대학 강사 (2018-2020)',
+  ],
+  publications: [
+    '현대서예의 이해 (2023)',
+    '먹과 붓의 대화 (2021)',
+  ],
+  memberships: [
+    '한국서예협회',
+    '대한서예가협회',
+    '현대서예연구회',
+  ],
+  philosophy: '서예는 마음을 닦고 정신을 수양하는 도구이며, 아름다운 글씨는 아름다운 마음에서 나옵니다.',
+  techniques: ['해서', '행서', '초서', '전서', '예서'],
+  materials: ['한지', '선지', '화선지', '먹', '붓'],
 }

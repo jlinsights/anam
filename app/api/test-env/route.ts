@@ -1,10 +1,20 @@
+import { createSuccessResponse } from '@/lib/error-handler'
+
 export async function GET() {
-  return Response.json({
-    // kakao_api_key: process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY
-    //   ? "exists"
-    //   : "missing",
-    // kakao_key_length: process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY?.length || 0,
-    airtable_key: process.env.AIRTABLE_API_KEY ? 'exists' : 'missing',
-    airtable_base: process.env.AIRTABLE_BASE_ID ? 'exists' : 'missing',
-  })
+  // Only expose environment info in development
+  if (process.env.NODE_ENV === 'production') {
+    return createSuccessResponse(
+      { env: 'production' },
+      'Environment information is not available in production'
+    )
+  }
+
+  return createSuccessResponse(
+    {
+      airtable_key: process.env.AIRTABLE_API_KEY ? 'exists' : 'missing',
+      airtable_base: process.env.AIRTABLE_BASE_ID ? 'exists' : 'missing',
+      node_env: process.env.NODE_ENV,
+    },
+    'Environment variables status retrieved'
+  )
 }

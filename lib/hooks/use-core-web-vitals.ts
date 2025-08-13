@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from 'react'
 
 interface CoreWebVitalsMetrics {
   lcp: number | null
-  fid: number | null
   cls: number | null
   fcp: number | null
   inp: number | null
@@ -13,7 +12,6 @@ interface CoreWebVitalsMetrics {
 
 interface WebVitalsThresholds {
   lcp: { good: number; poor: number }
-  fid: { good: number; poor: number }
   cls: { good: number; poor: number }
   fcp: { good: number; poor: number }
   inp: { good: number; poor: number }
@@ -22,7 +20,6 @@ interface WebVitalsThresholds {
 
 const THRESHOLDS: WebVitalsThresholds = {
   lcp: { good: 2500, poor: 4000 },
-  fid: { good: 100, poor: 300 },
   cls: { good: 0.1, poor: 0.25 },
   fcp: { good: 1800, poor: 3000 },
   inp: { good: 200, poor: 500 },
@@ -32,7 +29,6 @@ const THRESHOLDS: WebVitalsThresholds = {
 export function useCoreWebVitals() {
   const [metrics, setMetrics] = useState<CoreWebVitalsMetrics>({
     lcp: null,
-    fid: null,
     cls: null,
     fcp: null,
     inp: null,
@@ -106,16 +102,16 @@ export function useCoreWebVitals() {
 
     const loadWebVitals = async () => {
       try {
-        const { getCLS, getFCP, getFID, getLCP, getTTFB } = await import('web-vitals')
+        const { onCLS, onFCP, onINP, onLCP, onTTFB } = await import('web-vitals')
         
         if (!mounted) return
 
         // Set up metric collection
-        getCLS(metric => updateMetric('cls', metric.value))
-        getFCP(metric => updateMetric('fcp', metric.value))
-        getFID(metric => updateMetric('fid', metric.value))
-        getLCP(metric => updateMetric('lcp', metric.value))
-        getTTFB(metric => updateMetric('ttfb', metric.value))
+        onCLS((metric: any) => updateMetric('cls', metric.value))
+        onFCP((metric: any) => updateMetric('fcp', metric.value))
+        onINP((metric: any) => updateMetric('inp', metric.value))
+        onLCP((metric: any) => updateMetric('lcp', metric.value))
+        onTTFB((metric: any) => updateMetric('ttfb', metric.value))
 
         // INP measurement (newer metric)
         if ('PerformanceObserver' in window) {

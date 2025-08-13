@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Artwork, Artist } from '@/lib/types'
 import { ArtworkImage } from '@/components/common/ProgressiveImage'
+import { ArtworkErrorBoundary } from '@/components/error-boundary/ArtworkErrorBoundary'
 
 interface ArtworkDetailPageProps {
   artwork: Artwork
@@ -36,14 +37,15 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
   const nextArtwork = currentIndex < allArtworks.length - 1 ? allArtworks[currentIndex + 1] : null
 
   return (
-    <div className="min-h-screen bg-paper">
+    <ArtworkErrorBoundary>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header with navigation */}
-      <header className="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm border-b-2 border-ink">
-        <div className="max-w-7xl mx-auto px-zen-md py-zen-sm">
+      <header className="sticky top-0 z-50 bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur-sm border-b-2 border-gray-800 dark:border-gray-200">
+        <div className="max-w-7xl mx-auto px-8 py-4">
           <div className="flex justify-between items-center">
             <button 
               onClick={() => router.back()}
-              className="flex items-center text-ink hover:text-gold transition-colors duration-300"
+              className="flex items-center text-gray-900 dark:text-white hover:text-yellow-600 transition-colors duration-300"
             >
               <span className="mr-2">←</span>
               <span className="font-display font-medium">뒤로가기</span>
@@ -53,19 +55,19 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
               {previousArtwork && (
                 <Link 
                   href={`/gallery/${previousArtwork.slug}`}
-                  className="p-2 text-ink hover:text-gold transition-colors duration-300"
+                  className="p-2 text-gray-900 dark:text-white hover:text-yellow-600 transition-colors duration-300"
                   title="이전 작품"
                 >
                   ←
                 </Link>
               )}
-              <span className="font-display text-sm text-ink-light">
+              <span className="font-display text-sm text-gray-600 dark:text-gray-400">
                 {currentIndex + 1} / {allArtworks.length}
               </span>
               {nextArtwork && (
                 <Link 
                   href={`/gallery/${nextArtwork.slug}`}
-                  className="p-2 text-ink hover:text-gold transition-colors duration-300"
+                  className="p-2 text-gray-900 dark:text-white hover:text-yellow-600 transition-colors duration-300"
                   title="다음 작품"
                 >
                   →
@@ -76,9 +78,9 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-zen-md py-zen-xl">
+      <main className="max-w-7xl mx-auto px-6 py-16">
         {/* Main artwork section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-zen-xl items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Artwork image */}
           <motion.div
             className="relative"
@@ -87,8 +89,8 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
             transition={{ duration: 0.8 }}
           >
             <div className="
-              relative aspect-square bg-paper-cream border-4 border-ink
-              shadow-brutal hover:shadow-brutal-strong
+              relative aspect-square bg-amber-50 dark:bg-amber-900 border-4 border-gray-900 dark:border-gray-100
+              shadow-lg hover:shadow-xl
               transition-all duration-500
               overflow-hidden
             ">
@@ -98,20 +100,25 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
                 className="absolute inset-4"
                 priority={true}
                 onLoad={() => setImageLoaded(true)}
+                onError={() => {
+                  console.warn('Failed to load artwork image for:', artwork.title)
+                  setImageLoaded(true) // Hide loading state even on error
+                }}
+                fallbackSrc="/Images/placeholder.jpg"
               />
               
               {/* Loading overlay */}
               <AnimatePresence>
                 {!imageLoaded && (
                   <motion.div
-                    className="absolute inset-4 bg-paper-warm flex items-center justify-center"
+                    className="absolute inset-4 bg-orange-50 dark:bg-orange-900 flex items-center justify-center"
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.5 }}
                   >
                     <div className="text-center">
-                      <div className="w-12 h-12 border-2 border-ink border-t-transparent rounded-full animate-spin mb-4"></div>
-                      <p className="font-display text-ink-light">작품 이미지 로딩중...</p>
+                      <div className="w-12 h-12 border-2 border-gray-900 dark:border-gray-100 border-t-transparent rounded-full animate-spin mb-4"></div>
+                      <p className="font-display text-gray-600 dark:text-gray-400">작품 이미지 로딩중...</p>
                     </div>
                   </motion.div>
                 )}
@@ -121,16 +128,16 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
 
           {/* Artwork information */}
           <motion.div
-            className="space-y-zen-lg"
+            className="space-y-8"
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <div>
-              <h1 className="font-calligraphy font-bold text-ink text-3xl md:text-4xl mb-zen-sm">
+              <h1 className="font-calligraphy font-bold text-gray-900 dark:text-white text-3xl md:text-4xl mb-4">
                 {artwork.title}
               </h1>
-              <div className="flex flex-wrap gap-2 text-lg font-display text-ink-light mb-zen-md">
+              <div className="flex flex-wrap gap-2 text-lg font-display text-gray-600 dark:text-gray-400 mb-6">
                 <span>{artwork.year}년</span>
                 {artwork.medium && (
                   <>
@@ -150,13 +157,13 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
             {/* Description */}
             {artwork.description && (
               <motion.div
-                className="bg-paper-warm p-zen-lg border-l-4 border-gold"
+                className="bg-orange-50 dark:bg-orange-900 p-8 border-l-4 border-yellow-600"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
-                <h3 className="font-display font-semibold text-ink mb-zen-sm">작품 해설</h3>
-                <p className="font-display text-ink leading-relaxed whitespace-pre-wrap">
+                <h3 className="font-display font-semibold text-gray-900 dark:text-white mb-4">작품 해설</h3>
+                <p className="font-display text-gray-900 dark:text-white leading-relaxed whitespace-pre-wrap">
                   {artwork.description}
                 </p>
               </motion.div>
@@ -165,17 +172,17 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
             {/* Artist notes */}
             {artwork.artistNote && (
               <motion.div
-                className="bg-paper-cream p-zen-lg border-2 border-ink/20"
+                className="bg-amber-50 dark:bg-amber-900 p-8 border-2 border-gray-900/20 dark:border-gray-100/20"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-                <h3 className="font-display font-semibold text-ink mb-zen-sm">작가 노트</h3>
-                <blockquote className="font-display text-ink-light italic leading-relaxed">
+                <h3 className="font-display font-semibold text-gray-900 dark:text-white mb-4">작가 노트</h3>
+                <blockquote className="font-display text-gray-600 dark:text-gray-400 italic leading-relaxed">
                   "{artwork.artistNote}"
                 </blockquote>
                 {artist?.name && (
-                  <cite className="block mt-zen-sm text-sm text-ink-light">
+                  <cite className="block mt-4 text-sm text-gray-600 dark:text-gray-400">
                     - {artist.name}
                   </cite>
                 )}
@@ -184,14 +191,14 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
 
             {/* Technical details */}
             <motion.div
-              className="grid grid-cols-1 sm:grid-cols-2 gap-zen-md"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.8 }}
             >
               <div className="space-y-2">
-                <h4 className="font-display font-semibold text-ink">작품 정보</h4>
-                <div className="space-y-1 text-sm text-ink-light">
+                <h4 className="font-display font-semibold text-gray-900 dark:text-white">작품 정보</h4>
+                <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
                   <div><strong>제작연도:</strong> {artwork.year}년</div>
                   {artwork.medium && <div><strong>재료:</strong> {artwork.medium}</div>}
                   {artwork.dimensions && <div><strong>크기:</strong> {artwork.dimensions}</div>}
@@ -200,8 +207,8 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
               </div>
               
               <div className="space-y-2">
-                <h4 className="font-display font-semibold text-ink">수집 정보</h4>
-                <div className="space-y-1 text-sm text-ink-light">
+                <h4 className="font-display font-semibold text-gray-900 dark:text-white">수집 정보</h4>
+                <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
                   <div><strong>작품 ID:</strong> {artwork.id}</div>
                   <div><strong>소장:</strong> 개인 소장</div>
                   <div><strong>상태:</strong> 양호</div>
@@ -212,7 +219,7 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
                         {artwork.tags.map((tag, index) => (
                           <span 
                             key={index}
-                            className="px-2 py-1 bg-gold/20 text-ink text-xs rounded"
+                            className="px-2 py-1 bg-yellow-600/20 text-gray-900 dark:text-white text-xs rounded"
                           >
                             #{tag}
                           </span>
@@ -226,19 +233,19 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
 
             {/* Action buttons */}
             <motion.div
-              className="flex flex-col sm:flex-row gap-zen-sm pt-zen-md"
+              className="flex flex-col sm:flex-row gap-4 pt-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 1 }}
             >
               <button className="
-                px-zen-lg py-zen-md
-                bg-ink text-paper font-display font-bold
-                hover:bg-gold hover:text-ink
+                px-8 py-4
+                bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-display font-bold
+                hover:bg-yellow-600 hover:text-gray-900
                 transition-all duration-300
-                shadow-brutal hover:shadow-brutal-strong
+                shadow-lg hover:shadow-xl
                 transform hover:-translate-x-1 hover:-translate-y-1
-                border-4 border-ink hover:border-gold
+                border-4 border-gray-900 dark:border-gray-100 hover:border-yellow-600
               ">
                 고화질 이미지 보기
               </button>
@@ -246,11 +253,11 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
               <Link 
                 href="/#artist"
                 className="
-                  inline-block text-center px-zen-lg py-zen-md
-                  bg-paper border-4 border-ink text-ink font-display font-bold
-                  hover:bg-ink hover:text-paper
+                  inline-block text-center px-8 py-4
+                  bg-white dark:bg-gray-800 border-4 border-gray-900 dark:border-gray-100 text-gray-900 dark:text-white font-display font-bold
+                  hover:bg-gray-900 dark:hover:bg-gray-100 hover:text-white dark:hover:text-gray-900
                   transition-all duration-300
-                  shadow-brutal-offset hover:shadow-brutal
+                  shadow-lg hover:shadow-xl
                   transform hover:translate-x-1 hover:translate-y-1
                 "
               >
@@ -263,16 +270,16 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
         {/* Related artworks */}
         {relatedArtworks.length > 0 && (
           <motion.section
-            className="mt-zen-2xl pt-zen-xl border-t-2 border-ink/20"
+            className="mt-24 pt-16 border-t-2 border-gray-900/20 dark:border-gray-100/20"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.2 }}
           >
-            <h2 className="font-calligraphy font-bold text-ink text-2xl mb-zen-lg text-center">
+            <h2 className="font-calligraphy font-bold text-gray-900 dark:text-white text-2xl mb-8 text-center">
               관련 작품
             </h2>
             
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-zen-md">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
               {relatedArtworks.map((relatedArtwork, index) => (
                 <motion.div
                   key={relatedArtwork.id}
@@ -285,8 +292,8 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
                     className="block group"
                   >
                     <div className="
-                      relative aspect-square bg-paper-cream border-2 border-ink
-                      shadow-brutal-sm group-hover:shadow-brutal
+                      relative aspect-square bg-amber-50 dark:bg-amber-900 border-2 border-gray-900 dark:border-gray-100
+                      shadow-md group-hover:shadow-lg
                       transition-all duration-300
                       group-hover:-translate-x-1 group-hover:-translate-y-1
                       overflow-hidden
@@ -298,19 +305,19 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
                       />
                       
                       <div className="
-                        absolute inset-0 bg-gold/10 opacity-0 group-hover:opacity-100
+                        absolute inset-0 bg-yellow-600/10 opacity-0 group-hover:opacity-100
                         transition-opacity duration-300
                         flex items-center justify-center
                       ">
-                        <span className="font-display text-ink text-xs">보기</span>
+                        <span className="font-display text-gray-900 dark:text-white text-xs">보기</span>
                       </div>
                     </div>
                     
                     <div className="mt-2 text-center">
-                      <p className="font-display text-ink text-sm font-medium truncate">
+                      <p className="font-display text-gray-900 dark:text-white text-sm font-medium truncate">
                         {relatedArtwork.title}
                       </p>
-                      <p className="font-display text-ink-light text-xs">
+                      <p className="font-display text-gray-600 dark:text-gray-400 text-xs">
                         {relatedArtwork.year}년
                       </p>
                     </div>
@@ -322,5 +329,6 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
         )}
       </main>
     </div>
+    </ArtworkErrorBoundary>
   )
 }

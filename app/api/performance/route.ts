@@ -1,3 +1,4 @@
+import { createErrorResponse, createSuccessResponse } from '@/lib/error-handler'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -36,26 +37,12 @@ export async function POST(request: NextRequest) {
     // 성능 데이터 집계 및 분석
     const analysis = analyzePerformanceData(data)
 
-    return NextResponse.json({
-      success: true,
-      message: 'Performance data received successfully',
-      analysis,
-      timestamp: new Date().toISOString(),
-    })
-  } catch (error) {
-    console.error('Failed to process performance data:', error)
-
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Failed to process performance data',
-        error:
-          process.env.NODE_ENV === 'development'
-            ? (error as Error).message
-            : 'Internal server error',
-      },
-      { status: 500 }
+    return createSuccessResponse(
+      { analysis },
+      'Performance data received successfully'
     )
+  } catch (error) {
+    return createErrorResponse(error, 500, 'Failed to process performance data')
   }
 }
 
@@ -68,26 +55,12 @@ export async function GET(request: NextRequest) {
     // 실제 환경에서는 데이터베이스에서 조회
     const mockStats = generateMockPerformanceStats(timeframe)
 
-    return NextResponse.json({
-      success: true,
-      data: mockStats,
-      timeframe,
-      generated_at: new Date().toISOString(),
-    })
-  } catch (error) {
-    console.error('Failed to fetch performance stats:', error)
-
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Failed to fetch performance statistics',
-        error:
-          process.env.NODE_ENV === 'development'
-            ? (error as Error).message
-            : 'Internal server error',
-      },
-      { status: 500 }
+    return createSuccessResponse(
+      { stats: mockStats, timeframe },
+      'Performance statistics retrieved successfully'
     )
+  } catch (error) {
+    return createErrorResponse(error, 500, 'Failed to fetch performance statistics')
   }
 }
 

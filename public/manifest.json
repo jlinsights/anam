@@ -1,15 +1,17 @@
 {
   "name": "아남 배옥영 서예 갤러리",
   "short_name": "아남 서예",
-  "description": "아남 배옥영 작가의 현대 서예 작품을 온라인으로 감상할 수 있는 디지털 갤러리",
+  "description": "아남 배옥영 작가의 현대 서예 작품을 온라인으로 감상할 수 있는 디지털 갤러리입니다. 전통과 현대가 조화된 독창적인 서예 작품들을 만나보세요.",
   "lang": "ko",
-  "start_url": "/",
+  "start_url": "/?utm_source=pwa&utm_medium=homescreen",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
   "theme_color": "#1a1a1a",
   "background_color": "#ffffff",
   "scope": "/",
-  "categories": ["art", "culture", "calligraphy", "gallery"],
+  "id": "/",
+  "categories": ["art", "culture", "calligraphy", "gallery", "museum", "education"],
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
@@ -81,7 +83,28 @@
       "name": "갤러리",
       "short_name": "갤러리",
       "description": "현대 서예 작품 갤러리로 바로가기",
-      "url": "/gallery",
+      "url": "/gallery?utm_source=pwa&utm_medium=shortcut",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "작가 소개",
+      "short_name": "작가",
+      "description": "배옥영 작가의 프로필과 이력",
+      "url": "/artist?utm_source=pwa&utm_medium=shortcut",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "전시 일정",
+      "short_name": "전시",
+      "description": "진행중인 전시회와 예정된 전시 일정",
+      "url": "/exhibitions?utm_source=pwa&utm_medium=shortcut",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "연락처",
+      "short_name": "연락",
+      "description": "갤러리 문의 및 연락처 정보",
+      "url": "/contact?utm_source=pwa&utm_medium=shortcut",
       "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     }
   ],
@@ -89,5 +112,40 @@
   "prefer_related_applications": false,
   "edge_side_panel": {
     "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "handle_links": "preferred",
+  "capture_links": "existing-client-navigate",
+  "protocol_handlers": [
+    {
+      "protocol": "web+anam",
+      "url": "/?action=%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "image/*": [".jpg", ".jpeg", ".png", ".webp", ".gif"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "files",
+          "accept": ["image/*"]
+        }
+      ]
+    }
   }
 }

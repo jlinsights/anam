@@ -40,13 +40,25 @@ const customJestConfig = {
   // 테스트 setup 파일
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 
-  // 테스트 커버리지 임계값
+  // 테스트 커버리지 임계값 (85%로 상향)
   coverageThreshold: {
     global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70,
+      branches: 85,
+      functions: 85,
+      lines: 85,
+      statements: 85,
+    },
+    './components/**/*.{js,jsx,ts,tsx}': {
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90,
+    },
+    './lib/**/*.{js,jsx,ts,tsx}': {
+      branches: 85,
+      functions: 85,
+      lines: 85,
+      statements: 85,
     },
   },
 

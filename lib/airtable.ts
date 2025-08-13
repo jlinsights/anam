@@ -124,6 +124,13 @@ async function createAirtableBase() {
  * 헬퍼 함수들
  */
 
+// 텍스트 필드 정리 함수 - 제어 문자 및 문제가 되는 문자 제거
+function sanitizeText(text: any): string {
+  if (!text || typeof text !== 'string') return ''
+  // Remove control characters (0x00-0x1F) and DEL characters (0x7F-0x9F)
+  return text.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim()
+}
+
 // 필드 값을 우선순위에 따라 가져오는 함수
 function getFieldValue(fields: any, fieldNames: string[]): any {
   for (const fieldName of fieldNames) {
@@ -132,7 +139,9 @@ function getFieldValue(fields: any, fieldNames: string[]): any {
       fields[fieldName] !== null &&
       fields[fieldName] !== ''
     ) {
-      return fields[fieldName]
+      const value = fields[fieldName]
+      // Sanitize text fields
+      return typeof value === 'string' ? sanitizeText(value) : value
     }
   }
   return null
@@ -140,14 +149,17 @@ function getFieldValue(fields: any, fieldNames: string[]): any {
 
 // 슬러그 생성 함수
 function createSlug(title: string, year: number | string): string {
-  if (!title || title.trim() === '') {
+  // First sanitize the title
+  const sanitizedTitle = sanitizeText(title)
+  
+  if (!sanitizedTitle || sanitizedTitle.trim() === '') {
     return `anam-untitled-${year || 2024}`
   }
   
   // Clean and normalize the year
   const cleanYear = year && year.toString().trim() !== '' ? year : 2024
   
-  const cleanTitle = title
+  const cleanTitle = sanitizedTitle
     .toLowerCase()
     .replace(/[^\w\s가-힣]/g, '') // Remove special characters
     .replace(/\s+/g, '-') // Replace spaces with dashes
@@ -233,6 +245,7 @@ const ARTWORK_FIELD_MAP: Record<string, string[]> = {
   category: ['category', 'Category', '카테고리'],
   available: ['available', 'Available', '판매여부'],
   number: ['number', 'Number', '번호', 'ID', 'id', 'ArtworkNumber', 'artwork_number'],
+  slug: ['slug', 'Slug', 'SLUG', 'slug_id', 'SlugId', '슬러그'],
 }
 
 const ARTIST_FIELD_MAP: Record<string, string[]> = {
@@ -392,17 +405,41 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
         fields.medium ||
         '화선지에 먹') as string
 
-      // Use Number field for slug to match image filenames
-      const artworkNumber = pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number')
-      let slug = artworkNumber 
-        ? String(artworkNumber).padStart(2, '0') // Ensure 2-digit format (01, 02, etc.)
-        : createSlug(title, year || 2024) // Fallback to title-based slug
+      // 우선순위 1: Airtable slug 필드 사용
+      const airtableSlug = pickField<string>(fields, ARTWORK_FIELD_MAP, 'slug')
+      let slug = airtableSlug
       
-      // Skip problematic records that cause InvalidCharacterError
-      const problemNumbers = ['25', '31', '58', '27', '43', '45']
-      if (problemNumbers.includes(String(artworkNumber))) {
-        console.warn(`⚠️ Skipping problematic record ${artworkNumber}: may cause build errors`)
-        return // Skip this record
+      // 우선순위 2: Number 필드를 이용한 slug 생성
+      if (!slug) {
+        const artworkNumber = pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number')
+        slug = artworkNumber 
+          ? `anam-${String(artworkNumber).padStart(2, '0')}` // anam-01, anam-02 형식
+          : createSlug(title, year || 2024) // Fallback to title-based slug
+      }
+      
+      // slug 유효성 검사
+      if (!slug || slug.trim() === '') {
+        console.warn(`⚠️ Skipping record ${index + 1}: invalid slug`)
+        return
+      }
+      
+      // Airtable에서 받은 slug가 anam-XX-2024 형식이면 anam-XX로 변환
+      if (slug && slug.includes('-2024')) {
+        const cleanSlug = slug.replace('-2024', '')
+        if (/^anam-\d+$/.test(cleanSlug)) {
+          slug = cleanSlug
+          console.log(`✅ Cleaned slug: ${slug}`)
+        }
+      }
+      
+      // Validate slug format - ensure it's anam-XX format
+      if (slug && !/^anam-\d+$/.test(slug)) {
+        console.warn(`⚠️ Invalid slug format for artwork: ${slug}`)
+        // Use number-based slug as fallback
+        const artworkNumber = pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number')
+        slug = artworkNumber 
+          ? `anam-${String(artworkNumber).padStart(2, '0')}`
+          : `anam-${String(index + 1).padStart(2, '0')}`
       }
       
       const artwork: Artwork = {
@@ -418,10 +455,25 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
         description: pickField<string>(fields, ARTWORK_FIELD_MAP, 'description') || '',
         number: pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number'), // Airtable Number 필드
         imageUrl: (() => {
-          // 우선순위 1: Airtable Number 필드를 이용한 로컬 이미지 매칭
+          // 우선순위 1: Airtable slug 필드를 이용한 최적화된 이미지 매칭
+          const airtableSlug = pickField<string>(fields, ARTWORK_FIELD_MAP, 'slug')
+          if (airtableSlug) {
+            // slug에서 숫자 추출 (anam-01, anam-02 형식)
+            const slugMatch = airtableSlug.match(/anam-(\d+)/)
+            if (slugMatch) {
+              const slugNumber = slugMatch[1].padStart(2, '0') // 01, 02, 03...
+              const slugBasedPath = `/Images/Artworks/optimized/${slugNumber}/${slugNumber}-medium.jpg`
+              
+              if (index === 0) {
+                console.log('✅ Using Airtable slug-based image path:', slugBasedPath, '(Slug:', airtableSlug, ')')
+              }
+              return slugBasedPath
+            }
+          }
+          
+          // 우선순위 2: Airtable Number 필드를 이용한 로컬 이미지 매칭 (fallback)
           const artworkNumber = pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number')
           if (artworkNumber) {
-            // 동적 import 대신 상단에서 import한 함수 사용
             const numberBasedPath = `/Images/Artworks/optimized/${String(artworkNumber).padStart(2, '0')}/${String(artworkNumber).padStart(2, '0')}-medium.jpg`
             
             if (index === 0) {
@@ -430,7 +482,7 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
             return numberBasedPath
           }
           
-          // 우선순위 2: Airtable Attachment 필드에서 URL 추출
+          // 우선순위 3: Airtable Attachment 필드에서 URL 추출
           const imageField = getFieldValue(fields, [
             'image',
             'Image',
@@ -458,7 +510,7 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
             }
           }
           
-          // 우선순위 3: 직접 URL 필드 확인 (문자열로 저장된 경우)
+          // 우선순위 4: 직접 URL 필드 확인 (문자열로 저장된 경우)
           const directUrl = getFieldValue(fields, [
             'imageUrl',
             'ImageUrl',
@@ -475,17 +527,14 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
             return directUrl
           }
           
-          // 우선순위 4: 레거시 slug 기반 fallback
-          const slug = fields.slug || createSlug(title, year || 2024)
-          const yearNum = year ? parseInt(year.toString()) : 2024
-          // 동적 import 대신 직접 경로 생성
-          const legacyPath = `/Images/Artworks/${yearNum}/${slug}-medium.jpg`
+          // 우선순위 5: 최종 fallback - 기본 이미지 경로
+          const defaultPath = `/Images/Artworks/optimized/01/01-medium.jpg`
           
           if (index === 0) {
-            console.log('⚠️ Using legacy slug-based fallback path:', legacyPath)
+            console.log('⚠️ Using default fallback path:', defaultPath)
           }
           
-          return legacyPath
+          return defaultPath
         })(),
         imageUrlQuery: `${title} calligraphy art`,
         artistNote: pickField<string>(fields, ARTWORK_FIELD_MAP, 'artistNote') || '',
