@@ -281,6 +281,42 @@ const config: Config = {
           light: 'hsl(var(--gold-light))',
           dark: 'hsl(var(--gold-dark))',
         },
+        // Aceternity UI Custom Cultural Colors
+        spring: {
+          DEFAULT: 'oklch(0.85 0.10 142)', // 봄 - 연한 초록
+          primary: 'oklch(0.70 0.15 142)',
+          secondary: 'oklch(0.92 0.08 142)',
+          accent: 'oklch(0.75 0.12 142)',
+          muted: 'oklch(0.95 0.05 142)',
+        },
+        summer: {
+          DEFAULT: 'oklch(0.80 0.12 158)', // 여름 - 진한 초록
+          primary: 'oklch(0.65 0.18 158)',
+          secondary: 'oklch(0.88 0.10 158)',
+          accent: 'oklch(0.72 0.15 158)',
+          muted: 'oklch(0.93 0.06 158)',
+        },
+        autumn: {
+          DEFAULT: 'oklch(0.75 0.15 45)', // 가을 - 황금색
+          primary: 'oklch(0.60 0.20 45)',
+          secondary: 'oklch(0.85 0.12 45)',
+          accent: 'oklch(0.68 0.18 45)',
+          muted: 'oklch(0.90 0.08 45)',
+        },
+        winter: {
+          DEFAULT: 'oklch(0.70 0.05 260)', // 겨울 - 차가운 회색
+          primary: 'oklch(0.55 0.08 260)',
+          secondary: 'oklch(0.82 0.03 260)',
+          accent: 'oklch(0.62 0.06 260)',
+          muted: 'oklch(0.88 0.02 260)',
+        },
+        eternal: {
+          DEFAULT: 'oklch(0.25 0.08 30)', // 영원 - 먹색 기반
+          primary: 'oklch(0.20 0.10 30)',
+          secondary: 'oklch(0.92 0.02 30)',
+          accent: 'oklch(0.68 0.12 45)', // 금색 액센트
+          muted: 'oklch(0.95 0.01 30)',
+        },
       },
       fontFamily: {
         display: ['var(--font-noto-serif-kr)', 'Noto Serif KR', 'serif'],
