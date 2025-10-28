@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 🎨 Aceternity UI Theme Integration */
+@import './aceternity-theme.css';
+
 /* Enhanced Gallery Animations for BMAD UX Improvements */
 @keyframes fade-in {
   from {

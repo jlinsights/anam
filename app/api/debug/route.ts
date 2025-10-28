@@ -1,13 +1,18 @@
 import { getArtworks } from '@/lib/artworks'
-import { isDebugAllowed } from '@/lib/debug-guard'
+import { validateDebugAccess } from '@/lib/debug-guard'
 import { createErrorResponse, createSuccessResponse, handleNotFoundError } from '@/lib/error-handler'
 import { NextResponse } from 'next/server'
 
-export async function GET() {
-  // Check if debug routes are allowed
-  if (!isDebugAllowed()) {
+export async function GET(request: Request) {
+  // Enhanced security check with context validation
+  const { allowed, reason, context } = validateDebugAccess(request)
+  
+  if (!allowed) {
+    console.warn('🔒 Debug route access denied:', { reason, context })
     return handleNotFoundError('Debug endpoint')
   }
+
+  console.info('🔓 Debug route access granted:', { reason, ip: context.ip })
 
   try {
     const artworks = await getArtworks()

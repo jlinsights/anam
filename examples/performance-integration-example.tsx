@@ -12,13 +12,28 @@ import { usePerformanceContext } from '@/components/performance-provider'
 import { usePerformanceMeasurement, useScrollPerformance } from '@/hooks/use-performance-monitoring'
 import PerformanceDashboard from '@/components/performance-dashboard'
 import PerformanceReport from '@/components/performance-report'
+import type { Artwork } from '@/lib/types'
+
+// 🎯 SuperClaude Pattern: Proper Interface Definitions
+interface ArtworkExample {
+  id: number
+  title: string
+  imageUrl: string
+  thumbnailUrl: string
+}
+
+interface FilterState {
+  category?: string
+  year?: number
+  medium?: string
+}
 
 // Example: Gallery Component with Performance Tracking
 export function ExampleGallery() {
-  const [artworks, setArtworks] = useState<any[]>([])
+  const [artworks, setArtworks] = useState<ArtworkExample[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [filters, setFilters] = useState({})
+  const [filters, setFilters] = useState<FilterState>({})
 
   // Performance monitoring hooks
   const {
@@ -38,10 +53,10 @@ export function ExampleGallery() {
       setIsLoading(true)
       
       // Measure gallery loading time
-      const { result: loadedArtworks, duration } = await measure('gallery-load', async () => {
+      const { result: loadedArtworks, duration } = await measure('gallery-load', async (): Promise<ArtworkExample[]> => {
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1200))
-        return Array.from({ length: 50 }, (_, i) => ({
+        return Array.from({ length: 50 }, (_, i): ArtworkExample => ({
           id: i + 1,
           title: `Artwork ${i + 1}`,
           imageUrl: `/images/artworks/optimized/${i + 1}/${i + 1}-medium.webp`,
@@ -84,7 +99,7 @@ export function ExampleGallery() {
   }, [artworks, measure, trackSearchPerformance, trackError])
 
   // Track filter performance
-  const handleFilter = useCallback(async (newFilters: Record<string, any>) => {
+  const handleFilter = useCallback(async (newFilters: FilterState) => {
     try {
       const { duration } = await measure('filter-operation', async () => {
         // Simulate filter processing
@@ -185,13 +200,12 @@ export function ExampleGallery() {
 }
 
 // Example: Artwork Card with Image Loading Tracking
-function ArtworkCard({ 
-  artwork, 
-  onImageLoad 
-}: { 
-  artwork: any
-  onImageLoad: (imageUrl: string, startTime: number) => void 
-}) {
+interface ArtworkCardProps {
+  artwork: ArtworkExample
+  onImageLoad: (imageUrl: string, startTime: number) => void
+}
+
+function ArtworkCard({ artwork, onImageLoad }: ArtworkCardProps) {
   const [imageStartTime, setImageStartTime] = useState<number>(0)
   const { trackError } = usePerformanceContext()
 
