@@ -309,28 +309,38 @@
 
 /* Cultural Context Integration */
 .aceternity-cultural-spring {
-  @apply bg-gradient-to-br from-spring/10 to-spring/5;
-  @apply border-spring/20;
+  background: linear-gradient(to bottom right, 
+    oklch(0.85 0.10 142 / 0.1), 
+    oklch(0.85 0.10 142 / 0.05));
+  border-color: oklch(0.85 0.10 142 / 0.2);
 }
 
 .aceternity-cultural-summer {
-  @apply bg-gradient-to-br from-summer/10 to-summer/5;
-  @apply border-summer/20;
+  background: linear-gradient(to bottom right, 
+    oklch(0.80 0.12 158 / 0.1), 
+    oklch(0.80 0.12 158 / 0.05));
+  border-color: oklch(0.80 0.12 158 / 0.2);
 }
 
 .aceternity-cultural-autumn {
-  @apply bg-gradient-to-br from-autumn/10 to-autumn/5;
-  @apply border-autumn/20;
+  background: linear-gradient(to bottom right, 
+    oklch(0.75 0.15 45 / 0.1), 
+    oklch(0.75 0.15 45 / 0.05));
+  border-color: oklch(0.75 0.15 45 / 0.2);
 }
 
 .aceternity-cultural-winter {
-  @apply bg-gradient-to-br from-winter/10 to-winter/5;
-  @apply border-winter/20;
+  background: linear-gradient(to bottom right, 
+    oklch(0.70 0.05 260 / 0.1), 
+    oklch(0.70 0.05 260 / 0.05));
+  border-color: oklch(0.70 0.05 260 / 0.2);
 }
 
 .aceternity-cultural-eternal {
-  @apply bg-gradient-to-br from-eternal/10 to-eternal/5;
-  @apply border-eternal/20;
+  background: linear-gradient(to bottom right, 
+    oklch(0.25 0.08 30 / 0.1), 
+    oklch(0.25 0.08 30 / 0.05));
+  border-color: oklch(0.25 0.08 30 / 0.2);
 }
 
 /* Advanced Shadow Variants */
