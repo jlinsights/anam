@@ -1,1 +1,1 @@
-🔧 갤러리 로딩 문제 해결 - API 실패 시 Fallback 데이터 자동 사용
+✨ Airtable 자동 동기화 시스템 구현 - Webhook API 및 관리자 도구 추가
