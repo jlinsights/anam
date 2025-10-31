@@ -6,14 +6,21 @@
   3. requestTimeout 증가 및 AbortError 방지
 */
 
-/** 필수 ENV 확인 */
-function assertAirtableEnv() {
+/** 필수 ENV 확인 - 프로덕션에서는 경고만 표시 */
+function assertAirtableEnv(): boolean {
   const { AIRTABLE_API_KEY, AIRTABLE_BASE_ID } = process.env
   if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
-    throw new Error(
-      '[Airtable] AIRTABLE_API_KEY 또는 AIRTABLE_BASE_ID 환경 변수가 설정되지 않았습니다. .env.local 파일을 확인하세요.'
-    )
+    const isProduction = process.env.NODE_ENV === 'production'
+    const message = '[Airtable] AIRTABLE_API_KEY 또는 AIRTABLE_BASE_ID 환경 변수가 설정되지 않았습니다.'
+    
+    if (isProduction) {
+      console.warn(`⚠️ ${message} Fallback 데이터를 사용합니다.`)
+      return false
+    } else {
+      throw new Error(`${message} .env.local 파일을 확인하세요.`)
+    }
   }
+  return true
 }
 
 let basePromise: Promise<any> | null = null
@@ -24,15 +31,24 @@ let basePromise: Promise<any> | null = null
 export async function getBase() {
   if (basePromise) return basePromise
 
-  assertAirtableEnv()
+  // 환경변수 확인 - 실패 시 null 반환
+  if (!assertAirtableEnv()) {
+    return null
+  }
+
   basePromise = (async () => {
-    const { default: Airtable } = await import('airtable')
-    const airtable = new Airtable({
-      apiKey: process.env.AIRTABLE_API_KEY!,
-      requestTimeout: 15000, // 15초로 증가 (AbortError 방지)
-      endpointUrl: 'https://api.airtable.com',
-    })
-    return airtable.base(process.env.AIRTABLE_BASE_ID!)
+    try {
+      const { default: Airtable } = await import('airtable')
+      const airtable = new Airtable({
+        apiKey: process.env.AIRTABLE_API_KEY!,
+        requestTimeout: 15000, // 15초로 증가 (AbortError 방지)
+        endpointUrl: 'https://api.airtable.com',
+      })
+      return airtable.base(process.env.AIRTABLE_BASE_ID!)
+    } catch (error) {
+      console.error('❌ Failed to initialize Airtable base:', error)
+      return null
+    }
   })()
 
   return basePromise
@@ -71,6 +87,13 @@ export async function safeAirtableRequest<T>(
   operation: () => Promise<T>,
   retries: number = 3
 ): Promise<T | null> {
+  // Base가 없으면 즉시 null 반환
+  const base = await getBase()
+  if (!base) {
+    console.warn('[Airtable] Base not available, skipping request')
+    return null
+  }
+
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       return await operation()

@@ -228,7 +228,9 @@ export async function getArtworksFromSource(): Promise<Artwork[]> {
 
     if (!res.ok) {
       console.error('API responded with error:', res.status)
-      return []
+      // API 실패 시 fallback 데이터 즉시 반환
+      console.warn('🔄 API failed, using fallback artwork data')
+      return fallbackArtworksData
     }
 
     // JSON 파싱 실패(HTML 등) 대비
@@ -237,13 +239,26 @@ export async function getArtworksFromSource(): Promise<Artwork[]> {
       json = await res.json()
     } catch (err) {
       console.error('Failed to parse JSON from /api/artworks:', err)
-      return []
+      // JSON 파싱 실패 시에도 fallback 데이터 반환
+      console.warn('🔄 JSON parse failed, using fallback artwork data')
+      return fallbackArtworksData
     }
 
-    return (json.data || []) as Artwork[]
+    const artworks = (json.data || []) as Artwork[]
+    
+    // 데이터가 없거나 비어있는 경우에도 fallback 사용
+    if (!artworks || artworks.length === 0) {
+      console.warn('🔄 No artworks in API response, using fallback artwork data')
+      return fallbackArtworksData
+    }
+    
+    console.log(`✅ Loaded ${artworks.length} artworks from API`)
+    return artworks
   } catch (error) {
     console.error('Failed to fetch /api/artworks:', error)
-    return []
+    // 모든 에러 상황에서 fallback 데이터 반환
+    console.warn('🔄 API error, using fallback artwork data')
+    return fallbackArtworksData
   }
 }
 
