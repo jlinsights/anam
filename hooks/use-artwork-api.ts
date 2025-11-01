@@ -11,8 +11,9 @@ export function useArtworks() {
   return useFetch<Artwork[]>('/api/artworks', {
     immediate: true,
     revalidateOnFocus: true,
-    retryAttempts: 2,
-    retryDelay: 1000
+    retryAttempts: 1,
+    retryDelay: 300,
+    timeout: 2000 // 2초 타임아웃으로 더 빠른 fallback 실행
   })
 }
 
@@ -35,8 +36,9 @@ export function useArtist() {
   return useFetch<Artist>('/api/artist', {
     immediate: true,
     revalidateOnFocus: false,
-    retryAttempts: 2,
-    retryDelay: 1000
+    retryAttempts: 1,
+    retryDelay: 300,
+    timeout: 2000 // 2초 타임아웃으로 더 빠른 fallback 실행
   })
 }
 

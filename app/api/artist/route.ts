@@ -1,4 +1,4 @@
-import { fetchArtistFromAirtable } from '@/lib/airtable'
+import { fetchArtistFromSupabase } from '@/lib/supabase/artworks'
 import { createErrorResponse, createSuccessResponse } from '@/lib/error-handler'
 import type { Artist } from '@/lib/types'
 import { NextRequest, NextResponse } from 'next/server'
@@ -49,26 +49,26 @@ async function getCachedArtist(): Promise<Artist | null> {
     return cachedArtist
   }
 
-  // 새로운 데이터 가져오기
+  // 새로운 데이터 가져오기 (Supabase 우선, 실패 시 fallback)
   try {
-    const artist = await fetchArtistFromAirtable()
+    const artist = await fetchArtistFromSupabase()
 
     if (artist) {
       cachedArtist = artist
       cacheTimestamp = now
-      console.log('✅ Cached artist data from Airtable')
+      console.log('✅ Cached artist data from Supabase')
       return artist
     } else {
-      console.warn('⚠️ No artist found in Airtable, using fallback data')
+      console.warn('⚠️ No artist found in Supabase, using fallback data')
       const fallbackArtist = getFallbackArtistData()
       cachedArtist = fallbackArtist
       cacheTimestamp = now
       return fallbackArtist
     }
   } catch (error) {
-    console.error('❌ Error fetching artist from Airtable:', error)
+    console.error('❌ Error fetching artist from Supabase:', error)
 
-    // 권한 오류나 네트워크 오류 시 fallback 데이터 사용
+    // 오류 시 fallback 데이터 사용
     console.log('🔄 Using fallback artist data due to error')
     const fallbackArtist = getFallbackArtistData()
     cachedArtist = fallbackArtist

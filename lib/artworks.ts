@@ -116,19 +116,36 @@ export const fallbackArtworksData: Artwork[] = Array.from({ length: 61 }, (_, in
 })
 
 /**
- * 작품 데이터를 가져오는 메인 함수 (Airtable → fallback 순서)
+ * 작품 데이터를 가져오는 메인 함수 (Supabase → Airtable → fallback 순서)
+ * Supabase가 우선이고, 실패 시 Airtable, 최종적으로 fallback 사용
  */
 export async function getArtworks(): Promise<Artwork[]> {
   try {
-    // Try to fetch from Airtable first
-    const artworksFromAirtable = await fetchArtworksFromAirtable()
-    if (artworksFromAirtable && artworksFromAirtable.length > 0) {
-      console.log(`✅ Loaded ${artworksFromAirtable.length} artworks from Airtable`)
-      return artworksFromAirtable
+    // 1. Try Supabase first (primary data source)
+    try {
+      const { fetchArtworksFromSupabase } = await import('@/lib/supabase/artworks')
+      const artworksFromSupabase = await fetchArtworksFromSupabase()
+      if (artworksFromSupabase && artworksFromSupabase.length > 0) {
+        console.log(`✅ Loaded ${artworksFromSupabase.length} artworks from Supabase`)
+        return artworksFromSupabase
+      }
+    } catch (supabaseError) {
+      console.warn('⚠️ Supabase unavailable, trying Airtable:', supabaseError)
+    }
+
+    // 2. Fallback to Airtable if Supabase fails
+    try {
+      const artworksFromAirtable = await fetchArtworksFromAirtable()
+      if (artworksFromAirtable && artworksFromAirtable.length > 0) {
+        console.log(`✅ Loaded ${artworksFromAirtable.length} artworks from Airtable (fallback)`)
+        return artworksFromAirtable
+      }
+    } catch (airtableError) {
+      console.warn('⚠️ Airtable also unavailable:', airtableError)
     }
     
-    // Fallback to local data if Airtable fails
-    console.warn('🔄 Using fallback artwork data (Airtable unavailable)')
+    // 3. Final fallback to local data
+    console.warn('🔄 Using fallback artwork data (both Supabase and Airtable unavailable)')
     return fallbackArtworksData
   } catch (error) {
     console.error('❌ Error in getArtworks:', error)
@@ -137,7 +154,7 @@ export async function getArtworks(): Promise<Artwork[]> {
 }
 
 /**
- * 특정 slug로 작품 찾기 (Enhanced with better slug matching)
+ * 특정 slug로 작품 찾기 (Supabase 우선, fallback 지원)
  */
 export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
   try {
@@ -146,6 +163,19 @@ export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
       return null
     }
     
+    // 1. Try Supabase first
+    try {
+      const { fetchArtworkBySlugFromSupabase } = await import('@/lib/supabase/artworks')
+      const artwork = await fetchArtworkBySlugFromSupabase(slug)
+      if (artwork) {
+        console.log(`✅ Found artwork in Supabase for slug: "${slug}"`)
+        return artwork
+      }
+    } catch (supabaseError) {
+      console.warn('⚠️ Supabase query failed, trying fallback:', supabaseError)
+    }
+    
+    // 2. Fallback to getArtworks() which tries all sources
     const artworks = await getArtworks()
     console.log(`🔍 Looking for artwork with slug: "${slug}" in ${artworks.length} artworks`)
     
@@ -197,19 +227,35 @@ export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
 }
 
 /**
- * 작가 정보 가져오기
+ * 작가 정보 가져오기 (Supabase → Airtable → fallback 순서)
  */
 export async function fetchArtist(fallbackKey = 'default'): Promise<Artist | null> {
   try {
-    // 1. Airtable에서 데이터 시도
-    const artistFromAirtable = await fetchArtistFromAirtable()
-    if (artistFromAirtable) {
-      console.log('✅ Loaded artist data from Airtable')
-      return artistFromAirtable
+    // 1. Try Supabase first (primary data source)
+    try {
+      const { fetchArtistFromSupabase } = await import('@/lib/supabase/artworks')
+      const artistFromSupabase = await fetchArtistFromSupabase()
+      if (artistFromSupabase) {
+        console.log('✅ Loaded artist data from Supabase')
+        return artistFromSupabase
+      }
+    } catch (supabaseError) {
+      console.warn('⚠️ Supabase unavailable, trying Airtable:', supabaseError)
     }
 
-    // 2. Fallback 데이터 사용
-    console.warn('🔄 Using fallback artist data')
+    // 2. Fallback to Airtable if Supabase fails
+    try {
+      const artistFromAirtable = await fetchArtistFromAirtable()
+      if (artistFromAirtable) {
+        console.log('✅ Loaded artist data from Airtable (fallback)')
+        return artistFromAirtable
+      }
+    } catch (airtableError) {
+      console.warn('⚠️ Airtable also unavailable:', airtableError)
+    }
+
+    // 3. Final fallback 데이터 사용
+    console.warn('🔄 Using fallback artist data (both Supabase and Airtable unavailable)')
     return fallbackArtistData
   } catch (error) {
     console.error('❌ Error in fetchArtist:', error)

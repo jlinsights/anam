@@ -28,15 +28,61 @@ export class RootErrorBoundary extends Component<Props, State> {
   }
 
   static getDerivedStateFromError(error: Error): State {
-    // Analyze error type
+    // Analyze error type with more comprehensive detection
     let errorType: State['errorType'] = 'unknown'
     
-    if (error.name === 'ChunkLoadError' || error.message.includes('Loading chunk')) {
+    const errorName = error.name || ''
+    const errorMessage = error.message || ''
+    const errorStack = error.stack || ''
+    const lowerMessage = errorMessage.toLowerCase()
+    const lowerStack = errorStack.toLowerCase()
+    
+    // Chunk loading errors
+    if (
+      errorName === 'ChunkLoadError' ||
+      lowerMessage.includes('loading chunk') ||
+      lowerMessage.includes('chunk load failed') ||
+      lowerMessage.includes('failed to fetch dynamically imported module') ||
+      lowerStack.includes('chunk')
+    ) {
       errorType = 'chunk'
-    } else if (error.message.includes('fetch') || error.message.includes('network')) {
+    }
+    // Network errors
+    else if (
+      lowerMessage.includes('fetch') ||
+      lowerMessage.includes('network') ||
+      lowerMessage.includes('connection') ||
+      lowerMessage.includes('timeout') ||
+      lowerMessage.includes('failed to load') ||
+      lowerMessage.includes('networkerror') ||
+      errorName === 'NetworkError' ||
+      errorName === 'TypeError' && (lowerMessage.includes('fetch') || lowerMessage.includes('network'))
+    ) {
       errorType = 'network'
-    } else if (error.name === 'SyntaxError' || error.name === 'ReferenceError') {
+    }
+    // JavaScript/runtime errors
+    else if (
+      errorName === 'SyntaxError' ||
+      errorName === 'ReferenceError' ||
+      errorName === 'TypeError' ||
+      errorName === 'RangeError' ||
+      errorName === 'EvalError' ||
+      errorName === 'URIError' ||
+      lowerMessage.includes('is not defined') ||
+      lowerMessage.includes('cannot read property') ||
+      lowerMessage.includes('cannot read properties') ||
+      lowerMessage.includes('undefined is not an object')
+    ) {
       errorType = 'javascript'
+    }
+    
+    // Log unknown errors for debugging
+    if (errorType === 'unknown') {
+      console.warn('Unknown error type detected:', {
+        name: errorName,
+        message: errorMessage.substring(0, 200), // Limit message length
+        stack: errorStack.substring(0, 500), // Limit stack length
+      })
     }
 
     return {
@@ -58,12 +104,36 @@ export class RootErrorBoundary extends Component<Props, State> {
       timestamp: new Date().toISOString(),
       userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'server',
       url: typeof window !== 'undefined' ? window.location.href : 'unknown',
-      referrer: typeof window !== 'undefined' ? document.referrer : 'unknown'
+      referrer: typeof window !== 'undefined' ? document.referrer : 'unknown',
+      // Enhanced error details
+      errorName: error.name,
+      errorMessage: error.message,
+      errorStack: error.stack?.substring(0, 1000), // Limit stack length for logging
+      // Browser/environment info
+      windowWidth: typeof window !== 'undefined' ? window.innerWidth : undefined,
+      windowHeight: typeof window !== 'undefined' ? window.innerHeight : undefined,
+      viewport: typeof window !== 'undefined' 
+        ? `${window.innerWidth}x${window.innerHeight}` 
+        : 'unknown',
+      // Performance info
+      memory: typeof (performance as any)?.memory !== 'undefined' 
+        ? {
+            usedJSHeapSize: (performance as any).memory.usedJSHeapSize,
+            totalJSHeapSize: (performance as any).memory.totalJSHeapSize,
+            jsHeapSizeLimit: (performance as any).memory.jsHeapSizeLimit,
+          }
+        : undefined,
     }
 
     console.error('Root Error Boundary caught a critical error:', {
-      error,
-      errorInfo,
+      error: {
+        name: error.name,
+        message: error.message,
+        stack: error.stack?.substring(0, 500), // Truncate for console
+      },
+      errorInfo: {
+        componentStack: errorInfo.componentStack?.substring(0, 500),
+      },
       context: errorContext
     })
 

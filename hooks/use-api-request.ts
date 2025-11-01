@@ -13,6 +13,7 @@ export interface UseApiRequestOptions {
   revalidateOnFocus?: boolean
   retryAttempts?: number
   retryDelay?: number
+  timeout?: number
 }
 
 export interface UseApiRequestReturn<T> extends ApiState<T> {
@@ -34,7 +35,8 @@ export function useApiRequest<T>(
     immediate = true,
     revalidateOnFocus = false,
     retryAttempts = 2,
-    retryDelay = 1000
+    retryDelay = 1000,
+    timeout = 10000
   } = options
 
   const [state, setState] = useState<ApiState<T>>({
@@ -72,21 +74,34 @@ export function useApiRequest<T>(
 
       setState(prev => ({ ...prev, loading: true, error: null }))
 
-      const data = await requestFn(signal)
+      // Set up timeout
+      const timeoutId = setTimeout(() => {
+        if (!signal.aborted) {
+          abortControllerRef.current?.abort()
+        }
+      }, timeout)
 
-      // Check if request was cancelled or component unmounted
-      if (signal.aborted || !mountedRef.current) {
-        return null
+      try {
+        const data = await requestFn(signal)
+        clearTimeout(timeoutId)
+        
+        // Check if request was cancelled or component unmounted
+        if (signal.aborted || !mountedRef.current) {
+          return null
+        }
+
+        setState({
+          data,
+          loading: false,
+          error: null
+        })
+
+        retryCountRef.current = 0
+        return data
+      } catch (error) {
+        clearTimeout(timeoutId)
+        throw error
       }
-
-      setState({
-        data,
-        loading: false,
-        error: null
-      })
-
-      retryCountRef.current = 0
-      return data
 
     } catch (error) {
       // Check if component is still mounted
@@ -94,9 +109,17 @@ export function useApiRequest<T>(
         return null
       }
 
-      // Handle AbortError (request was cancelled)
+      // Handle AbortError (request was cancelled or timed out)
       if (error instanceof Error && error.name === 'AbortError') {
-        console.log('Request was cancelled')
+        console.log('Request was cancelled or timed out')
+        
+        // For timeout, set error and try fallback
+        setState(prev => ({
+          ...prev,
+          loading: false,
+          error: 'Request timed out, loading fallback data...'
+        }))
+        
         return null
       }
 
@@ -195,7 +218,7 @@ export function useFetch<T>(
   url: string,
   options: RequestInit & UseApiRequestOptions = {}
 ): UseApiRequestReturn<T> {
-  const { immediate, revalidateOnFocus, retryAttempts, retryDelay, ...fetchOptions } = options
+  const { immediate, revalidateOnFocus, retryAttempts, retryDelay, timeout, ...fetchOptions } = options
 
   const requestFn = useCallback(async (signal: AbortSignal): Promise<T> => {
     try {
@@ -277,7 +300,8 @@ export function useFetch<T>(
     immediate,
     revalidateOnFocus,
     retryAttempts,
-    retryDelay
+    retryDelay,
+    timeout
   })
 }
 

@@ -1,4 +1,4 @@
-import { fetchArtworksFromAirtable } from '@/lib/airtable'
+import { fetchArtworksFromSupabase, fetchArtworkBySlugFromSupabase } from '@/lib/supabase/artworks'
 import { fallbackArtworksData } from '@/lib/artworks'
 import { createErrorResponse, createSuccessResponse, handleExternalServiceError } from '@/lib/error-handler'
 import type { Artwork } from '@/lib/types'
@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server'
 // 캐시 설정
 let cachedArtworks: Artwork[] | null = null
 let cacheTimestamp = 0
-const CACHE_DURATION = 1 * 60 * 1000 // 1분으로 단축 (기존 5분)
+const CACHE_DURATION = 1 * 60 * 1000 // 1분
 
 async function getCachedArtworks(): Promise<Artwork[]> {
   const now = Date.now()
@@ -18,23 +18,23 @@ async function getCachedArtworks(): Promise<Artwork[]> {
     return cachedArtworks
   }
 
-  // 새로운 데이터 가져오기
+  // 새로운 데이터 가져오기 (Supabase 우선, 실패 시 fallback)
   try {
-    const artworks = await fetchArtworksFromAirtable()
+    const artworks = await fetchArtworksFromSupabase()
 
     if (artworks && artworks.length > 0) {
       cachedArtworks = artworks
       cacheTimestamp = now
-      console.log(`✅ Cached ${artworks.length} artworks from Airtable`)
+      console.log(`✅ Cached ${artworks.length} artworks from Supabase`)
       return artworks
     } else {
-      console.warn('⚠️ No artworks from Airtable, using fallback data')
+      console.warn('⚠️ No artworks from Supabase, using fallback data')
       cachedArtworks = fallbackArtworksData
       cacheTimestamp = now
       return fallbackArtworksData
     }
   } catch (error) {
-    console.error('❌ Error fetching artworks, using fallback data:', error)
+    console.error('❌ Error fetching artworks from Supabase, using fallback data:', error)
     cachedArtworks = fallbackArtworksData
     cacheTimestamp = now
     return fallbackArtworksData
@@ -59,8 +59,22 @@ export async function GET(request: NextRequest) {
     // But let's add a final safety net just in case
     const finalArtworks = (artworks && artworks.length > 0) ? artworks : fallbackArtworksData
 
-    // 특정 slug가 요청된 경우
+    // 특정 slug가 요청된 경우 (Supabase에서 직접 조회 시도)
     if (slug) {
+      try {
+        const artwork = await fetchArtworkBySlugFromSupabase(slug)
+        if (artwork) {
+          return NextResponse.json({
+            success: true,
+            message: 'Artwork found',
+            data: artwork,
+          })
+        }
+      } catch (error) {
+        console.warn('⚠️ Error fetching artwork by slug from Supabase, falling back to cache:', error)
+      }
+
+      // Fallback to cached artworks
       const artwork = finalArtworks.find((artwork: Artwork) => artwork.slug === slug)
       return NextResponse.json({
         success: !!artwork,

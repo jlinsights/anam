@@ -20,6 +20,7 @@ export default function HomePage() {
   const [isPlaying, setIsPlaying] = useState(true)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [fallbackLoaded, setFallbackLoaded] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Fetch data using hooks with cancellation support
@@ -38,20 +39,93 @@ export default function HomePage() {
 
   const loading = artworksLoading || artistLoading
 
-  // Handle client-side hydration
+  // Handle client-side hydration and immediate fallback loading
   useEffect(() => {
     setMounted(true)
+    
+    // Immediately load fallback data on mount
+    const loadImmediateFallback = async () => {
+      try {
+        const fallbackArtworks = await getArtworks()
+        if (fallbackArtworks && fallbackArtworks.length > 0 && displayedArtworks.length === 0) {
+          const shuffled = [...fallbackArtworks].sort(() => 0.5 - Math.random())
+          setDisplayedArtworks(shuffled.slice(0, 8))
+          setFallbackLoaded(true)
+          console.log('⚡ Immediate fallback loaded on mount:', fallbackArtworks.length, 'artworks')
+        }
+      } catch (error) {
+        console.error('❌ Immediate fallback failed on mount:', error)
+      }
+    }
+    
+    loadImmediateFallback()
   }, [])
 
-  // Initialize displayed artworks when data loads
+  // Initialize displayed artworks when API data loads (replace fallback if better)
   useEffect(() => {
-    if (artworks && artworks.length > 0 && displayedArtworks.length === 0) {
+    if (artworks && artworks.length > 0) {
+      // If we have API data, replace fallback data
       const shuffled = [...artworks].sort(() => 0.5 - Math.random())
       setDisplayedArtworks(shuffled.slice(0, 8))
+      console.log('✅ API data loaded, replacing fallback:', artworks.length, 'artworks')
     }
-  }, [artworks, displayedArtworks.length])
+  }, [artworks])
 
-  // Fallback to static data if API fails
+  // Enhanced fallback logic with early timeout
+  useEffect(() => {
+    const fallbackTimer = setTimeout(() => {
+      if (displayedArtworks.length === 0) {
+        console.warn('⏰ Loading timeout, forcing immediate fallback data load')
+        
+        const loadFallbackData = async () => {
+          try {
+            const fallbackArtworks = await getArtworks()
+            if (fallbackArtworks && fallbackArtworks.length > 0) {
+              const shuffled = [...fallbackArtworks].sort(() => 0.5 - Math.random())
+              setDisplayedArtworks(shuffled.slice(0, 8))
+              console.log('✅ Fallback data loaded successfully:', fallbackArtworks.length, 'artworks')
+            }
+          } catch (fallbackError) {
+            console.error('❌ Fallback data load failed:', fallbackError)
+          }
+        }
+        
+        loadFallbackData()
+      }
+    }, 1000) // 1초 후 강제 fallback (더 빠르게)
+
+    return () => clearTimeout(fallbackTimer)
+  }, [displayedArtworks.length])
+
+  // Immediate fallback on mount if no API data within 500ms
+  useEffect(() => {
+    if (mounted) {
+      const immediateTimer = setTimeout(() => {
+        if (displayedArtworks.length === 0 && !artworks) {
+          console.warn('🚀 Immediate fallback triggered')
+          
+          const loadImmediateFallback = async () => {
+            try {
+              const fallbackArtworks = await getArtworks()
+              if (fallbackArtworks && fallbackArtworks.length > 0) {
+                const shuffled = [...fallbackArtworks].sort(() => 0.5 - Math.random())
+                setDisplayedArtworks(shuffled.slice(0, 8))
+                console.log('⚡ Immediate fallback successful:', fallbackArtworks.length, 'artworks')
+              }
+            } catch (error) {
+              console.error('❌ Immediate fallback failed:', error)
+            }
+          }
+          
+          loadImmediateFallback()
+        }
+      }, 300) // 300ms 후 즉시 fallback
+      
+      return () => clearTimeout(immediateTimer)
+    }
+  }, [mounted, displayedArtworks.length, artworks])
+
+  // Original fallback for API errors
   useEffect(() => {
     if (artworksError && !loading) {
       console.warn('API failed, attempting to load static data:', artworksError)
@@ -139,13 +213,26 @@ export default function HomePage() {
   // Get featured artwork for hero
   const featuredArtwork = displayedArtworks.length > 0 ? displayedArtworks[0] : undefined
 
-  // Show loading during SSR or while fetching data
-  if (!mounted || loading) {
+  // Show loading only for very short period, then force fallback
+  if (!mounted) {
     return (
       <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-300">갤러리를 불러오는 중...</p>
+        </div>
+      </div>
+    )
+  }
+  
+  // Only show loading if we don't have any data (including fallback)
+  if (loading && displayedArtworks.length === 0 && !fallbackLoaded) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">갤러리를 불러오는 중...</p>
+          <p className="text-sm text-gray-500 mt-2">잠시만 기다려주세요...</p>
         </div>
       </div>
     )
