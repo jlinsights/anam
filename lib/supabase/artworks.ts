@@ -144,12 +144,27 @@ export async function fetchArtistFromSupabase(): Promise<Artist | null> {
   try {
     const supabase = createSupabaseClient()
 
-    // Get the first artist (assuming single artist for now)
-    const { data, error } = await supabase
-      .from('artists')
+    // Try both 'artists' and 'artist' table names
+    let data, error
+    let { data: artistData, error: artistError } = await supabase
+      .from('artist')
       .select('*')
       .limit(1)
-      .single()
+      .maybeSingle()
+
+    if (artistError && artistError.code === 'PGRST116') {
+      // Try 'artists' table as fallback
+      const result = await supabase
+        .from('artists')
+        .select('*')
+        .limit(1)
+        .maybeSingle()
+      artistData = result.data
+      artistError = result.error
+    }
+
+    data = artistData
+    error = artistError
 
     if (error) {
       if (error.code === 'PGRST116') {

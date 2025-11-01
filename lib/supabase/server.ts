@@ -85,9 +85,13 @@ export function createSupabaseClient(): SupabaseClient<Database> {
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl || !supabaseKey) {
+    const errorMessage = 'Missing Supabase environment variables'
     console.warn('⚠️ Supabase environment variables not configured')
     console.warn('Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY')
-    throw new Error('Missing Supabase environment variables')
+    // Create a more descriptive error for better tracking
+    const error = new Error(errorMessage)
+    error.name = 'SupabaseConfigurationError'
+    throw error
   }
 
   supabaseClient = createClient<Database>(supabaseUrl, supabaseKey, {
@@ -116,7 +120,10 @@ export function createBrowserClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing Supabase browser environment variables')
+    const errorMessage = 'Missing Supabase browser environment variables'
+    const error = new Error(errorMessage)
+    error.name = 'SupabaseConfigurationError'
+    throw error
   }
 
   return createClient<Database>(supabaseUrl, supabaseAnonKey, {

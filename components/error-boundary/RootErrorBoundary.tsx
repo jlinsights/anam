@@ -71,17 +71,39 @@ export class RootErrorBoundary extends Component<Props, State> {
       lowerMessage.includes('is not defined') ||
       lowerMessage.includes('cannot read property') ||
       lowerMessage.includes('cannot read properties') ||
-      lowerMessage.includes('undefined is not an object')
+      lowerMessage.includes('undefined is not an object') ||
+      lowerMessage.includes('missing') ||
+      lowerMessage.includes('not configured') ||
+      lowerMessage.includes('environment variables')
     ) {
       errorType = 'javascript'
     }
+    // Supabase/database errors
+    else if (
+      lowerMessage.includes('supabase') ||
+      lowerMessage.includes('missing supabase') ||
+      lowerMessage.includes('pgrst') ||
+      lowerMessage.includes('postgrest') ||
+      lowerMessage.includes('relation') ||
+      lowerMessage.includes('table') ||
+      lowerMessage.includes('column') ||
+      lowerStack.includes('supabase') ||
+      errorName === 'PostgrestError'
+    ) {
+      errorType = 'network' // Database errors are treated as network issues
+    }
     
-    // Log unknown errors for debugging
+    // Log unknown errors for debugging with enhanced context
     if (errorType === 'unknown') {
       console.warn('Unknown error type detected:', {
         name: errorName,
         message: errorMessage.substring(0, 200), // Limit message length
         stack: errorStack.substring(0, 500), // Limit stack length
+        fullError: {
+          name: errorName,
+          message: errorMessage,
+          stack: errorStack.substring(0, 1000),
+        }
       })
     }
 
