@@ -3,11 +3,11 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe, toHaveNoViolations } from 'jest-axe'
 import ArtworkDetailModalClient from '@/components/artwork-detail-modal-client'
-import ContactForm from '@/components/contact-form'
-import LanguageSwitcher from '@/components/language-switcher'
-import Navigation from '@/components/single-page/Navigation'
-import ThemeToggle from '@/components/theme-toggle'
-import SocialShare from '@/components/social-share'
+import { ContactForm } from '@/components/contact-form'
+import { LanguageSwitcher } from '@/components/language-switcher'
+import { Navigation } from '@/components/single-page/Navigation'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { SocialShare } from '@/components/social-share'
 import { mockArtwork } from '../lib/hooks/artwork.mock'
 
 // Add jest-axe matchers
@@ -33,13 +33,13 @@ jest.mock('next-intl', () => ({
 describe('Comprehensive Accessibility Tests', () => {
   describe('ArtworkDetailModal Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(<ArtworkDetailModalClient artwork={mockArtwork} />)
+      const { container } = render(<ArtworkDetailModalClient artwork={mockArtwork} recommendedArtworks={[]} />)
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
 
     it('should manage focus correctly in modal', async () => {
-      render(<ArtworkDetailModalClient artwork={mockArtwork} />)
+      render(<ArtworkDetailModalClient artwork={mockArtwork} recommendedArtworks={[]} />)
       
       // Modal should be in the document
       const modal = screen.getByRole('dialog')
@@ -52,7 +52,7 @@ describe('Comprehensive Accessibility Tests', () => {
 
     it('should trap focus within modal', async () => {
       const user = userEvent.setup()
-      render(<ArtworkDetailModalClient artwork={mockArtwork} />)
+      render(<ArtworkDetailModalClient artwork={mockArtwork} recommendedArtworks={[]} />)
       
       const modal = screen.getByRole('dialog')
       const focusableElements = within(modal).getAllByRole('button')
@@ -67,7 +67,7 @@ describe('Comprehensive Accessibility Tests', () => {
     })
 
     it('should provide proper ARIA labels for image navigation', () => {
-      render(<ArtworkDetailModalClient artwork={mockArtwork} />)
+      render(<ArtworkDetailModalClient artwork={mockArtwork} recommendedArtworks={[]} />)
       
       const prevButton = screen.getByLabelText('Previous image')
       const nextButton = screen.getByLabelText('Next image')
@@ -78,7 +78,7 @@ describe('Comprehensive Accessibility Tests', () => {
 
     it('should announce image changes to screen readers', async () => {
       const user = userEvent.setup()
-      render(<ArtworkDetailModalClient artwork={mockArtwork} />)
+      render(<ArtworkDetailModalClient artwork={mockArtwork} recommendedArtworks={[]} />)
       
       const nextButton = screen.getByLabelText('Next image')
       await user.click(nextButton)
@@ -90,7 +90,7 @@ describe('Comprehensive Accessibility Tests', () => {
     })
 
     it('should have proper heading hierarchy', () => {
-      const { container } = render(<ArtworkDetailModalClient artwork={mockArtwork} />)
+      const { container } = render(<ArtworkDetailModalClient artwork={mockArtwork} recommendedArtworks={[]} />)
       
       const headings = container.querySelectorAll('h1, h2, h3, h4, h5, h6')
       const levels = Array.from(headings).map(h => parseInt(h.tagName.charAt(1)))
@@ -195,19 +195,19 @@ describe('Comprehensive Accessibility Tests', () => {
 
   describe('Navigation Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(<Navigation />)
+      const { container } = render(<Navigation currentSection="gallery" onNavigate={() => {}} />)
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
 
     it('should use semantic navigation element', () => {
-      render(<Navigation />)
+      render(<Navigation currentSection="gallery" onNavigate={() => {}} />)
       const nav = screen.getByRole('navigation')
       expect(nav).toBeInTheDocument()
     })
 
     it('should have accessible menu structure', () => {
-      render(<Navigation />)
+      render(<Navigation currentSection="gallery" onNavigate={() => {}} />)
       
       // Check for menu list
       const menuList = screen.getByRole('list')
@@ -220,7 +220,7 @@ describe('Comprehensive Accessibility Tests', () => {
 
     it('should support keyboard navigation', async () => {
       const user = userEvent.setup()
-      render(<Navigation />)
+      render(<Navigation currentSection="gallery" onNavigate={() => {}} />)
       
       // Get all navigation links
       const links = screen.getAllByRole('link')
@@ -233,7 +233,7 @@ describe('Comprehensive Accessibility Tests', () => {
     })
 
     it('should indicate current page', () => {
-      render(<Navigation />)
+      render(<Navigation currentSection="gallery" onNavigate={() => {}} />)
       
       // Look for aria-current attribute on active link
       const links = screen.getAllByRole('link')
@@ -408,7 +408,7 @@ describe('Comprehensive Accessibility Tests', () => {
       const { container } = render(
         <div>
           <ContactForm />
-          <Navigation />
+          <Navigation currentSection="gallery" onNavigate={() => {}} />
         </div>
       )
       
@@ -429,7 +429,7 @@ describe('Comprehensive Accessibility Tests', () => {
 
     it('should provide focus indicators', async () => {
       const user = userEvent.setup()
-      render(<Navigation />)
+      render(<Navigation currentSection="gallery" onNavigate={() => {}} />)
       
       const firstLink = screen.getAllByRole('link')[0]
       await user.tab()
@@ -452,7 +452,7 @@ describe('Comprehensive Accessibility Tests', () => {
         dispatchEvent: jest.fn(),
       }))
       
-      render(<Navigation />)
+      render(<Navigation currentSection="gallery" onNavigate={() => {}} />)
       
       // Mobile menu button should be present and accessible
       const menuButton = screen.getByRole('button', { name: /menu/i })

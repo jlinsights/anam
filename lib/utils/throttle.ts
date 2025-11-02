@@ -3,6 +3,8 @@
  * Ensures smooth 60fps performance across the ANAM Gallery application
  */
 
+import React from 'react'
+
 export type ThrottledFunction<T extends (...args: any[]) => any> = {
   (...args: Parameters<T>): void
   cancel: () => void

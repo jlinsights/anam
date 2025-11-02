@@ -35,9 +35,9 @@ const nextConfig = {
       "tailwind-merge"
     ],
     // ✅ WEBPACK OPTIMIZATION FOR CHUNK STABILITY
-    webpackBuildWorker: true,
-    // ✅ IMPROVED: Improve chunk loading reliability
-    optimizeCss: true,
+    webpackBuildWorker: false,
+    // ✅ FIXED: Disable problematic CSS optimization causing critters error
+    // optimizeCss: true,
   },
   // Next.js 15에 맞는 설정
   serverExternalPackages: [],
@@ -58,12 +58,7 @@ const nextConfig = {
         crypto: false,
       };
       
-      // ✅ CHUNK LOADING OPTIMIZATION
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        'react': require.resolve('react'),
-        'react-dom': require.resolve('react-dom'),
-      };
+      // ✅ CHUNK LOADING OPTIMIZATION - Removed problematic React aliases
     }
 
     // ✅ DEVELOPMENT ENVIRONMENT OPTIMIZATION
@@ -73,12 +68,25 @@ const nextConfig = {
         ignored: ["**/node_modules/**", "**/.git/**", "**/.next/**"],
       };
       
-      // ✅ DEV: Prevent chunk conflicts during development
+      // ✅ DEV: Simplified chunk configuration for development
       config.optimization = {
         ...config.optimization,
         removeAvailableModules: false,
         removeEmptyChunks: false,
-        splitChunks: false, // Disable in development for stability
+        splitChunks: {
+          chunks: "all",
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            // Simple vendor chunk for development
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: "vendors",
+              chunks: "all",
+              enforce: true,
+            },
+          },
+        },
       };
     }
 
@@ -101,81 +109,77 @@ const nextConfig = {
       ],
     };
 
-    // ✅ OPTIMIZED CHUNK STRATEGY - React 19 + Next.js 15.4.5 Compatible
-    config.optimization = {
-      ...config.optimization,
-      splitChunks: {
-        chunks: "all",
-        minSize: 30000, // Increased minimum size
-        maxSize: 500000, // Relaxed maximum size for better bundling
-        maxAsyncRequests: 6, // Limit async requests
-        maxInitialRequests: 4, // Limit initial requests
-        cacheGroups: {
-          // Consolidate vendor chunks for better performance
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: "vendors",
-            chunks: "all",
-            priority: 10,
-            enforce: true,
-            reuseExistingChunk: true,
-          },
-          // React ecosystem in single chunk
-          react: {
-            test: /[\\/]node_modules[\\/](react|react-dom|react-.*|@react)[\\/]/,
-            name: "react-vendor",
-            chunks: "all",
-            priority: 20,
-            enforce: true,
-          },
-          // UI libraries consolidated
-          ui: {
-            test: /[\\/]node_modules[\\/](@radix-ui|framer-motion|lucide-react)[\\/]/,
-            name: "ui-vendor",
-            chunks: "all",
-            priority: 15,
-            enforce: true,
-          },
-          // Utilities and async libraries
-          utils: {
-            test: /[\\/]node_modules[\\/](date-fns|clsx|class-variance-authority|tailwind-merge|zustand|zod)[\\/]/,
-            name: "utils-vendor",
-            chunks: "all",
-            priority: 12,
-          },
-          // Performance monitoring (keep async for better performance)
-          monitoring: {
-            test: /[\\/]node_modules[\\/](web-vitals|@sentry)[\\/]/,
-            name: "monitoring",
-            chunks: "async",
-            priority: 8,
-          },
-          // Default group for remaining vendor code
-          default: {
-            minChunks: 2,
-            priority: -20,
-            reuseExistingChunk: true,
-            maxSize: 300000,
+    // ✅ PRODUCTION CHUNK STRATEGY - Only apply in production
+    if (!dev) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: "all",
+          minSize: 30000, // Increased minimum size
+          maxSize: 500000, // Relaxed maximum size for better bundling
+          maxAsyncRequests: 6, // Limit async requests
+          maxInitialRequests: 4, // Limit initial requests
+          cacheGroups: {
+            // Consolidate vendor chunks for better performance
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: "vendors",
+              chunks: "all",
+              priority: 10,
+              enforce: true,
+              reuseExistingChunk: true,
+            },
+            // React ecosystem in single chunk
+            react: {
+              test: /[\\/]node_modules[\\/](react|react-dom|react-.*|@react)[\\/]/,
+              name: "react-vendor",
+              chunks: "all",
+              priority: 20,
+              enforce: true,
+            },
+            // UI libraries consolidated
+            ui: {
+              test: /[\\/]node_modules[\\/](@radix-ui|framer-motion|lucide-react)[\\/]/,
+              name: "ui-vendor",
+              chunks: "all",
+              priority: 15,
+              enforce: true,
+            },
+            // Utilities and async libraries
+            utils: {
+              test: /[\\/]node_modules[\\/](date-fns|clsx|class-variance-authority|tailwind-merge|zustand|zod)[\\/]/,
+              name: "utils-vendor",
+              chunks: "all",
+              priority: 12,
+            },
+            // Performance monitoring (keep async for better performance)
+            monitoring: {
+              test: /[\\/]node_modules[\\/](web-vitals|@sentry)[\\/]/,
+              name: "monitoring",
+              chunks: "async",
+              priority: 8,
+            },
+            // Default group for remaining vendor code
+            default: {
+              minChunks: 2,
+              priority: -20,
+              reuseExistingChunk: true,
+              maxSize: 300000,
+            },
           },
         },
-      },
-      // Enhanced module concatenation for React 19
-      concatenateModules: true,
-      usedExports: true,
-      sideEffects: false,
-      // Improved runtime chunk optimization
-      runtimeChunk: {
-        name: 'runtime'
-      },
-    };
+        // Enhanced module concatenation for React 19
+        concatenateModules: true,
+        usedExports: true,
+        sideEffects: false,
+        // Improved runtime chunk optimization
+        runtimeChunk: {
+          name: 'runtime'
+        },
+      };
+    }
 
     return config;
-  },
-  serverRuntimeConfig: {
-    // 서버 사이드 설정
-  },
-  publicRuntimeConfig: {
-    // 클라이언트 사이드 설정
   },
   compress: true,
   poweredByHeader: false,

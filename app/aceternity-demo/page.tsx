@@ -5,7 +5,7 @@
  * Showcase of modern design integration with ANAM Gallery
  */
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import SuperClaudeLayout from '@/components/layout/SuperClaudeLayout'
 import { BMADGallerySystem } from '@/components/gallery/BMADGallerySystem'

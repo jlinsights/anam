@@ -8,9 +8,9 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe, toHaveNoViolations } from 'jest-axe'
 import ArtworkDetailModalClient from '@/components/artwork-detail-modal-client'
-import Navigation from '@/components/single-page/Navigation'
-import ContactForm from '@/components/contact-form'
-import LanguageSwitcher from '@/components/language-switcher'
+import { Navigation } from '@/components/single-page/Navigation'
+import { ContactForm } from '@/components/contact-form'
+import { LanguageSwitcher } from '@/components/language-switcher'
 import { mockArtwork } from '../lib/hooks/artwork.mock'
 
 // Add jest-axe matchers
@@ -35,14 +35,14 @@ jest.mock('next-intl', () => ({
 describe('Focus Management and ARIA Compliance', () => {
   describe('Modal Focus Management', () => {
     it('should focus the modal container on open', () => {
-      render(<ArtworkDetailModalClient artwork={mockArtwork} />)
+      render(<ArtworkDetailModalClient artwork={mockArtwork} recommendedArtworks={[]} />)
       
       const modal = screen.getByRole('dialog')
       expect(modal).toHaveFocus()
     })
 
     it('should focus the close button as first interactive element', () => {
-      render(<ArtworkDetailModalClient artwork={mockArtwork} />)
+      render(<ArtworkDetailModalClient artwork={mockArtwork} recommendedArtworks={[]} />)
       
       const closeButton = screen.getByLabelText('Close')
       expect(closeButton).toBeInTheDocument()
@@ -51,7 +51,7 @@ describe('Focus Management and ARIA Compliance', () => {
 
     it('should trap focus within modal', async () => {
       const user = userEvent.setup()
-      render(<ArtworkDetailModalClient artwork={mockArtwork} />)
+      render(<ArtworkDetailModalClient artwork={mockArtwork} recommendedArtworks={[]} />)
       
       const modal = screen.getByRole('dialog')
       const focusableElements = within(modal).getAllByRole('button')
@@ -78,7 +78,7 @@ describe('Focus Management and ARIA Compliance', () => {
 
     it('should handle Escape key to close modal', async () => {
       const user = userEvent.setup()
-      render(<ArtworkDetailModalClient artwork={mockArtwork} />)
+      render(<ArtworkDetailModalClient artwork={mockArtwork} recommendedArtworks={[]} />)
       
       const modal = screen.getByRole('dialog')
       expect(modal).toBeInTheDocument()
@@ -118,7 +118,7 @@ describe('Focus Management and ARIA Compliance', () => {
     })
 
     it('should have proper ARIA attributes', () => {
-      render(<ArtworkDetailModalClient artwork={mockArtwork} />)
+      render(<ArtworkDetailModalClient artwork={mockArtwork} recommendedArtworks={[]} />)
       
       const modal = screen.getByRole('dialog')
       
@@ -131,7 +131,7 @@ describe('Focus Management and ARIA Compliance', () => {
     })
 
     it('should have accessible close button', () => {
-      render(<ArtworkDetailModalClient artwork={mockArtwork} />)
+      render(<ArtworkDetailModalClient artwork={mockArtwork} recommendedArtworks={[]} />)
       
       const closeButton = screen.getByLabelText('Close')
       
@@ -142,7 +142,7 @@ describe('Focus Management and ARIA Compliance', () => {
 
   describe('Navigation Focus Management', () => {
     it('should have focusable navigation links', () => {
-      render(<Navigation />)
+      render(<Navigation currentSection="gallery" onNavigate={() => {}} />)
       
       const nav = screen.getByRole('navigation')
       const links = within(nav).getAllByRole('link')
@@ -154,7 +154,7 @@ describe('Focus Management and ARIA Compliance', () => {
     })
 
     it('should indicate current page with aria-current', () => {
-      render(<Navigation />)
+      render(<Navigation currentSection="gallery" onNavigate={() => {}} />)
       
       const links = screen.getAllByRole('link')
       const currentLink = links.find(link => 
@@ -166,7 +166,7 @@ describe('Focus Management and ARIA Compliance', () => {
 
     it('should support keyboard navigation', async () => {
       const user = userEvent.setup()
-      render(<Navigation />)
+      render(<Navigation currentSection="gallery" onNavigate={() => {}} />)
       
       const links = screen.getAllByRole('link')
       
@@ -178,7 +178,7 @@ describe('Focus Management and ARIA Compliance', () => {
     })
 
     it('should have skip link for screen readers', () => {
-      render(<Navigation />)
+      render(<Navigation currentSection="gallery" onNavigate={() => {}} />)
       
       // Look for skip link (might be visually hidden)
       const skipLink = screen.queryByText(/skip to main content/i)
@@ -188,7 +188,7 @@ describe('Focus Management and ARIA Compliance', () => {
     })
 
     it('should have proper landmark structure', () => {
-      render(<Navigation />)
+      render(<Navigation currentSection="gallery" onNavigate={() => {}} />)
       
       const nav = screen.getByRole('navigation')
       expect(nav).toBeInTheDocument()
@@ -382,7 +382,7 @@ describe('Focus Management and ARIA Compliance', () => {
       const TestComponent = () => (
         <div>
           <header>
-            <Navigation />
+            <Navigation currentSection="gallery" onNavigate={() => {}} />
           </header>
           <main>
             <h1>Main Content</h1>
@@ -512,7 +512,7 @@ describe('Focus Management and ARIA Compliance', () => {
 
   describe('Focus Visibility', () => {
     it('should have visible focus indicators', () => {
-      render(<Navigation />)
+      render(<Navigation currentSection="gallery" onNavigate={() => {}} />)
       
       const links = screen.getAllByRole('link')
       
@@ -560,7 +560,7 @@ describe('Focus Management and ARIA Compliance', () => {
     it('should pass axe accessibility tests', async () => {
       const { container } = render(
         <div>
-          <Navigation />
+          <Navigation currentSection="gallery" onNavigate={() => {}} />
           <main>
             <ContactForm />
             <LanguageSwitcher />
