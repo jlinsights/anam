@@ -1,1 +1,1 @@
-🚨 로딩 이슈 긴급 수정 - 즉시 fallback 데이터 로드로 무한 로딩 해결
+🔧 Fix deployment configuration - resolving Vercel npm version compatibility

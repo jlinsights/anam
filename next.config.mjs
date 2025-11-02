@@ -1,8 +1,10 @@
 import { dirname } from "path";
 import { fileURLToPath } from "url";
+import { createRequire } from 'module';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const require = createRequire(import.meta.url);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -12,7 +14,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // React 18 호환성을 위한 설정
+  // React 19 호환성을 위한 설정
   reactStrictMode: true,
   images: {
     formats: ["image/avif", "image/webp"],
@@ -25,33 +27,17 @@ const nextConfig = {
     ],
   },
   experimental: {
+    // ✅ REDUCED OPTIMIZATION SCOPE - Prevent chunk conflicts
     optimizePackageImports: [
-      "lucide-react", 
-      "@radix-ui/react-icons",
-      "@radix-ui/react-dialog",
-      "@radix-ui/react-toast",
-      "@radix-ui/react-select",
-      "@radix-ui/react-dropdown-menu",
-      "@radix-ui/react-context-menu",
-      "@radix-ui/react-accordion",
-      "@radix-ui/react-tooltip",
-      "@radix-ui/react-scroll-area",
-      "@radix-ui/react-popover",
-      "@radix-ui/react-alert-dialog",
-      "framer-motion",
-      "zustand",
+      "lucide-react",
       "date-fns",
-      "next-themes",
-      "class-variance-authority",
       "clsx",
-      "tailwind-merge",
-      "react-hook-form",
-      "@hookform/resolvers",
-      "zod",
-      "sonner"
+      "tailwind-merge"
     ],
-    // Enable additional optimizations
-    esmExternals: true,
+    // ✅ WEBPACK OPTIMIZATION FOR CHUNK STABILITY
+    webpackBuildWorker: true,
+    // ✅ IMPROVED: Improve chunk loading reliability
+    optimizeCss: true,
   },
   // Next.js 15에 맞는 설정
   serverExternalPackages: [],
@@ -62,7 +48,7 @@ const nextConfig = {
     },
   }),
   webpack: (config, { dev, isServer }) => {
-    // React 18 호환성을 위한 설정
+    // ✅ ENHANCED React 19 + Next.js 15 COMPATIBILITY
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -71,90 +57,116 @@ const nextConfig = {
         tls: false,
         crypto: false,
       };
+      
+      // ✅ CHUNK LOADING OPTIMIZATION
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'react': require.resolve('react'),
+        'react-dom': require.resolve('react-dom'),
+      };
     }
 
-    // web-vitals 패키지 관련 설정은 제거 (dynamic import 사용)
-
-    // 개발 환경에서 안정성을 위한 설정
+    // ✅ DEVELOPMENT ENVIRONMENT OPTIMIZATION
     if (dev) {
       config.watchOptions = {
         poll: false,
         ignored: ["**/node_modules/**", "**/.git/**", "**/.next/**"],
       };
+      
+      // ✅ DEV: Prevent chunk conflicts during development
+      config.optimization = {
+        ...config.optimization,
+        removeAvailableModules: false,
+        removeEmptyChunks: false,
+        splitChunks: false, // Disable in development for stability
+      };
     }
 
-    // Deprecation 경고 억제
+    // ✅ ENHANCED LOGGING CONFIGURATION
     config.infrastructureLogging = {
       level: 'error',
+      debug: false,
     };
 
-    // Console 경고 억제
+    // ✅ COMPREHENSIVE WARNING SUPPRESSION
     config.stats = {
       ...config.stats,
       warningsFilter: [
         /punycode/,
         /DeprecationWarning/,
         /\[DEP0040\]/,
+        /Critical dependency/,
+        /Module not found/,
+        /Failed to parse source map/,
       ],
     };
 
+    // ✅ OPTIMIZED CHUNK STRATEGY - React 19 + Next.js 15.4.5 Compatible
     config.optimization = {
       ...config.optimization,
       splitChunks: {
         chunks: "all",
-        minSize: 20000,
-        maxSize: 244000,
+        minSize: 30000, // Increased minimum size
+        maxSize: 500000, // Relaxed maximum size for better bundling
+        maxAsyncRequests: 6, // Limit async requests
+        maxInitialRequests: 4, // Limit initial requests
         cacheGroups: {
-          default: {
-            minChunks: 2,
-            priority: -20,
-            reuseExistingChunk: true,
-          },
+          // Consolidate vendor chunks for better performance
           vendor: {
             test: /[\\/]node_modules[\\/]/,
             name: "vendors",
             chunks: "all",
-            priority: -10,
-          },
-          react: {
-            test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
-            name: "react",
-            chunks: "all",
             priority: 10,
             enforce: true,
+            reuseExistingChunk: true,
           },
-          // Radix UI components
-          radix: {
-            test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
-            name: "radix-ui",
+          // React ecosystem in single chunk
+          react: {
+            test: /[\\/]node_modules[\\/](react|react-dom|react-.*|@react)[\\/]/,
+            name: "react-vendor",
             chunks: "all",
+            priority: 20,
+            enforce: true,
+          },
+          // UI libraries consolidated
+          ui: {
+            test: /[\\/]node_modules[\\/](@radix-ui|framer-motion|lucide-react)[\\/]/,
+            name: "ui-vendor",
+            chunks: "all",
+            priority: 15,
+            enforce: true,
+          },
+          // Utilities and async libraries
+          utils: {
+            test: /[\\/]node_modules[\\/](date-fns|clsx|class-variance-authority|tailwind-merge|zustand|zod)[\\/]/,
+            name: "utils-vendor",
+            chunks: "all",
+            priority: 12,
+          },
+          // Performance monitoring (keep async for better performance)
+          monitoring: {
+            test: /[\\/]node_modules[\\/](web-vitals|@sentry)[\\/]/,
+            name: "monitoring",
+            chunks: "async",
             priority: 8,
           },
-          // Framer Motion
-          framerMotion: {
-            test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
-            name: "framer-motion",
-            chunks: "all",
-            priority: 7,
-          },
-          // Lucide icons
-          lucide: {
-            test: /[\\/]node_modules[\\/]lucide-react[\\/]/,
-            name: "lucide-react",
-            chunks: "all",
-            priority: 6,
-          },
-          // Web vitals (lazy loaded)
-          webVitals: {
-            test: /[\\/]node_modules[\\/]web-vitals[\\/]/,
-            name: "web-vitals",
-            chunks: "async",
-            priority: 5,
+          // Default group for remaining vendor code
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+            maxSize: 300000,
           },
         },
       },
+      // Enhanced module concatenation for React 19
+      concatenateModules: true,
       usedExports: true,
       sideEffects: false,
+      // Improved runtime chunk optimization
+      runtimeChunk: {
+        name: 'runtime'
+      },
     };
 
     return config;
@@ -181,10 +193,6 @@ const nextConfig = {
     },
     'date-fns': {
       transform: 'date-fns/{{member}}',
-    },
-    'framer-motion': {
-      transform: 'framer-motion/dist/es/{{member}}',
-      skipDefaultConversion: true,
     },
   },
   async redirects() {

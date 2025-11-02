@@ -69,7 +69,7 @@
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "date-fns": "3.6.0",
+    "date-fns": "^3.6.0",
     "dotenv": "^16.5.0",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.514.0",

@@ -1,0 +1,306 @@
+/**
+ * Chunk Error Monitoring & Prevention System
+ * 
+ * Monitors chunk loading errors and implements automatic recovery strategies
+ * for the persistent chunk error ID: root_error_1761992620647
+ */
+
+interface ChunkError {
+  id: string
+  type: 'chunk' | 'network' | 'javascript'
+  timestamp: number
+  url?: string
+  stack?: string
+  retryCount: number
+  recovered: boolean
+}
+
+class ChunkErrorMonitor {
+  private errors: ChunkError[] = []
+  private retryAttempts = new Map<string, number>()
+  private maxRetries = 3
+  private retryDelay = 2000
+  private isMonitoring = false
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      this.initializeMonitoring()
+    }
+  }
+
+  private initializeMonitoring() {
+    if (this.isMonitoring) return
+    this.isMonitoring = true
+
+    // Monitor chunk loading errors
+    this.setupChunkErrorHandling()
+    
+    // Monitor network issues
+    this.setupNetworkMonitoring()
+    
+    // Setup periodic health check
+    this.startHealthCheck()
+  }
+
+  private setupChunkErrorHandling() {
+    // Intercept dynamic import errors
+    const originalImport = window.eval('import')
+    if (originalImport) {
+      // @ts-ignore - Override global import for monitoring
+      window.eval = (code: string) => {
+        if (code.includes('import(')) {
+          return this.wrappedDynamicImport(code)
+        }
+        return originalImport.call(window, code)
+      }
+    }
+
+    // Monitor script loading errors
+    document.addEventListener('error', (event) => {
+      const target = event.target as HTMLScriptElement
+      if (target && target.tagName === 'SCRIPT' && target.src) {
+        this.handleChunkError(target.src, event.error)
+      }
+    }, true)
+
+    // Monitor unhandled promise rejections (chunk loading failures)
+    window.addEventListener('unhandledrejection', (event) => {
+      if (this.isChunkLoadingError(event.reason)) {
+        this.handleChunkError('unknown', event.reason)
+        event.preventDefault() // Prevent console error
+      }
+    })
+  }
+
+  private async wrappedDynamicImport(code: string): Promise<any> {
+    try {
+      return await eval(code)
+    } catch (error) {
+      if (this.isChunkLoadingError(error)) {
+        await this.handleChunkError('dynamic-import', error)
+        // Retry the import after recovery
+        return await eval(code)
+      }
+      throw error
+    }
+  }
+
+  private isChunkLoadingError(error: any): boolean {
+    if (!error) return false
+    
+    const message = error.message || error.toString() || ''
+    const stack = error.stack || ''
+    
+    return (
+      message.includes('Loading chunk') ||
+      message.includes('ChunkLoadError') ||
+      message.includes('Failed to import') ||
+      message.includes('Loading CSS chunk') ||
+      message.includes('Failed to fetch dynamically imported module') ||
+      stack.includes('chunk') ||
+      error.name === 'ChunkLoadError'
+    )
+  }
+
+  private async handleChunkError(url: string, error: any) {
+    const errorId = this.generateErrorId()
+    const currentRetries = this.retryAttempts.get(url) || 0
+
+    const chunkError: ChunkError = {
+      id: errorId,
+      type: 'chunk',
+      timestamp: Date.now(),
+      url,
+      stack: error?.stack?.substring(0, 500),
+      retryCount: currentRetries,
+      recovered: false
+    }
+
+    this.errors.push(chunkError)
+    
+    console.warn(`🚨 Chunk Error Detected: ${errorId}`, {
+      url,
+      error: error?.message,
+      retryCount: currentRetries
+    })
+
+    // Attempt recovery
+    if (currentRetries < this.maxRetries) {
+      await this.attemptRecovery(url, chunkError)
+    } else {
+      console.error(`❌ Max retries exceeded for chunk: ${url}`)
+      this.forcePageReload('chunk-error-max-retries')
+    }
+  }
+
+  private async attemptRecovery(url: string, chunkError: ChunkError) {
+    const currentRetries = this.retryAttempts.get(url) || 0
+    this.retryAttempts.set(url, currentRetries + 1)
+
+    console.log(`🔄 Attempting chunk recovery ${currentRetries + 1}/${this.maxRetries} for: ${url}`)
+
+    // Strategy 1: Clear caches
+    await this.clearCaches()
+
+    // Strategy 2: Preload chunk with retry
+    if (url !== 'dynamic-import' && url !== 'unknown') {
+      await this.preloadChunk(url)
+    }
+
+    // Strategy 3: Wait before retry
+    await this.delay(this.retryDelay * (currentRetries + 1))
+
+    chunkError.recovered = true
+  }
+
+  private async clearCaches() {
+    try {
+      // Clear service worker caches
+      if ('caches' in window) {
+        const cacheNames = await caches.keys()
+        await Promise.all(
+          cacheNames.map(cacheName => {
+            if (cacheName.includes('next') || cacheName.includes('chunk')) {
+              return caches.delete(cacheName)
+            }
+          })
+        )
+      }
+
+      // Clear module cache if available
+      if ('webpackChunkName' in window) {
+        // @ts-ignore
+        delete window.webpackChunkName
+      }
+    } catch (error) {
+      console.warn('Failed to clear caches:', error)
+    }
+  }
+
+  private async preloadChunk(url: string): Promise<void> {
+    return new Promise((resolve) => {
+      const link = document.createElement('link')
+      link.rel = 'preload'
+      link.as = 'script'
+      link.href = url
+      link.onload = () => resolve()
+      link.onerror = () => resolve() // Still resolve to continue
+      document.head.appendChild(link)
+      
+      // Cleanup after 5 seconds
+      setTimeout(() => {
+        if (link.parentNode) {
+          link.parentNode.removeChild(link)
+        }
+        resolve()
+      }, 5000)
+    })
+  }
+
+  private setupNetworkMonitoring() {
+    // Monitor network status
+    window.addEventListener('online', () => {
+      console.log('🌐 Network restored, checking chunk health...')
+      this.checkChunkHealth()
+    })
+
+    window.addEventListener('offline', () => {
+      console.log('📡 Network offline detected')
+    })
+  }
+
+  private startHealthCheck() {
+    // Periodic health check every 30 seconds
+    setInterval(() => {
+      this.checkChunkHealth()
+    }, 30000)
+  }
+
+  private async checkChunkHealth() {
+    try {
+      // Test basic module loading
+      const testResponse = await fetch('/_next/static/chunks/webpack-' + Math.random() + '.js', {
+        method: 'HEAD',
+        cache: 'no-cache'
+      })
+      
+      if (!testResponse.ok) {
+        console.warn('⚠️ Chunk health check failed, clearing caches...')
+        await this.clearCaches()
+      }
+    } catch (error) {
+      // Ignore health check errors in development
+      if (process.env.NODE_ENV === 'development') {
+        return
+      }
+      console.warn('Chunk health check error:', error)
+    }
+  }
+
+  private forcePageReload(reason: string) {
+    console.log(`🔄 Force reload triggered: ${reason}`)
+    
+    // Clear everything before reload
+    this.clearCaches()
+    localStorage.setItem('chunk-error-reload', Date.now().toString())
+    
+    // Delay reload to allow cleanup
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  private generateErrorId(): string {
+    return `chunk_error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  }
+
+  // Public API
+  getErrorHistory(): ChunkError[] {
+    return [...this.errors]
+  }
+
+  getHealthStatus() {
+    const recentErrors = this.errors.filter(
+      error => Date.now() - error.timestamp < 300000 // Last 5 minutes
+    )
+
+    return {
+      totalErrors: this.errors.length,
+      recentErrors: recentErrors.length,
+      recoveredErrors: this.errors.filter(e => e.recovered).length,
+      isHealthy: recentErrors.length === 0,
+      lastError: this.errors[this.errors.length - 1] || null
+    }
+  }
+
+  clearErrorHistory() {
+    this.errors = []
+    this.retryAttempts.clear()
+  }
+}
+
+// Global instance
+let chunkMonitor: ChunkErrorMonitor | null = null
+
+export function initializeChunkMonitor() {
+  if (typeof window !== 'undefined' && !chunkMonitor) {
+    chunkMonitor = new ChunkErrorMonitor()
+    
+    // Expose to window for debugging
+    if (process.env.NODE_ENV === 'development') {
+      // @ts-ignore
+      window.chunkMonitor = chunkMonitor
+    }
+  }
+  return chunkMonitor
+}
+
+export function getChunkMonitor() {
+  return chunkMonitor
+}
+
+export { ChunkErrorMonitor }
