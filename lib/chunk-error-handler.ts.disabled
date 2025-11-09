@@ -1,0 +1,257 @@
+/**
+ * Advanced Chunk Error Handler
+ * Handles vendor chunk loading errors and provides graceful recovery
+ */
+
+interface ChunkError {
+  name: string
+  message: string
+  stack?: string
+  chunkId?: string
+  filename?: string
+}
+
+class ChunkErrorHandler {
+  private static instance: ChunkErrorHandler
+  private errorCount = 0
+  private maxRetries = 3
+  private retryDelay = 1000
+  private failedChunks = new Set<string>()
+
+  static getInstance(): ChunkErrorHandler {
+    if (!ChunkErrorHandler.instance) {
+      ChunkErrorHandler.instance = new ChunkErrorHandler()
+    }
+    return ChunkErrorHandler.instance
+  }
+
+  init() {
+    if (typeof window === 'undefined') return
+
+    // Handle chunk loading errors
+    window.addEventListener('error', this.handleScriptError.bind(this))
+    
+    // Handle promise rejections from dynamic imports
+    window.addEventListener('unhandledrejection', this.handlePromiseRejection.bind(this))
+
+    // Setup additional recovery mechanisms
+    this.setupAdvancedRecovery()
+  }
+
+  private handleScriptError(event: ErrorEvent) {
+    const { target, error } = event
+    
+    if (target && (target as HTMLElement).tagName === 'SCRIPT') {
+      const script = target as HTMLScriptElement
+      const src = script.src
+      
+      if (src && this.isChunkFile(src)) {
+        console.warn('🔧 Chunk loading error detected:', src)
+        this.handleChunkError(src, error)
+        event.preventDefault()
+      }
+    }
+  }
+
+  private handlePromiseRejection(event: PromiseRejectionEvent) {
+    const error = event.reason
+    
+    if (this.isChunkLoadError(error)) {
+      console.warn('🔧 Dynamic import chunk error:', error)
+      this.handleChunkError('dynamic-import', error)
+      event.preventDefault()
+    }
+  }
+
+  private isChunkFile(src: string): boolean {
+    return /\/(chunks\/|_next\/static\/).*\.(js|css)$/.test(src) ||
+           /vendors-[a-f0-9]+\.js$/.test(src) ||
+           /framework-[a-f0-9]+\.js$/.test(src) ||
+           /ui-libs-[a-f0-9]+\.js$/.test(src)
+  }
+
+  private isChunkLoadError(error: any): boolean {
+    if (!error) return false
+    
+    const message = error.message || error.toString()
+    return /loading chunk|chunk load failed|cannot read prop.*length/i.test(message) ||
+           /vendors-.*\.js/.test(message) ||
+           /failed to fetch dynamically imported module/i.test(message)
+  }
+
+  private async handleChunkError(source: string, error: any) {
+    this.errorCount++
+    
+    const chunkId = this.extractChunkId(source)
+    if (chunkId && this.failedChunks.has(chunkId)) {
+      console.warn('🚨 Chunk already failed, skipping retry:', chunkId)
+      return
+    }
+
+    if (chunkId) {
+      this.failedChunks.add(chunkId)
+    }
+
+    // Try to recover based on error count
+    if (this.errorCount === 1) {
+      console.log('🔄 Attempting chunk error recovery (attempt 1/3)')
+      await this.clearCacheAndRetry()
+    } else if (this.errorCount === 2) {
+      console.log('🔄 Attempting chunk error recovery (attempt 2/3)')
+      await this.forceReload()
+    } else if (this.errorCount >= this.maxRetries) {
+      console.log('🚨 Maximum chunk error retries reached, forcing page reload')
+      this.forcePageReload()
+    }
+  }
+
+  private extractChunkId(source: string): string | null {
+    const match = source.match(/vendors-([a-f0-9]+)\.js$/) ||
+                  source.match(/framework-([a-f0-9]+)\.js$/) ||
+                  source.match(/ui-libs-([a-f0-9]+)\.js$/) ||
+                  source.match(/chunk-([a-f0-9]+)\.js$/)
+    
+    return match ? match[1] : null
+  }
+
+  private async clearCacheAndRetry() {
+    try {
+      // Clear service worker caches
+      if ('caches' in window) {
+        const cacheNames = await caches.keys()
+        await Promise.all(
+          cacheNames.map(cacheName => caches.delete(cacheName))
+        )
+        console.log('✅ Cleared service worker caches')
+      }
+
+      // Clear localStorage chunk cache if it exists
+      try {
+        Object.keys(localStorage).forEach(key => {
+          if (key.includes('chunk') || key.includes('vendor')) {
+            localStorage.removeItem(key)
+          }
+        })
+      } catch (e) {
+        console.warn('Could not clear localStorage:', e)
+      }
+
+      // Wait a bit then retry
+      await this.sleep(this.retryDelay)
+      
+      // Try to reload the failed scripts
+      this.reloadFailedChunks()
+      
+    } catch (error) {
+      console.error('Error during cache clear and retry:', error)
+      this.forceReload()
+    }
+  }
+
+  private async forceReload() {
+    console.log('🔄 Force reloading with cache bypass...')
+    
+    // Clear all possible caches
+    try {
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations()
+        await Promise.all(registrations.map(reg => reg.unregister()))
+      }
+    } catch (e) {
+      console.warn('Could not clear service workers:', e)
+    }
+
+    // Reload with cache bypass
+    window.location.reload()
+  }
+
+  private forcePageReload() {
+    console.log('🚨 Forcing complete page reload as last resort...')
+    
+    // Add a timestamp to force bypass all caches
+    const url = new URL(window.location.href)
+    url.searchParams.set('_reload', Date.now().toString())
+    window.location.href = url.toString()
+  }
+
+  private reloadFailedChunks() {
+    // Try to re-import failed chunks if we can identify them
+    const scripts = document.querySelectorAll('script[src*="chunk"], script[src*="vendor"]')
+    
+    scripts.forEach(script => {
+      const src = (script as HTMLScriptElement).src
+      if (src && this.isChunkFile(src)) {
+        // Create a new script element to retry loading
+        const newScript = document.createElement('script')
+        newScript.src = src + '?retry=' + Date.now()
+        newScript.async = true
+        
+        newScript.onload = () => {
+          console.log('✅ Successfully reloaded chunk:', src)
+          script.remove()
+        }
+        
+        newScript.onerror = () => {
+          console.warn('❌ Failed to reload chunk:', src)
+          newScript.remove()
+        }
+        
+        document.head.appendChild(newScript)
+      }
+    })
+  }
+
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  private setupAdvancedRecovery() {
+    // Enhanced recovery for dynamic imports
+    if (typeof window !== 'undefined' && 'webpackChunkName' in window) {
+      const originalImport = window.__webpack_require__?.()
+      if (originalImport) {
+        // Wrap dynamic imports with error recovery
+        console.log('🔧 Advanced chunk recovery mechanisms enabled')
+      }
+    }
+
+    // Setup periodic cleanup of failed chunks
+    setInterval(() => {
+      if (this.failedChunks.size > 0) {
+        console.log(`🧹 Cleaning up ${this.failedChunks.size} failed chunks`)
+        this.failedChunks.clear()
+      }
+    }, 300000) // Every 5 minutes
+  }
+
+  // Public method to manually trigger recovery
+  public recoverFromChunkError() {
+    console.log('🔧 Manual chunk error recovery triggered')
+    this.handleChunkError('manual-trigger', new Error('Manual recovery'))
+  }
+
+  // Get error statistics
+  public getErrorStats() {
+    return {
+      errorCount: this.errorCount,
+      failedChunks: Array.from(this.failedChunks),
+      maxRetries: this.maxRetries
+    }
+  }
+
+  // Reset error state (useful for testing)
+  public reset() {
+    this.errorCount = 0
+    this.failedChunks.clear()
+  }
+}
+
+// Initialize the chunk error handler
+export const chunkErrorHandler = ChunkErrorHandler.getInstance()
+
+// Auto-initialize on client side
+if (typeof window !== 'undefined') {
+  chunkErrorHandler.init()
+}
+
+export default chunkErrorHandler

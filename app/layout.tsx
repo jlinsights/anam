@@ -243,6 +243,8 @@ export default function RootLayout({
             __html: JSON.stringify(generateStructuredData(), null, 2),
           }}
         />
+        
+        {/* ✅ SIMPLE ERROR PREVENTION - Basic only */}
       </head>
       <body
         className={`${inter.variable} ${notoSerifKR.variable}`}

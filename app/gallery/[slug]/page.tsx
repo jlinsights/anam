@@ -6,7 +6,7 @@ import type { Artwork, Artist } from '@/lib/types'
 import type { Metadata } from 'next'
 
 interface ArtworkPageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 // Helper function to sanitize text for metadata
@@ -17,7 +17,7 @@ function sanitizeText(text: string): string {
 }
 
 export async function generateMetadata({ params }: ArtworkPageProps): Promise<Metadata> {
-  const { slug } = params
+  const { slug } = await params
   const artwork = await getArtworkBySlug(slug)
   
   if (!artwork) {
@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: ArtworkPageProps): Promise<Me
 export const dynamic = 'force-dynamic'
 
 export default async function ArtworkPage({ params }: ArtworkPageProps) {
-  const { slug } = params
+  const { slug } = await params
   
   try {
     console.log(`📄 Loading artwork page for slug: "${slug}"`)

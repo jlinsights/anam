@@ -7,7 +7,6 @@ import { I18nProvider } from '@/components/i18n-provider'
 import { PWAInstallPrompt } from '@/components/pwa-install-prompt'
 import { ServiceWorkerRegistration } from '@/components/service-worker-registration'
 import { UIProvider } from '@/lib/store/ui-store'
-import { initializeChunkMonitor } from '@/lib/chunk-error-monitor'
 
 interface ClientLayoutProps {
   children: React.ReactNode
@@ -22,10 +21,8 @@ export function ClientLayout({ children }: ClientLayoutProps) {
   useEffect(() => {
     setMounted(true)
     
-    // ✅ Initialize chunk error monitoring system
-    initializeChunkMonitor()
-    
-    // 에러 처리는 ErrorBoundary가 담당하므로 try-catch 불필요
+    // ✅ SIMPLIFIED: Basic mounting only, no complex error handling
+    console.log('✅ Client layout mounted')
   }, [])
 
   // 서버 사이드에서는 기본 레이아웃만 렌더링
