@@ -75,7 +75,7 @@ export interface Database {
 let supabaseClient: SupabaseClient<Database> | null = null
 
 // Create Supabase client for server-side operations
-export function createSupabaseClient(): SupabaseClient<Database> {
+export function createSupabaseClient(): SupabaseClient<Database> | null {
   // Return cached client if available
   if (supabaseClient) {
     return supabaseClient
@@ -85,13 +85,10 @@ export function createSupabaseClient(): SupabaseClient<Database> {
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl || !supabaseKey) {
-    const errorMessage = 'Missing Supabase environment variables'
-    console.warn('⚠️ Supabase environment variables not configured')
-    console.warn('Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY')
-    // Create a more descriptive error for better tracking
-    const error = new Error(errorMessage)
-    error.name = 'SupabaseConfigurationError'
-    throw error
+    console.warn('⚠️ Supabase environment variables not configured, using fallback data sources')
+    console.warn('To enable Supabase: set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY')
+    // ✅ Return null instead of throwing error to allow graceful fallback
+    return null
   }
 
   supabaseClient = createClient<Database>(supabaseUrl, supabaseKey, {
@@ -113,17 +110,18 @@ export { createSupabaseClient as createClient }
 // Client-side Supabase client (for browser use)
 export function createBrowserClient() {
   if (typeof window === 'undefined') {
-    throw new Error('createBrowserClient can only be used in browser context')
+    console.warn('createBrowserClient can only be used in browser context')
+    return null
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    const errorMessage = 'Missing Supabase browser environment variables'
-    const error = new Error(errorMessage)
-    error.name = 'SupabaseConfigurationError'
-    throw error
+    console.warn('⚠️ Supabase browser environment variables not configured')
+    console.warn('To enable Supabase: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY')
+    // ✅ Return null instead of throwing error to allow graceful fallback
+    return null
   }
 
   return createClient<Database>(supabaseUrl, supabaseAnonKey, {

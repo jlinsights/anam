@@ -13,6 +13,12 @@ import { captureError } from '@/lib/error-logger'
 export async function fetchArtworksFromSupabase(): Promise<Artwork[] | null> {
   try {
     const supabase = createSupabaseClient()
+    
+    // ✅ Handle null client gracefully (missing environment variables)
+    if (!supabase) {
+      console.warn('⚠️ Supabase client not configured, skipping')
+      return null
+    }
 
     const { data, error } = await supabase
       .from('artworks')
@@ -78,6 +84,12 @@ export async function fetchArtworkBySlugFromSupabase(
 ): Promise<Artwork | null> {
   try {
     const supabase = createSupabaseClient()
+    
+    // ✅ Handle null client gracefully (missing environment variables)
+    if (!supabase) {
+      console.warn('⚠️ Supabase client not configured, skipping')
+      return null
+    }
 
     const { data, error } = await supabase
       .from('artworks')
@@ -143,6 +155,12 @@ export async function fetchArtworkBySlugFromSupabase(
 export async function fetchArtistFromSupabase(): Promise<Artist | null> {
   try {
     const supabase = createSupabaseClient()
+    
+    // ✅ Handle null client gracefully (missing environment variables)
+    if (!supabase) {
+      console.warn('⚠️ Supabase client not configured, skipping')
+      return null
+    }
 
     // Try both 'artists' and 'artist' table names
     let data, error
@@ -239,6 +257,12 @@ export async function fetchFeaturedArtworksFromSupabase(
 ): Promise<Artwork[]> {
   try {
     const supabase = createSupabaseClient()
+    
+    // ✅ Handle null client gracefully (missing environment variables)
+    if (!supabase) {
+      console.warn('⚠️ Supabase client not configured, skipping')
+      return []
+    }
 
     const { data, error } = await supabase
       .from('artworks')
@@ -303,6 +327,12 @@ export async function searchArtworksInSupabase(
 ): Promise<Artwork[]> {
   try {
     const supabase = createSupabaseClient()
+    
+    // ✅ Handle null client gracefully (missing environment variables)
+    if (!supabase) {
+      console.warn('⚠️ Supabase client not configured, skipping')
+      return []
+    }
 
     const { data, error } = await supabase
       .from('artworks')

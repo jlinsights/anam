@@ -43,19 +43,8 @@ class ChunkErrorMonitor {
   }
 
   private setupChunkErrorHandling() {
-    // Intercept dynamic import errors
-    const originalImport = window.eval('import')
-    if (originalImport) {
-      // @ts-ignore - Override global import for monitoring
-      window.eval = (code: string) => {
-        if (code.includes('import(')) {
-          return this.wrappedDynamicImport(code)
-        }
-        return originalImport.call(window, code)
-      }
-    }
-
-    // Monitor script loading errors
+    // ✅ FIXED: Removed problematic eval() and global import overrides
+    // Monitor script loading errors only
     document.addEventListener('error', (event) => {
       const target = event.target as HTMLScriptElement
       if (target && target.tagName === 'SCRIPT' && target.src) {
@@ -72,18 +61,7 @@ class ChunkErrorMonitor {
     })
   }
 
-  private async wrappedDynamicImport(code: string): Promise<any> {
-    try {
-      return await eval(code)
-    } catch (error) {
-      if (this.isChunkLoadingError(error)) {
-        await this.handleChunkError('dynamic-import', error)
-        // Retry the import after recovery
-        return await eval(code)
-      }
-      throw error
-    }
-  }
+  // ✅ REMOVED: wrappedDynamicImport method that contained problematic eval() usage
 
   private isChunkLoadingError(error: any): boolean {
     if (!error) return false

@@ -1,1 +1,1 @@
-🔧 폰트 404 오류 수정: 존재하지 않는 noto-serif-kr-subset.woff2 프리로드 제거
+🔧 빌드 오류 수정: 누락된 aceternity-theme.css 임포트 제거

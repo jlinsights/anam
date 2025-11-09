@@ -109,73 +109,70 @@ const nextConfig = {
       ],
     };
 
-    // ✅ PRODUCTION CHUNK STRATEGY - Only apply in production
+    // ✅ ENHANCED PRODUCTION CHUNK STRATEGY - Prevent null property errors
     if (!dev) {
       config.optimization = {
         ...config.optimization,
         splitChunks: {
           chunks: "all",
-          minSize: 30000, // Increased minimum size
-          maxSize: 500000, // Relaxed maximum size for better bundling
-          maxAsyncRequests: 6, // Limit async requests
-          maxInitialRequests: 4, // Limit initial requests
+          minSize: 20000, // Reduced for better chunking
+          maxSize: 300000, // Smaller chunks for stability
+          maxAsyncRequests: 8,
+          maxInitialRequests: 5,
+          automaticNameDelimiter: '-',
           cacheGroups: {
-            // Consolidate vendor chunks for better performance
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: "vendors",
-              chunks: "all",
-              priority: 10,
+            // Framework chunk (React + Next.js)
+            framework: {
+              test: /[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
+              name: 'framework',
+              chunks: 'all',
+              priority: 40,
               enforce: true,
               reuseExistingChunk: true,
-            },
-            // React ecosystem in single chunk
-            react: {
-              test: /[\\/]node_modules[\\/](react|react-dom|react-.*|@react)[\\/]/,
-              name: "react-vendor",
-              chunks: "all",
-              priority: 20,
-              enforce: true,
             },
             // UI libraries consolidated
             ui: {
               test: /[\\/]node_modules[\\/](@radix-ui|framer-motion|lucide-react)[\\/]/,
-              name: "ui-vendor",
+              name: "ui-libs",
               chunks: "all",
-              priority: 15,
+              priority: 30,
               enforce: true,
+              reuseExistingChunk: true,
             },
-            // Utilities and async libraries
+            // Utilities
             utils: {
-              test: /[\\/]node_modules[\\/](date-fns|clsx|class-variance-authority|tailwind-merge|zustand|zod)[\\/]/,
-              name: "utils-vendor",
+              test: /[\\/]node_modules[\\/](clsx|class-variance-authority|tailwind-merge|zod)[\\/]/,
+              name: "utils",
               chunks: "all",
-              priority: 12,
+              priority: 25,
+              reuseExistingChunk: true,
             },
-            // Performance monitoring (keep async for better performance)
-            monitoring: {
-              test: /[\\/]node_modules[\\/](web-vitals|@sentry)[\\/]/,
-              name: "monitoring",
-              chunks: "async",
-              priority: 8,
+            // Other vendor libraries
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: "vendor",
+              chunks: "all",
+              priority: 10,
+              reuseExistingChunk: true,
+              minChunks: 1,
             },
-            // Default group for remaining vendor code
+            // Default group
             default: {
               minChunks: 2,
               priority: -20,
               reuseExistingChunk: true,
-              maxSize: 300000,
+              maxSize: 200000,
             },
           },
         },
-        // Enhanced module concatenation for React 19
-        concatenateModules: true,
+        // ✅ SAFER: Simplified module optimization to prevent null errors
         usedExports: true,
         sideEffects: false,
-        // Improved runtime chunk optimization
-        runtimeChunk: {
-          name: 'runtime'
-        },
+        // ✅ FIXED: Simpler runtime chunk naming to prevent null reference errors
+        runtimeChunk: 'single',
+        // ✅ ADDED: Better module resolution
+        moduleIds: 'deterministic',
+        chunkIds: 'deterministic',
       };
     }
 
@@ -211,16 +208,19 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https://imagedelivery.net https://fonts.gstatic.com",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' data:",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com data:",
+              "font-src 'self' https://fonts.gstatic.com data:",
+              "img-src 'self' data: blob: https://imagedelivery.net https://fonts.gstatic.com https://*.vercel.app",
               "connect-src 'self'",
-              "media-src 'self'",
+              "media-src 'self' data: blob:",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
               "frame-ancestors 'none'",
+              "frame-src 'self'",
+              "child-src 'self'",
+              "worker-src 'self' blob:",
               "upgrade-insecure-requests",
             ].join("; "),
           },
@@ -253,6 +253,32 @@ const nextConfig = {
       {
         source: "/images/(.*)",
         headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/_next/static/css/(.*)",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "text/css; charset=utf-8",
+          },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/_next/static/chunks/(.*)",
+        headers: [
+          {
+            key: "Content-Type", 
+            value: "application/javascript; charset=utf-8",
+          },
           {
             key: "Cache-Control",
             value: "public, max-age=31536000, immutable",

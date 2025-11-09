@@ -31,6 +31,23 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     if (error.message) {
       console.error('Error message:', error.message)
     }
+    
+    // Handle specific error types
+    if (error.message?.includes('Cannot read properties of null')) {
+      console.warn('🔍 Null property access detected - likely component unmounted during render')
+    }
+    
+    if (error.message?.includes('vendors-') || error.message?.includes('chunk')) {
+      console.warn('📦 Chunk loading error detected - possible network or caching issue')
+    }
+    
+    // Report to error monitoring service if available
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'exception', {
+        description: error.message,
+        fatal: false
+      })
+    }
   }
 
   render() {

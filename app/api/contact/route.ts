@@ -1,4 +1,6 @@
 import { createErrorResponse, createSuccessResponse, handleValidationError } from '@/lib/error-handler'
+import { withRateLimit, getClientIP } from '@/lib/rate-limit'
+import { sanitizeObject, threatMonitor } from '@/lib/security/input-sanitizer'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
@@ -12,11 +14,54 @@ const contactSchema = z.object({
 })
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
+  return withRateLimit(request, 'contact', async () => {
+    try {
+      const body = await request.json()
+      
+      // 🛡️ 보안: 입력 데이터 sanitization
+      const sanitizationResult = sanitizeObject(body, {
+        maxLength: 5000,
+        stripTags: true,
+        normalizeUnicode: true,
+        preventPathTraversal: true
+      })
+      
+      // 위협이 탐지된 경우 로깅
+      if (!sanitizationResult.isClean) {
+        const clientIP = getClientIP(request)
+        const userAgent = request.headers.get('user-agent') || 'unknown'
+        
+        Object.entries(sanitizationResult.threats).forEach(([field, threats]) => {
+          threats.forEach(threat => {
+            threatMonitor.logThreat(
+              clientIP,
+              userAgent,
+              threat,
+              JSON.stringify(body[field]),
+              '/api/contact'
+            )
+          })
+        })
+        
+        // 심각한 위협인 경우 요청 차단
+        const hasHighThreat = Object.values(sanitizationResult.threats)
+          .flat()
+          .some(threat => 
+            threat.includes('XSS') || 
+            threat.includes('SQL') || 
+            threat.includes('script')
+          )
+        
+        if (hasHighThreat) {
+          return NextResponse.json({
+            success: false,
+            error: '입력 데이터에 보안 위협이 탐지되었습니다.'
+          }, { status: 400 })
+        }
+      }
 
-    // 입력 데이터 검증
-    const validatedData = contactSchema.parse(body)
+      // 입력 데이터 검증 (sanitized 데이터 사용)
+      const validatedData = contactSchema.parse(sanitizationResult.sanitized)
 
     // 이메일 전송 로직 (Nodemailer 사용)
     const nodemailer = require('nodemailer')
@@ -78,19 +123,20 @@ export async function POST(request: NextRequest) {
     // 이메일 전송
     await transporter.sendMail(mailOptions)
 
-    return createSuccessResponse(
-      { sent: true },
-      '문의가 성공적으로 전송되었습니다.'
-    )
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return handleValidationError(error)
-    }
+      return createSuccessResponse(
+        { sent: true },
+        '문의가 성공적으로 전송되었습니다.'
+      )
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return handleValidationError(error)
+      }
 
-    return createErrorResponse(
-      error,
-      500,
-      '문의 전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
-    )
-  }
+      return createErrorResponse(
+        error,
+        500,
+        '문의 전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+      )
+    }
+  })
 }
