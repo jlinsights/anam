@@ -1,1 +1,1 @@
-🔧 빌드 오류 수정: 누락된 aceternity-theme.css 임포트 제거
+🔧 Gallery 버그 수정: 리다이렉트 제거 및 Next.js 15 async params 호환성 개선
