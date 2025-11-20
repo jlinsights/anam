@@ -3,7 +3,7 @@
  * Airtable 대신 Supabase를 데이터 소스로 사용
  */
 
-import { createSupabaseClient } from './server'
+import { createSupabaseClient, type Database } from './server'
 import type { Artwork, Artist } from '@/lib/types'
 import { captureError } from '@/lib/error-logger'
 
@@ -350,8 +350,9 @@ export async function searchArtworksInSupabase(
       return []
     }
 
-    // Transform to Artwork type
-    const artworks: Artwork[] = data.map((row) => ({
+    // Transform to Artwork type with proper typing
+    const typedData = data as Database['public']['Tables']['artworks']['Row'][]
+    const artworks: Artwork[] = typedData.map((row) => ({
       id: row.id,
       slug: row.slug,
       title: row.title,

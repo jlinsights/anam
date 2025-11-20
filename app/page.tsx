@@ -4,13 +4,15 @@ import { getArtworks } from '@/lib/artworks'
 import { fetchArtist } from '@/lib/artist'
 import type { Metadata } from 'next'
 import type { Artwork, Artist } from '@/lib/types'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react'
 import { useArtworks, useArtist } from '@/hooks/use-artwork-api'
 import Image from 'next/image'
 import Link from 'next/link'
 import { MinimalHeader } from '@/components/layout/MinimalHeader'
-import { HeroSection } from '@/components/sections/HeroSection'
-import UpcomingExhibition from '@/components/exhibition/UpcomingExhibition'
+
+// ✅ PERFORMANCE: Lazy load heavy components
+const HeroSection = lazy(() => import('@/components/sections/HeroSection').then(mod => ({ default: mod.HeroSection })))
+const UpcomingExhibition = lazy(() => import('@/components/exhibition/UpcomingExhibition'))
 
 // Metadata is handled in layout.tsx
 
@@ -243,24 +245,33 @@ export default function HomePage() {
       {/* Minimal Header */}
       <MinimalHeader />
       
-      {/* Hero Section */}
-      <HeroSection 
-        title="아남 배옥영"
-        subtitle="전통과 현대가 만나는 서예의 새로운 지평"
-        description="깊이 있는 전통 서예 기법과 현대적 감각이 조화를 이루는 독창적인 작품 세계를 만나보세요."
-        featuredArtwork={featuredArtwork ? {
-          id: featuredArtwork.id,
-          title: featuredArtwork.title,
-          imageUrl: featuredArtwork.imageUrl || '',
-          year: featuredArtwork.year?.toString() || '',
-          medium: featuredArtwork.medium || ''
-        } : undefined}
-        stats={{
-          totalArtworks: artworks.length,
-          yearsActive: 30,
-          exhibitions: 25
-        }}
-      />
+      {/* Hero Section - Lazy loaded */}
+      <Suspense fallback={
+        <div className="min-h-[70vh] flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 dark:border-gray-300 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-300">로딩 중...</p>
+          </div>
+        </div>
+      }>
+        <HeroSection 
+          title="아남 배옥영"
+          subtitle="전통과 현대가 만나는 서예의 새로운 지평"
+          description="깊이 있는 전통 서예 기법과 현대적 감각이 조화를 이루는 독창적인 작품 세계를 만나보세요."
+          featuredArtwork={featuredArtwork ? {
+            id: featuredArtwork.id,
+            title: featuredArtwork.title,
+            imageUrl: featuredArtwork.imageUrl || '',
+            year: featuredArtwork.year?.toString() || '',
+            medium: featuredArtwork.medium || ''
+          } : undefined}
+          stats={{
+            totalArtworks: artworks.length,
+            yearsActive: 30,
+            exhibitions: 25
+          }}
+        />
+      </Suspense>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-16">
@@ -559,8 +570,17 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* Upcoming Exhibition Section */}
-      <UpcomingExhibition />
+      {/* Upcoming Exhibition Section - Lazy loaded */}
+      <Suspense fallback={
+        <div className="container mx-auto px-4 py-8">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 animate-pulse">
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+          </div>
+        </div>
+      }>
+        <UpcomingExhibition />
+      </Suspense>
 
       {/* Footer */}
       <footer className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-0">

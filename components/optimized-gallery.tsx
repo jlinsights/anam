@@ -13,7 +13,11 @@ import { Eye, Heart, Share2, ZoomIn } from 'lucide-react'
 import Link from 'next/link'
 
 interface OptimizedGalleryProps {
+  // Support both artworks and initialArtworks for backward compatibility
+  artworks?: Artwork[]
   initialArtworks?: Artwork[]
+  loading?: boolean
+  error?: Error | null
   fetchMoreArtworks?: (offset: number, limit: number) => Promise<Artwork[]>
   pageSize?: number
   showPerformanceMonitor?: boolean
@@ -25,7 +29,10 @@ interface OptimizedGalleryProps {
  * Implements all performance optimizations for smooth 60fps experience
  */
 export function OptimizedGallery({
+  artworks: propsArtworks,
   initialArtworks = [],
+  loading = false,
+  error = null,
   fetchMoreArtworks,
   pageSize = 20,
   showPerformanceMonitor = process.env.NODE_ENV === 'development',
@@ -37,8 +44,13 @@ export function OptimizedGallery({
   // Responsive handling
   const { breakpoint, width } = useThrottledResponsive()
   
+  // Combine artworks from both props for backward compatibility
+  const combinedArtworks = useMemo(() => {
+    return propsArtworks || initialArtworks || []
+  }, [propsArtworks, initialArtworks])
+  
   // Gallery state
-  const [filteredArtworks, setFilteredArtworks] = useState<Artwork[]>(initialArtworks)
+  const [filteredArtworks, setFilteredArtworks] = useState<Artwork[]>(combinedArtworks)
   const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null)
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
   const [hoveredArtwork, setHoveredArtwork] = useState<string | null>(null)
@@ -62,6 +74,11 @@ export function OptimizedGallery({
   )
 
   // Track render performance
+  // Update filtered artworks when combined artworks change
+  React.useEffect(() => {
+    setFilteredArtworks(combinedArtworks)
+  }, [combinedArtworks])
+
   React.useEffect(() => {
     const endTracking = trackRender()
     return endTracking
@@ -128,6 +145,27 @@ export function OptimizedGallery({
     ))
   }, [displayedArtworks, hoveredArtwork, throttledHoverStart, throttledHoverEnd, handleArtworkClick])
 
+  // Handle error state
+  if (error) {
+    return (
+      <div className={`w-full ${className}`}>
+        <div className="text-center py-16">
+          <div className="w-16 h-16 mx-auto mb-4 text-red-400">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.866-.833-2.598 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            오류가 발생했습니다
+          </h3>
+          <p className="text-gray-600 dark:text-gray-300">
+            {error.message || '갤러리를 불러오는 중 문제가 발생했습니다.'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={`w-full ${className}`}>
       {/* Performance monitor (development only) */}
@@ -136,11 +174,25 @@ export function OptimizedGallery({
       {/* Search and filters */}
       <div className="mb-8">
         <SearchFilter
-          artworks={initialArtworks}
+          artworks={combinedArtworks}
           onFilteredResults={handleFilteredResults}
           className="max-w-4xl mx-auto"
         />
       </div>
+
+      {/* Loading state */}
+      {loading && combinedArtworks.length === 0 && (
+        <div className="text-center py-16">
+          <div className="w-8 h-8 mx-auto mb-4 animate-spin">
+            <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            작품을 불러오는 중...
+          </h3>
+        </div>
+      )}
 
       {/* Gallery grid with infinite scroll */}
       <ThrottledInfiniteScroll

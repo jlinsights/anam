@@ -35,6 +35,12 @@ async function migrateArtworks() {
 
     // Connect to Supabase
     const supabase = createSupabaseClient()
+    
+    if (!supabase) {
+      console.error('❌ Failed to create Supabase client. Please check your environment variables.')
+      console.error('Required: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY')
+      throw new Error('Supabase client initialization failed')
+    }
 
     // Prepare data for insertion
     const artworksToInsert = artworks.map((artwork) => ({
@@ -99,6 +105,12 @@ async function migrateArtist() {
 
     // Connect to Supabase
     const supabase = createSupabaseClient()
+    
+    if (!supabase) {
+      console.error('❌ Failed to create Supabase client. Please check your environment variables.')
+      console.error('Required: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY')
+      throw new Error('Supabase client initialization failed')
+    }
 
     // Prepare data for insertion
     const artistToInsert = {
