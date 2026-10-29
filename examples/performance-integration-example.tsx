@@ -8,7 +8,7 @@
  */
 
 import React, { useEffect, useState, useCallback } from 'react'
-import { usePerformanceContext } from '@/components/performance-provider'
+import { PerformanceProvider, usePerformanceContext } from '@/components/performance-provider'
 import { usePerformanceMeasurement, useScrollPerformance } from '@/hooks/use-performance-monitoring'
 import PerformanceDashboard from '@/components/performance-dashboard'
 import PerformanceReport from '@/components/performance-report'

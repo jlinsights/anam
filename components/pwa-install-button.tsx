@@ -110,7 +110,7 @@ export function PWAInstallButton() {
                     <div className="flex items-start gap-2">
                       <Smartphone className="h-3 w-3 mt-0.5 flex-shrink-0" />
                       <span>
-                        <strong>모바일:</strong> 브라우저 메뉴 → "홈 화면에 추가"
+                        <strong>모바일:</strong> 브라우저 메뉴 → &quot;홈 화면에 추가&quot;
                       </span>
                     </div>
                     <div className="flex items-start gap-2">

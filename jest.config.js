@@ -7,18 +7,29 @@ const createJestConfig = nextJest({
 
 // Jest 커스텀 설정
 const customJestConfig = {
-  // 테스트 환경 설정
-  testEnvironment: 'jsdom',
+  // jsdom + Node 내장 fetch/Request/TextEncoder/스트림 (msw v2·NextRequest 필요)
+  testEnvironment: 'jest-fixed-jsdom',
 
-  // API 테스트는 node 환경 사용
+  // msw/node 해석을 위해 browser export 조건을 끄고, jsdom 기준 URL 지정
   testEnvironmentOptions: {
     customExportConditions: [''],
+    url: 'http://localhost:3000',
   },
 
   // 테스트 파일 패턴
   testMatch: [
     '**/__tests__/**/*.(js|jsx|ts|tsx)',
     '**/*.(test|spec).(js|jsx|ts|tsx)',
+  ],
+
+  // 헬퍼·목 파일과 Playwright 스펙(e2e)은 Jest 테스트가 아님
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/.next/',
+    '<rootDir>/__tests__/mocks/',
+    '<rootDir>/__tests__/utils/',
+    '<rootDir>/__tests__/e2e/',
+    '\\.mock\\.(js|jsx|ts|tsx)$',
   ],
 
   // 커버리지 설정
@@ -35,6 +46,8 @@ const customJestConfig = {
   // 모듈 경로 별칭
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
+    // Next SWC가 framer-motion을 v12에 없는 내부 경로(dist/es/*)로 바꾸므로 패키지 진입점으로 되돌린다
+    '^framer-motion/dist/es/.*$': '<rootDir>/node_modules/framer-motion',
   },
 
   // 테스트 setup 파일
@@ -68,13 +81,6 @@ const customJestConfig = {
     '^.+\\.module\\.(css|sass|scss)$',
   ],
 
-  // API 테스트용 환경 매핑
-  testEnvironmentOptions: {
-    jsdom: {
-      url: 'http://localhost:3000',
-    },
-  },
-
   // 테스트 타임아웃 증가
   testTimeout: 10000,
 
@@ -88,4 +94,12 @@ const customJestConfig = {
   verbose: true,
 }
 
-module.exports = createJestConfig(customJestConfig)
+// next/jest는 자체 '/node_modules/' 무시 패턴을 앞에 붙여 위 transformIgnorePatterns를 무력화한다.
+// SWC가 lucide-react를 개별 ESM 아이콘 import로 바꾸므로, 생성된 설정에서 패턴을 직접 교체한다.
+module.exports = async () => {
+  const config = await createJestConfig(customJestConfig)()
+  return {
+    ...config,
+    transformIgnorePatterns: customJestConfig.transformIgnorePatterns,
+  }
+}

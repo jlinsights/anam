@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import type { Artist } from '@/lib/types'
 
 interface EnhancedArtistSectionProps {
@@ -47,7 +48,7 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
           <div className="bg-amber-50 dark:bg-amber-900/20 p-6 rounded-lg border-l-4 border-yellow-600">
             <h4 className="font-display font-bold text-gray-900 dark:text-white text-lg mb-3">작가의 말</h4>
             <p className="font-display text-gray-700 dark:text-gray-300 leading-relaxed italic">
-              "{artistData.statement}"
+              &quot;{artistData.statement}&quot;
             </p>
           </div>
         )}
@@ -432,7 +433,7 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
             transition={{ duration: 1, delay: 0.5 }}
             viewport={{ once: true }}
           >
-            <a href="/gallery" className="
+            <Link href="/gallery" className="
               inline-block text-center px-8 py-4
               bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-display font-bold
               hover:bg-yellow-600 hover:text-gray-900
@@ -442,7 +443,7 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
               border-4 border-gray-900 dark:border-gray-100 hover:border-yellow-600
             ">
               작품 갤러리 보기
-            </a>
+            </Link>
             
             <a href="/contact" className="
               inline-block text-center px-8 py-4

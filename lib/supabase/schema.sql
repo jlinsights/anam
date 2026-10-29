@@ -1,3 +1,8 @@
+-- ⚠️ 오래된 초기 스키마 — 운영 DB(Supabase ANAM)와 다르다. 이 파일로 DB를 만들지 말 것.
+--   운영 DB: artist(단수) 테이블, SNS 개별 컬럼, artworks.image_path, number INTEGER,
+--            migration_log 테이블, artwork_stats/featured_artworks/latest_artworks 뷰, search_artworks 함수.
+--   실제 스키마 기준은 lib/supabase/database.types.ts (운영 DB에서 생성). 갱신하려면 운영 DB에서 DDL을 다시 덤프할 것.
+--
 -- ANAM Gallery Supabase Database Schema
 -- Execute this script in your Supabase Dashboard SQL Editor
 

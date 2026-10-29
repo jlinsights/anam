@@ -1,1 +1,1 @@
-🚀 프로덕션 배포 완료: Gallery 버그 수정 및 Vercel 배포
+🔧 검사 도구 복구: ESLint 멈춤(prettier 누락) 해결, Jest 환경 정비, Supabase 생성 타입 적용·훅 조건부 호출 수정, 마이그레이션 스크립트 운영 스키마 정렬·schema.sql 구버전 표시, 작품 검색 필터 주입 차단

@@ -130,7 +130,7 @@ export function ArtistSection({ artist }: ArtistSectionProps) {
               viewport={{ once: true }}
             >
               <p className="font-calligraphy text-ink italic text-lg">
-                "먹과 붓이 만나는 순간, 전통과 현대가 하나가 된다"
+                &quot;먹과 붓이 만나는 순간, 전통과 현대가 하나가 된다&quot;
               </p>
               <cite className="font-display text-ink-light text-sm block mt-zen-xs">
                 - {artistData.name}

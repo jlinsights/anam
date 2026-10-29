@@ -1,13 +1,13 @@
 /**
  * Airtable에서 Supabase로 데이터 마이그레이션 스크립트
- * 
+ *
  * Usage:
  *   npx tsx scripts/migrate-airtable-to-supabase.ts
- * 
+ *
  * Requirements:
  *   - Airtable credentials configured (AIRTABLE_API_KEY, AIRTABLE_BASE_ID)
  *   - Supabase credentials configured (NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
- *   - Supabase schema already created (run lib/supabase/schema.sql first)
+ *   - 운영 DB 스키마 기준 (lib/supabase/database.types.ts). schema.sql은 오래된 초기본이라 쓰지 말 것
  */
 
 import { config } from 'dotenv'
@@ -16,7 +16,10 @@ import { resolve } from 'path'
 // Load environment variables
 config({ path: resolve(process.cwd(), '.env.local') })
 
-import { fetchArtworksFromAirtable, fetchArtistFromAirtable } from '../lib/airtable'
+import {
+  fetchArtworksFromAirtable,
+  fetchArtistFromAirtable,
+} from '../lib/airtable'
 import { createSupabaseClient } from '../lib/supabase/server'
 import type { Artwork, Artist } from '../lib/types'
 
@@ -35,10 +38,14 @@ async function migrateArtworks() {
 
     // Connect to Supabase
     const supabase = createSupabaseClient()
-    
+
     if (!supabase) {
-      console.error('❌ Failed to create Supabase client. Please check your environment variables.')
-      console.error('Required: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY')
+      console.error(
+        '❌ Failed to create Supabase client. Please check your environment variables.'
+      )
+      console.error(
+        'Required: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY'
+      )
       throw new Error('Supabase client initialization failed')
     }
 
@@ -51,10 +58,12 @@ async function migrateArtworks() {
       dimensions: artwork.dimensions || null,
       aspect_ratio: artwork.aspectRatio || null,
       description: artwork.description || null,
-      image_url: artwork.imageUrl,
+      image_path: artwork.imageUrl || null, // 실제 테이블 컬럼명: image_path
       image_url_query: artwork.imageUrlQuery || null,
-      image_id: artwork.imageId || null,
-      number: artwork.number?.toString() || null,
+      number:
+        Number.isFinite(Number(artwork.number)) && artwork.number !== ''
+          ? Number(artwork.number)
+          : null,
       artist_note: artwork.artistNote || null,
       featured: artwork.featured || false,
       category: artwork.category || null,
@@ -83,7 +92,9 @@ async function migrateArtworks() {
       throw error
     }
 
-    console.log(`✅ Successfully migrated ${data?.length || artworks.length} artworks to Supabase`)
+    console.log(
+      `✅ Successfully migrated ${data?.length || artworks.length} artworks to Supabase`
+    )
   } catch (error) {
     console.error('❌ Migration failed:', error)
     throw error
@@ -105,10 +116,14 @@ async function migrateArtist() {
 
     // Connect to Supabase
     const supabase = createSupabaseClient()
-    
+
     if (!supabase) {
-      console.error('❌ Failed to create Supabase client. Please check your environment variables.')
-      console.error('Required: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY')
+      console.error(
+        '❌ Failed to create Supabase client. Please check your environment variables.'
+      )
+      console.error(
+        'Required: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY'
+      )
       throw new Error('Supabase client initialization failed')
     }
 
@@ -126,7 +141,12 @@ async function migrateArtist() {
       website: artist.website || null,
       email: artist.email || null,
       phone: artist.phone || null,
-      social_links: artist.socialLinks || {},
+      // artist 테이블은 SNS 링크를 개별 컬럼으로 저장한다
+      instagram: artist.socialLinks?.instagram || null,
+      facebook: artist.socialLinks?.facebook || null,
+      twitter: artist.socialLinks?.twitter || null,
+      youtube: artist.socialLinks?.youtube || null,
+      linkedin: artist.socialLinks?.linkedin || null,
       birth_place: artist.birthPlace || null,
       current_location: artist.currentLocation || null,
       specialties: artist.specialties || [],
@@ -141,7 +161,7 @@ async function migrateArtist() {
 
     // Check if artist already exists
     const { data: existing } = await supabase
-      .from('artists')
+      .from('artist')
       .select('id')
       .limit(1)
       .single()
@@ -150,7 +170,7 @@ async function migrateArtist() {
     if (existing) {
       // Update existing artist
       const { data, error } = await supabase
-        .from('artists')
+        .from('artist')
         .update(artistToInsert)
         .eq('id', existing.id)
         .select()
@@ -161,7 +181,7 @@ async function migrateArtist() {
     } else {
       // Insert new artist
       const { data, error } = await supabase
-        .from('artists')
+        .from('artist')
         .insert(artistToInsert)
         .select()
         .single()
@@ -206,4 +226,3 @@ if (require.main === module) {
 }
 
 export { migrateArtworks, migrateArtist }
-

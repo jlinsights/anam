@@ -179,7 +179,7 @@ export function ArtworkDetailPage({ artwork, allArtworks, artist }: ArtworkDetai
               >
                 <h3 className="font-display font-semibold text-gray-900 dark:text-white mb-4">작가 노트</h3>
                 <blockquote className="font-display text-gray-600 dark:text-gray-400 italic leading-relaxed">
-                  "{artwork.artistNote}"
+                  &quot;{artwork.artistNote}&quot;
                 </blockquote>
                 {artist?.name && (
                   <cite className="block mt-4 text-sm text-gray-600 dark:text-gray-400">

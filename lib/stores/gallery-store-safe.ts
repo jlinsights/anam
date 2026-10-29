@@ -207,7 +207,7 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
       updateFilteredArtworks: () => {
         const state = get()
         
-        let filtered = state.artworks.filter(artwork => {
+        const filtered = state.artworks.filter(artwork => {
           const matchesSearch = !state.searchTerm || 
             artwork.title.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
             artwork.medium.toLowerCase().includes(state.searchTerm.toLowerCase()) ||

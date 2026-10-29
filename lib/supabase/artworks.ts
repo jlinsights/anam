@@ -3,9 +3,45 @@
  * Airtable 대신 Supabase를 데이터 소스로 사용
  */
 
-import { createSupabaseClient, type Database } from './server'
+import { createSupabaseClient } from './server'
+import type { Tables } from './database.types'
 import type { Artwork, Artist } from '@/lib/types'
 import { captureError } from '@/lib/error-logger'
+
+type ArtworkRow = Tables<'artworks'>
+
+/**
+ * artworks 행을 Artwork 타입으로 변환 (실제 스키마 기준: 이미지는 image_path 하나)
+ */
+function mapArtworkRow(row: ArtworkRow): Artwork {
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    year: row.year,
+    medium: row.medium,
+    dimensions: row.dimensions || '70 x 140 cm',
+    aspectRatio: row.aspect_ratio || '2/1',
+    description: row.description || '',
+    imageUrl: row.image_path || '',
+    imageUrlQuery: row.image_url_query || undefined,
+    number: row.number || undefined,
+    artistNote: row.artist_note || undefined,
+    featured: row.featured || false,
+    category: row.category || undefined,
+    tags: row.tags || [],
+    price: row.price || undefined,
+    available: row.available !== false,
+    exhibition: row.exhibition || undefined,
+    series: row.series || undefined,
+    technique: row.technique || undefined,
+    inspiration: row.inspiration || undefined,
+    symbolism: row.symbolism || undefined,
+    culturalContext: row.cultural_context || undefined,
+    createdAt: row.created_at || undefined,
+    updatedAt: row.updated_at || undefined,
+  }
+}
 
 /**
  * Supabase에서 모든 작품 데이터 가져오기
@@ -13,7 +49,7 @@ import { captureError } from '@/lib/error-logger'
 export async function fetchArtworksFromSupabase(): Promise<Artwork[] | null> {
   try {
     const supabase = createSupabaseClient()
-    
+
     // ✅ Handle null client gracefully (missing environment variables)
     if (!supabase) {
       console.warn('⚠️ Supabase client not configured, skipping')
@@ -38,36 +74,11 @@ export async function fetchArtworksFromSupabase(): Promise<Artwork[] | null> {
     }
 
     // Transform Supabase data to Artwork type
-    const artworks: Artwork[] = data.map((row) => ({
-      id: row.id,
-      slug: row.slug,
-      title: row.title,
-      year: row.year,
-      medium: row.medium,
-      dimensions: row.dimensions || '70 x 140 cm',
-      aspectRatio: row.aspect_ratio || '2/1',
-      description: row.description || '',
-      imageUrl: row.image_path || row.image_url, // image_path 우선, 하위 호환성
-      imageUrlQuery: row.image_url_query || undefined,
-      imageId: row.image_id || undefined,
-      number: row.number || undefined,
-      artistNote: row.artist_note || undefined,
-      featured: row.featured || false,
-      category: row.category || undefined,
-      tags: row.tags || [],
-      price: row.price || undefined,
-      available: row.available !== false,
-      exhibition: row.exhibition || undefined,
-      series: row.series || undefined,
-      technique: row.technique || undefined,
-      inspiration: row.inspiration || undefined,
-      symbolism: row.symbolism || undefined,
-      culturalContext: row.cultural_context || undefined,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    }))
+    const artworks: Artwork[] = data.map(mapArtworkRow)
 
-    console.log(`✅ Successfully fetched ${artworks.length} artworks from Supabase`)
+    console.log(
+      `✅ Successfully fetched ${artworks.length} artworks from Supabase`
+    )
     return artworks
   } catch (error) {
     console.error('❌ Exception in fetchArtworksFromSupabase:', error)
@@ -84,7 +95,7 @@ export async function fetchArtworkBySlugFromSupabase(
 ): Promise<Artwork | null> {
   try {
     const supabase = createSupabaseClient()
-    
+
     // ✅ Handle null client gracefully (missing environment variables)
     if (!supabase) {
       console.warn('⚠️ Supabase client not configured, skipping')
@@ -112,34 +123,7 @@ export async function fetchArtworkBySlugFromSupabase(
     }
 
     // Transform to Artwork type
-    const artwork: Artwork = {
-      id: data.id,
-      slug: data.slug,
-      title: data.title,
-      year: data.year,
-      medium: data.medium,
-      dimensions: data.dimensions || '70 x 140 cm',
-      aspectRatio: data.aspect_ratio || '2/1',
-      description: data.description || '',
-      imageUrl: data.image_path || data.image_url, // image_path 우선, 하위 호환성
-      imageUrlQuery: data.image_url_query || undefined,
-      imageId: data.image_id || undefined,
-      number: data.number || undefined,
-      artistNote: data.artist_note || undefined,
-      featured: data.featured || false,
-      category: data.category || undefined,
-      tags: data.tags || [],
-      price: data.price || undefined,
-      available: data.available !== false,
-      exhibition: data.exhibition || undefined,
-      series: data.series || undefined,
-      technique: data.technique || undefined,
-      inspiration: data.inspiration || undefined,
-      symbolism: data.symbolism || undefined,
-      culturalContext: data.cultural_context || undefined,
-      createdAt: data.created_at,
-      updatedAt: data.updated_at,
-    }
+    const artwork = mapArtworkRow(data)
 
     return artwork
   } catch (error) {
@@ -155,34 +139,18 @@ export async function fetchArtworkBySlugFromSupabase(
 export async function fetchArtistFromSupabase(): Promise<Artist | null> {
   try {
     const supabase = createSupabaseClient()
-    
+
     // ✅ Handle null client gracefully (missing environment variables)
     if (!supabase) {
       console.warn('⚠️ Supabase client not configured, skipping')
       return null
     }
 
-    // Try both 'artists' and 'artist' table names
-    let data, error
-    let { data: artistData, error: artistError } = await supabase
+    const { data, error } = await supabase
       .from('artist')
       .select('*')
       .limit(1)
       .maybeSingle()
-
-    if (artistError && artistError.code === 'PGRST116') {
-      // Try 'artists' table as fallback
-      const result = await supabase
-        .from('artists')
-        .select('*')
-        .limit(1)
-        .maybeSingle()
-      artistData = result.data
-      artistError = result.error
-    }
-
-    data = artistData
-    error = artistError
 
     if (error) {
       if (error.code === 'PGRST116') {
@@ -214,12 +182,8 @@ export async function fetchArtistFromSupabase(): Promise<Artist | null> {
       email: data.email || undefined,
       phone: data.phone || undefined,
       socialLinks: (() => {
-        // Handle both JSONB format and individual columns
-        if (data.social_links && typeof data.social_links === 'object') {
-          return data.social_links
-        }
-        // Build from individual columns (actual table structure)
-        const links: any = {}
+        // artist 테이블은 SNS 링크를 개별 컬럼으로 저장한다
+        const links: Record<string, string> = {}
         if (data.instagram) links.instagram = data.instagram
         if (data.facebook) links.facebook = data.facebook
         if (data.twitter) links.twitter = data.twitter
@@ -257,7 +221,7 @@ export async function fetchFeaturedArtworksFromSupabase(
 ): Promise<Artwork[]> {
   try {
     const supabase = createSupabaseClient()
-    
+
     // ✅ Handle null client gracefully (missing environment variables)
     if (!supabase) {
       console.warn('⚠️ Supabase client not configured, skipping')
@@ -282,34 +246,7 @@ export async function fetchFeaturedArtworksFromSupabase(
     }
 
     // Transform to Artwork type
-    const artworks: Artwork[] = data.map((row) => ({
-      id: row.id,
-      slug: row.slug,
-      title: row.title,
-      year: row.year,
-      medium: row.medium,
-      dimensions: row.dimensions || '70 x 140 cm',
-      aspectRatio: row.aspect_ratio || '2/1',
-      description: row.description || '',
-      imageUrl: row.image_path || row.image_url, // image_path 우선, 하위 호환성
-      imageUrlQuery: row.image_url_query || undefined,
-      imageId: row.image_id || undefined,
-      number: row.number || undefined,
-      artistNote: row.artist_note || undefined,
-      featured: row.featured || false,
-      category: row.category || undefined,
-      tags: row.tags || [],
-      price: row.price || undefined,
-      available: row.available !== false,
-      exhibition: row.exhibition || undefined,
-      series: row.series || undefined,
-      technique: row.technique || undefined,
-      inspiration: row.inspiration || undefined,
-      symbolism: row.symbolism || undefined,
-      culturalContext: row.cultural_context || undefined,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    }))
+    const artworks: Artwork[] = data.map(mapArtworkRow)
 
     return artworks
   } catch (error) {
@@ -327,17 +264,25 @@ export async function searchArtworksInSupabase(
 ): Promise<Artwork[]> {
   try {
     const supabase = createSupabaseClient()
-    
+
     // ✅ Handle null client gracefully (missing environment variables)
     if (!supabase) {
       console.warn('⚠️ Supabase client not configured, skipping')
       return []
     }
 
+    // .or() 필터 문법을 깨는 문자(쉼표·괄호·따옴표·백슬래시)와 와일드카드(%, *, _)를 제거해 필터 주입을 막는다
+    const term = query.replace(/[,()"\\%*_]/g, ' ').trim()
+    if (!term) {
+      return []
+    }
+
     const { data, error } = await supabase
       .from('artworks')
       .select('*')
-      .or(`title.ilike.%${query}%,description.ilike.%${query}%,artist_note.ilike.%${query}%`)
+      .or(
+        `title.ilike.%${term}%,description.ilike.%${term}%,artist_note.ilike.%${term}%`
+      )
       .order('year', { ascending: false })
 
     if (error) {
@@ -350,36 +295,7 @@ export async function searchArtworksInSupabase(
       return []
     }
 
-    // Transform to Artwork type with proper typing
-    const typedData = data as Database['public']['Tables']['artworks']['Row'][]
-    const artworks: Artwork[] = typedData.map((row) => ({
-      id: row.id,
-      slug: row.slug,
-      title: row.title,
-      year: row.year,
-      medium: row.medium,
-      dimensions: row.dimensions || '70 x 140 cm',
-      aspectRatio: row.aspect_ratio || '2/1',
-      description: row.description || '',
-      imageUrl: row.image_path || row.image_url, // image_path 우선, 하위 호환성
-      imageUrlQuery: row.image_url_query || undefined,
-      imageId: row.image_id || undefined,
-      number: row.number || undefined,
-      artistNote: row.artist_note || undefined,
-      featured: row.featured || false,
-      category: row.category || undefined,
-      tags: row.tags || [],
-      price: row.price || undefined,
-      available: row.available !== false,
-      exhibition: row.exhibition || undefined,
-      series: row.series || undefined,
-      technique: row.technique || undefined,
-      inspiration: row.inspiration || undefined,
-      symbolism: row.symbolism || undefined,
-      culturalContext: row.cultural_context || undefined,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    }))
+    const artworks: Artwork[] = data.map(mapArtworkRow)
 
     return artworks
   } catch (error) {
@@ -388,4 +304,3 @@ export async function searchArtworksInSupabase(
     return []
   }
 }
-

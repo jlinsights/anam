@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { fetchArtist } from '@/lib/artist'
 import { EnhancedArtistSection } from '@/components/single-page/EnhancedArtistSection'
 import { Metadata } from 'next'
@@ -55,7 +56,7 @@ export default async function ArtistPage() {
               </p>
             </div>
             <div className="flex gap-4">
-              <a href="/gallery" className="
+              <Link href="/gallery" className="
                 px-8 py-4
                 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-display font-bold
                 hover:bg-yellow-600 hover:text-gray-900
@@ -65,8 +66,8 @@ export default async function ArtistPage() {
                 transform hover:-translate-x-1 hover:-translate-y-1
               ">
                 갤러리 보기
-              </a>
-              <a href="/" className="
+              </Link>
+              <Link href="/" className="
                 px-8 py-4
                 bg-white dark:bg-gray-800 border-4 border-gray-900 dark:border-gray-100 text-gray-900 dark:text-white font-display font-bold
                 hover:bg-gray-900 dark:hover:bg-gray-100 hover:text-white dark:hover:text-gray-900
@@ -75,7 +76,7 @@ export default async function ArtistPage() {
                 transform hover:translate-x-1 hover:translate-y-1
               ">
                 홈으로 돌아가기
-              </a>
+              </Link>
             </div>
           </div>
         </div>

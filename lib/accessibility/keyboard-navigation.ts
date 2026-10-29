@@ -457,7 +457,7 @@ export class KeyboardNavigationTesting {
     const type = element.getAttribute('type')
 
     // Default keyboard support based on element type
-    let keyboardSupport = {
+    const keyboardSupport = {
       enter: false,
       space: false,
       escape: false,
