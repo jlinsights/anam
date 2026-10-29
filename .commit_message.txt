@@ -1,1 +1,1 @@
-🐛 홈 크래시·무한 새로고침 수정, 무인증 엔드포인트 차단(performance/analytics·test-airtable 프로덕션 403), revalidate 시크릿 필수·timing-safe 비교 + 회귀 테스트, modularizeImports·FID 제거
+⬆️ Next.js 15.5.6→15.5.28 보안 패치(이미지 최적화 RCE 등 critical 2건, Vercel 배포 차단 해소), eslint-config-next·@next/bundle-analyzer 동일 버전 고정
