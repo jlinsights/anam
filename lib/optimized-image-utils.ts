@@ -137,8 +137,11 @@ export async function preloadArtworkImages(
 ): Promise<void> {
   // Network-aware optimization
   const connection = (navigator as any).connection
-  const isSlowConnection = connection && (connection.effectiveType === '2g' || connection.effectiveType === 'slow-2g')
-  
+  const isSlowConnection =
+    connection &&
+    (connection.effectiveType === '2g' ||
+      connection.effectiveType === 'slow-2g')
+
   if (isSlowConnection && !priority) {
     // Skip preloading on slow connections unless priority
     return
@@ -146,10 +149,10 @@ export async function preloadArtworkImages(
 
   const format = getBestImageFormat()
   const limit = priority ? artworkIds.length : Math.min(6, artworkIds.length) // Limit non-priority preloading
-  
-  const preloadPromises = artworkIds.slice(0, limit).map((id) =>
-    preloadImage(getOptimizedImagePath(id, size, format))
-  )
+
+  const preloadPromises = artworkIds
+    .slice(0, limit)
+    .map((id) => preloadImage(getOptimizedImagePath(id, size, format)))
 
   try {
     if (priority) {
@@ -177,7 +180,11 @@ export function createImageObserver(
     return null
   }
 
-  const { rootMargin = '100px 0px', threshold = 0.1, priority = false } = options || {}
+  const {
+    rootMargin = '100px 0px',
+    threshold = 0.1,
+    priority = false,
+  } = options || {}
 
   return new IntersectionObserver(
     (entries) => {
@@ -238,7 +245,14 @@ export function generateBlurDataURL(
   if (!ctx) return ''
 
   // Enhanced Korean traditional gradient
-  const gradient = ctx.createRadialGradient(width/2, height/3, 0, width/2, height, Math.max(width, height))
+  const gradient = ctx.createRadialGradient(
+    width / 2,
+    height / 3,
+    0,
+    width / 2,
+    height,
+    Math.max(width, height)
+  )
   gradient.addColorStop(0, 'rgb(254, 252, 232)') // 한지색
   gradient.addColorStop(0.6, 'rgb(168, 85, 27)') // 황금색
   gradient.addColorStop(1, 'rgb(120, 113, 108)') // 돌색
@@ -251,7 +265,7 @@ export function generateBlurDataURL(
   const data = imageData.data
   for (let i = 0; i < data.length; i += 4) {
     const noise = (Math.random() - 0.5) * 10
-    data[i] = Math.max(0, Math.min(255, data[i] + noise))     // R
+    data[i] = Math.max(0, Math.min(255, data[i] + noise)) // R
     data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise)) // G
     data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise)) // B
   }
@@ -290,9 +304,12 @@ export function preloadCriticalImages(imageSources: string[]): void {
 /**
  * Layout shift prevention with aspect ratio containers
  */
-export function getAspectRatioStyle(width: number, height: number): React.CSSProperties {
+export function getAspectRatioStyle(
+  width: number,
+  height: number
+): React.CSSProperties {
   return {
     aspectRatio: `${width} / ${height}`,
-    containIntrinsicSize: `${width}px ${height}px`
+    containIntrinsicSize: `${width}px ${height}px`,
   }
 }

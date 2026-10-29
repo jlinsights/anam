@@ -23,7 +23,7 @@ const THRESHOLDS: WebVitalsThresholds = {
   cls: { good: 0.1, poor: 0.25 },
   fcp: { good: 1800, poor: 3000 },
   inp: { good: 200, poor: 500 },
-  ttfb: { good: 800, poor: 1800 }
+  ttfb: { good: 800, poor: 1800 },
 }
 
 export function useCoreWebVitals() {
@@ -32,26 +32,32 @@ export function useCoreWebVitals() {
     cls: null,
     fcp: null,
     inp: null,
-    ttfb: null
+    ttfb: null,
   })
 
   const [isLoading, setIsLoading] = useState(true)
 
-  const updateMetric = useCallback((name: keyof CoreWebVitalsMetrics, value: number) => {
-    setMetrics(prev => ({ ...prev, [name]: value }))
-  }, [])
+  const updateMetric = useCallback(
+    (name: keyof CoreWebVitalsMetrics, value: number) => {
+      setMetrics((prev) => ({ ...prev, [name]: value }))
+    },
+    []
+  )
 
-  const getMetricStatus = useCallback((
-    metricName: keyof CoreWebVitalsMetrics,
-    value: number | null
-  ): 'good' | 'needs-improvement' | 'poor' | 'unknown' => {
-    if (value === null) return 'unknown'
-    
-    const threshold = THRESHOLDS[metricName]
-    if (value <= threshold.good) return 'good'
-    if (value <= threshold.poor) return 'needs-improvement'
-    return 'poor'
-  }, [])
+  const getMetricStatus = useCallback(
+    (
+      metricName: keyof CoreWebVitalsMetrics,
+      value: number | null
+    ): 'good' | 'needs-improvement' | 'poor' | 'unknown' => {
+      if (value === null) return 'unknown'
+
+      const threshold = THRESHOLDS[metricName]
+      if (value <= threshold.good) return 'good'
+      if (value <= threshold.poor) return 'needs-improvement'
+      return 'poor'
+    },
+    []
+  )
 
   const getOverallScore = useCallback((): {
     score: number
@@ -63,9 +69,12 @@ export function useCoreWebVitals() {
 
     Object.entries(metrics).forEach(([name, value]) => {
       if (value !== null) {
-        const status = getMetricStatus(name as keyof CoreWebVitalsMetrics, value)
+        const status = getMetricStatus(
+          name as keyof CoreWebVitalsMetrics,
+          value
+        )
         let score = 0
-        
+
         switch (status) {
           case 'good':
             score = 100
@@ -79,14 +88,15 @@ export function useCoreWebVitals() {
             issues.push(`${name.toUpperCase()} is poor`)
             break
         }
-        
+
         scores.push(score)
       }
     })
 
-    const averageScore = scores.length > 0 
-      ? scores.reduce((sum, score) => sum + score, 0) / scores.length 
-      : 0
+    const averageScore =
+      scores.length > 0
+        ? scores.reduce((sum, score) => sum + score, 0) / scores.length
+        : 0
 
     let grade: 'excellent' | 'good' | 'needs-improvement' | 'poor'
     if (averageScore >= 90) grade = 'excellent'
@@ -102,8 +112,9 @@ export function useCoreWebVitals() {
 
     const loadWebVitals = async () => {
       try {
-        const { onCLS, onFCP, onINP, onLCP, onTTFB } = await import('web-vitals')
-        
+        const { onCLS, onFCP, onINP, onLCP, onTTFB } =
+          await import('web-vitals')
+
         if (!mounted) return
 
         // Set up metric collection
@@ -125,7 +136,7 @@ export function useCoreWebVitals() {
                 }
               })
             })
-            
+
             po.observe({ type: 'event', buffered: true })
           } catch (e) {
             // INP not supported
@@ -151,7 +162,7 @@ export function useCoreWebVitals() {
     isLoading,
     getMetricStatus,
     getOverallScore,
-    thresholds: THRESHOLDS
+    thresholds: THRESHOLDS,
   }
 }
 
@@ -162,32 +173,35 @@ export function useComponentPerformance(componentName: string) {
 
   useEffect(() => {
     const startTime = performance.now()
-    setRenderCount(prev => prev + 1)
+    setRenderCount((prev) => prev + 1)
 
     return () => {
       const endTime = performance.now()
       const renderTime = endTime - startTime
-      
-      setRenderTimes(prev => {
+
+      setRenderTimes((prev) => {
         const newTimes = [...prev, renderTime].slice(-10) // Keep last 10 renders
         return newTimes
       })
 
       // Log slow renders (>16ms for 60fps)
       if (renderTime > 16) {
-        console.warn(`Slow render in ${componentName}: ${renderTime.toFixed(2)}ms`)
+        console.warn(
+          `Slow render in ${componentName}: ${renderTime.toFixed(2)}ms`
+        )
       }
     }
   })
 
-  const averageRenderTime = renderTimes.length > 0 
-    ? renderTimes.reduce((sum, time) => sum + time, 0) / renderTimes.length 
-    : 0
+  const averageRenderTime =
+    renderTimes.length > 0
+      ? renderTimes.reduce((sum, time) => sum + time, 0) / renderTimes.length
+      : 0
 
   return {
     renderCount,
     averageRenderTime,
     lastRenderTime: renderTimes[renderTimes.length - 1] || 0,
-    isSlowComponent: averageRenderTime > 16
+    isSlowComponent: averageRenderTime > 16,
   }
 }

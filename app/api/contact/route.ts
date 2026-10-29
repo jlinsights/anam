@@ -1,4 +1,8 @@
-import { createErrorResponse, createSuccessResponse, handleValidationError } from '@/lib/error-handler'
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  handleValidationError,
+} from '@/lib/error-handler'
 import { withRateLimit, getClientIP } from '@/lib/rate-limit'
 import { sanitizeObject, threatMonitor } from '@/lib/security/input-sanitizer'
 import { NextRequest, NextResponse } from 'next/server'
@@ -17,72 +21,78 @@ export async function POST(request: NextRequest) {
   return withRateLimit(request, 'contact', async () => {
     try {
       const body = await request.json()
-      
+
       // 🛡️ 보안: 입력 데이터 sanitization
       const sanitizationResult = sanitizeObject(body, {
         maxLength: 5000,
         stripTags: true,
         normalizeUnicode: true,
-        preventPathTraversal: true
+        preventPathTraversal: true,
       })
-      
+
       // 위협이 탐지된 경우 로깅
       if (!sanitizationResult.isClean) {
         const clientIP = getClientIP(request)
         const userAgent = request.headers.get('user-agent') || 'unknown'
-        
-        Object.entries(sanitizationResult.threats).forEach(([field, threats]) => {
-          threats.forEach(threat => {
-            threatMonitor.logThreat(
-              clientIP,
-              userAgent,
-              threat,
-              JSON.stringify(body[field]),
-              '/api/contact'
-            )
-          })
-        })
-        
+
+        Object.entries(sanitizationResult.threats).forEach(
+          ([field, threats]) => {
+            threats.forEach((threat) => {
+              threatMonitor.logThreat(
+                clientIP,
+                userAgent,
+                threat,
+                JSON.stringify(body[field]),
+                '/api/contact'
+              )
+            })
+          }
+        )
+
         // 심각한 위협인 경우 요청 차단
         const hasHighThreat = Object.values(sanitizationResult.threats)
           .flat()
-          .some(threat => 
-            threat.includes('XSS') || 
-            threat.includes('SQL') || 
-            threat.includes('script')
+          .some(
+            (threat) =>
+              threat.includes('XSS') ||
+              threat.includes('SQL') ||
+              threat.includes('script')
           )
-        
+
         if (hasHighThreat) {
-          return NextResponse.json({
-            success: false,
-            error: '입력 데이터에 보안 위협이 탐지되었습니다.'
-          }, { status: 400 })
+          return NextResponse.json(
+            {
+              success: false,
+              error: '입력 데이터에 보안 위협이 탐지되었습니다.',
+            },
+            { status: 400 }
+          )
         }
       }
 
       // 입력 데이터 검증 (sanitized 데이터 사용)
       const validatedData = contactSchema.parse(sanitizationResult.sanitized)
 
-    // 이메일 전송 로직 (Nodemailer 사용)
-    const nodemailer = require('nodemailer')
+      // 이메일 전송 로직 (Nodemailer 사용)
+      const nodemailer = require('nodemailer')
 
-    // SMTP 설정 (환경변수 사용)
-    const transporter = nodemailer.createTransporter({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    })
+      // SMTP 설정 (환경변수 사용)
+      const transporter = nodemailer.createTransporter({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.SMTP_PORT || '587'),
+        secure: false, // true for 465, false for other ports
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      })
 
-    // 이메일 내용 구성
-    const mailOptions = {
-      from: `"아남 갤러리 문의" <${process.env.SMTP_USER}>`,
-      to: 'heelang@orientalcalligraphy.org',
-      subject: `[아남 갤러리 문의] ${validatedData.subject}`,
-      html: `
+      // 이메일 내용 구성
+      const mailOptions = {
+        from: `"아남 갤러리 문의" <${process.env.SMTP_USER}>`,
+        to: 'heelang@orientalcalligraphy.org',
+        subject: `[아남 갤러리 문의] ${validatedData.subject}`,
+        html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
             아남 갤러리 문의
@@ -118,10 +128,10 @@ export async function POST(request: NextRequest) {
           </div>
         </div>
       `,
-    }
+      }
 
-    // 이메일 전송
-    await transporter.sendMail(mailOptions)
+      // 이메일 전송
+      await transporter.sendMail(mailOptions)
 
       return createSuccessResponse(
         { sent: true },

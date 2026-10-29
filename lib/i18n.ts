@@ -439,8 +439,7 @@ export function saveLocale(locale: Locale): void {
 
 // 번역 함수 타입
 export type TranslationKey =
-  | keyof Translation
-  | `${keyof Translation}.${string}`
+  keyof Translation | `${keyof Translation}.${string}`
 
 // 중첩된 키 접근을 위한 헬퍼 함수
 export function getNestedValue(obj: any, path: string): string {

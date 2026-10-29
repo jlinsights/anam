@@ -328,4 +328,3 @@ export function Stats({ stats, variant = 'default', className }: StatsProps) {
     </div>
   )
 }
-

@@ -1,6 +1,12 @@
 // Error Boundary Components for ANAM Gallery
-export { ArtworkErrorBoundary, ArtworkErrorFallback } from './ArtworkErrorBoundary'
-export { GalleryErrorBoundary, GalleryErrorFallback } from './GalleryErrorBoundary'
+export {
+  ArtworkErrorBoundary,
+  ArtworkErrorFallback,
+} from './ArtworkErrorBoundary'
+export {
+  GalleryErrorBoundary,
+  GalleryErrorFallback,
+} from './GalleryErrorBoundary'
 export { ApiErrorBoundary, ApiErrorFallback } from './ApiErrorBoundary'
 export { ImageErrorBoundary, ImageErrorFallback } from './ImageErrorBoundary'
 export { RootErrorBoundary, useGlobalErrorHandler } from './RootErrorBoundary'
@@ -12,12 +18,12 @@ export { ErrorBoundary } from '../error-boundary'
 export type { Component, ErrorInfo } from 'react'
 
 // Error boundary types for better organization
-export type ErrorBoundaryType = 
-  | 'root'        // Application-level errors
-  | 'gallery'     // Gallery component errors
-  | 'api'         // API/data fetching errors
-  | 'image'       // Image loading errors
-  | 'artwork'     // Artwork-specific errors
+export type ErrorBoundaryType =
+  | 'root' // Application-level errors
+  | 'gallery' // Gallery component errors
+  | 'api' // API/data fetching errors
+  | 'image' // Image loading errors
+  | 'artwork' // Artwork-specific errors
 
 // Error context types
 export interface ErrorContext {
@@ -37,9 +43,9 @@ export function getErrorBoundaryForContext(context: string) {
     ApiErrorBoundary: Api,
     ImageErrorBoundary: Image,
     ArtworkErrorBoundary: Artwork,
-    RootErrorBoundary: Root
+    RootErrorBoundary: Root,
   } = require('./index')
-  
+
   switch (context) {
     case 'gallery':
     case 'artworks':

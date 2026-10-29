@@ -8,25 +8,25 @@ interface GalleryState {
   // Navigation state
   currentSection: string
   isNavigating: boolean
-  
+
   // Artwork data
   artworks: Artwork[]
   selectedArtwork: Artwork | null
   currentArtworkIndex: number
-  
+
   // Gallery filters and search
   searchTerm: string
   selectedYear: number | null
   selectedMedium: string | null
   filteredArtworks: Artwork[]
-  
+
   // Modal state
   isModalOpen: boolean
   modalHistory: Artwork[]
-  
+
   // Artist data
   artist: Artist | null
-  
+
   // User preferences (simplified - no persistence)
   preferences: {
     autoplay: boolean
@@ -41,35 +41,35 @@ interface GalleryActions {
   // Navigation actions
   setCurrentSection: (section: string) => void
   navigateToSection: (section: string) => void
-  
+
   // Artwork actions
   setArtworks: (artworks: Artwork[]) => void
   selectArtwork: (artwork: Artwork) => void
   nextArtwork: () => void
   previousArtwork: () => void
   closeArtwork: () => void
-  
+
   // Search and filter actions
   setSearchTerm: (term: string) => void
   setSelectedYear: (year: number | null) => void
   setSelectedMedium: (medium: string | null) => void
   clearFilters: () => void
   updateFilteredArtworks: () => void
-  
+
   // Modal actions
   openModal: (artwork: Artwork) => void
   closeModal: () => void
-  
+
   // Artist actions
   setArtist: (artist: Artist | null) => void
-  
+
   // Preference actions
   updatePreferences: (preferences: Partial<GalleryState['preferences']>) => void
-  
+
   // Performance actions (simplified)
   trackSectionView: (section: string) => void
   trackArtworkView: (artworkId: string) => void
-  
+
   // Utility actions
   reset: () => void
 }
@@ -92,8 +92,8 @@ const initialState: GalleryState = {
     autoplay: false,
     showMetadata: true,
     animationSpeed: 'normal',
-    theme: 'auto'
-  }
+    theme: 'auto',
+  },
 }
 
 // Create the store WITHOUT persistence to avoid hydration issues
@@ -109,7 +109,7 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
 
       navigateToSection: (section) => {
         set({ isNavigating: true })
-        
+
         // Only run DOM operations on client side
         if (typeof window !== 'undefined') {
           // Smooth scroll to section
@@ -118,7 +118,7 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
             element.scrollIntoView({ behavior: 'smooth', block: 'start' })
           }
         }
-        
+
         setTimeout(() => {
           get().setCurrentSection(section)
           set({ isNavigating: false })
@@ -133,26 +133,27 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
 
       selectArtwork: (artwork) => {
         const state = get()
-        const index = state.artworks.findIndex(a => a.id === artwork.id)
-        
+        const index = state.artworks.findIndex((a) => a.id === artwork.id)
+
         set({
           selectedArtwork: artwork,
           currentArtworkIndex: index,
-          modalHistory: [...state.modalHistory, artwork].slice(-10) // Keep last 10
+          modalHistory: [...state.modalHistory, artwork].slice(-10), // Keep last 10
         })
-        
+
         get().trackArtworkView(artwork.id)
       },
 
       nextArtwork: () => {
         const state = get()
         if (state.filteredArtworks.length === 0) return
-        
-        const nextIndex = state.currentArtworkIndex < state.filteredArtworks.length - 1 
-          ? state.currentArtworkIndex + 1 
-          : 0
+
+        const nextIndex =
+          state.currentArtworkIndex < state.filteredArtworks.length - 1
+            ? state.currentArtworkIndex + 1
+            : 0
         const nextArtwork = state.filteredArtworks[nextIndex]
-        
+
         if (nextArtwork) {
           get().selectArtwork(nextArtwork)
         }
@@ -161,12 +162,13 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
       previousArtwork: () => {
         const state = get()
         if (state.filteredArtworks.length === 0) return
-        
-        const prevIndex = state.currentArtworkIndex > 0 
-          ? state.currentArtworkIndex - 1 
-          : state.filteredArtworks.length - 1
+
+        const prevIndex =
+          state.currentArtworkIndex > 0
+            ? state.currentArtworkIndex - 1
+            : state.filteredArtworks.length - 1
         const prevArtwork = state.filteredArtworks[prevIndex]
-        
+
         if (prevArtwork) {
           get().selectArtwork(prevArtwork)
         }
@@ -175,7 +177,7 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
       closeArtwork: () => {
         set({
           selectedArtwork: null,
-          currentArtworkIndex: 0
+          currentArtworkIndex: 0,
         })
       },
 
@@ -199,26 +201,37 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
         set({
           searchTerm: '',
           selectedYear: null,
-          selectedMedium: null
+          selectedMedium: null,
         })
         get().updateFilteredArtworks()
       },
 
       updateFilteredArtworks: () => {
         const state = get()
-        
-        const filtered = state.artworks.filter(artwork => {
-          const matchesSearch = !state.searchTerm || 
-            artwork.title.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
-            artwork.medium.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
-            (artwork.description && artwork.description.toLowerCase().includes(state.searchTerm.toLowerCase()))
-          
-          const matchesYear = state.selectedYear === null || artwork.year === state.selectedYear
-          const matchesMedium = state.selectedMedium === null || artwork.medium === state.selectedMedium
-          
+
+        const filtered = state.artworks.filter((artwork) => {
+          const matchesSearch =
+            !state.searchTerm ||
+            artwork.title
+              .toLowerCase()
+              .includes(state.searchTerm.toLowerCase()) ||
+            artwork.medium
+              .toLowerCase()
+              .includes(state.searchTerm.toLowerCase()) ||
+            (artwork.description &&
+              artwork.description
+                .toLowerCase()
+                .includes(state.searchTerm.toLowerCase()))
+
+          const matchesYear =
+            state.selectedYear === null || artwork.year === state.selectedYear
+          const matchesMedium =
+            state.selectedMedium === null ||
+            artwork.medium === state.selectedMedium
+
           return matchesSearch && matchesYear && matchesMedium
         })
-        
+
         set({ filteredArtworks: filtered })
       },
 
@@ -243,8 +256,8 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
         set((state) => ({
           preferences: {
             ...state.preferences,
-            ...newPreferences
-          }
+            ...newPreferences,
+          },
         }))
       },
 
@@ -262,49 +275,53 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
       // Utility actions
       reset: () => {
         set(initialState)
-      }
+      },
     }),
     { name: 'gallery-store-safe' }
   )
 )
 
 // Optimized selector hooks for performance - prevent over-subscription
-export const useCurrentSection = () => useGalleryStore(
-  useCallback((state) => state.currentSection, [])
-)
-export const useArtworks = () => useGalleryStore(
-  useCallback((state) => state.filteredArtworks, [])
-)
-export const useSelectedArtwork = () => useGalleryStore(
-  useCallback((state) => state.selectedArtwork, [])
-)
-export const useModalState = () => useGalleryStore(
-  useCallback((state) => ({ 
-    isOpen: state.isModalOpen, 
-    artwork: state.selectedArtwork 
-  }), [])
-)
-export const useGalleryFilters = () => useGalleryStore(
-  useCallback((state) => ({
-    searchTerm: state.searchTerm,
-    selectedYear: state.selectedYear,
-    selectedMedium: state.selectedMedium
-  }), [])
-)
-export const usePreferences = () => useGalleryStore(
-  useCallback((state) => state.preferences, [])
-)
+export const useCurrentSection = () =>
+  useGalleryStore(useCallback((state) => state.currentSection, []))
+export const useArtworks = () =>
+  useGalleryStore(useCallback((state) => state.filteredArtworks, []))
+export const useSelectedArtwork = () =>
+  useGalleryStore(useCallback((state) => state.selectedArtwork, []))
+export const useModalState = () =>
+  useGalleryStore(
+    useCallback(
+      (state) => ({
+        isOpen: state.isModalOpen,
+        artwork: state.selectedArtwork,
+      }),
+      []
+    )
+  )
+export const useGalleryFilters = () =>
+  useGalleryStore(
+    useCallback(
+      (state) => ({
+        searchTerm: state.searchTerm,
+        selectedYear: state.selectedYear,
+        selectedMedium: state.selectedMedium,
+      }),
+      []
+    )
+  )
+export const usePreferences = () =>
+  useGalleryStore(useCallback((state) => state.preferences, []))
 
 // Safe wrapper hook to prevent hydration issues
 export function useSafeGalleryStore() {
   const [mounted, setMounted] = useState(false)
-  
+
   useEffect(() => {
     setMounted(true)
   }, [])
-  
+
   const store = useGalleryStore()
-  
+
   // Return default state during SSR
   if (!mounted) {
     return {
@@ -328,9 +345,9 @@ export function useSafeGalleryStore() {
       updatePreferences: () => {},
       trackSectionView: () => {},
       trackArtworkView: () => {},
-      reset: () => {}
+      reset: () => {},
     }
   }
-  
+
   return store
 }

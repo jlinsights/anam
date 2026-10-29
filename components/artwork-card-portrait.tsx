@@ -1,14 +1,14 @@
 /**
  * @fileoverview Artwork Card Components with 9:16 Portrait Aspect Ratio
- * 
+ *
  * This module provides components for displaying artworks in a vertical 9:16 aspect ratio
  * with comprehensive metadata display including title, year, medium, and dimensions.
- * 
+ *
  * Components:
  * - ArtworkCardPortrait: Individual artwork card with metadata
  * - ArtworkGridPortrait: Responsive grid layout for multiple artworks  
  * - ArtworkCardPortraitSkeleton: Loading skeleton component
- * 
+ *
  * Features:
  * - 9:16 aspect ratio optimized for portrait artworks
  * - Comprehensive metadata display (title, year, medium, dimensions)
@@ -65,48 +65,55 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Link 
-        href={`/gallery/${artwork.slug}`} 
-        className="block focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 rounded"
+      <Link
+        href={`/gallery/${artwork.slug}`}
+        className='block focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 rounded'
         aria-label={`${artwork.title} 작품 상세보기 - ${artwork.year}년${artwork.medium ? `, ${artwork.medium}` : ''}`}
       >
         {/* Image Container with 9:16 aspect ratio */}
-        <div className="
+        <div
+          className='
           relative bg-paper border-2 border-ink
           shadow-brutal-sm group-hover:shadow-brutal group-focus-within:shadow-brutal
           transition-all duration-300
           group-hover:-translate-x-1 group-hover:-translate-y-1 group-focus-within:-translate-x-1 group-focus-within:-translate-y-1
           overflow-hidden
           aspect-[9/16]
-        ">
+        '
+        >
           {/* Progressive artwork image */}
           <ArtworkImage
             artwork={artwork}
-            size="medium"
-            className="absolute inset-2 rounded object-cover w-full h-full"
-            placeholderClassName="bg-paper-cream"
+            size='medium'
+            className='absolute inset-2 rounded object-cover w-full h-full'
+            placeholderClassName='bg-paper-cream'
             priority={priority}
             alt={`${artwork.title} - ${artwork.year}년 작품${artwork.medium ? `, ${artwork.medium}` : ''}`}
           />
-          
+
           {/* Hover overlay */}
           <motion.div
-            className="
+            className='
               absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent
               flex items-end justify-center
               opacity-0 group-hover:opacity-100 group-focus-within:opacity-100
               transition-opacity duration-300
-            "
+            '
             animate={{
-              opacity: isHovered ? 1 : 0
+              opacity: isHovered ? 1 : 0,
             }}
           >
-            <div className="text-center p-zen-md pb-zen-lg">
-              <div className="w-8 h-8 border border-paper mx-auto mb-2 flex items-center justify-center bg-paper/90 rounded" aria-hidden="true">
-                <span className="text-xs">🖼</span>
+            <div className='text-center p-zen-md pb-zen-lg'>
+              <div
+                className='w-8 h-8 border border-paper mx-auto mb-2 flex items-center justify-center bg-paper/90 rounded'
+                aria-hidden='true'
+              >
+                <span className='text-xs'>🖼</span>
               </div>
-              <span className="font-display text-paper text-sm font-medium block">작품 상세보기</span>
-              <div className="text-xs text-paper/80 mt-1">
+              <span className='font-display text-paper text-sm font-medium block'>
+                작품 상세보기
+              </span>
+              <div className='text-xs text-paper/80 mt-1'>
                 클릭하여 더 자세히 보기
               </div>
             </div>
@@ -115,50 +122,60 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
 
         {/* Metadata Section */}
         {showMetadata && (
-          <div className="mt-zen-sm space-y-zen-xs">
+          <div className='mt-zen-sm space-y-zen-xs'>
             {/* Title */}
-            <h2 className="font-display font-bold text-ink text-lg leading-tight line-clamp-2">
+            <h2 className='font-display font-bold text-ink text-lg leading-tight line-clamp-2'>
               {artwork.title}
             </h2>
 
             {/* Artwork details */}
-            <dl className="space-y-zen-xs">
+            <dl className='space-y-zen-xs'>
               {/* Year */}
-              <div className="flex items-center gap-2 text-ink-light">
-                <Calendar className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                <dt className="sr-only">제작년도:</dt>
-                <dd className="font-display text-sm">{artwork.year}년</dd>
+              <div className='flex items-center gap-2 text-ink-light'>
+                <Calendar
+                  className='w-4 h-4 flex-shrink-0'
+                  aria-hidden='true'
+                />
+                <dt className='sr-only'>제작년도:</dt>
+                <dd className='font-display text-sm'>{artwork.year}년</dd>
               </div>
 
               {/* Medium */}
               {artwork.medium && (
-                <div className="flex items-center gap-2 text-ink-light">
-                  <Palette className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                  <dt className="sr-only">재료:</dt>
-                  <dd className="font-display text-sm line-clamp-1">{artwork.medium}</dd>
+                <div className='flex items-center gap-2 text-ink-light'>
+                  <Palette
+                    className='w-4 h-4 flex-shrink-0'
+                    aria-hidden='true'
+                  />
+                  <dt className='sr-only'>재료:</dt>
+                  <dd className='font-display text-sm line-clamp-1'>
+                    {artwork.medium}
+                  </dd>
                 </div>
               )}
 
               {/* Dimensions */}
               {artwork.dimensions && (
-                <div className="flex items-center gap-2 text-ink-light">
-                  <Ruler className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                  <dt className="sr-only">크기:</dt>
-                  <dd className="font-display text-sm line-clamp-1">{artwork.dimensions}</dd>
+                <div className='flex items-center gap-2 text-ink-light'>
+                  <Ruler className='w-4 h-4 flex-shrink-0' aria-hidden='true' />
+                  <dt className='sr-only'>크기:</dt>
+                  <dd className='font-display text-sm line-clamp-1'>
+                    {artwork.dimensions}
+                  </dd>
                 </div>
               )}
             </dl>
 
             {/* Series or Technique if available */}
             {(artwork.series || artwork.technique) && (
-              <div className="pt-zen-xs border-t border-stone/20">
+              <div className='pt-zen-xs border-t border-stone/20'>
                 {artwork.series && (
-                  <p className="font-display text-xs text-ink-light">
+                  <p className='font-display text-xs text-ink-light'>
                     시리즈: {artwork.series}
                   </p>
                 )}
                 {artwork.technique && (
-                  <p className="font-display text-xs text-ink-light mt-1">
+                  <p className='font-display text-xs text-ink-light mt-1'>
                     기법: {artwork.technique}
                   </p>
                 )}
@@ -167,12 +184,14 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
 
             {/* Featured badge */}
             {artwork.featured && (
-              <div className="mt-zen-xs">
-                <span className="
+              <div className='mt-zen-xs'>
+                <span
+                  className='
                   inline-block px-2 py-1 
                   bg-gold text-ink text-xs font-display font-bold
                   border border-ink
-                ">
+                '
+                >
                   대표작
                 </span>
               </div>
@@ -205,8 +224,8 @@ export const ArtworkGridPortrait = memo(function ArtworkGridPortrait({
     mobile: 2,
     tablet: 3,
     desktop: 4,
-    wide: 5
-  }
+    wide: 5,
+  },
 }: ArtworkGridPortraitProps) {
   // Generate responsive grid classes based on columns config
   const gridClasses = cn(
@@ -217,7 +236,7 @@ export const ArtworkGridPortrait = memo(function ArtworkGridPortrait({
     columns.mobile === 3 && 'grid-cols-3',
     // Tablet
     columns.tablet === 2 && 'sm:grid-cols-2',
-    columns.tablet === 3 && 'sm:grid-cols-3', 
+    columns.tablet === 3 && 'sm:grid-cols-3',
     columns.tablet === 4 && 'sm:grid-cols-4',
     // Desktop
     columns.desktop === 3 && 'md:grid-cols-3',
@@ -233,13 +252,13 @@ export const ArtworkGridPortrait = memo(function ArtworkGridPortrait({
   )
 
   return (
-    <div 
+    <div
       className={gridClasses}
-      role="grid"
+      role='grid'
       aria-label={`작품 갤러리 - ${artworks.length}개 작품`}
     >
       {artworks.map((artwork, index) => (
-        <div key={artwork.id} role="gridcell">
+        <div key={artwork.id} role='gridcell'>
           <ArtworkCardPortrait
             artwork={artwork}
             showMetadata={showMetadata}
@@ -253,28 +272,32 @@ export const ArtworkGridPortrait = memo(function ArtworkGridPortrait({
 })
 
 // Loading skeleton for portrait cards
-export const ArtworkCardPortraitSkeleton = memo(function ArtworkCardPortraitSkeleton({
-  showMetadata = true
-}: {
-  showMetadata?: boolean
-}) {
-  return (
-    <div className="animate-pulse">
-      {/* Image skeleton with 9:16 ratio */}
-      <div className="
+export const ArtworkCardPortraitSkeleton = memo(
+  function ArtworkCardPortraitSkeleton({
+    showMetadata = true,
+  }: {
+    showMetadata?: boolean
+  }) {
+    return (
+      <div className='animate-pulse'>
+        {/* Image skeleton with 9:16 ratio */}
+        <div
+          className='
         aspect-[9/16] bg-stone/20 border-2 border-stone/40
         shadow-brutal-sm
-      " />
-      
-      {/* Metadata skeleton */}
-      {showMetadata && (
-        <div className="mt-zen-sm space-y-zen-xs">
-          <div className="h-5 bg-stone/20 rounded w-3/4" />
-          <div className="h-4 bg-stone/20 rounded w-1/2" />
-          <div className="h-4 bg-stone/20 rounded w-2/3" />
-          <div className="h-4 bg-stone/20 rounded w-1/3" />
-        </div>
-      )}
-    </div>
-  )
-})
+      '
+        />
+
+        {/* Metadata skeleton */}
+        {showMetadata && (
+          <div className='mt-zen-sm space-y-zen-xs'>
+            <div className='h-5 bg-stone/20 rounded w-3/4' />
+            <div className='h-4 bg-stone/20 rounded w-1/2' />
+            <div className='h-4 bg-stone/20 rounded w-2/3' />
+            <div className='h-4 bg-stone/20 rounded w-1/3' />
+          </div>
+        )}
+      </div>
+    )
+  }
+)

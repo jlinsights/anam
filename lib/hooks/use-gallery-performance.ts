@@ -1,7 +1,11 @@
 'use client'
 
 import { useEffect, useCallback, useMemo, useRef } from 'react'
-import { performanceMonitor, type PerformanceMetrics, type PerformanceIssue } from '@/lib/performance-monitor'
+import {
+  performanceMonitor,
+  type PerformanceMetrics,
+  type PerformanceIssue,
+} from '@/lib/performance-monitor'
 
 interface GalleryPerformanceOptions {
   enableTracking?: boolean
@@ -25,7 +29,7 @@ export function useGalleryPerformance({
   onMetricsUpdate,
   onPerformanceIssue,
   trackArtworkViews = true,
-  optimizationThreshold = 75
+  optimizationThreshold = 75,
 }: GalleryPerformanceOptions = {}): GalleryPerformanceReturn {
   const metricsRef = useRef<PerformanceMetrics | null>(null)
   const scoreRef = useRef<number>(0)
@@ -33,14 +37,20 @@ export function useGalleryPerformance({
   const sectionTimesRef = useRef<Map<string, number>>(new Map())
 
   // Memoized callbacks to prevent useEffect re-runs
-  const stableOnMetricsUpdate = useCallback((metrics: PerformanceMetrics) => {
-    metricsRef.current = metrics
-    onMetricsUpdate?.(metrics)
-  }, [onMetricsUpdate])
+  const stableOnMetricsUpdate = useCallback(
+    (metrics: PerformanceMetrics) => {
+      metricsRef.current = metrics
+      onMetricsUpdate?.(metrics)
+    },
+    [onMetricsUpdate]
+  )
 
-  const stableOnPerformanceIssue = useCallback((issue: PerformanceIssue) => {
-    onPerformanceIssue?.(issue)
-  }, [onPerformanceIssue])
+  const stableOnPerformanceIssue = useCallback(
+    (issue: PerformanceIssue) => {
+      onPerformanceIssue?.(issue)
+    },
+    [onPerformanceIssue]
+  )
 
   // Initialize performance monitoring
   useEffect(() => {
@@ -68,14 +78,17 @@ export function useGalleryPerformance({
   }, [enableTracking, stableOnMetricsUpdate, stableOnPerformanceIssue])
 
   // Track artwork views
-  const trackArtworkView = useCallback((artworkId: string) => {
-    if (!trackArtworkViews || !artworkId) return
+  const trackArtworkView = useCallback(
+    (artworkId: string) => {
+      if (!trackArtworkViews || !artworkId) return
 
-    viewedArtworksRef.current.add(artworkId)
-    
-    // Simple tracking without performance monitor methods
-    console.debug('Artwork viewed:', artworkId)
-  }, [trackArtworkViews])
+      viewedArtworksRef.current.add(artworkId)
+
+      // Simple tracking without performance monitor methods
+      console.debug('Artwork viewed:', artworkId)
+    },
+    [trackArtworkViews]
+  )
 
   // Track section changes
   const trackSectionChange = useCallback((section: string) => {
@@ -83,7 +96,7 @@ export function useGalleryPerformance({
 
     const now = performance.now()
     sectionTimesRef.current.set(section, now)
-    
+
     // Simple tracking without performance monitor methods
     console.debug('Section changed:', section)
   }, [])
@@ -91,7 +104,7 @@ export function useGalleryPerformance({
   // Calculate current performance score
   const currentScore = useMemo(() => {
     if (!metricsRef.current) return 0
-    
+
     try {
       scoreRef.current = performanceMonitor.getPerformanceScore()
       return scoreRef.current
@@ -118,7 +131,7 @@ export function useGalleryPerformance({
       recs.push('이미지 최적화와 우선 로딩으로 LCP를 개선하세요')
     }
 
-    // FCP recommendations  
+    // FCP recommendations
     if (metrics.fcp && metrics.fcp > 1800) {
       recs.push('CSS와 JavaScript 최적화로 FCP를 개선하세요')
     }
@@ -132,9 +145,11 @@ export function useGalleryPerformance({
     if (typeof window !== 'undefined' && 'memory' in performance) {
       const memory = (performance as any).memory
       const usedMB = memory.usedJSHeapSize / (1024 * 1024)
-      
+
       if (usedMB > 50) {
-        recs.push('메모리 사용량이 높습니다. 컴포넌트 메모이제이션을 확인하세요')
+        recs.push(
+          '메모리 사용량이 높습니다. 컴포넌트 메모이제이션을 확인하세요'
+        )
       }
     }
 
@@ -210,13 +225,20 @@ export function useOptimizedImageLoading(itemsCount: number = 0) {
     const viewportHeight = window.innerHeight
     const estimatedItemsPerRow = Math.floor(window.innerWidth / 300) // Assume ~300px per item
     const estimatedRowsInViewport = Math.ceil(viewportHeight / 400) // Assume ~400px per row
-    
-    return Math.min(estimatedItemsPerRow * estimatedRowsInViewport, itemsCount, 8)
+
+    return Math.min(
+      estimatedItemsPerRow * estimatedRowsInViewport,
+      itemsCount,
+      8
+    )
   }, [itemsCount])
 
-  const shouldPrioritizeImage = useCallback((index: number) => {
-    return index < priorityCount
-  }, [priorityCount])
+  const shouldPrioritizeImage = useCallback(
+    (index: number) => {
+      return index < priorityCount
+    },
+    [priorityCount]
+  )
 
   return {
     priorityCount,

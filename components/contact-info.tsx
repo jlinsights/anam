@@ -186,4 +186,3 @@ function ContactItem({
 
   return contentElement
 }
-

@@ -87,4 +87,3 @@ export function ArtworkDetailClient({ title, slug }: ArtworkDetailClientProps) {
     </Button>
   )
 }
-

@@ -24,11 +24,11 @@ class PrefetchManager {
     const link = document.createElement('link')
     link.rel = 'prefetch'
     link.href = url
-    
+
     if (options.as) {
       link.as = options.as
     }
-    
+
     if (options.crossorigin) {
       link.crossOrigin = options.crossorigin
     }
@@ -46,11 +46,11 @@ class PrefetchManager {
     const link = document.createElement('link')
     link.rel = 'preload'
     link.href = url
-    
+
     if (options.as) {
       link.as = options.as
     }
-    
+
     if (options.crossorigin) {
       link.crossOrigin = options.crossorigin
     }
@@ -74,7 +74,7 @@ class PrefetchManager {
    */
   prefetchRoute(href: string): void {
     if (typeof window === 'undefined') return
-    
+
     // Next.js의 자동 프리페치를 활용하거나 수동으로 프리페치
     const link = document.createElement('link')
     link.rel = 'prefetch'
@@ -90,18 +90,22 @@ class PrefetchManager {
     link.rel = 'preload'
     link.as = 'image'
     link.href = src
-    
+
     if (sizes) {
       link.setAttribute('imagesizes', sizes)
     }
-    
+
     document.head.appendChild(link)
   }
 
   /**
    * 폰트 프리로드
    */
-  preloadFont(href: string, type: string, crossorigin: 'anonymous' | 'use-credentials' = 'anonymous'): void {
+  preloadFont(
+    href: string,
+    type: string,
+    crossorigin: 'anonymous' | 'use-credentials' = 'anonymous'
+  ): void {
     const link = document.createElement('link')
     link.rel = 'preload'
     link.as = 'font'
@@ -124,7 +128,10 @@ class PrefetchManager {
   /**
    * 연결 프리커넥트
    */
-  preconnect(url: string, crossorigin: 'anonymous' | 'use-credentials' = 'anonymous'): void {
+  preconnect(
+    url: string,
+    crossorigin: 'anonymous' | 'use-credentials' = 'anonymous'
+  ): void {
     const link = document.createElement('link')
     link.rel = 'preconnect'
     link.href = url
@@ -148,9 +155,8 @@ class PrefetchManager {
 }
 
 // 전역 프리페치 매니저 인스턴스
-export const prefetchManager = typeof window !== 'undefined' 
-  ? new PrefetchManager()
-  : null
+export const prefetchManager =
+  typeof window !== 'undefined' ? new PrefetchManager() : null
 
 /**
  * 마우스 호버 시 라우트 프리페치
@@ -179,7 +185,7 @@ export function preloadCriticalResources() {
     '/Images/Artworks/featured/featured-01.webp',
   ]
 
-  criticalImages.forEach(src => {
+  criticalImages.forEach((src) => {
     prefetchManager.preloadImage(src)
   })
 
@@ -195,4 +201,3 @@ if (typeof window !== 'undefined') {
     preloadCriticalResources()
   }
 }
-

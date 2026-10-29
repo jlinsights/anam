@@ -1,5 +1,9 @@
 import { clearCacheAndRevalidate } from '@/lib/cache'
-import { createErrorResponse, createSuccessResponse, handleAuthError } from '@/lib/error-handler'
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  handleAuthError,
+} from '@/lib/error-handler'
 import { NextRequest, NextResponse } from 'next/server'
 
 // Optional secret to protect endpoint
@@ -24,7 +28,10 @@ export async function POST(req: NextRequest) {
 
     clearCacheAndRevalidate(tag)
 
-    return createSuccessResponse({ revalidated: true, tag }, 'Cache revalidated successfully')
+    return createSuccessResponse(
+      { revalidated: true, tag },
+      'Cache revalidated successfully'
+    )
   } catch (error: any) {
     return createErrorResponse(error, 400)
   }

@@ -36,13 +36,16 @@ export function throttle<T extends (...args: any[]) => any>(
 
     // Otherwise, schedule execution for later if not already scheduled
     if (!timeoutId) {
-      timeoutId = setTimeout(() => {
-        lastCallTime = Date.now()
-        timeoutId = null
-        if (lastArgs) {
-          func(...lastArgs)
-        }
-      }, delay - (now - lastCallTime))
+      timeoutId = setTimeout(
+        () => {
+          lastCallTime = Date.now()
+          timeoutId = null
+          if (lastArgs) {
+            func(...lastArgs)
+          }
+        },
+        delay - (now - lastCallTime)
+      )
     }
   }
 
@@ -118,19 +121,19 @@ export function throttleAnimationFrame<T extends (...args: any[]) => any>(
 export const THROTTLE_DELAYS = {
   /** For mouse move, scroll handlers - allows smooth tracking */
   MOUSE_MOVE: 16, // ~60fps
-  
+
   /** For scroll handlers - balance between responsiveness and performance */
   SCROLL: 16, // ~60fps
-  
+
   /** For resize handlers - less frequent updates needed */
   RESIZE: 100, // 10fps - sufficient for layout updates
-  
+
   /** For search input - balance between responsiveness and API calls */
   SEARCH: 300, // 3.33fps - good for user typing
-  
+
   /** For API calls - prevent excessive requests */
   API: 500, // 2fps - reduce server load
-  
+
   /** For heavy computations - allow time for other operations */
   COMPUTATION: 200, // 5fps - balance performance and responsiveness
 } as const
@@ -138,7 +141,9 @@ export const THROTTLE_DELAYS = {
 /**
  * Creates a throttled mouse move handler optimized for tracking
  */
-export function createThrottledMouseHandler<T extends (event: MouseEvent | React.MouseEvent) => void>(
+export function createThrottledMouseHandler<
+  T extends (event: MouseEvent | React.MouseEvent) => void,
+>(
   handler: T,
   delay: number = THROTTLE_DELAYS.MOUSE_MOVE
 ): ThrottledFunction<T> {
@@ -184,14 +189,14 @@ export function withThrottle<P extends Record<string, any>>(
 ) {
   return function ThrottledComponent(props: P) {
     const throttledProps = { ...props }
-    
+
     for (const [propName, delay] of Object.entries(handlerMap)) {
       const handler = props[propName as keyof P]
       if (typeof handler === 'function') {
         throttledProps[propName as keyof P] = throttle(handler, delay) as any
       }
     }
-    
+
     return React.createElement(Component, throttledProps)
   }
 }
@@ -222,7 +227,10 @@ export function useThrottleAnimationFrame<T extends (...args: any[]) => any>(
  */
 export class ThrottleMonitor {
   private static instance: ThrottleMonitor
-  private metrics: Map<string, { calls: number; throttled: number; lastCall: number }> = new Map()
+  private metrics: Map<
+    string,
+    { calls: number; throttled: number; lastCall: number }
+  > = new Map()
 
   static getInstance(): ThrottleMonitor {
     if (!ThrottleMonitor.instance) {
@@ -232,7 +240,11 @@ export class ThrottleMonitor {
   }
 
   track(name: string, wasThrottled: boolean) {
-    const metric = this.metrics.get(name) || { calls: 0, throttled: 0, lastCall: 0 }
+    const metric = this.metrics.get(name) || {
+      calls: 0,
+      throttled: 0,
+      lastCall: 0,
+    }
     metric.calls++
     if (wasThrottled) metric.throttled++
     metric.lastCall = Date.now()

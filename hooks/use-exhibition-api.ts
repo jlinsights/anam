@@ -28,7 +28,7 @@ export function useExhibitions() {
     immediate: true,
     revalidateOnFocus: true,
     retryAttempts: 2,
-    retryDelay: 1000
+    retryDelay: 1000,
   })
 }
 
@@ -40,7 +40,7 @@ export function useUpcomingExhibitions() {
     immediate: true,
     revalidateOnFocus: true,
     retryAttempts: 2,
-    retryDelay: 1000
+    retryDelay: 1000,
   })
 }
 
@@ -52,6 +52,6 @@ export function useExhibition(id: string) {
     immediate: !!id,
     revalidateOnFocus: false,
     retryAttempts: 2,
-    retryDelay: 1000
+    retryDelay: 1000,
   })
 }

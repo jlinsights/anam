@@ -132,4 +132,3 @@ export function useLocale() {
   console.warn('useLocale is deprecated, please use useI18n hook instead')
   return { locale: 'ko' as Locale, changeLocale: () => {} }
 }
-

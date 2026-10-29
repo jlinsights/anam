@@ -1,6 +1,12 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from 'react'
 import { toast } from '@/hooks/use-toast'
 import {
   PerformanceMetrics,
@@ -9,7 +15,7 @@ import {
   advancedPerformanceMonitor,
   galleryPerformanceTracker,
   bundlePerformanceAnalyzer,
-  errorCorrelationAnalyzer
+  errorCorrelationAnalyzer,
 } from '@/lib/performance-monitor'
 
 interface PerformanceContextType {
@@ -18,28 +24,41 @@ interface PerformanceContextType {
   alerts: PerformanceAlert[]
   isMonitoring: boolean
   lastUpdated: Date | null
-  
+
   // Controls
   startMonitoring: () => Promise<void>
   stopMonitoring: () => void
   clearAlerts: () => void
-  
+
   // Gallery tracking
-  trackGalleryLoad: (startTime: number, endTime: number, artworkCount: number) => void
+  trackGalleryLoad: (
+    startTime: number,
+    endTime: number,
+    artworkCount: number
+  ) => void
   trackArtworkDetail: (artworkId: string, loadTime: number) => void
-  trackSearchPerformance: (query: string, responseTime: number, resultCount: number) => void
-  trackFilterPerformance: (filters: Record<string, any>, responseTime: number) => void
+  trackSearchPerformance: (
+    query: string,
+    responseTime: number,
+    resultCount: number
+  ) => void
+  trackFilterPerformance: (
+    filters: Record<string, any>,
+    responseTime: number
+  ) => void
   trackImageLoading: (imageUrl: string, loadTime: number, size: number) => void
   trackScrollPerformance: (frameDuration: number) => void
-  
+
   // Error tracking
   trackError: (error: Error) => void
-  
+
   // Reports
   getAdvancedReport: () => Promise<any>
 }
 
-const PerformanceContext = createContext<PerformanceContextType | undefined>(undefined)
+const PerformanceContext = createContext<PerformanceContextType | undefined>(
+  undefined
+)
 
 interface PerformanceProviderProps {
   children: ReactNode
@@ -62,7 +81,7 @@ export function PerformanceProvider({
   enableErrorCorrelation = true,
   enableBundleAnalysis = true,
   realTimeUpdates = true,
-  updateInterval = 30000
+  updateInterval = 30000,
 }: PerformanceProviderProps) {
   const [metrics, setMetrics] = useState<PerformanceMetrics>({})
   const [score, setScore] = useState<number>(0)
@@ -87,22 +106,26 @@ export function PerformanceProvider({
 
   // Handle performance alerts
   const handlePerformanceAlert = (alert: PerformanceAlert) => {
-    setAlerts(prev => [alert, ...prev.slice(0, 49)]) // Keep last 50 alerts
-    
+    setAlerts((prev) => [alert, ...prev.slice(0, 49)]) // Keep last 50 alerts
+
     // Show toast notification if enabled and meets threshold
     if (showAlerts && shouldShowAlert(alert.severity)) {
-      const severityEmoji = {
-        low: '💡',
-        medium: '⚠️',
-        high: '🚨',
-        critical: '🔥'
-      }[alert.severity] || '⚠️'
-      
+      const severityEmoji =
+        {
+          low: '💡',
+          medium: '⚠️',
+          high: '🚨',
+          critical: '🔥',
+        }[alert.severity] || '⚠️'
+
       toast({
         title: `${severityEmoji} Performance Alert`,
         description: alert.message,
-        variant: alert.severity === 'critical' || alert.severity === 'high' ? 'destructive' : 'default',
-        duration: alert.severity === 'critical' ? 10000 : 5000
+        variant:
+          alert.severity === 'critical' || alert.severity === 'high'
+            ? 'destructive'
+            : 'default',
+        duration: alert.severity === 'critical' ? 10000 : 5000,
       })
     }
   }
@@ -112,15 +135,20 @@ export function PerformanceProvider({
     const alert: PerformanceAlert = {
       id: `budget-${Date.now()}`,
       type: 'budget_exceeded',
-      severity: event.percentage > 150 ? 'critical' : event.percentage > 120 ? 'high' : 'medium',
+      severity:
+        event.percentage > 150
+          ? 'critical'
+          : event.percentage > 120
+            ? 'high'
+            : 'medium',
       metric: event.budget,
       value: event.actual,
       threshold: event.allocated,
       timestamp: Date.now(),
       message: `Budget exceeded for ${event.budget}: ${event.percentage.toFixed(1)}%`,
-      actionRequired: event.recommendations
+      actionRequired: event.recommendations,
     }
-    
+
     handlePerformanceAlert(alert)
   }
 
@@ -130,18 +158,18 @@ export function PerformanceProvider({
       await advancedPerformanceMonitor.startMonitoring({
         onMetricsUpdate: handleMetricsUpdate,
         onPerformanceAlert: handlePerformanceAlert,
-        onBudgetExceeded: handleBudgetExceeded
+        onBudgetExceeded: handleBudgetExceeded,
       })
-      
+
       setIsMonitoring(true)
-      
+
       // Initial data load
       const report = await advancedPerformanceMonitor.getAdvancedReport()
       setMetrics(report.metrics)
       setScore(report.score)
       setAlerts(report.alerts)
       setLastUpdated(new Date())
-      
+
       console.log('🚀 Performance monitoring started')
     } catch (error) {
       console.error('Failed to start performance monitoring:', error)
@@ -161,9 +189,17 @@ export function PerformanceProvider({
   }
 
   // Gallery tracking methods
-  const trackGalleryLoad = (startTime: number, endTime: number, artworkCount: number) => {
+  const trackGalleryLoad = (
+    startTime: number,
+    endTime: number,
+    artworkCount: number
+  ) => {
     if (enableGalleryTracking) {
-      galleryPerformanceTracker.trackGalleryLoad(startTime, endTime, artworkCount)
+      galleryPerformanceTracker.trackGalleryLoad(
+        startTime,
+        endTime,
+        artworkCount
+      )
     }
   }
 
@@ -173,19 +209,34 @@ export function PerformanceProvider({
     }
   }
 
-  const trackSearchPerformance = (query: string, responseTime: number, resultCount: number) => {
+  const trackSearchPerformance = (
+    query: string,
+    responseTime: number,
+    resultCount: number
+  ) => {
     if (enableGalleryTracking) {
-      galleryPerformanceTracker.trackSearchPerformance(query, responseTime, resultCount)
+      galleryPerformanceTracker.trackSearchPerformance(
+        query,
+        responseTime,
+        resultCount
+      )
     }
   }
 
-  const trackFilterPerformance = (filters: Record<string, any>, responseTime: number) => {
+  const trackFilterPerformance = (
+    filters: Record<string, any>,
+    responseTime: number
+  ) => {
     if (enableGalleryTracking) {
       galleryPerformanceTracker.trackFilterPerformance(filters, responseTime)
     }
   }
 
-  const trackImageLoading = (imageUrl: string, loadTime: number, size: number) => {
+  const trackImageLoading = (
+    imageUrl: string,
+    loadTime: number,
+    size: number
+  ) => {
     if (enableGalleryTracking) {
       galleryPerformanceTracker.trackImageLoading(imageUrl, loadTime, size)
     }
@@ -264,7 +315,11 @@ export function PerformanceProvider({
   // Handle visibility change to pause/resume monitoring
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && !isMonitoring && autoStart) {
+      if (
+        document.visibilityState === 'visible' &&
+        !isMonitoring &&
+        autoStart
+      ) {
         startMonitoring()
       } else if (document.visibilityState === 'hidden' && isMonitoring) {
         // Optionally pause monitoring when page is hidden
@@ -273,7 +328,8 @@ export function PerformanceProvider({
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+    return () =>
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
   }, [isMonitoring, autoStart])
 
   const value: PerformanceContextType = {
@@ -282,21 +338,21 @@ export function PerformanceProvider({
     alerts,
     isMonitoring,
     lastUpdated,
-    
+
     startMonitoring,
     stopMonitoring,
     clearAlerts,
-    
+
     trackGalleryLoad,
     trackArtworkDetail,
     trackSearchPerformance,
     trackFilterPerformance,
     trackImageLoading,
     trackScrollPerformance,
-    
+
     trackError,
-    
-    getAdvancedReport
+
+    getAdvancedReport,
   }
 
   return (
@@ -310,35 +366,39 @@ export function PerformanceProvider({
 export function usePerformanceContext() {
   const context = useContext(PerformanceContext)
   if (context === undefined) {
-    throw new Error('usePerformanceContext must be used within a PerformanceProvider')
+    throw new Error(
+      'usePerformanceContext must be used within a PerformanceProvider'
+    )
   }
   return context
 }
 
 // Performance observer component for critical performance monitoring
-export function PerformanceObserver({ 
-  children, 
-  onCriticalAlert 
-}: { 
+export function PerformanceObserver({
+  children,
+  onCriticalAlert,
+}: {
   children: ReactNode
-  onCriticalAlert?: (alert: PerformanceAlert) => void 
+  onCriticalAlert?: (alert: PerformanceAlert) => void
 }) {
   const { alerts, score } = usePerformanceContext()
 
   // Handle critical performance issues
   useEffect(() => {
-    const criticalAlerts = alerts.filter(alert => alert.severity === 'critical')
-    
+    const criticalAlerts = alerts.filter(
+      (alert) => alert.severity === 'critical'
+    )
+
     if (criticalAlerts.length > 0) {
       const latestAlert = criticalAlerts[0]
       onCriticalAlert?.(latestAlert)
-      
+
       // Log critical performance issue
       console.error('🔥 Critical Performance Issue:', {
         metric: latestAlert.metric,
         value: latestAlert.value,
         threshold: latestAlert.threshold,
-        message: latestAlert.message
+        message: latestAlert.message,
       })
     }
   }, [alerts, onCriticalAlert])
@@ -354,12 +414,12 @@ export function PerformanceObserver({
 }
 
 // Performance boundary component for error handling
-export function PerformanceBoundary({ 
-  children, 
-  fallback 
-}: { 
+export function PerformanceBoundary({
+  children,
+  fallback,
+}: {
   children: ReactNode
-  fallback?: ReactNode 
+  fallback?: ReactNode
 }) {
   const { trackError } = usePerformanceContext()
 
@@ -370,7 +430,7 @@ export function PerformanceBoundary({
 
     // Note: This is a simplified error boundary implementation
     // In a real app, you might want to use a proper React Error Boundary
-    
+
     return () => {
       // Cleanup if needed
     }

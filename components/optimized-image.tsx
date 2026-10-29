@@ -60,13 +60,15 @@ export function OptimizedArtworkImage({
       return getArtworkImageMeta((artwork as any).number, usage)
     }
     // 레거시 호환성을 위해 slug + year 사용
-    const { getArtworkImageMeta: getLegacyImageMeta } = require('@/lib/image-utils')
+    const {
+      getArtworkImageMeta: getLegacyImageMeta,
+    } = require('@/lib/image-utils')
     // 레거시 함수가 필요한 경우 별도 처리
     return {
       src: artwork.imageUrl, // 이미 imageUrl에 올바른 경로가 설정되어 있음
       sizes: '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
       loading: 'lazy' as const,
-      priority: false
+      priority: false,
     }
   })()
   const altText = generateAltText(artwork.title, 'artwork')
@@ -75,7 +77,7 @@ export function OptimizedArtworkImage({
     console.log('✅ Image loaded successfully:', {
       src: hasError ? artwork.imageUrl : imageMeta.src,
       title: artwork.title,
-      usage
+      usage,
     })
     setIsLoading(false)
     onLoad?.()
@@ -88,7 +90,7 @@ export function OptimizedArtworkImage({
       title: artwork.title,
       slug: artwork.slug,
       year: artwork.year,
-      number: (artwork as any).number
+      number: (artwork as any).number,
     })
     setHasError(true)
     setIsLoading(false)

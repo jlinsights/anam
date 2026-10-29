@@ -95,17 +95,26 @@ export class ScreenReaderTesting {
       { selector: 'a[href], [role="link"]', type: 'links' },
       { selector: 'input, select, textarea', type: 'form-controls' },
       { selector: 'img, [role="img"]', type: 'images' },
-      { selector: 'h1, h2, h3, h4, h5, h6, [role="heading"]', type: 'headings' },
+      {
+        selector: 'h1, h2, h3, h4, h5, h6, [role="heading"]',
+        type: 'headings',
+      },
       { selector: '[role="navigation"], nav', type: 'navigation' },
       { selector: '[role="main"], main', type: 'landmarks' },
       { selector: '[role="dialog"], [role="alertdialog"]', type: 'modals' },
-      { selector: '[aria-live], [role="status"], [role="alert"]', type: 'live-regions' }
+      {
+        selector: '[aria-live], [role="status"], [role="alert"]',
+        type: 'live-regions',
+      },
     ]
 
     for (const test of elementTests) {
       const elements = container.querySelectorAll(test.selector)
       for (const element of Array.from(elements)) {
-        const result = await this.testElementAccessibility(element as HTMLElement, test.type)
+        const result = await this.testElementAccessibility(
+          element as HTMLElement,
+          test.type
+        )
         results.push(result)
       }
     }
@@ -118,7 +127,7 @@ export class ScreenReaderTesting {
       timestamp,
       results,
       summary,
-      score
+      score,
     }
   }
 
@@ -131,14 +140,14 @@ export class ScreenReaderTesting {
   ): Promise<ScreenReaderTestResult> {
     const issues: string[] = []
     const recommendations: string[] = []
-    
+
     // Get element selector
     const selector = this.getElementSelector(element)
-    
+
     // Test accessible name
     const accessibleName = this.getAccessibleName(element)
     const announcement = this.generateAnnouncement(element, accessibleName)
-    
+
     // Test context and clarity
     const context = this.getElementContext(element)
     const clarity = this.assessClarity(element, accessibleName, context)
@@ -180,16 +189,20 @@ export class ScreenReaderTesting {
       context,
       clarity,
       issues,
-      recommendations
+      recommendations,
     }
   }
 
   /**
    * Test ARIA compliance
    */
-  static testAriaCompliance(container: HTMLElement = document.body): AriaTestResult[] {
+  static testAriaCompliance(
+    container: HTMLElement = document.body
+  ): AriaTestResult[] {
     const results: AriaTestResult[] = []
-    const elementsWithAria = container.querySelectorAll('[aria-label], [aria-labelledby], [aria-describedby], [role], [aria-live], [aria-hidden]')
+    const elementsWithAria = container.querySelectorAll(
+      '[aria-label], [aria-labelledby], [aria-describedby], [role], [aria-live], [aria-hidden]'
+    )
 
     for (const element of Array.from(elementsWithAria)) {
       const result = this.testElementAria(element as HTMLElement)
@@ -202,9 +215,13 @@ export class ScreenReaderTesting {
   /**
    * Test live regions functionality
    */
-  static testLiveRegions(container: HTMLElement = document.body): LiveRegionTestResult[] {
+  static testLiveRegions(
+    container: HTMLElement = document.body
+  ): LiveRegionTestResult[] {
     const results: LiveRegionTestResult[] = []
-    const liveRegions = container.querySelectorAll('[aria-live], [role="status"], [role="alert"], [role="log"]')
+    const liveRegions = container.querySelectorAll(
+      '[aria-live], [role="status"], [role="alert"], [role="log"]'
+    )
 
     for (const element of Array.from(liveRegions)) {
       const result = this.testLiveRegion(element as HTMLElement)
@@ -217,23 +234,32 @@ export class ScreenReaderTesting {
   /**
    * Monitor live region announcements
    */
-  static startLiveRegionMonitoring(container: HTMLElement = document.body): void {
+  static startLiveRegionMonitoring(
+    container: HTMLElement = document.body
+  ): void {
     this.announcements = []
-    
+
     if (this.liveRegionObserver) {
       this.liveRegionObserver.disconnect()
     }
 
     this.liveRegionObserver = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.type === 'childList' || mutation.type === 'characterData') {
+        if (
+          mutation.type === 'childList' ||
+          mutation.type === 'characterData'
+        ) {
           const target = mutation.target as HTMLElement
-          const liveRegion = target.closest('[aria-live], [role="status"], [role="alert"]')
-          
+          const liveRegion = target.closest(
+            '[aria-live], [role="status"], [role="alert"]'
+          )
+
           if (liveRegion) {
             const announcement = liveRegion.textContent || ''
             if (announcement.trim()) {
-              this.announcements.push(`${new Date().toISOString()}: ${announcement}`)
+              this.announcements.push(
+                `${new Date().toISOString()}: ${announcement}`
+              )
             }
           }
         }
@@ -243,7 +269,7 @@ export class ScreenReaderTesting {
     this.liveRegionObserver.observe(container, {
       childList: true,
       subtree: true,
-      characterData: true
+      characterData: true,
     })
   }
 
@@ -261,9 +287,13 @@ export class ScreenReaderTesting {
   private static getElementSelector(element: HTMLElement): string {
     const tagName = element.tagName.toLowerCase()
     const id = element.id ? `#${element.id}` : ''
-    const classes = element.className ? `.${element.className.split(' ').join('.')}` : ''
-    const role = element.getAttribute('role') ? `[role="${element.getAttribute('role')}"]` : ''
-    
+    const classes = element.className
+      ? `.${element.className.split(' ').join('.')}`
+      : ''
+    const role = element.getAttribute('role')
+      ? `[role="${element.getAttribute('role')}"]`
+      : ''
+
     return `${tagName}${id}${classes}${role}`.slice(0, 100)
   }
 
@@ -274,11 +304,15 @@ export class ScreenReaderTesting {
 
     const ariaLabelledby = element.getAttribute('aria-labelledby')
     if (ariaLabelledby) {
-      const labelElements = ariaLabelledby.split(' ')
-        .map(id => document.getElementById(id))
+      const labelElements = ariaLabelledby
+        .split(' ')
+        .map((id) => document.getElementById(id))
         .filter(Boolean)
       if (labelElements.length > 0) {
-        return labelElements.map(el => el?.textContent || '').join(' ').trim()
+        return labelElements
+          .map((el) => el?.textContent || '')
+          .join(' ')
+          .trim()
       }
     }
 
@@ -289,11 +323,13 @@ export class ScreenReaderTesting {
         const label = document.querySelector(`label[for="${id}"]`)
         if (label) return label.textContent?.trim() || ''
       }
-      
+
       // Check if wrapped in label
       const parentLabel = element.closest('label')
       if (parentLabel) {
-        const labelText = parentLabel.textContent?.replace(element.textContent || '', '').trim()
+        const labelText = parentLabel.textContent
+          ?.replace(element.textContent || '', '')
+          .trim()
         if (labelText) return labelText
       }
     }
@@ -313,11 +349,14 @@ export class ScreenReaderTesting {
     return content || ''
   }
 
-  private static generateAnnouncement(element: HTMLElement, accessibleName: string): string {
+  private static generateAnnouncement(
+    element: HTMLElement,
+    accessibleName: string
+  ): string {
     const tagName = element.tagName.toLowerCase()
     const role = element.getAttribute('role')
     const type = element.getAttribute('type')
-    
+
     let announcement = accessibleName
 
     // Add role/type information
@@ -349,7 +388,10 @@ export class ScreenReaderTesting {
 
     // Add state information
     const states = []
-    if (element.hasAttribute('disabled') || element.getAttribute('aria-disabled') === 'true') {
+    if (
+      element.hasAttribute('disabled') ||
+      element.getAttribute('aria-disabled') === 'true'
+    ) {
       states.push('disabled')
     }
     if (element.getAttribute('aria-expanded') === 'true') {
@@ -373,11 +415,13 @@ export class ScreenReaderTesting {
 
   private static getElementContext(element: HTMLElement): string {
     const contexts = []
-    
+
     // Find containing landmarks
     const landmarks = ['main', 'nav', 'aside', 'header', 'footer', 'section']
     for (const landmark of landmarks) {
-      const container = element.closest(`${landmark}, [role="${landmark === 'aside' ? 'complementary' : landmark}"]`)
+      const container = element.closest(
+        `${landmark}, [role="${landmark === 'aside' ? 'complementary' : landmark}"]`
+      )
       if (container) {
         contexts.push(landmark)
         break
@@ -399,7 +443,11 @@ export class ScreenReaderTesting {
     return contexts.join(', ')
   }
 
-  private static assessClarity(element: HTMLElement, accessibleName: string, context: string): 'excellent' | 'good' | 'fair' | 'poor' {
+  private static assessClarity(
+    element: HTMLElement,
+    accessibleName: string,
+    context: string
+  ): 'excellent' | 'good' | 'fair' | 'poor' {
     let score = 0
 
     // Accessible name quality
@@ -415,8 +463,22 @@ export class ScreenReaderTesting {
     }
 
     // Descriptiveness
-    const descriptiveWords = ['submit', 'cancel', 'close', 'open', 'save', 'delete', 'edit', 'add', 'remove']
-    if (descriptiveWords.some(word => accessibleName.toLowerCase().includes(word))) {
+    const descriptiveWords = [
+      'submit',
+      'cancel',
+      'close',
+      'open',
+      'save',
+      'delete',
+      'edit',
+      'add',
+      'remove',
+    ]
+    if (
+      descriptiveWords.some((word) =>
+        accessibleName.toLowerCase().includes(word)
+      )
+    ) {
       score += 2
     }
 
@@ -426,8 +488,17 @@ export class ScreenReaderTesting {
     }
 
     // Generic text detection
-    const genericPhrases = ['click here', 'read more', 'learn more', 'button', 'link', 'image']
-    if (genericPhrases.some(phrase => accessibleName.toLowerCase() === phrase)) {
+    const genericPhrases = [
+      'click here',
+      'read more',
+      'learn more',
+      'button',
+      'link',
+      'image',
+    ]
+    if (
+      genericPhrases.some((phrase) => accessibleName.toLowerCase() === phrase)
+    ) {
       score -= 2
     }
 
@@ -437,9 +508,13 @@ export class ScreenReaderTesting {
     return 'poor'
   }
 
-  private static testButtonAccessibility(element: HTMLElement, issues: string[], recommendations: string[]): void {
+  private static testButtonAccessibility(
+    element: HTMLElement,
+    issues: string[],
+    recommendations: string[]
+  ): void {
     const accessibleName = this.getAccessibleName(element)
-    
+
     if (!accessibleName) {
       issues.push('Button has no accessible name')
       recommendations.push('Add aria-label or visible text content')
@@ -450,24 +525,36 @@ export class ScreenReaderTesting {
       recommendations.push('Remove "button" from the accessible name')
     }
 
-    if (element.getAttribute('role') && element.getAttribute('role') !== 'button') {
+    if (
+      element.getAttribute('role') &&
+      element.getAttribute('role') !== 'button'
+    ) {
       issues.push('Conflicting role attribute on button element')
       recommendations.push('Remove role attribute or use correct role')
     }
   }
 
-  private static testLinkAccessibility(element: HTMLElement, issues: string[], recommendations: string[]): void {
+  private static testLinkAccessibility(
+    element: HTMLElement,
+    issues: string[],
+    recommendations: string[]
+  ): void {
     const accessibleName = this.getAccessibleName(element)
     const href = element.getAttribute('href')
-    
+
     if (!accessibleName) {
       issues.push('Link has no accessible name')
       recommendations.push('Add text content or aria-label')
     }
 
-    if (accessibleName.toLowerCase() === 'click here' || accessibleName.toLowerCase() === 'read more') {
+    if (
+      accessibleName.toLowerCase() === 'click here' ||
+      accessibleName.toLowerCase() === 'read more'
+    ) {
       issues.push('Link has generic text')
-      recommendations.push('Use descriptive link text that explains the destination')
+      recommendations.push(
+        'Use descriptive link text that explains the destination'
+      )
     }
 
     if (!href || href === '#') {
@@ -475,16 +562,25 @@ export class ScreenReaderTesting {
       recommendations.push('Provide valid href or use button element instead')
     }
 
-    if (element.getAttribute('target') === '_blank' && !element.getAttribute('aria-label')?.includes('new window')) {
+    if (
+      element.getAttribute('target') === '_blank' &&
+      !element.getAttribute('aria-label')?.includes('new window')
+    ) {
       issues.push('Link opens in new window without warning')
       recommendations.push('Include "opens in new window" in accessible name')
     }
   }
 
-  private static testFormControlAccessibility(element: HTMLElement, issues: string[], recommendations: string[]): void {
+  private static testFormControlAccessibility(
+    element: HTMLElement,
+    issues: string[],
+    recommendations: string[]
+  ): void {
     const accessibleName = this.getAccessibleName(element)
-    const required = element.hasAttribute('required') || element.getAttribute('aria-required') === 'true'
-    
+    const required =
+      element.hasAttribute('required') ||
+      element.getAttribute('aria-required') === 'true'
+
     if (!accessibleName) {
       issues.push('Form control has no accessible name')
       recommendations.push('Associate with label element or add aria-label')
@@ -492,7 +588,9 @@ export class ScreenReaderTesting {
 
     if (required && !accessibleName.toLowerCase().includes('required')) {
       issues.push('Required field not clearly indicated to screen readers')
-      recommendations.push('Include "required" in accessible name or use aria-required')
+      recommendations.push(
+        'Include "required" in accessible name or use aria-required'
+      )
     }
 
     const describedBy = element.getAttribute('aria-describedby')
@@ -500,39 +598,61 @@ export class ScreenReaderTesting {
       const descriptionElement = document.getElementById(describedBy)
       if (!descriptionElement) {
         issues.push('aria-describedby references non-existent element')
-        recommendations.push('Ensure aria-describedby points to valid element ID')
+        recommendations.push(
+          'Ensure aria-describedby points to valid element ID'
+        )
       }
     }
   }
 
-  private static testImageAccessibility(element: HTMLElement, issues: string[], recommendations: string[]): void {
+  private static testImageAccessibility(
+    element: HTMLElement,
+    issues: string[],
+    recommendations: string[]
+  ): void {
     const alt = element.getAttribute('alt')
     const role = element.getAttribute('role')
-    
+
     if (alt === null) {
       issues.push('Image missing alt attribute')
-      recommendations.push('Add alt attribute with descriptive text or empty alt for decorative images')
+      recommendations.push(
+        'Add alt attribute with descriptive text or empty alt for decorative images'
+      )
     }
 
     if (alt === '' && role !== 'presentation' && role !== 'none') {
       // This might be intentional for decorative images
     }
 
-    if (alt && alt.toLowerCase().includes('image of') || alt && alt.toLowerCase().includes('picture of')) {
+    if (
+      (alt && alt.toLowerCase().includes('image of')) ||
+      (alt && alt.toLowerCase().includes('picture of'))
+    ) {
       issues.push('Alt text includes redundant "image of" or "picture of"')
       recommendations.push('Remove redundant phrases from alt text')
     }
 
-    if (element.tagName === 'SVG' && !alt && !element.getAttribute('aria-label') && !element.getAttribute('aria-labelledby')) {
+    if (
+      element.tagName === 'SVG' &&
+      !alt &&
+      !element.getAttribute('aria-label') &&
+      !element.getAttribute('aria-labelledby')
+    ) {
       issues.push('SVG missing accessible name')
       recommendations.push('Add aria-label, aria-labelledby, or title element')
     }
   }
 
-  private static testHeadingAccessibility(element: HTMLElement, issues: string[], recommendations: string[]): void {
+  private static testHeadingAccessibility(
+    element: HTMLElement,
+    issues: string[],
+    recommendations: string[]
+  ): void {
     const accessibleName = this.getAccessibleName(element)
-    const level = element.tagName.match(/^H([1-6])$/)?.[1] || element.getAttribute('aria-level')
-    
+    const level =
+      element.tagName.match(/^H([1-6])$/)?.[1] ||
+      element.getAttribute('aria-level')
+
     if (!accessibleName) {
       issues.push('Heading has no text content')
       recommendations.push('Add descriptive heading text')
@@ -544,13 +664,19 @@ export class ScreenReaderTesting {
     }
 
     // Check heading hierarchy (simplified)
-    const allHeadings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6, [role="heading"]'))
+    const allHeadings = Array.from(
+      document.querySelectorAll('h1, h2, h3, h4, h5, h6, [role="heading"]')
+    )
     const currentIndex = allHeadings.indexOf(element)
     if (currentIndex > 0) {
       const prevHeading = allHeadings[currentIndex - 1] as HTMLElement
-      const prevLevel = parseInt(prevHeading.tagName.match(/^H([1-6])$/)?.[1] || prevHeading.getAttribute('aria-level') || '1')
+      const prevLevel = parseInt(
+        prevHeading.tagName.match(/^H([1-6])$/)?.[1] ||
+          prevHeading.getAttribute('aria-level') ||
+          '1'
+      )
       const currentLevel = parseInt(level || '1')
-      
+
       if (currentLevel - prevLevel > 1) {
         issues.push('Heading level skips hierarchical order')
         recommendations.push('Use sequential heading levels (h1, h2, h3, etc.)')
@@ -558,9 +684,15 @@ export class ScreenReaderTesting {
     }
   }
 
-  private static testNavigationAccessibility(element: HTMLElement, issues: string[], recommendations: string[]): void {
-    const label = element.getAttribute('aria-label') || element.getAttribute('aria-labelledby')
-    
+  private static testNavigationAccessibility(
+    element: HTMLElement,
+    issues: string[],
+    recommendations: string[]
+  ): void {
+    const label =
+      element.getAttribute('aria-label') ||
+      element.getAttribute('aria-labelledby')
+
     if (!label) {
       const navElements = document.querySelectorAll('nav, [role="navigation"]')
       if (navElements.length > 1) {
@@ -576,9 +708,13 @@ export class ScreenReaderTesting {
     }
   }
 
-  private static testLandmarkAccessibility(element: HTMLElement, issues: string[], recommendations: string[]): void {
+  private static testLandmarkAccessibility(
+    element: HTMLElement,
+    issues: string[],
+    recommendations: string[]
+  ): void {
     const role = element.getAttribute('role') || element.tagName.toLowerCase()
-    
+
     if (role === 'main') {
       const mainElements = document.querySelectorAll('main, [role="main"]')
       if (mainElements.length > 1) {
@@ -588,11 +724,15 @@ export class ScreenReaderTesting {
     }
   }
 
-  private static testModalAccessibility(element: HTMLElement, issues: string[], recommendations: string[]): void {
+  private static testModalAccessibility(
+    element: HTMLElement,
+    issues: string[],
+    recommendations: string[]
+  ): void {
     const ariaModal = element.getAttribute('aria-modal')
     const ariaLabel = element.getAttribute('aria-label')
     const ariaLabelledby = element.getAttribute('aria-labelledby')
-    
+
     if (ariaModal !== 'true') {
       issues.push('Modal missing aria-modal="true"')
       recommendations.push('Add aria-modal="true" to modal dialog')
@@ -612,10 +752,14 @@ export class ScreenReaderTesting {
     }
   }
 
-  private static testLiveRegionAccessibility(element: HTMLElement, issues: string[], recommendations: string[]): void {
+  private static testLiveRegionAccessibility(
+    element: HTMLElement,
+    issues: string[],
+    recommendations: string[]
+  ): void {
     const ariaLive = element.getAttribute('aria-live')
     const role = element.getAttribute('role')
-    
+
     if (!ariaLive && !role) {
       issues.push('Live region missing aria-live attribute')
       recommendations.push('Add aria-live="polite" or aria-live="assertive"')
@@ -624,35 +768,41 @@ export class ScreenReaderTesting {
     const content = element.textContent?.trim()
     if (!content) {
       issues.push('Live region is empty')
-      recommendations.push('Ensure live region contains meaningful content when active')
+      recommendations.push(
+        'Ensure live region contains meaningful content when active'
+      )
     }
   }
 
   private static testElementAria(element: HTMLElement): AriaTestResult {
     const issues: string[] = []
     const attributes: AriaTestResult['attributes'] = {}
-    
+
     // Test ARIA attributes
-    const ariaAttributes = Array.from(element.attributes).filter(attr => attr.name.startsWith('aria-'))
-    
+    const ariaAttributes = Array.from(element.attributes).filter((attr) =>
+      attr.name.startsWith('aria-')
+    )
+
     for (const attr of ariaAttributes) {
       attributes[attr.name] = {
         present: true,
         value: attr.value,
         valid: this.validateAriaAttribute(attr.name, attr.value, element),
-        required: this.isAriaAttributeRequired(attr.name, element)
+        required: this.isAriaAttributeRequired(attr.name, element),
       }
     }
 
     // Test roles
     const explicitRole = element.getAttribute('role')
     const implicitRole = this.getImplicitRole(element)
-    
+
     const roles = {
       implicit: implicitRole,
       explicit: explicitRole || undefined,
       valid: explicitRole ? this.isValidRole(explicitRole) : true,
-      conflicts: explicitRole ? this.roleConflictsWithElement(explicitRole, element) : false
+      conflicts: explicitRole
+        ? this.roleConflictsWithElement(explicitRole, element)
+        : false,
     }
 
     // Test labels
@@ -661,7 +811,7 @@ export class ScreenReaderTesting {
       hasLabel: accessibleName.length > 0,
       labelText: accessibleName,
       labelSources: this.getLabelSources(element),
-      accessible: this.isProperlyLabeled(element)
+      accessible: this.isProperlyLabeled(element),
     }
 
     const score = this.calculateAriaScore(attributes, roles, labels, issues)
@@ -673,17 +823,19 @@ export class ScreenReaderTesting {
       roles,
       labels,
       issues,
-      score
+      score,
     }
   }
 
   private static testLiveRegion(element: HTMLElement): LiveRegionTestResult {
     const issues: string[] = []
-    
+
     const ariaLive = element.getAttribute('aria-live') || 'off'
     const type = ariaLive as 'polite' | 'assertive' | 'off'
-    
-    const relevant = (element.getAttribute('aria-relevant') || 'additions text').split(' ')
+
+    const relevant = (
+      element.getAttribute('aria-relevant') || 'additions text'
+    ).split(' ')
     const atomic = element.getAttribute('aria-atomic') === 'true'
     const busy = element.getAttribute('aria-busy') === 'true'
     const hasContent = (element.textContent?.trim().length || 0) > 0
@@ -691,10 +843,17 @@ export class ScreenReaderTesting {
     const updates = {
       detected: false, // Would need monitoring to detect
       announced: false, // Would need screen reader testing
-      clear: hasContent && !element.textContent?.includes('undefined') && !element.textContent?.includes('null')
+      clear:
+        hasContent &&
+        !element.textContent?.includes('undefined') &&
+        !element.textContent?.includes('null'),
     }
 
-    if (type === 'off' && element.getAttribute('role') !== 'status' && element.getAttribute('role') !== 'alert') {
+    if (
+      type === 'off' &&
+      element.getAttribute('role') !== 'status' &&
+      element.getAttribute('role') !== 'alert'
+    ) {
       issues.push('Live region not properly configured for announcements')
     }
 
@@ -710,46 +869,67 @@ export class ScreenReaderTesting {
       busy,
       hasContent,
       updates,
-      issues
+      issues,
     }
   }
 
   private static calculateSummary(results: ScreenReaderTestResult[]) {
     const total = results.length
-    const excellent = results.filter(r => r.clarity === 'excellent').length
-    const good = results.filter(r => r.clarity === 'good').length
-    const fair = results.filter(r => r.clarity === 'fair').length
-    const poor = results.filter(r => r.clarity === 'poor').length
+    const excellent = results.filter((r) => r.clarity === 'excellent').length
+    const good = results.filter((r) => r.clarity === 'good').length
+    const fair = results.filter((r) => r.clarity === 'fair').length
+    const poor = results.filter((r) => r.clarity === 'poor').length
     const issues = results.reduce((sum, r) => sum + r.issues.length, 0)
 
     return { total, excellent, good, fair, poor, issues }
   }
 
-  private static calculateOverallScore(results: ScreenReaderTestResult[]): number {
+  private static calculateOverallScore(
+    results: ScreenReaderTestResult[]
+  ): number {
     if (results.length === 0) return 100
 
-    const scores = results.map(r => {
+    const scores = results.map((r) => {
       switch (r.clarity) {
-        case 'excellent': return 100
-        case 'good': return 80
-        case 'fair': return 60
-        case 'poor': return 20
-        default: return 0
+        case 'excellent':
+          return 100
+        case 'good':
+          return 80
+        case 'fair':
+          return 60
+        case 'poor':
+          return 20
+        default:
+          return 0
       }
     })
 
-    const averageScore = scores.reduce((sum, score) => sum + score, 0) / scores.length
-    const issuesPenalty = Math.min(results.reduce((sum, r) => sum + r.issues.length, 0) * 5, 50)
-    
+    const averageScore =
+      scores.reduce((sum, score) => sum + score, 0) / scores.length
+    const issuesPenalty = Math.min(
+      results.reduce((sum, r) => sum + r.issues.length, 0) * 5,
+      50
+    )
+
     return Math.max(0, Math.round(averageScore - issuesPenalty))
   }
 
   // Additional helper methods for ARIA validation
-  private static validateAriaAttribute(name: string, value: string, element: HTMLElement): boolean {
+  private static validateAriaAttribute(
+    name: string,
+    value: string,
+    element: HTMLElement
+  ): boolean {
     // Simplified validation - in production, use a comprehensive ARIA spec
-    const booleanAttrs = ['aria-checked', 'aria-disabled', 'aria-expanded', 'aria-hidden', 'aria-selected']
+    const booleanAttrs = [
+      'aria-checked',
+      'aria-disabled',
+      'aria-expanded',
+      'aria-hidden',
+      'aria-selected',
+    ]
     const triStateAttrs = ['aria-checked', 'aria-pressed', 'aria-selected']
-    
+
     if (booleanAttrs.includes(name)) {
       if (triStateAttrs.includes(name)) {
         return ['true', 'false', 'mixed'].includes(value)
@@ -760,17 +940,20 @@ export class ScreenReaderTesting {
     return value.trim().length > 0
   }
 
-  private static isAriaAttributeRequired(name: string, element: HTMLElement): boolean {
+  private static isAriaAttributeRequired(
+    name: string,
+    element: HTMLElement
+  ): boolean {
     const role = element.getAttribute('role')
-    
+
     // Simplified required attributes mapping
     const requiredAttrs: Record<string, string[]> = {
-      'checkbox': ['aria-checked'],
-      'radio': ['aria-checked'],
-      'slider': ['aria-valuenow'],
-      'progressbar': ['aria-valuenow'],
-      'tab': ['aria-selected'],
-      'option': ['aria-selected']
+      checkbox: ['aria-checked'],
+      radio: ['aria-checked'],
+      slider: ['aria-valuenow'],
+      progressbar: ['aria-valuenow'],
+      tab: ['aria-selected'],
+      option: ['aria-selected'],
     }
 
     return role ? (requiredAttrs[role] || []).includes(name) : false
@@ -779,20 +962,25 @@ export class ScreenReaderTesting {
   private static getImplicitRole(element: HTMLElement): string {
     const tagName = element.tagName.toLowerCase()
     const type = element.getAttribute('type')
-    
+
     const implicitRoles: Record<string, string> = {
-      'button': 'button',
-      'a': element.hasAttribute('href') ? 'link' : 'generic',
-      'input': type === 'button' || type === 'submit' ? 'button' : type === 'checkbox' ? 'checkbox' : 'textbox',
-      'select': 'combobox',
-      'textarea': 'textbox',
-      'img': 'img',
-      'nav': 'navigation',
-      'main': 'main',
-      'aside': 'complementary',
-      'header': 'banner',
-      'footer': 'contentinfo',
-      'section': 'region'
+      button: 'button',
+      a: element.hasAttribute('href') ? 'link' : 'generic',
+      input:
+        type === 'button' || type === 'submit'
+          ? 'button'
+          : type === 'checkbox'
+            ? 'checkbox'
+            : 'textbox',
+      select: 'combobox',
+      textarea: 'textbox',
+      img: 'img',
+      nav: 'navigation',
+      main: 'main',
+      aside: 'complementary',
+      header: 'banner',
+      footer: 'contentinfo',
+      section: 'region',
     }
 
     if (tagName.match(/^h[1-6]$/)) {
@@ -804,29 +992,91 @@ export class ScreenReaderTesting {
 
   private static isValidRole(role: string): boolean {
     const validRoles = [
-      'alert', 'alertdialog', 'application', 'article', 'banner', 'button', 'cell', 'checkbox',
-      'columnheader', 'combobox', 'complementary', 'contentinfo', 'definition', 'dialog',
-      'directory', 'document', 'feed', 'figure', 'form', 'grid', 'gridcell', 'group',
-      'heading', 'img', 'link', 'list', 'listbox', 'listitem', 'log', 'main', 'marquee',
-      'math', 'menu', 'menubar', 'menuitem', 'menuitemcheckbox', 'menuitemradio',
-      'navigation', 'none', 'note', 'option', 'presentation', 'progressbar', 'radio',
-      'radiogroup', 'region', 'row', 'rowgroup', 'rowheader', 'scrollbar', 'search',
-      'searchbox', 'separator', 'slider', 'spinbutton', 'status', 'switch', 'tab',
-      'table', 'tablist', 'tabpanel', 'term', 'textbox', 'timer', 'toolbar', 'tooltip',
-      'tree', 'treegrid', 'treeitem'
+      'alert',
+      'alertdialog',
+      'application',
+      'article',
+      'banner',
+      'button',
+      'cell',
+      'checkbox',
+      'columnheader',
+      'combobox',
+      'complementary',
+      'contentinfo',
+      'definition',
+      'dialog',
+      'directory',
+      'document',
+      'feed',
+      'figure',
+      'form',
+      'grid',
+      'gridcell',
+      'group',
+      'heading',
+      'img',
+      'link',
+      'list',
+      'listbox',
+      'listitem',
+      'log',
+      'main',
+      'marquee',
+      'math',
+      'menu',
+      'menubar',
+      'menuitem',
+      'menuitemcheckbox',
+      'menuitemradio',
+      'navigation',
+      'none',
+      'note',
+      'option',
+      'presentation',
+      'progressbar',
+      'radio',
+      'radiogroup',
+      'region',
+      'row',
+      'rowgroup',
+      'rowheader',
+      'scrollbar',
+      'search',
+      'searchbox',
+      'separator',
+      'slider',
+      'spinbutton',
+      'status',
+      'switch',
+      'tab',
+      'table',
+      'tablist',
+      'tabpanel',
+      'term',
+      'textbox',
+      'timer',
+      'toolbar',
+      'tooltip',
+      'tree',
+      'treegrid',
+      'treeitem',
     ]
-    
+
     return validRoles.includes(role)
   }
 
-  private static roleConflictsWithElement(role: string, element: HTMLElement): boolean {
+  private static roleConflictsWithElement(
+    role: string,
+    element: HTMLElement
+  ): boolean {
     const tagName = element.tagName.toLowerCase()
-    
+
     // Check for semantic conflicts
     const conflicts: Record<string, string[]> = {
-      'button': ['link', 'checkbox', 'radio'],
-      'a': ['button', 'checkbox', 'radio'],
-      'input': ['button', 'link'] // depending on type
+      button: ['link', 'checkbox', 'radio'],
+      a: ['button', 'checkbox', 'radio'],
+      input: ['button', 'link'], // depending on type
     }
 
     return (conflicts[tagName] || []).includes(role)
@@ -834,19 +1084,19 @@ export class ScreenReaderTesting {
 
   private static getLabelSources(element: HTMLElement): string[] {
     const sources: string[] = []
-    
+
     if (element.getAttribute('aria-label')) sources.push('aria-label')
     if (element.getAttribute('aria-labelledby')) sources.push('aria-labelledby')
     if (element.getAttribute('title')) sources.push('title')
     if (element.textContent?.trim()) sources.push('content')
-    
+
     const id = element.getAttribute('id')
     if (id && document.querySelector(`label[for="${id}"]`)) {
       sources.push('label[for]')
     }
-    
+
     if (element.closest('label')) sources.push('label wrapper')
-    
+
     return sources
   }
 
@@ -864,7 +1114,7 @@ export class ScreenReaderTesting {
     let score = 100
 
     // Deduct for invalid attributes
-    Object.values(attributes).forEach(attr => {
+    Object.values(attributes).forEach((attr) => {
       if (!attr.valid) score -= 10
     })
 

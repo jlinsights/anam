@@ -153,4 +153,3 @@ export const ADAPTIVE_CONFIG = {
     fast: 90,
   },
 } as const
-

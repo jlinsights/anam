@@ -19,7 +19,7 @@ export function getOptimizedImagePath(
 ): string {
   // 숫자를 2자리 문자열로 변환 (01, 02, 03...)
   const paddedNumber = String(artworkNumber).padStart(2, '0')
-  
+
   // 최적화된 이미지 경로 시도
   if (size !== 'original') {
     return `/Images/Artworks/optimized/${paddedNumber}/${paddedNumber}-${size}.jpg`

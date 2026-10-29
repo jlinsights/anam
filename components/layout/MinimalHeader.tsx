@@ -40,27 +40,30 @@ export function MinimalHeader() {
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
-        <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 sm:h-20">
+        <nav className='container mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='flex items-center justify-between h-16 sm:h-20'>
             {/* Logo */}
-            <Link
-              href="/"
-              className="flex items-center space-x-2 group"
-            >
-              <span className={`text-2xl sm:text-3xl font-serif transition-colors duration-300 ${
-                isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'
-              } group-hover:text-gray-600 dark:group-hover:text-gray-300`}>
+            <Link href='/' className='flex items-center space-x-2 group'>
+              <span
+                className={`text-2xl sm:text-3xl font-serif transition-colors duration-300 ${
+                  isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'
+                } group-hover:text-gray-600 dark:group-hover:text-gray-300`}
+              >
                 아남
               </span>
-              <span className={`text-xs sm:text-sm font-light tracking-wider uppercase transition-colors duration-300 ${
-                isScrolled ? 'text-gray-600 dark:text-gray-400' : 'text-white/80'
-              }`}>
+              <span
+                className={`text-xs sm:text-sm font-light tracking-wider uppercase transition-colors duration-300 ${
+                  isScrolled
+                    ? 'text-gray-600 dark:text-gray-400'
+                    : 'text-white/80'
+                }`}
+              >
                 Gallery
               </span>
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className='hidden md:flex items-center space-x-8'>
               {navigation.map((item) => (
                 <Link
                   key={item.name}
@@ -71,8 +74,8 @@ export function MinimalHeader() {
                         ? 'text-gray-900 dark:text-white'
                         : 'text-white'
                       : isScrolled
-                      ? 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                      : 'text-white/70 hover:text-white'
+                        ? 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                        : 'text-white/70 hover:text-white'
                   }`}
                 >
                   <span>{item.name}</span>
@@ -81,7 +84,7 @@ export function MinimalHeader() {
                       className={`absolute -bottom-1 left-0 right-0 h-px ${
                         isScrolled ? 'bg-gray-900 dark:bg-white' : 'bg-white'
                       }`}
-                      layoutId="navbar-indicator"
+                      layoutId='navbar-indicator'
                     />
                   )}
                 </Link>
@@ -109,9 +112,9 @@ export function MinimalHeader() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-white dark:bg-gray-900 md:hidden"
+            className='fixed inset-0 z-40 bg-white dark:bg-gray-900 md:hidden'
           >
-            <div className="flex flex-col items-center justify-center h-full space-y-8">
+            <div className='flex flex-col items-center justify-center h-full space-y-8'>
               {navigation.map((item) => (
                 <Link
                   key={item.name}
@@ -124,12 +127,12 @@ export function MinimalHeader() {
                   }`}
                 >
                   <span>{item.nameKo}</span>
-                  <span className="block text-sm text-gray-400 dark:text-gray-600 mt-1">
+                  <span className='block text-sm text-gray-400 dark:text-gray-600 mt-1'>
                     {item.name}
                   </span>
                 </Link>
               ))}
-              <div className="pt-8">
+              <div className='pt-8'>
                 <ThemeToggle />
               </div>
             </div>

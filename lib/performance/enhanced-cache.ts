@@ -71,10 +71,10 @@ class EnhancedCache {
       try {
         const storageKey = `${this.prefix}${key}`
         const stored = localStorage.getItem(storageKey)
-        
+
         if (stored) {
           const entry: CacheEntry<T> = JSON.parse(stored)
-          
+
           if (this.isValid(entry)) {
             // 메모리 캐시에도 복원
             this.memoryCache.set(key, entry)
@@ -97,7 +97,7 @@ class EnhancedCache {
    */
   private isValid<T>(entry: CacheEntry<T>): boolean {
     const now = Date.now()
-    
+
     // 만료 시간 확인
     if (now > entry.expiresAt) {
       return false
@@ -116,7 +116,7 @@ class EnhancedCache {
    */
   delete(key: string): void {
     this.memoryCache.delete(key)
-    
+
     if (typeof window !== 'undefined') {
       try {
         const storageKey = `${this.prefix}${key}`
@@ -138,13 +138,13 @@ class EnhancedCache {
         keysToDelete.push(key)
       }
     })
-    keysToDelete.forEach(key => this.memoryCache.delete(key))
+    keysToDelete.forEach((key) => this.memoryCache.delete(key))
 
     // localStorage에서 삭제
     if (typeof window !== 'undefined') {
       try {
         const keys = Object.keys(localStorage)
-        keys.forEach(key => {
+        keys.forEach((key) => {
           if (key.startsWith(this.prefix) && key.includes(pattern)) {
             localStorage.removeItem(key)
           }
@@ -160,11 +160,11 @@ class EnhancedCache {
    */
   clear(): void {
     this.memoryCache.clear()
-    
+
     if (typeof window !== 'undefined') {
       try {
         const keys = Object.keys(localStorage)
-        keys.forEach(key => {
+        keys.forEach((key) => {
           if (key.startsWith(this.prefix)) {
             localStorage.removeItem(key)
           }
@@ -188,13 +188,13 @@ class EnhancedCache {
         keysToDelete.push(key)
       }
     })
-    keysToDelete.forEach(key => this.memoryCache.delete(key))
+    keysToDelete.forEach((key) => this.memoryCache.delete(key))
 
     // localStorage 정리
     if (typeof window !== 'undefined') {
       try {
         const keys = Object.keys(localStorage)
-        keys.forEach(key => {
+        keys.forEach((key) => {
           if (key.startsWith(this.prefix)) {
             try {
               const stored = localStorage.getItem(key)
@@ -222,11 +222,13 @@ class EnhancedCache {
   getStats() {
     const memorySize = this.memoryCache.size
     let localStorageSize = 0
-    
+
     if (typeof window !== 'undefined') {
       try {
         const keys = Object.keys(localStorage)
-        localStorageSize = keys.filter(key => key.startsWith(this.prefix)).length
+        localStorageSize = keys.filter((key) =>
+          key.startsWith(this.prefix)
+        ).length
       } catch {
         // 무시
       }
@@ -249,9 +251,12 @@ export const enhancedCache = new EnhancedCache()
 
 // 정기적인 캐시 정리 (5분마다)
 if (typeof window !== 'undefined') {
-  setInterval(() => {
-    enhancedCache.cleanup()
-  }, 5 * 60 * 1000)
+  setInterval(
+    () => {
+      enhancedCache.cleanup()
+    },
+    5 * 60 * 1000
+  )
 }
 
 /**
@@ -265,24 +270,24 @@ export async function withStaleWhileRevalidate<T>(
 ): Promise<T> {
   // 먼저 캐시에서 조회
   const cached = enhancedCache.get<T>(key)
-  
+
   if (cached) {
     // 백그라운드에서 최신 데이터 가져오기 (Stale-While-Revalidate)
     fetchFn()
-      .then(data => {
+      .then((data) => {
         enhancedCache.set(key, data, options)
       })
       .catch(() => {
         // 에러 발생 시 무시 (캐시된 데이터 계속 사용)
       })
-    
+
     return cached
   }
 
   // 캐시에 없으면 네트워크에서 가져오기
   const data = await fetchFn()
   enhancedCache.set(key, data, options)
-  
+
   return data
 }
 
@@ -295,10 +300,10 @@ export function withCacheSync<T extends (...args: any[]) => any>(
   options: CacheOptions = {}
 ): T {
   return ((...args: Parameters<T>) => {
-    const key = keyGenerator 
+    const key = keyGenerator
       ? keyGenerator(...args)
       : `${fn.name}_${JSON.stringify(args)}`
-    
+
     // 캐시 확인
     const cached = enhancedCache.get<ReturnType<T>>(key)
     if (cached !== null) {
@@ -308,8 +313,7 @@ export function withCacheSync<T extends (...args: any[]) => any>(
     // 함수 실행 및 결과 캐싱
     const result = fn(...args)
     enhancedCache.set(key, result, options)
-    
+
     return result
   }) as T
 }
-

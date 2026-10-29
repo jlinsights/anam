@@ -99,16 +99,19 @@ export class ColorContrastTesting {
     container: HTMLElement = document.body
   ): Promise<ColorContrastAudit> {
     const timestamp = new Date().toISOString()
-    
+
     // Test color contrast
     const contrastResults = await this.testAllColorContrasts(container)
-    
+
     // Test visual accessibility
     const visualResults = await this.testVisualAccessibility(container)
-    
+
     const summary = this.calculateSummary(contrastResults)
     const score = this.calculateOverallScore(contrastResults, visualResults)
-    const recommendations = this.generateRecommendations(contrastResults, visualResults)
+    const recommendations = this.generateRecommendations(
+      contrastResults,
+      visualResults
+    )
 
     return {
       url: window.location.href,
@@ -117,14 +120,16 @@ export class ColorContrastTesting {
       results: contrastResults,
       visualResults,
       score,
-      recommendations
+      recommendations,
     }
   }
 
   /**
    * Test color contrast for all text elements
    */
-  static async testAllColorContrasts(container: HTMLElement): Promise<ColorContrastResult[]> {
+  static async testAllColorContrasts(
+    container: HTMLElement
+  ): Promise<ColorContrastResult[]> {
     const results: ColorContrastResult[] = []
     const textElements = this.getTextElements(container)
 
@@ -141,17 +146,19 @@ export class ColorContrastTesting {
   /**
    * Test color contrast for a specific element
    */
-  static async testElementColorContrast(element: HTMLElement): Promise<ColorContrastResult | null> {
+  static async testElementColorContrast(
+    element: HTMLElement
+  ): Promise<ColorContrastResult | null> {
     const styles = getComputedStyle(element)
     const textContent = element.textContent?.trim()
-    
+
     if (!textContent || textContent.length === 0) {
       return null
     }
 
     const foreground = this.getEffectiveForegroundColor(element)
     const background = this.getEffectiveBackgroundColor(element)
-    
+
     if (!foreground || !background) {
       return null
     }
@@ -159,16 +166,25 @@ export class ColorContrastTesting {
     const ratio = this.calculateContrastRatio(foreground, background)
     const size = this.getTextSize(element)
     const wcagRequirement = this.getWCAGRequirement(size)
-    
+
     const level = this.determineContrastLevel(ratio, wcagRequirement)
     const passes = level !== 'fail'
-    
+
     const issues: string[] = []
     const recommendations: string[] = []
-    
+
     if (!passes) {
-      issues.push(`Color contrast ratio ${ratio.toFixed(2)}:1 is below WCAG AA requirement of ${wcagRequirement.aa}:1`)
-      recommendations.push(this.generateContrastRecommendation(ratio, wcagRequirement, foreground, background))
+      issues.push(
+        `Color contrast ratio ${ratio.toFixed(2)}:1 is below WCAG AA requirement of ${wcagRequirement.aa}:1`
+      )
+      recommendations.push(
+        this.generateContrastRecommendation(
+          ratio,
+          wcagRequirement,
+          foreground,
+          background
+        )
+      )
     }
 
     return {
@@ -182,14 +198,16 @@ export class ColorContrastTesting {
       selector: this.getElementSelector(element),
       wcagRequirement,
       issues,
-      recommendations
+      recommendations,
     }
   }
 
   /**
    * Test comprehensive visual accessibility
    */
-  static async testVisualAccessibility(container: HTMLElement): Promise<VisualAccessibilityResult[]> {
+  static async testVisualAccessibility(
+    container: HTMLElement
+  ): Promise<VisualAccessibilityResult[]> {
     const results: VisualAccessibilityResult[] = []
     const interactiveElements = this.getInteractiveElements(container)
 
@@ -204,11 +222,13 @@ export class ColorContrastTesting {
   /**
    * Test visual accessibility for a specific element
    */
-  static async testElementVisualAccessibility(element: HTMLElement): Promise<VisualAccessibilityResult> {
+  static async testElementVisualAccessibility(
+    element: HTMLElement
+  ): Promise<VisualAccessibilityResult> {
     const issues: string[] = []
-    
+
     // Test color contrast
-    const colorContrast = await this.testElementColorContrast(element) || {
+    const colorContrast = (await this.testElementColorContrast(element)) || {
       foreground: 'unknown',
       background: 'unknown',
       ratio: 0,
@@ -219,18 +239,18 @@ export class ColorContrastTesting {
       selector: this.getElementSelector(element),
       wcagRequirement: { aa: 4.5, aaa: 7 },
       issues: ['Could not determine color contrast'],
-      recommendations: ['Ensure text has sufficient color contrast']
+      recommendations: ['Ensure text has sufficient color contrast'],
     }
 
     // Test focus indicator
     const focusIndicator = await this.testFocusIndicator(element)
-    
+
     // Test color-only information
     const colorOnly = this.testColorOnlyInformation(element)
-    
+
     // Test motion safety
     const motionSafety = this.testMotionSafety(element)
-    
+
     // Test target size
     const targetSize = this.testTargetSize(element)
 
@@ -248,7 +268,7 @@ export class ColorContrastTesting {
       focusIndicator,
       colorOnly,
       motionSafety,
-      targetSize
+      targetSize,
     })
 
     return {
@@ -259,27 +279,29 @@ export class ColorContrastTesting {
         focusIndicator,
         colorOnly,
         motionSafety,
-        targetSize
+        targetSize,
       },
       score,
-      issues
+      issues,
     }
   }
 
   /**
    * Test focus indicator visibility and contrast
    */
-  static async testFocusIndicator(element: HTMLElement): Promise<FocusIndicatorResult> {
+  static async testFocusIndicator(
+    element: HTMLElement
+  ): Promise<FocusIndicatorResult> {
     const issues: string[] = []
     const methods: string[] = []
-    
+
     // Temporarily focus the element
     const originalFocus = document.activeElement
     element.focus()
-    
+
     const focusedStyles = getComputedStyle(element)
     const unfocusedStyles = getComputedStyle(element) // Would need to get this before focus
-    
+
     // Check for focus indicators
     let hasIndicator = false
     let visible = false
@@ -293,8 +315,10 @@ export class ColorContrastTesting {
     }
 
     // Check border changes
-    if (focusedStyles.borderColor !== 'transparent' && 
-        focusedStyles.borderWidth !== '0px') {
+    if (
+      focusedStyles.borderColor !== 'transparent' &&
+      focusedStyles.borderWidth !== '0px'
+    ) {
       hasIndicator = true
       visible = true
       methods.push('border')
@@ -318,7 +342,7 @@ export class ColorContrastTesting {
     if (visible) {
       const focusColor = this.extractFocusIndicatorColor(focusedStyles)
       const backgroundColor = this.getEffectiveBackgroundColor(element)
-      
+
       if (focusColor && backgroundColor) {
         ratio = this.calculateContrastRatio(focusColor, backgroundColor)
       }
@@ -326,7 +350,7 @@ export class ColorContrastTesting {
 
     // Restore original focus
     if (originalFocus && originalFocus !== element) {
-      (originalFocus as HTMLElement).focus()
+      ;(originalFocus as HTMLElement).focus()
     } else {
       element.blur()
     }
@@ -336,7 +360,9 @@ export class ColorContrastTesting {
     if (!hasIndicator) {
       issues.push('Element has no visible focus indicator')
     } else if (!sufficient) {
-      issues.push(`Focus indicator contrast ratio ${ratio.toFixed(2)}:1 is below 3:1 requirement`)
+      issues.push(
+        `Focus indicator contrast ratio ${ratio.toFixed(2)}:1 is below 3:1 requirement`
+      )
     }
 
     return {
@@ -345,7 +371,7 @@ export class ColorContrastTesting {
       sufficient,
       ratio,
       methods,
-      issues
+      issues,
     }
   }
 
@@ -354,10 +380,10 @@ export class ColorContrastTesting {
    */
   static testColorOnlyInformation(element: HTMLElement): ColorOnlyResult {
     const issues: string[] = []
-    
+
     // Check if element uses color to convey information
     const usesColorOnly = this.detectColorOnlyInformation(element)
-    
+
     let hasTextualIndicator = false
     let hasIconIndicator = false
     let hasPatternIndicator = false
@@ -367,24 +393,42 @@ export class ColorContrastTesting {
       const textContent = element.textContent || ''
       const ariaLabel = element.getAttribute('aria-label') || ''
       const title = element.getAttribute('title') || ''
-      
-      const indicatorWords = ['required', 'optional', 'error', 'success', 'warning', 'info', 'selected', 'active']
+
+      const indicatorWords = [
+        'required',
+        'optional',
+        'error',
+        'success',
+        'warning',
+        'info',
+        'selected',
+        'active',
+      ]
       const allText = `${textContent} ${ariaLabel} ${title}`.toLowerCase()
-      
-      hasTextualIndicator = indicatorWords.some(word => allText.includes(word))
+
+      hasTextualIndicator = indicatorWords.some((word) =>
+        allText.includes(word)
+      )
 
       // Check for icon indicators
-      const icons = element.querySelectorAll('svg, i[class*="icon"], .icon, [class*="fa-"]')
+      const icons = element.querySelectorAll(
+        'svg, i[class*="icon"], .icon, [class*="fa-"]'
+      )
       hasIconIndicator = icons.length > 0
 
       // Check for pattern/shape indicators
-      const hasPatternClasses = element.className.includes('pattern') || 
-                               element.className.includes('stripe') ||
-                               element.className.includes('dot')
+      const hasPatternClasses =
+        element.className.includes('pattern') ||
+        element.className.includes('stripe') ||
+        element.className.includes('dot')
       hasPatternIndicator = hasPatternClasses
     }
 
-    const accessible = !usesColorOnly || hasTextualIndicator || hasIconIndicator || hasPatternIndicator
+    const accessible =
+      !usesColorOnly ||
+      hasTextualIndicator ||
+      hasIconIndicator ||
+      hasPatternIndicator
 
     if (usesColorOnly && !accessible) {
       issues.push('Element uses color alone to convey information')
@@ -396,7 +440,7 @@ export class ColorContrastTesting {
       hasIconIndicator,
       hasPatternIndicator,
       accessible,
-      issues
+      issues,
     }
   }
 
@@ -405,10 +449,10 @@ export class ColorContrastTesting {
    */
   static testMotionSafety(element: HTMLElement): MotionSafetyResult {
     const issues: string[] = []
-    
+
     const styles = getComputedStyle(element)
     const hasAnimation = this.hasAnimation(element, styles)
-    
+
     let respectsReducedMotion = true
     let autoPlaying = false
     let canBePaused = true
@@ -416,15 +460,16 @@ export class ColorContrastTesting {
     if (hasAnimation) {
       // Check for prefers-reduced-motion support
       respectsReducedMotion = this.respectsReducedMotion(element)
-      
+
       // Check for auto-playing animations
       autoPlaying = this.isAutoPlaying(element, styles)
-      
+
       // Check if animation can be paused
       canBePaused = this.canBePaused(element)
     }
 
-    const accessible = !hasAnimation || (respectsReducedMotion && (!autoPlaying || canBePaused))
+    const accessible =
+      !hasAnimation || (respectsReducedMotion && (!autoPlaying || canBePaused))
 
     if (hasAnimation) {
       if (!respectsReducedMotion) {
@@ -441,7 +486,7 @@ export class ColorContrastTesting {
       autoPlaying,
       canBePaused,
       accessible,
-      issues
+      issues,
     }
   }
 
@@ -450,14 +495,14 @@ export class ColorContrastTesting {
    */
   static testTargetSize(element: HTMLElement): TargetSizeResult {
     const issues: string[] = []
-    
+
     const rect = element.getBoundingClientRect()
     const width = rect.width
     const height = rect.height
     const minimumSize = 44 // WCAG AA minimum target size in CSS pixels
-    
+
     const passes = width >= minimumSize && height >= minimumSize
-    
+
     // Check spacing between targets
     const spacing = this.getTargetSpacing(element)
     const adequateSpacing = spacing >= 8 // Minimum spacing
@@ -467,7 +512,9 @@ export class ColorContrastTesting {
         issues.push(`Target width ${width.toFixed(0)}px is below 44px minimum`)
       }
       if (height < minimumSize) {
-        issues.push(`Target height ${height.toFixed(0)}px is below 44px minimum`)
+        issues.push(
+          `Target height ${height.toFixed(0)}px is below 44px minimum`
+        )
       }
     }
 
@@ -482,62 +529,96 @@ export class ColorContrastTesting {
       passes,
       spacing,
       adequateSpacing,
-      issues
+      issues,
     }
   }
 
   // Helper methods for color calculations
   private static getTextElements(container: HTMLElement): HTMLElement[] {
     const textSelectors = [
-      'p', 'span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'a', 'button', 'label', 'legend', 'caption', 'th', 'td',
-      'li', 'dt', 'dd', 'blockquote', 'figcaption',
-      '[role="button"]', '[role="link"]', '[role="tab"]'
+      'p',
+      'span',
+      'div',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'a',
+      'button',
+      'label',
+      'legend',
+      'caption',
+      'th',
+      'td',
+      'li',
+      'dt',
+      'dd',
+      'blockquote',
+      'figcaption',
+      '[role="button"]',
+      '[role="link"]',
+      '[role="tab"]',
     ].join(', ')
 
-    return Array.from(container.querySelectorAll(textSelectors))
-      .filter(el => {
+    return Array.from(container.querySelectorAll(textSelectors)).filter(
+      (el) => {
         const text = (el as HTMLElement).textContent?.trim()
         return text && text.length > 0
-      }) as HTMLElement[]
+      }
+    ) as HTMLElement[]
   }
 
   private static getInteractiveElements(container: HTMLElement): HTMLElement[] {
     const interactiveSelectors = [
-      'button', 'a[href]', 'input', 'select', 'textarea',
+      'button',
+      'a[href]',
+      'input',
+      'select',
+      'textarea',
       '[tabindex]:not([tabindex="-1"])',
-      '[role="button"]', '[role="link"]', '[role="tab"]',
-      '[role="menuitem"]', '[role="option"]'
+      '[role="button"]',
+      '[role="link"]',
+      '[role="tab"]',
+      '[role="menuitem"]',
+      '[role="option"]',
     ].join(', ')
 
-    return Array.from(container.querySelectorAll(interactiveSelectors)) as HTMLElement[]
+    return Array.from(
+      container.querySelectorAll(interactiveSelectors)
+    ) as HTMLElement[]
   }
 
-  private static getEffectiveForegroundColor(element: HTMLElement): string | null {
+  private static getEffectiveForegroundColor(
+    element: HTMLElement
+  ): string | null {
     const styles = getComputedStyle(element)
     const color = styles.color
-    
+
     if (color === 'transparent' || color === 'rgba(0, 0, 0, 0)') {
       return null
     }
-    
+
     return this.normalizeColor(color)
   }
 
-  private static getEffectiveBackgroundColor(element: HTMLElement): string | null {
+  private static getEffectiveBackgroundColor(
+    element: HTMLElement
+  ): string | null {
     let current: HTMLElement | null = element
-    
+
     while (current && current !== document.body) {
       const styles = getComputedStyle(current)
       const bgColor = styles.backgroundColor
-      
+
       if (bgColor !== 'transparent' && bgColor !== 'rgba(0, 0, 0, 0)') {
         return this.normalizeColor(bgColor)
       }
-      
+
       current = current.parentElement
     }
-    
+
     // Default to white background
     return '#ffffff'
   }
@@ -547,10 +628,10 @@ export class ColorContrastTesting {
     const div = document.createElement('div')
     div.style.color = color
     document.body.appendChild(div)
-    
+
     const computedColor = getComputedStyle(div).color
     document.body.removeChild(div)
-    
+
     // Convert to hex
     const rgbMatch = computedColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/)
     if (rgbMatch) {
@@ -559,61 +640,80 @@ export class ColorContrastTesting {
       const b = parseInt(rgbMatch[3])
       return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
     }
-    
+
     // Convert rgba to hex (ignore alpha for now)
-    const rgbaMatch = computedColor.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*[\d.]+\)/)
+    const rgbaMatch = computedColor.match(
+      /rgba\((\d+),\s*(\d+),\s*(\d+),\s*[\d.]+\)/
+    )
     if (rgbaMatch) {
       const r = parseInt(rgbaMatch[1])
       const g = parseInt(rgbaMatch[2])
       const b = parseInt(rgbaMatch[3])
       return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
     }
-    
+
     return color
   }
 
-  private static calculateContrastRatio(foreground: string, background: string): number {
+  private static calculateContrastRatio(
+    foreground: string,
+    background: string
+  ): number {
     const getLuminance = (color: string): number => {
       const rgb = this.hexToRgb(color)
       if (!rgb) return 0
-      
+
       const rsRGB = rgb.r / 255
       const gsRGB = rgb.g / 255
       const bsRGB = rgb.b / 255
 
-      const r = rsRGB <= 0.03928 ? rsRGB / 12.92 : Math.pow((rsRGB + 0.055) / 1.055, 2.4)
-      const g = gsRGB <= 0.03928 ? gsRGB / 12.92 : Math.pow((gsRGB + 0.055) / 1.055, 2.4)
-      const b = bsRGB <= 0.03928 ? bsRGB / 12.92 : Math.pow((bsRGB + 0.055) / 1.055, 2.4)
+      const r =
+        rsRGB <= 0.03928
+          ? rsRGB / 12.92
+          : Math.pow((rsRGB + 0.055) / 1.055, 2.4)
+      const g =
+        gsRGB <= 0.03928
+          ? gsRGB / 12.92
+          : Math.pow((gsRGB + 0.055) / 1.055, 2.4)
+      const b =
+        bsRGB <= 0.03928
+          ? bsRGB / 12.92
+          : Math.pow((bsRGB + 0.055) / 1.055, 2.4)
 
       return 0.2126 * r + 0.7152 * g + 0.0722 * b
     }
 
     const fgLuminance = getLuminance(foreground)
     const bgLuminance = getLuminance(background)
-    
+
     const lightest = Math.max(fgLuminance, bgLuminance)
     const darkest = Math.min(fgLuminance, bgLuminance)
-    
+
     return (lightest + 0.05) / (darkest + 0.05)
   }
 
-  private static hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  private static hexToRgb(
+    hex: string
+  ): { r: number; g: number; b: number } | null {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : null
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : null
   }
 
   private static getTextSize(element: HTMLElement): 'normal' | 'large' {
     const styles = getComputedStyle(element)
     const fontSize = parseFloat(styles.fontSize)
     const fontWeight = styles.fontWeight
-    
+
     // Large text: 18pt (24px) normal weight or 14pt (18.67px) bold weight
-    const isLarge = fontSize >= 24 || (fontSize >= 18.67 && this.isBoldWeight(fontWeight))
-    
+    const isLarge =
+      fontSize >= 24 || (fontSize >= 18.67 && this.isBoldWeight(fontWeight))
+
     return isLarge ? 'large' : 'normal'
   }
 
@@ -622,13 +722,17 @@ export class ColorContrastTesting {
     return !isNaN(numericWeight) ? numericWeight >= 700 : fontWeight === 'bold'
   }
 
-  private static getWCAGRequirement(size: 'normal' | 'large'): { aa: number; aaa: number } {
-    return size === 'large' 
-      ? { aa: 3, aaa: 4.5 }
-      : { aa: 4.5, aaa: 7 }
+  private static getWCAGRequirement(size: 'normal' | 'large'): {
+    aa: number
+    aaa: number
+  } {
+    return size === 'large' ? { aa: 3, aaa: 4.5 } : { aa: 4.5, aaa: 7 }
   }
 
-  private static determineContrastLevel(ratio: number, requirement: { aa: number; aaa: number }): 'AA' | 'AAA' | 'fail' {
+  private static determineContrastLevel(
+    ratio: number,
+    requirement: { aa: number; aaa: number }
+  ): 'AA' | 'AAA' | 'fail' {
     if (ratio >= requirement.aaa) return 'AAA'
     if (ratio >= requirement.aa) return 'AA'
     return 'fail'
@@ -642,7 +746,7 @@ export class ColorContrastTesting {
   ): string {
     const needed = requirement.aa
     const improvement = needed / ratio
-    
+
     if (improvement <= 1.2) {
       return 'Slightly adjust text or background color'
     } else if (improvement <= 2) {
@@ -655,12 +759,16 @@ export class ColorContrastTesting {
   private static getElementSelector(element: HTMLElement): string {
     const tagName = element.tagName.toLowerCase()
     const id = element.id ? `#${element.id}` : ''
-    const classes = element.className ? `.${element.className.split(' ').slice(0, 2).join('.')}` : ''
-    
+    const classes = element.className
+      ? `.${element.className.split(' ').slice(0, 2).join('.')}`
+      : ''
+
     return `${tagName}${id}${classes}`.slice(0, 100)
   }
 
-  private static extractFocusIndicatorColor(styles: CSSStyleDeclaration): string | null {
+  private static extractFocusIndicatorColor(
+    styles: CSSStyleDeclaration
+  ): string | null {
     // Extract color from outline
     if (styles.outline !== 'none') {
       const outlineColor = styles.outlineColor
@@ -689,46 +797,65 @@ export class ColorContrastTesting {
   private static detectColorOnlyInformation(element: HTMLElement): boolean {
     const className = element.className.toLowerCase()
     const style = getComputedStyle(element)
-    
+
     // Check for common color-only patterns
     const colorOnlyPatterns = [
-      'error', 'success', 'warning', 'info',
-      'red', 'green', 'yellow', 'blue',
-      'primary', 'secondary', 'danger'
+      'error',
+      'success',
+      'warning',
+      'info',
+      'red',
+      'green',
+      'yellow',
+      'blue',
+      'primary',
+      'secondary',
+      'danger',
     ]
-    
-    const hasColorOnlyClass = colorOnlyPatterns.some(pattern => className.includes(pattern))
-    
-    // Check for validation states that might use color only
-    const isFormControl = ['input', 'select', 'textarea'].includes(element.tagName.toLowerCase())
-    const hasValidationColor = isFormControl && (
-      style.borderColor.includes('red') || 
-      style.borderColor.includes('green') ||
-      style.backgroundColor.includes('red') ||
-      style.backgroundColor.includes('green')
+
+    const hasColorOnlyClass = colorOnlyPatterns.some((pattern) =>
+      className.includes(pattern)
     )
-    
+
+    // Check for validation states that might use color only
+    const isFormControl = ['input', 'select', 'textarea'].includes(
+      element.tagName.toLowerCase()
+    )
+    const hasValidationColor =
+      isFormControl &&
+      (style.borderColor.includes('red') ||
+        style.borderColor.includes('green') ||
+        style.backgroundColor.includes('red') ||
+        style.backgroundColor.includes('green'))
+
     return hasColorOnlyClass || hasValidationColor
   }
 
-  private static hasAnimation(element: HTMLElement, styles: CSSStyleDeclaration): boolean {
-    return styles.animationName !== 'none' || 
-           styles.transitionProperty !== 'none' ||
-           element.tagName.toLowerCase() === 'video' ||
-           element.tagName.toLowerCase() === 'audio'
+  private static hasAnimation(
+    element: HTMLElement,
+    styles: CSSStyleDeclaration
+  ): boolean {
+    return (
+      styles.animationName !== 'none' ||
+      styles.transitionProperty !== 'none' ||
+      element.tagName.toLowerCase() === 'video' ||
+      element.tagName.toLowerCase() === 'audio'
+    )
   }
 
   private static respectsReducedMotion(element: HTMLElement): boolean {
     // Check if CSS contains prefers-reduced-motion media query
     // This is a simplified check - in practice, you'd need to analyze CSS rules
     const stylesheets = Array.from(document.styleSheets)
-    
+
     for (const stylesheet of stylesheets) {
       try {
         const rules = Array.from(stylesheet.cssRules || [])
         for (const rule of rules) {
-          if (rule instanceof CSSMediaRule && 
-              rule.conditionText.includes('prefers-reduced-motion')) {
+          if (
+            rule instanceof CSSMediaRule &&
+            rule.conditionText.includes('prefers-reduced-motion')
+          ) {
             return true
           }
         }
@@ -737,19 +864,22 @@ export class ColorContrastTesting {
         continue
       }
     }
-    
+
     return false
   }
 
-  private static isAutoPlaying(element: HTMLElement, styles: CSSStyleDeclaration): boolean {
+  private static isAutoPlaying(
+    element: HTMLElement,
+    styles: CSSStyleDeclaration
+  ): boolean {
     if (element.tagName.toLowerCase() === 'video') {
       return (element as HTMLVideoElement).autoplay
     }
-    
+
     if (element.tagName.toLowerCase() === 'audio') {
       return (element as HTMLAudioElement).autoplay
     }
-    
+
     // Check for infinite animations
     return styles.animationIterationCount === 'infinite'
   }
@@ -758,25 +888,26 @@ export class ColorContrastTesting {
     if (['video', 'audio'].includes(element.tagName.toLowerCase())) {
       return !(element as HTMLMediaElement).hasAttribute('controls') // Simplified check
     }
-    
+
     // Check for pause/play controls or handlers
-    const hasControls = element.querySelector('[role="button"]') !== null ||
-                       element.querySelector('button') !== null ||
-                       element.hasAttribute('onclick')
-    
+    const hasControls =
+      element.querySelector('[role="button"]') !== null ||
+      element.querySelector('button') !== null ||
+      element.hasAttribute('onclick')
+
     return hasControls
   }
 
   private static getTargetSpacing(element: HTMLElement): number {
     const rect = element.getBoundingClientRect()
-    
+
     // Find nearby interactive elements
     const allInteractive = this.getInteractiveElements(document.body)
     let minDistance = Infinity
-    
+
     for (const other of allInteractive) {
       if (other === element) continue
-      
+
       const otherRect = other.getBoundingClientRect()
       const distance = Math.min(
         Math.abs(rect.right - otherRect.left),
@@ -784,22 +915,25 @@ export class ColorContrastTesting {
         Math.abs(rect.bottom - otherRect.top),
         Math.abs(otherRect.bottom - rect.top)
       )
-      
+
       minDistance = Math.min(minDistance, distance)
     }
-    
+
     return minDistance === Infinity ? 100 : minDistance // Default to large spacing if no neighbors
   }
 
   private static calculateSummary(results: ColorContrastResult[]) {
     const totalElements = results.length
-    const passing = results.filter(r => r.passes).length
+    const passing = results.filter((r) => r.passes).length
     const failing = totalElements - passing
-    const aaCompliant = results.filter(r => r.level === 'AA' || r.level === 'AAA').length
-    const aaaCompliant = results.filter(r => r.level === 'AAA').length
-    const averageRatio = results.length > 0 
-      ? results.reduce((sum, r) => sum + r.ratio, 0) / results.length 
-      : 0
+    const aaCompliant = results.filter(
+      (r) => r.level === 'AA' || r.level === 'AAA'
+    ).length
+    const aaaCompliant = results.filter((r) => r.level === 'AAA').length
+    const averageRatio =
+      results.length > 0
+        ? results.reduce((sum, r) => sum + r.ratio, 0) / results.length
+        : 0
 
     return {
       totalElements,
@@ -807,7 +941,7 @@ export class ColorContrastTesting {
       failing,
       aaCompliant,
       aaaCompliant,
-      averageRatio
+      averageRatio,
     }
   }
 
@@ -819,20 +953,27 @@ export class ColorContrastTesting {
 
     // Color contrast score (50% weight)
     if (contrastResults.length > 0) {
-      const contrastScore = (contrastResults.filter(r => r.passes).length / contrastResults.length) * 100
+      const contrastScore =
+        (contrastResults.filter((r) => r.passes).length /
+          contrastResults.length) *
+        100
       score = score * 0.5 + contrastScore * 0.5
     }
 
     // Visual accessibility score (50% weight)
     if (visualResults.length > 0) {
-      const visualScore = visualResults.reduce((sum, r) => sum + r.score, 0) / visualResults.length
+      const visualScore =
+        visualResults.reduce((sum, r) => sum + r.score, 0) /
+        visualResults.length
       score = score * 0.5 + visualScore * 0.5
     }
 
     return Math.round(score)
   }
 
-  private static calculateElementScore(tests: VisualAccessibilityResult['tests']): number {
+  private static calculateElementScore(
+    tests: VisualAccessibilityResult['tests']
+  ): number {
     let score = 100
 
     // Color contrast (30%)
@@ -859,35 +1000,51 @@ export class ColorContrastTesting {
     visualResults: VisualAccessibilityResult[]
   ): string[] {
     const recommendations: string[] = []
-    
+
     // Color contrast recommendations
-    const failingContrast = contrastResults.filter(r => !r.passes)
+    const failingContrast = contrastResults.filter((r) => !r.passes)
     if (failingContrast.length > 0) {
-      recommendations.push(`Fix color contrast for ${failingContrast.length} text elements`)
+      recommendations.push(
+        `Fix color contrast for ${failingContrast.length} text elements`
+      )
     }
 
     // Focus indicator recommendations
-    const missingFocus = visualResults.filter(r => !r.tests.focusIndicator.hasIndicator)
+    const missingFocus = visualResults.filter(
+      (r) => !r.tests.focusIndicator.hasIndicator
+    )
     if (missingFocus.length > 0) {
-      recommendations.push(`Add visible focus indicators to ${missingFocus.length} interactive elements`)
+      recommendations.push(
+        `Add visible focus indicators to ${missingFocus.length} interactive elements`
+      )
     }
 
     // Color-only recommendations
-    const colorOnlyIssues = visualResults.filter(r => !r.tests.colorOnly.accessible)
+    const colorOnlyIssues = visualResults.filter(
+      (r) => !r.tests.colorOnly.accessible
+    )
     if (colorOnlyIssues.length > 0) {
-      recommendations.push(`Provide non-color indicators for ${colorOnlyIssues.length} elements using color alone`)
+      recommendations.push(
+        `Provide non-color indicators for ${colorOnlyIssues.length} elements using color alone`
+      )
     }
 
     // Motion safety recommendations
-    const motionIssues = visualResults.filter(r => !r.tests.motionSafety.accessible)
+    const motionIssues = visualResults.filter(
+      (r) => !r.tests.motionSafety.accessible
+    )
     if (motionIssues.length > 0) {
-      recommendations.push(`Implement reduced motion support for ${motionIssues.length} animated elements`)
+      recommendations.push(
+        `Implement reduced motion support for ${motionIssues.length} animated elements`
+      )
     }
 
     // Target size recommendations
-    const sizeIssues = visualResults.filter(r => !r.tests.targetSize.passes)
+    const sizeIssues = visualResults.filter((r) => !r.tests.targetSize.passes)
     if (sizeIssues.length > 0) {
-      recommendations.push(`Increase target size for ${sizeIssues.length} interactive elements to minimum 44x44px`)
+      recommendations.push(
+        `Increase target size for ${sizeIssues.length} interactive elements to minimum 44x44px`
+      )
     }
 
     return recommendations.slice(0, 10) // Limit to top 10

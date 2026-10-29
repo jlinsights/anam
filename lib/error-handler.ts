@@ -29,13 +29,18 @@ interface ErrorResponse {
  * Sanitizes error messages for production
  * Removes stack traces and sensitive information
  */
-function sanitizeError(error: any): { message: string; type: ErrorType; details?: any } {
+function sanitizeError(error: any): {
+  message: string
+  type: ErrorType
+  details?: any
+} {
   // Handle Zod validation errors
   if (error instanceof ZodError) {
     return {
       message: 'Invalid input data provided',
       type: ErrorType.VALIDATION,
-      details: process.env.NODE_ENV === 'development' ? error.errors : undefined,
+      details:
+        process.env.NODE_ENV === 'development' ? error.errors : undefined,
     }
   }
 
@@ -69,7 +74,10 @@ function sanitizeError(error: any): { message: string; type: ErrorType; details?
   }
 
   // Database errors
-  if (error.code?.startsWith('P') || error.name === 'PrismaClientKnownRequestError') {
+  if (
+    error.code?.startsWith('P') ||
+    error.name === 'PrismaClientKnownRequestError'
+  ) {
     return {
       message: 'Database operation failed',
       type: ErrorType.DATABASE,
@@ -78,16 +86,20 @@ function sanitizeError(error: any): { message: string; type: ErrorType; details?
 
   // Generic error handling
   const isProduction = process.env.NODE_ENV === 'production'
-  
+
   return {
-    message: isProduction ? 'Internal server error' : (error.message || 'Unknown error'),
+    message: isProduction
+      ? 'Internal server error'
+      : error.message || 'Unknown error',
     type: ErrorType.INTERNAL,
-    details: isProduction ? undefined : {
-      name: error.name,
-      message: error.message,
-      // Never include stack traces in production
-      stack: undefined,
-    },
+    details: isProduction
+      ? undefined
+      : {
+          name: error.name,
+          message: error.message,
+          // Never include stack traces in production
+          stack: undefined,
+        },
   }
 }
 
@@ -100,7 +112,7 @@ export function createErrorResponse(
   customMessage?: string
 ): NextResponse {
   const sanitized = sanitizeError(error)
-  
+
   const response: ErrorResponse = {
     success: false,
     message: customMessage || sanitized.message,
@@ -140,7 +152,9 @@ export function handleValidationError(error: ZodError): NextResponse {
 /**
  * Handles authentication errors
  */
-export function handleAuthError(message: string = 'Authentication required'): NextResponse {
+export function handleAuthError(
+  message: string = 'Authentication required'
+): NextResponse {
   return NextResponse.json(
     {
       success: false,
@@ -155,7 +169,9 @@ export function handleAuthError(message: string = 'Authentication required'): Ne
 /**
  * Handles not found errors
  */
-export function handleNotFoundError(resource: string = 'Resource'): NextResponse {
+export function handleNotFoundError(
+  resource: string = 'Resource'
+): NextResponse {
   return NextResponse.json(
     {
       success: false,
@@ -175,7 +191,7 @@ export function handleExternalServiceError(
   fallbackData?: any
 ): NextResponse {
   const isProduction = process.env.NODE_ENV === 'production'
-  
+
   if (fallbackData) {
     // Return fallback data with warning
     return NextResponse.json({
@@ -187,7 +203,11 @@ export function handleExternalServiceError(
     })
   }
 
-  return createErrorResponse(error, 503, 'External service temporarily unavailable')
+  return createErrorResponse(
+    error,
+    503,
+    'External service temporarily unavailable'
+  )
 }
 
 /**
@@ -198,10 +218,13 @@ export function createSuccessResponse(
   message: string = 'Success',
   status: number = 200
 ): NextResponse {
-  return NextResponse.json({
-    success: true,
-    message,
-    data,
-    timestamp: new Date().toISOString(),
-  }, { status })
+  return NextResponse.json(
+    {
+      success: true,
+      message,
+      data,
+      timestamp: new Date().toISOString(),
+    },
+    { status }
+  )
 }

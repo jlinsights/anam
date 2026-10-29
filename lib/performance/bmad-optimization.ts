@@ -5,19 +5,19 @@ import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals'
 
 export interface PerformanceMetrics {
   // Core Web Vitals
-  LCP: number | null  // Largest Contentful Paint
-  FID: number | null  // First Input Delay
-  CLS: number | null  // Cumulative Layout Shift
-  FCP: number | null  // First Contentful Paint
+  LCP: number | null // Largest Contentful Paint
+  FID: number | null // First Input Delay
+  CLS: number | null // Cumulative Layout Shift
+  FCP: number | null // First Contentful Paint
   TTFB: number | null // Time to First Byte
-  
+
   // Custom BMAD Metrics
   galleryLoadTime: number
   interactionLatency: number
   culturalEngagement: number
   zenBrutalistScore: number
   benchmarkCompliance: number
-  
+
   // Performance Budget Adherence
   budgetCompliance: {
     totalBundleSize: boolean
@@ -45,7 +45,7 @@ class BMADPerformanceMonitor {
     this.config = config
     this.startTime = performance.now()
     this.observers = new Map()
-    
+
     this.metrics = {
       LCP: null,
       FID: null,
@@ -61,8 +61,8 @@ class BMADPerformanceMonitor {
         totalBundleSize: false,
         imageOptimization: false,
         runtimePerformance: false,
-        accessibility: false
-      }
+        accessibility: false,
+      },
     }
 
     this.initializeMonitoring()
@@ -71,12 +71,12 @@ class BMADPerformanceMonitor {
   private initializeMonitoring() {
     // 🎯 Core Web Vitals Monitoring
     this.monitorCoreWebVitals()
-    
+
     // 🎨 BMAD-specific Performance Monitoring
     this.monitorGalleryPerformance()
     this.monitorCulturalEngagement()
     this.monitorZenBrutalistExperience()
-    
+
     // 🎯 Benchmark Compliance Monitoring
     if (this.config.enableBenchmarkMode) {
       this.monitorBenchmarkCompliance()
@@ -119,11 +119,15 @@ class BMADPerformanceMonitor {
     // Gallery-specific performance monitoring
     const observer = new PerformanceObserver((list) => {
       const entries = list.getEntries()
-      
+
       entries.forEach((entry) => {
         if (entry.name.includes('gallery') || entry.name.includes('artwork')) {
-          const loadTime = entry.duration || (entry.responseEnd - entry.requestStart)
-          this.metrics.galleryLoadTime = Math.max(this.metrics.galleryLoadTime, loadTime)
+          const loadTime =
+            entry.duration || entry.responseEnd - entry.requestStart
+          this.metrics.galleryLoadTime = Math.max(
+            this.metrics.galleryLoadTime,
+            loadTime
+          )
         }
       })
     })
@@ -139,43 +143,50 @@ class BMADPerformanceMonitor {
 
     const trackInteraction = (event: Event) => {
       const target = event.target as HTMLElement
-      const isCultural = target.closest('[data-cultural]') || 
-                        target.closest('.cultural-composition') ||
-                        target.closest('.zen-brutalist-artwork-card')
+      const isCultural =
+        target.closest('[data-cultural]') ||
+        target.closest('.cultural-composition') ||
+        target.closest('.zen-brutalist-artwork-card')
 
       if (isCultural) {
         engagementScore += this.calculateEngagementValue(event.type, target)
         interactionCount++
-        
-        this.metrics.culturalEngagement = engagementScore / Math.max(interactionCount, 1)
+
+        this.metrics.culturalEngagement =
+          engagementScore / Math.max(interactionCount, 1)
       }
 
       // Track interaction latency
       const interactionStart = performance.now()
       requestAnimationFrame(() => {
         const latency = performance.now() - interactionStart
-        this.metrics.interactionLatency = (this.metrics.interactionLatency + latency) / 2
+        this.metrics.interactionLatency =
+          (this.metrics.interactionLatency + latency) / 2
       })
     }
 
     // Monitor various interaction types
-    ['click', 'mouseover', 'scroll', 'touchstart'].forEach(eventType => {
+    ;['click', 'mouseover', 'scroll', 'touchstart'].forEach((eventType) => {
       document.addEventListener(eventType, trackInteraction, { passive: true })
     })
   }
 
-  private calculateEngagementValue(eventType: string, target: HTMLElement): number {
+  private calculateEngagementValue(
+    eventType: string,
+    target: HTMLElement
+  ): number {
     const baseValues = {
       click: 10,
       mouseover: 2,
       scroll: 1,
-      touchstart: 8
+      touchstart: 8,
     }
 
     let multiplier = 1
 
     // Cultural context multipliers
-    if (target.classList.contains('zen-brutalist-artwork-card')) multiplier *= 1.5
+    if (target.classList.contains('zen-brutalist-artwork-card'))
+      multiplier *= 1.5
     if (target.closest('.cultural-composition')) multiplier *= 1.3
     if (target.closest('[data-cultural-season]')) multiplier *= 1.2
 
@@ -197,7 +208,8 @@ class BMADPerformanceMonitor {
         }
       })
 
-      this.metrics.zenBrutalistScore = measurements > 0 ? zenScore / measurements : 0
+      this.metrics.zenBrutalistScore =
+        measurements > 0 ? zenScore / measurements : 0
     })
 
     animationObserver.observe({ entryTypes: ['measure'] })
@@ -205,15 +217,23 @@ class BMADPerformanceMonitor {
 
     // Monitor glass morphism and ink effects performance
     const checkRenderingPerformance = () => {
-      const glassElements = document.querySelectorAll('.glass-layer-1, .glass-layer-2, .glass-layer-3')
-      const inkElements = document.querySelectorAll('.ink-flow-ambient, .fluid-ink-transition')
-      
+      const glassElements = document.querySelectorAll(
+        '.glass-layer-1, .glass-layer-2, .glass-layer-3'
+      )
+      const inkElements = document.querySelectorAll(
+        '.ink-flow-ambient, .fluid-ink-transition'
+      )
+
       if (glassElements.length > 0 || inkElements.length > 0) {
         performance.mark('zen-rendering-start')
-        
+
         requestAnimationFrame(() => {
           performance.mark('zen-rendering-end')
-          performance.measure('zen-rendering', 'zen-rendering-start', 'zen-rendering-end')
+          performance.measure(
+            'zen-rendering',
+            'zen-rendering-start',
+            'zen-rendering-end'
+          )
         })
       }
     }
@@ -227,8 +247,11 @@ class BMADPerformanceMonitor {
     const benchmarkChecks = {
       // Load time compliance (권소영 기준: 3초 이내)
       loadTime: () => {
-        const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
-        const loadTime = navigationEntry.loadEventEnd - navigationEntry.fetchStart
+        const navigationEntry = performance.getEntriesByType(
+          'navigation'
+        )[0] as PerformanceNavigationTiming
+        const loadTime =
+          navigationEntry.loadEventEnd - navigationEntry.fetchStart
         return loadTime < 3000
       },
 
@@ -236,43 +259,56 @@ class BMADPerformanceMonitor {
       imageOptimization: () => {
         const images = document.querySelectorAll('img')
         let optimizedCount = 0
-        
-        images.forEach(img => {
-          if (img.src.includes('.webp') || img.src.includes('.avif') || img.loading === 'lazy') {
+
+        images.forEach((img) => {
+          if (
+            img.src.includes('.webp') ||
+            img.src.includes('.avif') ||
+            img.loading === 'lazy'
+          ) {
             optimizedCount++
           }
         })
-        
-        return images.length > 0 ? (optimizedCount / images.length) > 0.8 : true
+
+        return images.length > 0 ? optimizedCount / images.length > 0.8 : true
       },
 
       // International accessibility (bilingual support)
       accessibility: () => {
-        const bilingualElements = document.querySelectorAll('[data-lang], [lang]')
+        const bilingualElements = document.querySelectorAll(
+          '[data-lang], [lang]'
+        )
         const altTexts = document.querySelectorAll('img[alt]')
         const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6')
-        
-        return bilingualElements.length > 0 && 
-               altTexts.length === document.querySelectorAll('img').length &&
-               headings.length > 0
+
+        return (
+          bilingualElements.length > 0 &&
+          altTexts.length === document.querySelectorAll('img').length &&
+          headings.length > 0
+        )
       },
 
       // Mobile responsiveness
       responsiveness: () => {
         const viewport = document.querySelector('meta[name="viewport"]')
         const responsiveImages = document.querySelectorAll('img[sizes]')
-        
+
         return viewport !== null && responsiveImages.length > 0
-      }
+      },
     }
 
     // Run benchmark checks
-    const compliance = Object.entries(benchmarkChecks).reduce((acc, [key, check]) => {
-      acc[key as keyof typeof benchmarkChecks] = check()
-      return acc
-    }, {} as Record<string, boolean>)
+    const compliance = Object.entries(benchmarkChecks).reduce(
+      (acc, [key, check]) => {
+        acc[key as keyof typeof benchmarkChecks] = check()
+        return acc
+      },
+      {} as Record<string, boolean>
+    )
 
-    const complianceScore = Object.values(compliance).filter(Boolean).length / Object.keys(compliance).length
+    const complianceScore =
+      Object.values(compliance).filter(Boolean).length /
+      Object.keys(compliance).length
     this.metrics.benchmarkCompliance = complianceScore
   }
 
@@ -283,25 +319,35 @@ class BMADPerformanceMonitor {
       FID: { good: 100, poor: 300 },
       CLS: { good: 0.1, poor: 0.25 },
       FCP: { good: 1800, poor: 3000 },
-      TTFB: { good: 800, poor: 1800 }
+      TTFB: { good: 800, poor: 1800 },
     }
 
     const threshold = thresholds[metric as keyof typeof thresholds]
     if (!threshold) return
 
-    const status = value <= threshold.good ? 'good' : value <= threshold.poor ? 'needs-improvement' : 'poor'
-    
+    const status =
+      value <= threshold.good
+        ? 'good'
+        : value <= threshold.poor
+          ? 'needs-improvement'
+          : 'poor'
+
     // Auto-optimization triggers
     if (status === 'poor' && this.config.optimizationLevel === 'aggressive') {
       this.triggerOptimization(metric, value)
     }
 
     // Real-time reporting
-    if (this.config.enableRealTimeMonitoring && process.env.NODE_ENV === 'development') {
+    if (
+      this.config.enableRealTimeMonitoring &&
+      process.env.NODE_ENV === 'development'
+    ) {
       console.group(`🎯 BMAD Performance: ${metric}`)
       console.log(`Value: ${value}`)
       console.log(`Status: ${status}`)
-      console.log(`Threshold: Good < ${threshold.good}, Poor > ${threshold.poor}`)
+      console.log(
+        `Threshold: Good < ${threshold.good}, Poor > ${threshold.poor}`
+      )
       console.groupEnd()
     }
   }
@@ -312,7 +358,7 @@ class BMADPerformanceMonitor {
       LCP: () => {
         // Preload critical resources
         const criticalImages = document.querySelectorAll('img[data-critical]')
-        criticalImages.forEach(img => {
+        criticalImages.forEach((img) => {
           const link = document.createElement('link')
           link.rel = 'preload'
           link.as = 'image'
@@ -323,8 +369,10 @@ class BMADPerformanceMonitor {
 
       FID: () => {
         // Reduce main thread blocking
-        const scripts = document.querySelectorAll('script:not([async]):not([defer])')
-        scripts.forEach(script => {
+        const scripts = document.querySelectorAll(
+          'script:not([async]):not([defer])'
+        )
+        scripts.forEach((script) => {
           if (script.src && !script.src.includes('critical')) {
             script.setAttribute('defer', 'true')
           }
@@ -334,12 +382,12 @@ class BMADPerformanceMonitor {
       CLS: () => {
         // Add skeleton loaders for dynamic content
         const dynamicContainers = document.querySelectorAll('[data-dynamic]')
-        dynamicContainers.forEach(container => {
+        dynamicContainers.forEach((container) => {
           if (!container.querySelector('.skeleton')) {
             container.classList.add('skeleton')
           }
         })
-      }
+      },
     }
 
     const optimization = optimizations[metric as keyof typeof optimizations]
@@ -360,7 +408,7 @@ class BMADPerformanceMonitor {
       FID: 0.25,
       CLS: 0.25,
       culturalEngagement: 0.15,
-      benchmarkCompliance: 0.1
+      benchmarkCompliance: 0.1,
     }
 
     let score = 0
@@ -384,7 +432,7 @@ class BMADPerformanceMonitor {
       FID: (v: number) => Math.max(0, Math.min(1, (300 - v) / 300)),
       CLS: (v: number) => Math.max(0, Math.min(1, (0.25 - v) / 0.25)),
       culturalEngagement: (v: number) => Math.min(1, v / 10),
-      benchmarkCompliance: (v: number) => v
+      benchmarkCompliance: (v: number) => v,
     }
 
     const normalizer = normalizers[metric as keyof typeof normalizers]
@@ -398,17 +446,21 @@ class BMADPerformanceMonitor {
 
   public endBenchmark(): BMADPerformanceReport {
     performance.mark('bmad-benchmark-end')
-    performance.measure('bmad-total-time', 'bmad-benchmark-start', 'bmad-benchmark-end')
-    
+    performance.measure(
+      'bmad-total-time',
+      'bmad-benchmark-start',
+      'bmad-benchmark-end'
+    )
+
     const totalTime = performance.now() - this.startTime
     const score = this.getBenchmarkScore()
-    
+
     return {
       totalTime,
       score,
       metrics: this.getMetrics(),
       recommendations: this.generateRecommendations(),
-      complianceLevel: this.getComplianceLevel(score)
+      complianceLevel: this.getComplianceLevel(score),
     }
   }
 
@@ -429,11 +481,15 @@ class BMADPerformanceMonitor {
     }
 
     if (metrics.culturalEngagement < 5) {
-      recommendations.push('문화적 상호작용 요소 강화 및 Zen Brutalism 효과 개선')
+      recommendations.push(
+        '문화적 상호작용 요소 강화 및 Zen Brutalism 효과 개선'
+      )
     }
 
     if (metrics.benchmarkCompliance < 0.8) {
-      recommendations.push('권소영 벤치마크 기준에 맞는 이중언어 지원 및 접근성 개선')
+      recommendations.push(
+        '권소영 벤치마크 기준에 맞는 이중언어 지원 및 접근성 개선'
+      )
     }
 
     return recommendations
@@ -447,7 +503,7 @@ class BMADPerformanceMonitor {
   }
 
   public destroy(): void {
-    this.observers.forEach(observer => observer.disconnect())
+    this.observers.forEach((observer) => observer.disconnect())
     this.observers.clear()
   }
 }
@@ -461,13 +517,15 @@ export interface BMADPerformanceReport {
 }
 
 // 🎯 Factory function for easy integration
-export function createBMADMonitor(config: Partial<BMADPerformanceConfig> = {}): BMADPerformanceMonitor {
+export function createBMADMonitor(
+  config: Partial<BMADPerformanceConfig> = {}
+): BMADPerformanceMonitor {
   const defaultConfig: BMADPerformanceConfig = {
     enableRealTimeMonitoring: process.env.NODE_ENV === 'development',
     enableBenchmarkMode: true,
     culturalContext: 'eternal',
     performanceTarget: 'adaptive',
-    optimizationLevel: 'aggressive'
+    optimizationLevel: 'aggressive',
   }
 
   return new BMADPerformanceMonitor({ ...defaultConfig, ...config })

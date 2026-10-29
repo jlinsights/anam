@@ -13,8 +13,8 @@
 */
 
 // Automation 입력 변수 (Settings > Variables)
-const webhookUrl = WEBHOOK_URL // eslint-disable-line no-undef
-const secret = WEBHOOK_SECRET // eslint-disable-line no-undef
+const webhookUrl = WEBHOOK_URL
+const secret = WEBHOOK_SECRET
 const tag = 'artworks'
 
 async function revalidate() {

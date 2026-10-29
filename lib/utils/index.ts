@@ -14,11 +14,13 @@ export type DeepPartial<T> = {
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>
 
-export type RequireAtLeastOne<T, Keys extends keyof T = keyof T> =
-  Pick<T, Exclude<keyof T, Keys>> 
-  & {
-      [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>
-    }[Keys]
+export type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<
+  T,
+  Exclude<keyof T, Keys>
+> &
+  {
+    [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>
+  }[Keys]
 
 // Performance utilities
 export const performance60fps = {
@@ -30,7 +32,7 @@ export const performance60fps = {
       const status = duration <= 16.67 ? '✅' : '⚠️'
       console.log(`${status} [Performance] ${name}: ${duration.toFixed(2)}ms`)
     }
-  }
+  },
 }
 
 // Debounce utility for non-throttled scenarios
@@ -39,7 +41,7 @@ export function debounce<T extends (...args: any[]) => any>(
   delay: number
 ): (...args: Parameters<T>) => void {
   let timeoutId: NodeJS.Timeout
-  
+
   return (...args: Parameters<T>) => {
     clearTimeout(timeoutId)
     timeoutId = setTimeout(() => func(...args), delay)
@@ -58,7 +60,7 @@ export const animationFrame = {
     if (typeof window !== 'undefined') {
       cancelAnimationFrame(id)
     }
-  }
+  },
 }
 
 // Intersection observer utilities
@@ -69,10 +71,10 @@ export function createIntersectionObserver(
   if (typeof window === 'undefined' || !window.IntersectionObserver) {
     return null
   }
-  
+
   return new IntersectionObserver(callback, {
     rootMargin: '0px',
     threshold: 0.1,
-    ...options
+    ...options,
   })
 }

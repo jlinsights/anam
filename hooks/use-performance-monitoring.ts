@@ -8,7 +8,7 @@ import {
   advancedPerformanceMonitor,
   galleryPerformanceTracker,
   bundlePerformanceAnalyzer,
-  errorCorrelationAnalyzer
+  errorCorrelationAnalyzer,
 } from '@/lib/performance-monitor'
 
 interface UsePerformanceMonitoringOptions {
@@ -29,14 +29,16 @@ interface PerformanceState {
   error: Error | null
 }
 
-export function usePerformanceMonitoring(options: UsePerformanceMonitoringOptions = {}) {
+export function usePerformanceMonitoring(
+  options: UsePerformanceMonitoringOptions = {}
+) {
   const {
     autoStart = true,
     realTimeUpdates = true,
     updateInterval = 30000, // 30 seconds
     enableGalleryTracking = true,
     enableBundleAnalysis = true,
-    enableErrorCorrelation = true
+    enableErrorCorrelation = true,
   } = options
 
   const [state, setState] = useState<PerformanceState>({
@@ -45,7 +47,7 @@ export function usePerformanceMonitoring(options: UsePerformanceMonitoringOption
     alerts: [],
     isMonitoring: false,
     lastUpdated: null,
-    error: null
+    error: null,
   })
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -53,40 +55,48 @@ export function usePerformanceMonitoring(options: UsePerformanceMonitoringOption
 
   // Handle performance metrics updates
   const handleMetricsUpdate = useCallback((metrics: PerformanceMetrics) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       metrics,
       score: advancedPerformanceMonitor.getPerformanceScore(),
       lastUpdated: new Date(),
-      error: null
+      error: null,
     }))
   }, [])
 
   // Handle performance alerts
   const handlePerformanceAlert = useCallback((alert: PerformanceAlert) => {
     alertsRef.current = [alert, ...alertsRef.current.slice(0, 49)] // Keep last 50 alerts
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
-      alerts: [...alertsRef.current]
+      alerts: [...alertsRef.current],
     }))
   }, [])
 
   // Handle budget exceeded events
-  const handleBudgetExceeded = useCallback((event: BudgetExceededEvent) => {
-    const alert: PerformanceAlert = {
-      id: `budget-${Date.now()}`,
-      type: 'budget_exceeded',
-      severity: event.percentage > 150 ? 'critical' : event.percentage > 120 ? 'high' : 'medium',
-      metric: event.budget,
-      value: event.actual,
-      threshold: event.allocated,
-      timestamp: Date.now(),
-      message: `Budget exceeded for ${event.budget}: ${event.percentage.toFixed(1)}%`,
-      actionRequired: event.recommendations
-    }
-    
-    handlePerformanceAlert(alert)
-  }, [handlePerformanceAlert])
+  const handleBudgetExceeded = useCallback(
+    (event: BudgetExceededEvent) => {
+      const alert: PerformanceAlert = {
+        id: `budget-${Date.now()}`,
+        type: 'budget_exceeded',
+        severity:
+          event.percentage > 150
+            ? 'critical'
+            : event.percentage > 120
+              ? 'high'
+              : 'medium',
+        metric: event.budget,
+        value: event.actual,
+        threshold: event.allocated,
+        timestamp: Date.now(),
+        message: `Budget exceeded for ${event.budget}: ${event.percentage.toFixed(1)}%`,
+        actionRequired: event.recommendations,
+      }
+
+      handlePerformanceAlert(alert)
+    },
+    [handlePerformanceAlert]
+  )
 
   // Start monitoring
   const startMonitoring = useCallback(async () => {
@@ -94,13 +104,13 @@ export function usePerformanceMonitoring(options: UsePerformanceMonitoringOption
       await advancedPerformanceMonitor.startMonitoring({
         onMetricsUpdate: handleMetricsUpdate,
         onPerformanceAlert: handlePerformanceAlert,
-        onBudgetExceeded: handleBudgetExceeded
+        onBudgetExceeded: handleBudgetExceeded,
       })
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         isMonitoring: true,
-        error: null
+        error: null,
       }))
 
       // Start real-time updates
@@ -108,12 +118,12 @@ export function usePerformanceMonitoring(options: UsePerformanceMonitoringOption
         intervalRef.current = setInterval(async () => {
           try {
             const report = await advancedPerformanceMonitor.getAdvancedReport()
-            setState(prev => ({
+            setState((prev) => ({
               ...prev,
               metrics: report.metrics,
               score: report.score,
               alerts: report.alerts,
-              lastUpdated: new Date()
+              lastUpdated: new Date(),
             }))
           } catch (error) {
             console.warn('Failed to update performance metrics:', error)
@@ -121,10 +131,10 @@ export function usePerformanceMonitoring(options: UsePerformanceMonitoringOption
         }, updateInterval)
       }
     } catch (error) {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         error: error as Error,
-        isMonitoring: false
+        isMonitoring: false,
       }))
     }
   }, [
@@ -132,21 +142,21 @@ export function usePerformanceMonitoring(options: UsePerformanceMonitoringOption
     handlePerformanceAlert,
     handleBudgetExceeded,
     realTimeUpdates,
-    updateInterval
+    updateInterval,
   ])
 
   // Stop monitoring
   const stopMonitoring = useCallback(() => {
     advancedPerformanceMonitor.stopMonitoring()
-    
+
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
       intervalRef.current = null
     }
 
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
-      isMonitoring: false
+      isMonitoring: false,
     }))
   }, [])
 
@@ -156,9 +166,9 @@ export function usePerformanceMonitoring(options: UsePerformanceMonitoringOption
       const report = await advancedPerformanceMonitor.getAdvancedReport()
       return report
     } catch (error) {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
-        error: error as Error
+        error: error as Error,
       }))
       throw error
     }
@@ -167,56 +177,85 @@ export function usePerformanceMonitoring(options: UsePerformanceMonitoringOption
   // Clear alerts
   const clearAlerts = useCallback(() => {
     alertsRef.current = []
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
-      alerts: []
+      alerts: [],
     }))
   }, [])
 
   // Track gallery performance
-  const trackGalleryLoad = useCallback((startTime: number, endTime: number, artworkCount: number) => {
-    if (enableGalleryTracking) {
-      galleryPerformanceTracker.trackGalleryLoad(startTime, endTime, artworkCount)
-    }
-  }, [enableGalleryTracking])
+  const trackGalleryLoad = useCallback(
+    (startTime: number, endTime: number, artworkCount: number) => {
+      if (enableGalleryTracking) {
+        galleryPerformanceTracker.trackGalleryLoad(
+          startTime,
+          endTime,
+          artworkCount
+        )
+      }
+    },
+    [enableGalleryTracking]
+  )
 
-  const trackArtworkDetail = useCallback((artworkId: string, loadTime: number) => {
-    if (enableGalleryTracking) {
-      galleryPerformanceTracker.trackArtworkDetail(artworkId, loadTime)
-    }
-  }, [enableGalleryTracking])
+  const trackArtworkDetail = useCallback(
+    (artworkId: string, loadTime: number) => {
+      if (enableGalleryTracking) {
+        galleryPerformanceTracker.trackArtworkDetail(artworkId, loadTime)
+      }
+    },
+    [enableGalleryTracking]
+  )
 
-  const trackSearchPerformance = useCallback((query: string, responseTime: number, resultCount: number) => {
-    if (enableGalleryTracking) {
-      galleryPerformanceTracker.trackSearchPerformance(query, responseTime, resultCount)
-    }
-  }, [enableGalleryTracking])
+  const trackSearchPerformance = useCallback(
+    (query: string, responseTime: number, resultCount: number) => {
+      if (enableGalleryTracking) {
+        galleryPerformanceTracker.trackSearchPerformance(
+          query,
+          responseTime,
+          resultCount
+        )
+      }
+    },
+    [enableGalleryTracking]
+  )
 
-  const trackFilterPerformance = useCallback((filters: Record<string, any>, responseTime: number) => {
-    if (enableGalleryTracking) {
-      galleryPerformanceTracker.trackFilterPerformance(filters, responseTime)
-    }
-  }, [enableGalleryTracking])
+  const trackFilterPerformance = useCallback(
+    (filters: Record<string, any>, responseTime: number) => {
+      if (enableGalleryTracking) {
+        galleryPerformanceTracker.trackFilterPerformance(filters, responseTime)
+      }
+    },
+    [enableGalleryTracking]
+  )
 
-  const trackImageLoading = useCallback((imageUrl: string, loadTime: number, size: number) => {
-    if (enableGalleryTracking) {
-      galleryPerformanceTracker.trackImageLoading(imageUrl, loadTime, size)
-    }
-  }, [enableGalleryTracking])
+  const trackImageLoading = useCallback(
+    (imageUrl: string, loadTime: number, size: number) => {
+      if (enableGalleryTracking) {
+        galleryPerformanceTracker.trackImageLoading(imageUrl, loadTime, size)
+      }
+    },
+    [enableGalleryTracking]
+  )
 
-  const trackScrollPerformance = useCallback((frameDuration: number) => {
-    if (enableGalleryTracking) {
-      galleryPerformanceTracker.trackScrollPerformance(frameDuration)
-    }
-  }, [enableGalleryTracking])
+  const trackScrollPerformance = useCallback(
+    (frameDuration: number) => {
+      if (enableGalleryTracking) {
+        galleryPerformanceTracker.trackScrollPerformance(frameDuration)
+      }
+    },
+    [enableGalleryTracking]
+  )
 
   // Track errors with performance correlation
-  const trackError = useCallback((error: Error) => {
-    if (enableErrorCorrelation) {
-      const metrics = advancedPerformanceMonitor.getMetrics()
-      errorCorrelationAnalyzer.analyzeErrorCorrelation(error, metrics)
-    }
-  }, [enableErrorCorrelation])
+  const trackError = useCallback(
+    (error: Error) => {
+      if (enableErrorCorrelation) {
+        const metrics = advancedPerformanceMonitor.getMetrics()
+        errorCorrelationAnalyzer.analyzeErrorCorrelation(error, metrics)
+      }
+    },
+    [enableErrorCorrelation]
+  )
 
   // Auto-start monitoring
   useEffect(() => {
@@ -253,7 +292,7 @@ export function usePerformanceMonitoring(options: UsePerformanceMonitoringOption
     trackScrollPerformance,
 
     // Error tracking
-    trackError
+    trackError,
   }
 }
 
@@ -276,12 +315,12 @@ export function useWebVitals() {
         inp: metrics.inp,
         cls: metrics.cls,
         fcp: metrics.fcp,
-        ttfb: metrics.ttfb
+        ttfb: metrics.ttfb,
       })
     }
 
     advancedPerformanceMonitor.startMonitoring({
-      onMetricsUpdate: handleMetricsUpdate
+      onMetricsUpdate: handleMetricsUpdate,
     })
 
     return () => {
@@ -305,12 +344,12 @@ export function useBundleAnalysis() {
     chunkSizes: {},
     compressionRatio: 1,
     loading: false,
-    error: null
+    error: null,
   })
 
   const analyzeBundles = useCallback(async () => {
-    setBundleData(prev => ({ ...prev, loading: true, error: null }))
-    
+    setBundleData((prev) => ({ ...prev, loading: true, error: null }))
+
     try {
       const analytics = await bundlePerformanceAnalyzer.analyzeBundles()
       setBundleData({
@@ -318,13 +357,13 @@ export function useBundleAnalysis() {
         chunkSizes: analytics.chunkSizes,
         compressionRatio: analytics.compressionRatio,
         loading: false,
-        error: null
+        error: null,
       })
     } catch (error) {
-      setBundleData(prev => ({
+      setBundleData((prev) => ({
         ...prev,
         loading: false,
-        error: error as Error
+        error: error as Error,
       }))
     }
   }, [])
@@ -337,7 +376,7 @@ export function useBundleAnalysis() {
 
   return {
     ...bundleData,
-    analyzeBundles
+    analyzeBundles,
   }
 }
 
@@ -361,23 +400,29 @@ export function usePerformanceMeasurement() {
     return duration
   }, [])
 
-  const measure = useCallback(<T>(name: string, fn: () => T | Promise<T>): Promise<{ result: T; duration: number }> => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const startTime = performance.now()
-        const result = await fn()
-        const duration = performance.now() - startTime
-        resolve({ result, duration })
-      } catch (error) {
-        reject(error)
-      }
-    })
-  }, [])
+  const measure = useCallback(
+    <T>(
+      name: string,
+      fn: () => T | Promise<T>
+    ): Promise<{ result: T; duration: number }> => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const startTime = performance.now()
+          const result = await fn()
+          const duration = performance.now() - startTime
+          resolve({ result, duration })
+        } catch (error) {
+          reject(error)
+        }
+      })
+    },
+    []
+  )
 
   return {
     startMeasure,
     endMeasure,
-    measure
+    measure,
   }
 }
 
@@ -391,10 +436,11 @@ export function useScrollPerformance() {
     const now = performance.now()
     if (lastFrameTime.current > 0) {
       const frameDuration = now - lastFrameTime.current
-      setAverageFrameTime(prev => (prev * 0.9) + (frameDuration * 0.1)) // Exponential moving average
-      
+      setAverageFrameTime((prev) => prev * 0.9 + frameDuration * 0.1) // Exponential moving average
+
       // Track performance if gallery tracker is available
-      if (frameDuration > 20) { // Frame took longer than ~50fps
+      if (frameDuration > 20) {
+        // Frame took longer than ~50fps
         galleryPerformanceTracker.trackScrollPerformance(frameDuration)
       }
     }
@@ -410,7 +456,7 @@ export function useScrollPerformance() {
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
-    
+
     return () => {
       window.removeEventListener('scroll', handleScroll)
       if (frameRef.current) {
@@ -422,7 +468,7 @@ export function useScrollPerformance() {
   return {
     averageFrameTime,
     fps: 1000 / averageFrameTime,
-    isSmooth: averageFrameTime < 20 // Better than 50fps
+    isSmooth: averageFrameTime < 20, // Better than 50fps
   }
 }
 

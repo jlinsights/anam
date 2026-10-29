@@ -12,7 +12,10 @@ interface ErrorBoundaryState {
   error?: Error
 }
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props)
     this.state = { hasError: false }
@@ -26,26 +29,33 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     console.error('ErrorBoundary caught an error:', error, errorInfo)
     console.error('Error stack:', error.stack)
     console.error('Component stack:', errorInfo.componentStack)
-    
+
     // Try to identify the specific component causing the error
     if (error.message) {
       console.error('Error message:', error.message)
     }
-    
+
     // Handle specific error types
     if (error.message?.includes('Cannot read properties of null')) {
-      console.warn('🔍 Null property access detected - likely component unmounted during render')
+      console.warn(
+        '🔍 Null property access detected - likely component unmounted during render'
+      )
     }
-    
-    if (error.message?.includes('vendors-') || error.message?.includes('chunk')) {
-      console.warn('📦 Chunk loading error detected - possible network or caching issue')
+
+    if (
+      error.message?.includes('vendors-') ||
+      error.message?.includes('chunk')
+    ) {
+      console.warn(
+        '📦 Chunk loading error detected - possible network or caching issue'
+      )
     }
-    
+
     // Report to error monitoring service if available
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'exception', {
         description: error.message,
-        fatal: false
+        fatal: false,
       })
     }
   }
@@ -57,14 +67,15 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       }
 
       return (
-        <div className="min-h-screen bg-background flex items-center justify-center">
-          <div className="max-w-md mx-auto text-center p-6">
-            <h1 className="text-2xl font-bold mb-4">오류가 발생했습니다</h1>
-            <p className="text-muted-foreground mb-6">
-              페이지를 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.
+        <div className='min-h-screen bg-background flex items-center justify-center'>
+          <div className='max-w-md mx-auto text-center p-6'>
+            <h1 className='text-2xl font-bold mb-4'>오류가 발생했습니다</h1>
+            <p className='text-muted-foreground mb-6'>
+              페이지를 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해
+              주세요.
             </p>
             <button
-              className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+              className='px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90'
               onClick={() => window.location.reload()}
             >
               페이지 새로고침

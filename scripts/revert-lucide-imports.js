@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
+const fs = require('fs')
+const path = require('path')
 
 // Revert lucide-react imports to use Next.js optimizePackageImports instead
 function revertLucideImports() {
-  console.log('🔄 Reverting lucide-react imports to use Next.js optimization...\n');
+  console.log(
+    '🔄 Reverting lucide-react imports to use Next.js optimization...\n'
+  )
 
   const files = [
     './app/offline/page.tsx',
@@ -24,74 +26,78 @@ function revertLucideImports() {
     './components/theme-toggle.tsx',
     './components/pwa-install-button.tsx',
     './components/contact-form.tsx',
-    './components/artwork-detail-client.tsx'
-  ];
+    './components/artwork-detail-client.tsx',
+  ]
 
-  let filesFixed = 0;
+  let filesFixed = 0
 
   for (const filePath of files) {
     try {
-      const fullPath = path.resolve(filePath);
-      const content = fs.readFileSync(fullPath, 'utf-8');
-      
+      const fullPath = path.resolve(filePath)
+      const content = fs.readFileSync(fullPath, 'utf-8')
+
       // Find all individual lucide-react imports and group them
-      const lucideImports = [];
-      const lines = content.split('\n');
-      let modifiedContent = '';
-      let skippingLucideImports = false;
-      
+      const lucideImports = []
+      const lines = content.split('\n')
+      let modifiedContent = ''
+      let skippingLucideImports = false
+
       for (const line of lines) {
-        if (line.includes("// Optimized lucide-react imports")) {
-          skippingLucideImports = true;
-          continue;
+        if (line.includes('// Optimized lucide-react imports')) {
+          skippingLucideImports = true
+          continue
         }
-        
-        if (line.includes("import { ") && line.includes(" } from 'lucide-react/dist/esm/icons/")) {
+
+        if (
+          line.includes('import { ') &&
+          line.includes(" } from 'lucide-react/dist/esm/icons/")
+        ) {
           // Extract icon name
-          const match = line.match(/import\s*{\s*(\w+)\s*}\s*from/);
+          const match = line.match(/import\s*{\s*(\w+)\s*}\s*from/)
           if (match) {
-            lucideImports.push(match[1]);
+            lucideImports.push(match[1])
           }
-          continue;
+          continue
         }
-        
+
         if (skippingLucideImports && line.trim() === '') {
           // End of lucide imports section, add grouped import
           if (lucideImports.length > 0) {
-            modifiedContent += `import { ${lucideImports.join(', ')} } from 'lucide-react'\n`;
+            modifiedContent += `import { ${lucideImports.join(', ')} } from 'lucide-react'\n`
           }
-          skippingLucideImports = false;
+          skippingLucideImports = false
         }
-        
+
         if (!skippingLucideImports) {
-          modifiedContent += line + '\n';
+          modifiedContent += line + '\n'
         }
       }
-      
+
       // Handle case where file ends with lucide imports
       if (skippingLucideImports && lucideImports.length > 0) {
-        modifiedContent += `import { ${lucideImports.join(', ')} } from 'lucide-react'\n`;
+        modifiedContent += `import { ${lucideImports.join(', ')} } from 'lucide-react'\n`
       }
-      
+
       if (modifiedContent.trim() !== content.trim()) {
-        fs.writeFileSync(fullPath, modifiedContent);
-        filesFixed++;
-        console.log(`✅ Fixed: ${filePath}`);
+        fs.writeFileSync(fullPath, modifiedContent)
+        filesFixed++
+        console.log(`✅ Fixed: ${filePath}`)
       }
-      
     } catch (error) {
-      console.log(`❌ Error processing ${filePath}:`, error.message);
+      console.log(`❌ Error processing ${filePath}:`, error.message)
     }
   }
 
-  console.log(`\n📊 Fixed ${filesFixed} files`);
-  console.log('✅ Lucide-react imports reverted to use Next.js optimizePackageImports');
-  
-  return filesFixed;
+  console.log(`\n📊 Fixed ${filesFixed} files`)
+  console.log(
+    '✅ Lucide-react imports reverted to use Next.js optimizePackageImports'
+  )
+
+  return filesFixed
 }
 
 if (require.main === module) {
-  revertLucideImports();
+  revertLucideImports()
 }
 
-module.exports = { revertLucideImports };
+module.exports = { revertLucideImports }

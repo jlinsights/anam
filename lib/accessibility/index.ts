@@ -128,7 +128,13 @@ export interface AriaComplianceResult {
 
 export interface AccessibilityRecommendation {
   priority: 'critical' | 'high' | 'medium' | 'low'
-  category: 'keyboard' | 'screen-reader' | 'color-contrast' | 'focus' | 'aria' | 'structure'
+  category:
+    | 'keyboard'
+    | 'screen-reader'
+    | 'color-contrast'
+    | 'focus'
+    | 'aria'
+    | 'structure'
   title: string
   description: string
   solution: string
@@ -150,28 +156,28 @@ export const ACCESSIBILITY_CONFIG = {
   wcag: {
     level: 'AA' as const,
     version: '2.1' as const,
-    tags: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice']
+    tags: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice'],
   },
   colorContrast: {
     normalText: {
       aa: 4.5,
-      aaa: 7
+      aaa: 7,
     },
     largeText: {
       aa: 3,
-      aaa: 4.5
-    }
+      aaa: 4.5,
+    },
   },
   viewport: {
     mobile: { width: 375, height: 667 },
     tablet: { width: 768, height: 1024 },
-    desktop: { width: 1440, height: 900 }
+    desktop: { width: 1440, height: 900 },
   },
   timeout: {
     pageLoad: 10000,
     interaction: 5000,
-    assertion: 3000
-  }
+    assertion: 3000,
+  },
 } as const
 
 // Test selectors for common UI elements
@@ -186,9 +192,9 @@ export const ACCESSIBILITY_SELECTORS = {
     '[role="button"]',
     '[role="link"]',
     '[role="tab"]',
-    '[role="menuitem"]'
+    '[role="menuitem"]',
   ].join(', '),
-  
+
   landmarks: [
     'main',
     'nav',
@@ -199,18 +205,19 @@ export const ACCESSIBILITY_SELECTORS = {
     '[role="navigation"]',
     '[role="complementary"]',
     '[role="banner"]',
-    '[role="contentinfo"]'
+    '[role="contentinfo"]',
   ].join(', '),
-  
+
   headings: 'h1, h2, h3, h4, h5, h6, [role="heading"]',
-  
+
   images: 'img, [role="img"], svg[role="img"]',
-  
-  forms: 'form, [role="form"], fieldset, legend, label, input, select, textarea, button[type="submit"]',
-  
+
+  forms:
+    'form, [role="form"], fieldset, legend, label, input, select, textarea, button[type="submit"]',
+
   modals: '[role="dialog"], [role="alertdialog"], .modal, [aria-modal="true"]',
-  
-  liveRegions: '[aria-live], [role="status"], [role="alert"], [role="log"]'
+
+  liveRegions: '[aria-live], [role="status"], [role="alert"], [role="log"]',
 } as const
 
 // Common accessibility utilities
@@ -224,7 +231,7 @@ export const AccessibilityUtils = {
       return {
         r: parseInt(hex.substr(0, 2), 16),
         g: parseInt(hex.substr(2, 2), 16),
-        b: parseInt(hex.substr(4, 2), 16)
+        b: parseInt(hex.substr(4, 2), 16),
       }
     }
 
@@ -233,9 +240,18 @@ export const AccessibilityUtils = {
       const gsRGB = rgb.g / 255
       const bsRGB = rgb.b / 255
 
-      const r = rsRGB <= 0.03928 ? rsRGB / 12.92 : Math.pow((rsRGB + 0.055) / 1.055, 2.4)
-      const g = gsRGB <= 0.03928 ? gsRGB / 12.92 : Math.pow((gsRGB + 0.055) / 1.055, 2.4)
-      const b = bsRGB <= 0.03928 ? bsRGB / 12.92 : Math.pow((bsRGB + 0.055) / 1.055, 2.4)
+      const r =
+        rsRGB <= 0.03928
+          ? rsRGB / 12.92
+          : Math.pow((rsRGB + 0.055) / 1.055, 2.4)
+      const g =
+        gsRGB <= 0.03928
+          ? gsRGB / 12.92
+          : Math.pow((gsRGB + 0.055) / 1.055, 2.4)
+      const b =
+        bsRGB <= 0.03928
+          ? bsRGB / 12.92
+          : Math.pow((bsRGB + 0.055) / 1.055, 2.4)
 
       return 0.2126 * r + 0.7152 * g + 0.0722 * b
     }
@@ -258,23 +274,27 @@ export const AccessibilityUtils = {
     const ariaLabel = element.getAttribute('aria-label')
     const ariaLabelledby = element.getAttribute('aria-labelledby')
     const title = element.getAttribute('title')
-    
+
     if (ariaLabel && ariaLabel.trim()) return true
     if (ariaLabelledby) {
       const labelElement = document.getElementById(ariaLabelledby)
       return labelElement ? labelElement.textContent?.trim() !== '' : false
     }
     if (title && title.trim()) return true
-    
+
     // Check for associated label
-    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA' || element.tagName === 'SELECT') {
+    if (
+      element.tagName === 'INPUT' ||
+      element.tagName === 'TEXTAREA' ||
+      element.tagName === 'SELECT'
+    ) {
       const id = element.getAttribute('id')
       if (id) {
         const label = document.querySelector(`label[for="${id}"]`)
         return label ? label.textContent?.trim() !== '' : false
       }
     }
-    
+
     return element.textContent?.trim() !== ''
   },
 
@@ -285,20 +305,20 @@ export const AccessibilityUtils = {
     const tagName = element.tagName.toLowerCase()
     const tabIndex = element.getAttribute('tabindex')
     const role = element.getAttribute('role')
-    
+
     // Naturally focusable elements
     const naturallyFocusable = ['a', 'button', 'input', 'select', 'textarea']
     if (naturallyFocusable.includes(tagName)) {
       return !element.hasAttribute('disabled')
     }
-    
+
     // Elements with positive tabindex
     if (tabIndex && parseInt(tabIndex) >= 0) return true
-    
+
     // Elements with interactive roles
     const interactiveRoles = ['button', 'link', 'tab', 'menuitem', 'option']
     if (role && interactiveRoles.includes(role)) return true
-    
+
     return false
   },
 
@@ -315,7 +335,11 @@ export const AccessibilityUtils = {
       if (labelElement) return labelElement.textContent || ''
     }
 
-    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA' || element.tagName === 'SELECT') {
+    if (
+      element.tagName === 'INPUT' ||
+      element.tagName === 'TEXTAREA' ||
+      element.tagName === 'SELECT'
+    ) {
       const id = element.getAttribute('id')
       if (id) {
         const label = document.querySelector(`label[for="${id}"]`)
@@ -327,11 +351,11 @@ export const AccessibilityUtils = {
     if (title) return title
 
     return element.textContent || ''
-  }
+  },
 }
 
 export default {
   AccessibilityUtils,
   ACCESSIBILITY_CONFIG,
-  ACCESSIBILITY_SELECTORS
+  ACCESSIBILITY_SELECTORS,
 }

@@ -9,8 +9,8 @@ export { ContactSection } from './ContactSection'
 export { ArtworkModal } from './ArtworkModal'
 
 // Export new portrait artwork components
-export { 
-  ArtworkCardPortrait, 
-  ArtworkGridPortrait, 
-  ArtworkCardPortraitSkeleton 
+export {
+  ArtworkCardPortrait,
+  ArtworkGridPortrait,
+  ArtworkCardPortraitSkeleton,
 } from '../artwork-card-portrait'

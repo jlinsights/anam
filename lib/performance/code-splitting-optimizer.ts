@@ -36,7 +36,7 @@ class CodeSplittingOptimizer {
       priority = 'medium',
       preload = false,
       timeout = 10000,
-      fallback
+      fallback,
     } = options
 
     // Preload if requested or high priority
@@ -56,9 +56,9 @@ class CodeSplittingOptimizer {
       // Create loading promise with timeout and metrics
       const loadingPromise = Promise.race([
         importFn(),
-        this.createTimeoutPromise(timeout, componentName)
-      ]).then(
-        (module) => {
+        this.createTimeoutPromise(timeout, componentName),
+      ])
+        .then((module) => {
           const loadTime = performance.now() - startTime
           const cacheHit = this.preloadedComponents.has(componentName)
 
@@ -68,13 +68,12 @@ class CodeSplittingOptimizer {
             success: true,
             route,
             timestamp: Date.now(),
-            cacheHit
+            cacheHit,
           })
 
           return module
-        }
-      ).catch(
-        (error) => {
+        })
+        .catch((error) => {
           const loadTime = performance.now() - startTime
 
           this.recordLoadingMetrics({
@@ -83,7 +82,7 @@ class CodeSplittingOptimizer {
             success: false,
             route,
             timestamp: Date.now(),
-            cacheHit: false
+            cacheHit: false,
           })
 
           // Provide fallback or re-throw
@@ -91,10 +90,10 @@ class CodeSplittingOptimizer {
             return { default: fallback }
           }
           throw error
-        }
-      ).finally(() => {
-        this.loadingPromises.delete(componentName)
-      })
+        })
+        .finally(() => {
+          this.loadingPromises.delete(componentName)
+        })
 
       this.loadingPromises.set(componentName, loadingPromise)
       return loadingPromise
@@ -114,7 +113,7 @@ class CodeSplittingOptimizer {
     // Use requestIdleCallback for non-blocking preload
     if ('requestIdleCallback' in window) {
       requestIdleCallback(() => {
-        importFn().catch(error => {
+        importFn().catch((error) => {
           console.warn(`Failed to preload component ${componentName}:`, error)
           this.preloadedComponents.delete(componentName)
         })
@@ -122,7 +121,7 @@ class CodeSplittingOptimizer {
     } else {
       // Fallback for browsers without requestIdleCallback
       setTimeout(() => {
-        importFn().catch(error => {
+        importFn().catch((error) => {
           console.warn(`Failed to preload component ${componentName}:`, error)
           this.preloadedComponents.delete(componentName)
         })
@@ -144,50 +143,56 @@ class CodeSplittingOptimizer {
     importFn: () => Promise<any>
     componentName: string
   }> {
-    const candidates: Array<{ importFn: () => Promise<any>; componentName: string }> = []
+    const candidates: Array<{
+      importFn: () => Promise<any>
+      componentName: string
+    }> = []
 
     // Analyze historical navigation patterns
     const navigationPatterns = this.analyzeNavigationPatterns()
     const likelyNextRoutes = navigationPatterns[route] || []
 
     // Predefined component mappings for ANAM Gallery
-    const componentMappings: Record<string, Array<{ importFn: () => Promise<any>; componentName: string }>> = {
+    const componentMappings: Record<
+      string,
+      Array<{ importFn: () => Promise<any>; componentName: string }>
+    > = {
       '/': [
         {
           importFn: () => import('@/components/gallery/BMADGallerySystem'),
-          componentName: 'BMADGallerySystem'
+          componentName: 'BMADGallerySystem',
         },
         {
           importFn: () => import('@/components/layout/SuperClaudeLayout'),
-          componentName: 'SuperClaudeLayout'
-        }
+          componentName: 'SuperClaudeLayout',
+        },
       ],
       '/gallery': [
         {
           importFn: () => import('@/components/zen-brutalist-artwork-card'),
-          componentName: 'ZenBrutalistArtworkCard'
+          componentName: 'ZenBrutalistArtworkCard',
         },
         {
           importFn: () => import('@/components/artwork-detail-modal'),
-          componentName: 'ArtworkDetailModal'
-        }
+          componentName: 'ArtworkDetailModal',
+        },
       ],
       '/artist': [
         {
           importFn: () => import('@/components/artist-profile'),
-          componentName: 'ArtistProfile'
-        }
+          componentName: 'ArtistProfile',
+        },
       ],
       '/exhibition': [
         {
           importFn: () => import('@/components/exhibition-timeline'),
-          componentName: 'ExhibitionTimeline'
-        }
-      ]
+          componentName: 'ExhibitionTimeline',
+        },
+      ],
     }
 
     // Add candidates for likely next routes
-    likelyNextRoutes.forEach(nextRoute => {
+    likelyNextRoutes.forEach((nextRoute) => {
       const routeComponents = componentMappings[nextRoute] || []
       candidates.push(...routeComponents)
     })
@@ -208,14 +213,21 @@ class CodeSplittingOptimizer {
       '/gallery': ['/artist', '/exhibition'],
       '/artist': ['/gallery', '/exhibition'],
       '/exhibition': ['/gallery', '/artist'],
-      '/contact': ['/']
+      '/contact': ['/'],
     }
   }
 
-  private createTimeoutPromise(timeout: number, componentName: string): Promise<never> {
+  private createTimeoutPromise(
+    timeout: number,
+    componentName: string
+  ): Promise<never> {
     return new Promise((_, reject) => {
       setTimeout(() => {
-        reject(new Error(`Component ${componentName} failed to load within ${timeout}ms`))
+        reject(
+          new Error(
+            `Component ${componentName} failed to load within ${timeout}ms`
+          )
+        )
       }, timeout)
     })
   }
@@ -230,12 +242,12 @@ class CodeSplittingOptimizer {
 
     // Send to analytics if available
     if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'component_load', {
+      ;(window as any).gtag('event', 'component_load', {
         component_name: metrics.componentName,
         load_time: metrics.loadTime,
         success: metrics.success,
         route: metrics.route,
-        cache_hit: metrics.cacheHit
+        cache_hit: metrics.cacheHit,
       })
     }
   }
@@ -254,30 +266,39 @@ class CodeSplittingOptimizer {
         successRate: 100,
         cacheHitRate: 0,
         slowestComponents: [],
-        recommendations: []
+        recommendations: [],
       }
     }
 
-    const successfulLoads = this.loadingMetrics.filter(m => m.success)
-    const averageLoadTime = successfulLoads.reduce((sum, m) => sum + m.loadTime, 0) / successfulLoads.length
-    const successRate = (successfulLoads.length / this.loadingMetrics.length) * 100
-    const cacheHits = this.loadingMetrics.filter(m => m.cacheHit)
+    const successfulLoads = this.loadingMetrics.filter((m) => m.success)
+    const averageLoadTime =
+      successfulLoads.reduce((sum, m) => sum + m.loadTime, 0) /
+      successfulLoads.length
+    const successRate =
+      (successfulLoads.length / this.loadingMetrics.length) * 100
+    const cacheHits = this.loadingMetrics.filter((m) => m.cacheHit)
     const cacheHitRate = (cacheHits.length / this.loadingMetrics.length) * 100
 
     // Group by component and calculate averages
-    const componentMetrics = new Map<string, { totalTime: number; count: number }>()
-    successfulLoads.forEach(metric => {
-      const existing = componentMetrics.get(metric.componentName) || { totalTime: 0, count: 0 }
+    const componentMetrics = new Map<
+      string,
+      { totalTime: number; count: number }
+    >()
+    successfulLoads.forEach((metric) => {
+      const existing = componentMetrics.get(metric.componentName) || {
+        totalTime: 0,
+        count: 0,
+      }
       componentMetrics.set(metric.componentName, {
         totalTime: existing.totalTime + metric.loadTime,
-        count: existing.count + 1
+        count: existing.count + 1,
       })
     })
 
     const slowestComponents = Array.from(componentMetrics.entries())
       .map(([name, data]) => ({
         name,
-        avgLoadTime: data.totalTime / data.count
+        avgLoadTime: data.totalTime / data.count,
       }))
       .sort((a, b) => b.avgLoadTime - a.avgLoadTime)
       .slice(0, 5)
@@ -293,8 +314,13 @@ class CodeSplittingOptimizer {
     if (cacheHitRate < 50) {
       recommendations.push('Increase preloading of frequently used components')
     }
-    if (slowestComponents.length > 0 && slowestComponents[0].avgLoadTime > 3000) {
-      recommendations.push(`Optimize ${slowestComponents[0].name} - it's consistently slow`)
+    if (
+      slowestComponents.length > 0 &&
+      slowestComponents[0].avgLoadTime > 3000
+    ) {
+      recommendations.push(
+        `Optimize ${slowestComponents[0].name} - it's consistently slow`
+      )
     }
 
     return {
@@ -302,7 +328,7 @@ class CodeSplittingOptimizer {
       successRate,
       cacheHitRate,
       slowestComponents,
-      recommendations
+      recommendations,
     }
   }
 
@@ -330,11 +356,13 @@ class CodeSplittingOptimizer {
 
     // Short-term improvements (next sprint)
     if (metrics.cacheHitRate < 60) {
-      shortTerm.push('Implement intelligent component preloading based on user patterns')
+      shortTerm.push(
+        'Implement intelligent component preloading based on user patterns'
+      )
       shortTerm.push('Add service worker caching for component chunks')
     }
 
-    metrics.slowestComponents.slice(0, 3).forEach(component => {
+    metrics.slowestComponents.slice(0, 3).forEach((component) => {
       if (component.avgLoadTime > 2000) {
         shortTerm.push(`Optimize ${component.name} component bundle size`)
       }
@@ -352,17 +380,21 @@ class CodeSplittingOptimizer {
   public optimizeBasedOnBundleAnalysis(report: BundleAnalysisReport): void {
     // Automatically preload critical chunks
     report.chunks
-      .filter(chunk => chunk.priority === 'critical' || chunk.priority === 'high')
-      .forEach(chunk => {
+      .filter(
+        (chunk) => chunk.priority === 'critical' || chunk.priority === 'high'
+      )
+      .forEach((chunk) => {
         if (chunk.route) {
           this.preloadRouteComponents(chunk.route)
         }
       })
 
     // Implement recommendations
-    report.recommendations.forEach(rec => {
+    report.recommendations.forEach((rec) => {
       if (rec.type === 'lazy-load' && rec.impact === 'high') {
-        console.info(`Code Splitting Optimizer: Implementing ${rec.type} for ${rec.target}`)
+        console.info(
+          `Code Splitting Optimizer: Implementing ${rec.type} for ${rec.target}`
+        )
         // Implementation would go here
       }
     })

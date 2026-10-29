@@ -11,8 +11,9 @@ function assertAirtableEnv(): boolean {
   const { AIRTABLE_API_KEY, AIRTABLE_BASE_ID } = process.env
   if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
     const isProduction = process.env.NODE_ENV === 'production'
-    const message = '[Airtable] AIRTABLE_API_KEY 또는 AIRTABLE_BASE_ID 환경 변수가 설정되지 않았습니다.'
-    
+    const message =
+      '[Airtable] AIRTABLE_API_KEY 또는 AIRTABLE_BASE_ID 환경 변수가 설정되지 않았습니다.'
+
     if (isProduction) {
       console.warn(`⚠️ ${message} Fallback 데이터를 사용합니다.`)
       return false

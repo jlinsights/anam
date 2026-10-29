@@ -17,8 +17,12 @@ export function createSupabaseClient(): SupabaseClient<Database> | null {
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl || !supabaseKey) {
-    console.warn('⚠️ Supabase environment variables not configured, using fallback data sources')
-    console.warn('To enable Supabase: set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY')
+    console.warn(
+      '⚠️ Supabase environment variables not configured, using fallback data sources'
+    )
+    console.warn(
+      'To enable Supabase: set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY'
+    )
     // ✅ Return null instead of throwing error to allow graceful fallback
     return null
   }
@@ -26,11 +30,11 @@ export function createSupabaseClient(): SupabaseClient<Database> | null {
   supabaseClient = createClient<Database>(supabaseUrl, supabaseKey, {
     auth: {
       autoRefreshToken: false,
-      persistSession: false
+      persistSession: false,
     },
     db: {
-      schema: 'public'
-    }
+      schema: 'public',
+    },
   })
 
   return supabaseClient
@@ -51,14 +55,16 @@ export function createBrowserClient() {
 
   if (!supabaseUrl || !supabaseAnonKey) {
     console.warn('⚠️ Supabase browser environment variables not configured')
-    console.warn('To enable Supabase: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY')
+    console.warn(
+      'To enable Supabase: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY'
+    )
     // ✅ Return null instead of throwing error to allow graceful fallback
     return null
   }
 
   return createClient<Database>(supabaseUrl, supabaseAnonKey, {
     db: {
-      schema: 'public'
-    }
+      schema: 'public',
+    },
   })
 }

@@ -32,7 +32,7 @@ export function handleApiError(error: unknown): NextResponse<ApiResponse> {
       {
         success: false,
         error: error.message,
-        code: error.code
+        code: error.code,
       },
       { status: error.statusCode || 500 }
     )
@@ -45,27 +45,33 @@ export function handleApiError(error: unknown): NextResponse<ApiResponse> {
       return NextResponse.json(
         {
           success: false,
-          error: error.message
+          error: error.message,
         },
         { status: 404 }
       )
     }
 
-    if (error.message.includes('validation') || error.message.includes('invalid')) {
+    if (
+      error.message.includes('validation') ||
+      error.message.includes('invalid')
+    ) {
       return NextResponse.json(
         {
           success: false,
-          error: error.message
+          error: error.message,
         },
         { status: 400 }
       )
     }
 
-    if (error.message.includes('unauthorized') || error.message.includes('permission')) {
+    if (
+      error.message.includes('unauthorized') ||
+      error.message.includes('permission')
+    ) {
       return NextResponse.json(
         {
           success: false,
-          error: error.message
+          error: error.message,
         },
         { status: 403 }
       )
@@ -75,7 +81,7 @@ export function handleApiError(error: unknown): NextResponse<ApiResponse> {
     return NextResponse.json(
       {
         success: false,
-        error: error.message
+        error: error.message,
       },
       { status: 500 }
     )
@@ -85,7 +91,7 @@ export function handleApiError(error: unknown): NextResponse<ApiResponse> {
   return NextResponse.json(
     {
       success: false,
-      error: 'An unexpected error occurred'
+      error: 'An unexpected error occurred',
     },
     { status: 500 }
   )
@@ -103,7 +109,7 @@ export function createSuccessResponse<T>(
     success: true,
     data,
     metadata,
-    message
+    message,
   })
 }
 
@@ -121,7 +127,7 @@ export function createErrorResponse(
       success: false,
       error,
       code,
-      details
+      details,
     },
     { status: statusCode }
   )
@@ -139,7 +145,7 @@ export function validateRequestBody<T>(
   }
 
   const missingFields: string[] = []
-  
+
   for (const field of requiredFields) {
     if (!(field in body) || body[field] === undefined || body[field] === null) {
       missingFields.push(String(field))
@@ -160,7 +166,11 @@ export function validateQueryParams(
   searchParams: URLSearchParams,
   requiredParams: string[] = [],
   optionalParams: string[] = []
-): { isValid: boolean; missingParams?: string[]; params?: Record<string, string> } {
+): {
+  isValid: boolean
+  missingParams?: string[]
+  params?: Record<string, string>
+} {
   const missingParams: string[] = []
   const params: Record<string, string> = {}
 
@@ -209,24 +219,30 @@ export class RateLimiter {
   /**
    * Check if request is allowed
    */
-  checkRateLimit(identifier: string): { allowed: boolean; remainingRequests?: number; resetTime?: number } {
+  checkRateLimit(identifier: string): {
+    allowed: boolean
+    remainingRequests?: number
+    resetTime?: number
+  } {
     const now = Date.now()
     const windowStart = now - this.windowMs
 
     // Get existing requests for this identifier
     const existingRequests = this.requests.get(identifier) || []
-    
+
     // Filter requests within the current window
-    const recentRequests = existingRequests.filter(timestamp => timestamp > windowStart)
+    const recentRequests = existingRequests.filter(
+      (timestamp) => timestamp > windowStart
+    )
 
     if (recentRequests.length >= this.maxRequests) {
       const oldestRequest = Math.min(...recentRequests)
       const resetTime = oldestRequest + this.windowMs
-      
+
       return {
         allowed: false,
         remainingRequests: 0,
-        resetTime
+        resetTime,
       }
     }
 
@@ -237,7 +253,7 @@ export class RateLimiter {
     return {
       allowed: true,
       remainingRequests: this.maxRequests - recentRequests.length,
-      resetTime: now + this.windowMs
+      resetTime: now + this.windowMs,
     }
   }
 
@@ -249,8 +265,10 @@ export class RateLimiter {
     const windowStart = now - this.windowMs
 
     for (const [identifier, requests] of this.requests.entries()) {
-      const recentRequests = requests.filter(timestamp => timestamp > windowStart)
-      
+      const recentRequests = requests.filter(
+        (timestamp) => timestamp > windowStart
+      )
+
       if (recentRequests.length === 0) {
         this.requests.delete(identifier)
       } else {
@@ -277,7 +295,7 @@ export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Max-Age': '86400'
+  'Access-Control-Max-Age': '86400',
 }
 
 /**
@@ -296,7 +314,7 @@ export function addCorsHeaders(response: NextResponse): NextResponse {
 export function handleCorsOptions(): NextResponse {
   return new NextResponse(null, {
     status: 200,
-    headers: corsHeaders
+    headers: corsHeaders,
   })
 }
 
@@ -323,11 +341,13 @@ export function logApiRequest(
     method,
     path,
     duration,
-    statusCode
+    statusCode,
   }
 
   if (duration && statusCode) {
-    console.log(`API ${method} ${path} - ${statusCode} (${duration}ms) [${requestId}]`)
+    console.log(
+      `API ${method} ${path} - ${statusCode} (${duration}ms) [${requestId}]`
+    )
   } else {
     console.log(`API ${method} ${path} - Started [${requestId}]`)
   }
@@ -368,7 +388,7 @@ export function sanitizeInput(input: string): string {
  */
 export class ApiError extends Error {
   public statusCode: number
-  
+
   constructor(
     message: string,
     public code?: string,
@@ -387,21 +407,27 @@ export const globalRateLimiter = new RateLimiter(60000, 100) // 100 requests per
 /**
  * Middleware for rate limiting
  */
-export function rateLimitMiddleware(identifier: string): { allowed: boolean; response?: NextResponse } {
+export function rateLimitMiddleware(identifier: string): {
+  allowed: boolean
+  response?: NextResponse
+} {
   const rateLimitResult = globalRateLimiter.checkRateLimit(identifier)
-  
+
   if (!rateLimitResult.allowed) {
     const response = NextResponse.json(
       {
         success: false,
         error: 'Rate limit exceeded',
-        code: 'RATE_LIMIT_EXCEEDED'
+        code: 'RATE_LIMIT_EXCEEDED',
       },
       { status: 429 }
     )
 
-    response.headers.set('Retry-After', String(Math.ceil((rateLimitResult.resetTime! - Date.now()) / 1000)))
-    
+    response.headers.set(
+      'Retry-After',
+      String(Math.ceil((rateLimitResult.resetTime! - Date.now()) / 1000))
+    )
+
     return { allowed: false, response }
   }
 
