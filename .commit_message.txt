@@ -1,1 +1,1 @@
-🎨 Prettier 일괄 포맷 적용 (eslint --fix, 동작 변경 없음)
+🧪 Jest 공통 환경 수정: Web API 가짜 구현 제거, MSW 서버 공유, fetch·라우터 모킹 가능화, 시각 회귀 테스트 기본 실행 제외

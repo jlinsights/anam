@@ -32,7 +32,7 @@
     "validate:accessibility": "npm run test:a11y && npm run test:a11y:contrast",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:visual": "jest --testPathPattern=__tests__/visual",
+    "test:visual": "JEST_VISUAL=1 jest --testPathPattern=__tests__/visual",
     "test:performance": "jest --testPathPattern=__tests__/performance",
     "test:pwa": "jest --testPathPattern=__tests__/pwa",
     "test:all": "npm run test:coverage && npm run test:e2e",

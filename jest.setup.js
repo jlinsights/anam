@@ -37,17 +37,21 @@ if (typeof window !== 'undefined') {
 }
 
 // Mock next/navigation
+// 테스트에서 mockReturnValue로 덮어쓸 수 있도록 jest.fn으로 둔다
 jest.mock('next/navigation', () => ({
-  useRouter: () => ({
+  useRouter: jest.fn(() => ({
     push: jest.fn(),
     replace: jest.fn(),
     prefetch: jest.fn(),
     back: jest.fn(),
     forward: jest.fn(),
     refresh: jest.fn(),
-  }),
-  usePathname: () => '/',
-  useSearchParams: () => new URLSearchParams(),
+  })),
+  usePathname: jest.fn(() => '/'),
+  useSearchParams: jest.fn(() => new URLSearchParams()),
+  useParams: jest.fn(() => ({})),
+  notFound: jest.fn(),
+  redirect: jest.fn(),
 }))
 
 // Mock next-intl
@@ -117,12 +121,7 @@ jest.mock('next/font/google', () => ({
   }),
 }))
 
-// Mock Web APIs for API route testing
-global.Request = jest.fn()
-global.Response = jest.fn()
-global.Headers = jest.fn()
-global.URL = URL || jest.fn()
-global.URLSearchParams = URLSearchParams || jest.fn()
+// Request/Response/Headers/fetch는 jest-fixed-jsdom이 Node 내장 구현을 제공한다 (jest.fn으로 덮으면 NextRequest가 깨진다)
 
 // Mock crypto for Node.js environment
 if (!global.crypto) {
@@ -164,17 +163,17 @@ afterAll(() => {
   console.error = originalError
 })
 
-// MSW 설정 (API 모킹을 위한)
-import { setupServer } from 'msw/node'
-
-// MSW 서버 인스턴스를 전역으로 설정
-export const server = setupServer()
+// MSW 설정 (API 모킹을 위한) — 테스트 파일은 test-utils에서 같은 server를 가져다 쓴다
+import { server } from './__tests__/mocks/server'
 
 // 테스트 시작 전 MSW 서버 시작
 beforeAll(() => {
   server.listen({
     onUnhandledRequest: 'bypass',
   })
+  // listen 이후의(MSW가 가로채는) fetch를 jest.fn으로 감싸, 테스트가 mockClear/mockResolvedValue를 쓸 수 있게 한다
+  const interceptedFetch = global.fetch
+  global.fetch = jest.fn((...args) => interceptedFetch(...args))
 })
 
 // 각 테스트 후 핸들러 초기화

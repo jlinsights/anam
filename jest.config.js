@@ -30,6 +30,8 @@ const customJestConfig = {
     '<rootDir>/__tests__/utils/',
     '<rootDir>/__tests__/e2e/',
     '\\.mock\\.(js|jsx|ts|tsx)$',
+    // Puppeteer로 실행 중인 서버를 찍는 시각 회귀 테스트는 기본 실행에서 제외 (npm run test:visual로만 실행)
+    ...(process.env.JEST_VISUAL ? [] : ['<rootDir>/__tests__/visual/']),
   ],
 
   // 커버리지 설정
