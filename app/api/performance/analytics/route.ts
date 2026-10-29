@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// 인증이 없는 내부 분석 도구라 프로덕션에서는 막는다 (DELETE로 누구나 데이터를 지울 수 있었음)
+function blockInProduction(): NextResponse | null {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json(
+      { error: 'Not available in production' },
+      { status: 403 }
+    )
+  }
+  return null
+}
+
 interface PerformanceAnalyticsData {
   metrics: Record<string, number>
   userAgent: string
@@ -333,6 +344,9 @@ function generateInsights(data: PerformanceAnalyticsData[]): {
 }
 
 export async function POST(request: NextRequest) {
+  const blocked = blockInProduction()
+  if (blocked) return blocked
+
   try {
     const body = await request.json()
 
@@ -446,6 +460,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const blocked = blockInProduction()
+  if (blocked) return blocked
+
   try {
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type')
@@ -562,6 +579,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const blocked = blockInProduction()
+  if (blocked) return blocked
+
   try {
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type')

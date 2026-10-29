@@ -5,7 +5,7 @@
 
 import { PERFORMANCE_TARGETS, MONITORING_CONFIG } from './performance-config'
 
-type MetricType = 'LCP' | 'FID' | 'INP' | 'CLS' | 'FCP' | 'TTFB'
+type MetricType = 'LCP' | 'INP' | 'CLS' | 'FCP' | 'TTFB'
 
 type MetricValue = {
   value: number

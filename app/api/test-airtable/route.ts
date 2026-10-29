@@ -6,6 +6,14 @@ import { createErrorResponse, createSuccessResponse } from '@/lib/error-handler'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
+  // 요청마다 Airtable API를 두 번 호출하고 레코드 샘플을 돌려주므로 프로덕션에서는 막는다
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json(
+      { error: 'Not available in production' },
+      { status: 403 }
+    )
+  }
+
   try {
     console.log('🔍 Testing Airtable connection...')
 

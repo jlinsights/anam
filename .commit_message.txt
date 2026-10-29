@@ -1,1 +1,1 @@
-🐛 문의 메일 전송 실패 수정(createTransporter→createTransport), 수신 주소 CONTACT_EMAIL 지원, rate limiter 테스트 격리·타이머 unref
+🐛 홈 크래시·무한 새로고침 수정, 무인증 엔드포인트 차단(performance/analytics·test-airtable 프로덕션 403), revalidate 시크릿 필수·timing-safe 비교 + 회귀 테스트, modularizeImports·FID 제거

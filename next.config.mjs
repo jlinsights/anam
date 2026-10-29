@@ -220,30 +220,6 @@ const nextConfig = {
       exclude: ['error', 'warn']
     } : false,
   },
-  // ✅ ENHANCED Bundle optimization - Tree shaking
-  modularizeImports: {
-    'lucide-react': {
-      transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
-      preventFullImport: true,
-      skipDefaultConversion: true,
-    },
-    'date-fns': {
-      transform: 'date-fns/{{member}}',
-      skipDefaultConversion: true,
-    },
-    'framer-motion': {
-      transform: 'framer-motion/dist/es/{{member}}',
-      skipDefaultConversion: true,
-    },
-    '@radix-ui/react-dialog': {
-      transform: '@radix-ui/react-dialog/dist/{{member}}',
-      skipDefaultConversion: true,
-    },
-    '@radix-ui/react-toast': {
-      transform: '@radix-ui/react-toast/dist/{{member}}',
-      skipDefaultConversion: true,
-    },
-  },
   async redirects() {
     return [];
   },

@@ -42,8 +42,8 @@ export class RootErrorBoundary extends Component<Props, State> {
       errorName === 'ChunkLoadError' ||
       lowerMessage.includes('loading chunk') ||
       lowerMessage.includes('chunk load failed') ||
-      lowerMessage.includes('failed to fetch dynamically imported module') ||
-      lowerStack.includes('chunk')
+      // 스택은 보지 않는다: 프로덕션 스택은 전부 /_next/static/chunks/ 경로라 모든 오류가 chunk로 분류된다
+      lowerMessage.includes('failed to fetch dynamically imported module')
     ) {
       errorType = 'chunk'
     }
