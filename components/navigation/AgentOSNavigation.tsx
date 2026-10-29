@@ -5,17 +5,17 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
-import { 
-  Home, 
-  Image as ImageIcon, 
-  User, 
-  Calendar, 
-  Mail, 
-  Globe, 
-  Menu, 
+import {
+  Home,
+  Image as ImageIcon,
+  User,
+  Calendar,
+  Mail,
+  Globe,
+  Menu,
   X,
   ChevronDown,
-  Sparkles
+  Sparkles,
 } from 'lucide-react'
 
 interface NavigationItem {
@@ -41,7 +41,7 @@ export function AgentOSNavigation({
   culturalContext = 'eternal',
   enableBilingualMode = true,
   enableAgentFeatures = true,
-  className
+  className,
 }: AgentOSNavigationProps) {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
@@ -55,7 +55,7 @@ export function AgentOSNavigation({
       id: 'home',
       title: { ko: '홈', en: 'Home' },
       href: '/',
-      icon: Home
+      icon: Home,
     },
     {
       id: 'gallery',
@@ -67,56 +67,62 @@ export function AgentOSNavigation({
           id: 'all-works',
           title: { ko: '전체 작품', en: 'All Artworks' },
           href: '/gallery',
-          icon: ImageIcon
+          icon: ImageIcon,
         },
         {
           id: 'featured',
           title: { ko: '주요 작품', en: 'Featured' },
           href: '/gallery?filter=featured',
           icon: Sparkles,
-          badge: 'NEW'
-        }
-      ]
+          badge: 'NEW',
+        },
+      ],
     },
     {
       id: 'artist',
       title: { ko: '작가', en: 'Artist' },
       href: '/artist',
-      icon: User
+      icon: User,
     },
     {
       id: 'exhibition',
       title: { ko: '전시', en: 'Exhibition' },
       href: '/exhibition',
       icon: Calendar,
-      children: enableAgentFeatures ? [
-        {
-          id: 'upcoming',
-          title: { ko: '예정 전시', en: 'Upcoming' },
-          href: '/exhibition/upcoming',
-          icon: Calendar
-        },
-        {
-          id: 'virtual',
-          title: { ko: '가상 투어', en: 'Virtual Tour' },
-          href: '/exhibition/virtual',
-          icon: Globe,
-          badge: 'AI'
-        }
-      ] : undefined
+      children: enableAgentFeatures
+        ? [
+            {
+              id: 'upcoming',
+              title: { ko: '예정 전시', en: 'Upcoming' },
+              href: '/exhibition/upcoming',
+              icon: Calendar,
+            },
+            {
+              id: 'virtual',
+              title: { ko: '가상 투어', en: 'Virtual Tour' },
+              href: '/exhibition/virtual',
+              icon: Globe,
+              badge: 'AI',
+            },
+          ]
+        : undefined,
     },
     {
       id: 'contact',
       title: { ko: '연락처', en: 'Contact' },
       href: '/contact',
-      icon: Mail
-    }
+      icon: Mail,
+    },
   ]
 
   // 🎯 SuperClaude Pattern: Advanced Scroll Tracking
   useEffect(() => {
     const handleScroll = () => {
-      const progress = Math.min(1, window.scrollY / (document.documentElement.scrollHeight - window.innerHeight))
+      const progress = Math.min(
+        1,
+        window.scrollY /
+          (document.documentElement.scrollHeight - window.innerHeight)
+      )
       setScrollProgress(progress)
     }
 
@@ -133,30 +139,34 @@ export function AgentOSNavigation({
   // 🎨 Cultural Context Styling
   const culturalStyles = {
     spring: {
-      background: 'bg-gradient-to-r from-spring-primary/10 to-spring-secondary/5',
+      background:
+        'bg-gradient-to-r from-spring-primary/10 to-spring-secondary/5',
       accent: 'spring-primary',
-      border: 'border-spring-primary/20'
+      border: 'border-spring-primary/20',
     },
     summer: {
-      background: 'bg-gradient-to-r from-summer-primary/10 to-summer-secondary/5',
+      background:
+        'bg-gradient-to-r from-summer-primary/10 to-summer-secondary/5',
       accent: 'summer-primary',
-      border: 'border-summer-primary/20'
+      border: 'border-summer-primary/20',
     },
     autumn: {
-      background: 'bg-gradient-to-r from-autumn-primary/10 to-autumn-secondary/5',
+      background:
+        'bg-gradient-to-r from-autumn-primary/10 to-autumn-secondary/5',
       accent: 'autumn-primary',
-      border: 'border-autumn-primary/20'
+      border: 'border-autumn-primary/20',
     },
     winter: {
-      background: 'bg-gradient-to-r from-winter-primary/10 to-winter-secondary/5',
+      background:
+        'bg-gradient-to-r from-winter-primary/10 to-winter-secondary/5',
       accent: 'winter-primary',
-      border: 'border-winter-primary/20'
+      border: 'border-winter-primary/20',
     },
     eternal: {
       background: 'bg-paper/80 backdrop-blur-lg',
       accent: 'gold',
-      border: 'border-ink/10'
-    }
+      border: 'border-ink/10',
+    },
   }
 
   const currentStyle = culturalStyles[culturalContext]
@@ -170,7 +180,7 @@ export function AgentOSNavigation({
         currentStyle.border
       ),
       list: 'flex items-center justify-center space-x-zen-md px-zen-md py-zen-sm',
-      item: 'relative group'
+      item: 'relative group',
     },
     vertical: {
       container: cn(
@@ -179,7 +189,7 @@ export function AgentOSNavigation({
         currentStyle.border
       ),
       list: 'flex flex-col space-y-zen-sm p-zen-md',
-      item: 'relative'
+      item: 'relative',
     },
     floating: {
       container: cn(
@@ -189,7 +199,7 @@ export function AgentOSNavigation({
         'shadow-zen-float'
       ),
       list: 'flex items-center space-x-zen-sm px-zen-md py-zen-sm',
-      item: 'relative'
+      item: 'relative',
     },
     minimal: {
       container: cn(
@@ -198,57 +208,64 @@ export function AgentOSNavigation({
         currentStyle.border
       ),
       list: 'flex items-center space-x-zen-xs p-zen-xs',
-      item: 'relative'
-    }
+      item: 'relative',
+    },
   }
 
   const currentVariant = navigationVariants[variant]
 
   // 🎯 SuperClaude Pattern: Intelligent Link Component
-  const NavigationLink = ({ item, isActive }: { item: NavigationItem; isActive: boolean }) => {
+  const NavigationLink = ({
+    item,
+    isActive,
+  }: {
+    item: NavigationItem
+    isActive: boolean
+  }) => {
     const IconComponent = item.icon
-    
+
     return (
       <Link
         href={item.href}
         className={cn(
           'aceternity-nav-item flex items-center space-x-2 px-3 py-2 rounded-md transition-all duration-200',
           'hover:text-foreground',
-          isActive && 'aceternity-nav-item-active text-primary border-l-2 border-primary',
+          isActive &&
+            'aceternity-nav-item-active text-primary border-l-2 border-primary',
           variant === 'minimal' && 'p-2'
         )}
         target={item.external ? '_blank' : undefined}
         rel={item.external ? 'noopener noreferrer' : undefined}
       >
-        <IconComponent className={cn(
-          'w-4 h-4',
-          variant === 'minimal' && 'w-5 h-5'
-        )} />
-        
+        <IconComponent
+          className={cn('w-4 h-4', variant === 'minimal' && 'w-5 h-5')}
+        />
+
         {variant !== 'minimal' && (
-          <span className={cn(
-            'text-sm font-medium',
-            'zen-typography-body'
-          )}>
+          <span className={cn('text-sm font-medium', 'zen-typography-body')}>
             {item.title[currentLang]}
           </span>
         )}
-        
+
         {item.badge && (
-          <span className={cn(
-            'px-1.5 py-0.5 text-xs rounded-full',
-            `bg-${currentStyle.accent}/10 text-${currentStyle.accent}`,
-            'font-bold uppercase tracking-wide'
-          )}>
+          <span
+            className={cn(
+              'px-1.5 py-0.5 text-xs rounded-full',
+              `bg-${currentStyle.accent}/10 text-${currentStyle.accent}`,
+              'font-bold uppercase tracking-wide'
+            )}
+          >
             {item.badge}
           </span>
         )}
-        
+
         {item.children && variant !== 'minimal' && (
-          <ChevronDown className={cn(
-            'w-3 h-3 transition-transform',
-            expandedSubmenu === item.id && 'rotate-180'
-          )} />
+          <ChevronDown
+            className={cn(
+              'w-3 h-3 transition-transform',
+              expandedSubmenu === item.id && 'rotate-180'
+            )}
+          />
         )}
       </Link>
     )
@@ -273,9 +290,9 @@ export function AgentOSNavigation({
             )}
           >
             {item.children.map((child) => (
-              <div key={child.id} className="px-zen-xs">
-                <NavigationLink 
-                  item={child} 
+              <div key={child.id} className='px-zen-xs'>
+                <NavigationLink
+                  item={child}
                   isActive={pathname === child.href}
                 />
               </div>
@@ -292,16 +309,19 @@ export function AgentOSNavigation({
       <motion.nav
         className={cn(
           'aceternity-nav bg-background/80 backdrop-blur-lg',
-          currentVariant.container, 
+          currentVariant.container,
           className
         )}
-        initial={{ opacity: 0, y: variant === 'floating' ? 20 : variant === 'horizontal' ? -20 : 0 }}
+        initial={{
+          opacity: 0,
+          y: variant === 'floating' ? 20 : variant === 'horizontal' ? -20 : 0,
+        }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
       >
         {/* 🎨 Scroll Progress Indicator (for horizontal variant) */}
         {variant === 'horizontal' && (
-          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-ink/10">
+          <div className='absolute bottom-0 left-0 right-0 h-0.5 bg-ink/10'>
             <motion.div
               className={`h-full bg-${currentStyle.accent}`}
               style={{ scaleX: scrollProgress }}
@@ -315,21 +335,24 @@ export function AgentOSNavigation({
         <div className={currentVariant.list}>
           {/* 🎯 Logo/Brand (for horizontal and vertical variants) */}
           {(variant === 'horizontal' || variant === 'vertical') && (
-            <Link 
-              href="/" 
+            <Link
+              href='/'
               className={cn(
                 'flex items-center space-x-2 mr-zen-lg',
-                variant === 'vertical' && 'mb-zen-md pb-zen-md border-b border-ink/10'
+                variant === 'vertical' &&
+                  'mb-zen-md pb-zen-md border-b border-ink/10'
               )}
             >
-              <div className={cn(
-                'w-8 h-8 rounded-full',
-                `bg-gradient-to-br from-${currentStyle.accent} to-${currentStyle.accent}/60`
-              )} />
+              <div
+                className={cn(
+                  'w-8 h-8 rounded-full',
+                  `bg-gradient-to-br from-${currentStyle.accent} to-${currentStyle.accent}/60`
+                )}
+              />
               {variant === 'vertical' && (
                 <div>
-                  <div className="font-display font-bold text-ink">ANAM</div>
-                  <div className="text-xs text-ink-light">Gallery</div>
+                  <div className='font-display font-bold text-ink'>ANAM</div>
+                  <div className='text-xs text-ink-light'>Gallery</div>
                 </div>
               )}
             </Link>
@@ -343,9 +366,11 @@ export function AgentOSNavigation({
               onMouseEnter={() => item.children && setExpandedSubmenu(item.id)}
               onMouseLeave={() => setExpandedSubmenu(null)}
             >
-              <NavigationLink 
-                item={item} 
-                isActive={pathname === item.href || pathname.startsWith(item.href + '/')}
+              <NavigationLink
+                item={item}
+                isActive={
+                  pathname === item.href || pathname.startsWith(item.href + '/')
+                }
               />
               <Submenu item={item} />
             </div>
@@ -355,11 +380,11 @@ export function AgentOSNavigation({
           {enableBilingualMode && variant !== 'minimal' && (
             <motion.button
               onClick={() => setCurrentLang(currentLang === 'ko' ? 'en' : 'ko')}
-              className="aceternity-button-secondary flex items-center space-x-1 px-3 py-2 text-xs font-medium"
+              className='aceternity-button-secondary flex items-center space-x-1 px-3 py-2 text-xs font-medium'
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Globe className="w-3 h-3" />
+              <Globe className='w-3 h-3' />
               <span>{currentLang.toUpperCase()}</span>
             </motion.button>
           )}
@@ -368,9 +393,13 @@ export function AgentOSNavigation({
           {variant === 'horizontal' && (
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 rounded-md hover:bg-ink/5 transition-colors"
+              className='md:hidden p-2 rounded-md hover:bg-ink/5 transition-colors'
             >
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isOpen ? (
+                <X className='w-5 h-5' />
+              ) : (
+                <Menu className='w-5 h-5' />
+              )}
             </button>
           )}
         </div>
@@ -383,9 +412,12 @@ export function AgentOSNavigation({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 md:hidden"
+            className='fixed inset-0 z-40 md:hidden'
           >
-            <div className="absolute inset-0 bg-ink/20 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+            <div
+              className='absolute inset-0 bg-ink/20 backdrop-blur-sm'
+              onClick={() => setIsOpen(false)}
+            />
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
@@ -394,23 +426,24 @@ export function AgentOSNavigation({
               className={cn(
                 'absolute right-0 top-0 bottom-0 w-80 max-w-[80vw]',
                 currentStyle.background,
-                'border-l', currentStyle.border,
+                'border-l',
+                currentStyle.border,
                 'overflow-y-auto'
               )}
             >
-              <div className="p-zen-md space-y-zen-sm">
+              <div className='p-zen-md space-y-zen-sm'>
                 {navigationItems.map((item) => (
-                  <div key={item.id} className="space-y-zen-xs">
-                    <NavigationLink 
-                      item={item} 
+                  <div key={item.id} className='space-y-zen-xs'>
+                    <NavigationLink
+                      item={item}
                       isActive={pathname === item.href}
                     />
                     {item.children && (
-                      <div className="ml-zen-md space-y-zen-xs border-l border-ink/10 pl-zen-sm">
+                      <div className='ml-zen-md space-y-zen-xs border-l border-ink/10 pl-zen-sm'>
                         {item.children.map((child) => (
-                          <NavigationLink 
+                          <NavigationLink
                             key={child.id}
-                            item={child} 
+                            item={child}
                             isActive={pathname === child.href}
                           />
                         ))}

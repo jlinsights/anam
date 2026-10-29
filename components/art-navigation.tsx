@@ -208,4 +208,3 @@ export function ArtNavigation({
 export function NavigationSpacer({ className }: { className?: string }) {
   return <div className={cn('h-24 md:h-28', className)} />
 }
-

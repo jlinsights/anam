@@ -36,13 +36,13 @@ export function useApiRequest<T>(
     revalidateOnFocus = false,
     retryAttempts = 2,
     retryDelay = 1000,
-    timeout = 10000
+    timeout = 10000,
   } = options
 
   const [state, setState] = useState<ApiState<T>>({
     data: null,
     loading: false,
-    error: null
+    error: null,
   })
 
   const abortControllerRef = useRef<AbortController | null>(null)
@@ -72,7 +72,7 @@ export function useApiRequest<T>(
         return null
       }
 
-      setState(prev => ({ ...prev, loading: true, error: null }))
+      setState((prev) => ({ ...prev, loading: true, error: null }))
 
       // Set up timeout
       const timeoutId = setTimeout(() => {
@@ -84,7 +84,7 @@ export function useApiRequest<T>(
       try {
         const data = await requestFn(signal)
         clearTimeout(timeoutId)
-        
+
         // Check if request was cancelled or component unmounted
         if (signal.aborted || !mountedRef.current) {
           return null
@@ -93,7 +93,7 @@ export function useApiRequest<T>(
         setState({
           data,
           loading: false,
-          error: null
+          error: null,
         })
 
         retryCountRef.current = 0
@@ -102,7 +102,6 @@ export function useApiRequest<T>(
         clearTimeout(timeoutId)
         throw error
       }
-
     } catch (error) {
       // Check if component is still mounted
       if (!mountedRef.current) {
@@ -112,33 +111,36 @@ export function useApiRequest<T>(
       // Handle AbortError (request was cancelled or timed out)
       if (error instanceof Error && error.name === 'AbortError') {
         console.log('Request was cancelled or timed out')
-        
+
         // For timeout, set error and try fallback
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
           loading: false,
-          error: 'Request timed out, loading fallback data...'
+          error: 'Request timed out, loading fallback data...',
         }))
-        
+
         return null
       }
 
       // Handle other errors
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
-      
-      setState(prev => ({
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred'
+
+      setState((prev) => ({
         ...prev,
         loading: false,
-        error: errorMessage
+        error: errorMessage,
       }))
 
       // Retry logic
       if (retryCountRef.current < retryAttempts) {
         retryCountRef.current++
-        console.log(`Retrying request (attempt ${retryCountRef.current}/${retryAttempts})`)
-        
-        await new Promise(resolve => setTimeout(resolve, retryDelay))
-        
+        console.log(
+          `Retrying request (attempt ${retryCountRef.current}/${retryAttempts})`
+        )
+
+        await new Promise((resolve) => setTimeout(resolve, retryDelay))
+
         if (mountedRef.current) {
           return execute()
         }
@@ -151,10 +153,10 @@ export function useApiRequest<T>(
   // Cancel the request
   const cancel = useCallback(() => {
     cleanup()
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       loading: false,
-      error: null
+      error: null,
     }))
   }, [cleanup])
 
@@ -170,7 +172,7 @@ export function useApiRequest<T>(
     setState({
       data: null,
       loading: false,
-      error: null
+      error: null,
     })
     retryCountRef.current = 0
   }, [cleanup])
@@ -194,7 +196,7 @@ export function useApiRequest<T>(
     if (immediate) {
       execute()
     }
-    
+
     // Cleanup on unmount
     return () => {
       mountedRef.current = false
@@ -207,7 +209,7 @@ export function useApiRequest<T>(
     execute,
     cancel,
     retry,
-    reset
+    reset,
   }
 }
 
@@ -218,90 +220,111 @@ export function useFetch<T>(
   url: string,
   options: RequestInit & UseApiRequestOptions = {}
 ): UseApiRequestReturn<T> {
-  const { immediate, revalidateOnFocus, retryAttempts, retryDelay, timeout, ...fetchOptions } = options
+  const {
+    immediate,
+    revalidateOnFocus,
+    retryAttempts,
+    retryDelay,
+    timeout,
+    ...fetchOptions
+  } = options
 
-  const requestFn = useCallback(async (signal: AbortSignal): Promise<T> => {
-    try {
-      const response = await fetch(url, {
-        ...fetchOptions,
-        signal
-      })
+  const requestFn = useCallback(
+    async (signal: AbortSignal): Promise<T> => {
+      try {
+        const response = await fetch(url, {
+          ...fetchOptions,
+          signal,
+        })
 
-      if (!response.ok) {
-        console.error(`API error for ${url}:`, response.status, response.statusText)
-        
-        // For artworks API, try to use fallback data from local module
+        if (!response.ok) {
+          console.error(
+            `API error for ${url}:`,
+            response.status,
+            response.statusText
+          )
+
+          // For artworks API, try to use fallback data from local module
+          if (url.includes('/api/artworks')) {
+            console.warn('🔄 API failed, attempting to use fallback data')
+            try {
+              const { fallbackArtworksData } = await import('@/lib/artworks')
+              return fallbackArtworksData as unknown as T
+            } catch (importError) {
+              console.error('Failed to import fallback data:', importError)
+              throw new Error(`HTTP error! status: ${response.status}`)
+            }
+          }
+
+          // For artist API, try to use fallback data
+          if (url.includes('/api/artist')) {
+            console.warn(
+              '🔄 Artist API failed, attempting to use fallback data'
+            )
+            try {
+              const { fallbackArtistData } = await import('@/lib/artworks')
+              return fallbackArtistData as unknown as T
+            } catch (importError) {
+              console.error(
+                'Failed to import fallback artist data:',
+                importError
+              )
+              throw new Error(`HTTP error! status: ${response.status}`)
+            }
+          }
+
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const contentType = response.headers.get('content-type')
+        if (contentType && contentType.includes('application/json')) {
+          const result = await response.json()
+          return result.data ?? result
+        }
+
+        return response.text() as unknown as T
+      } catch (error) {
+        // If it's an AbortError, re-throw it
+        if ((error as Error).name === 'AbortError') {
+          throw error
+        }
+
+        // For other errors on artworks endpoint, try fallback
         if (url.includes('/api/artworks')) {
-          console.warn('🔄 API failed, attempting to use fallback data')
+          console.warn('🔄 Request failed, attempting to use fallback data')
           try {
             const { fallbackArtworksData } = await import('@/lib/artworks')
             return fallbackArtworksData as unknown as T
           } catch (importError) {
             console.error('Failed to import fallback data:', importError)
-            throw new Error(`HTTP error! status: ${response.status}`)
           }
         }
-        
-        // For artist API, try to use fallback data
+
+        // For other errors on artist endpoint, try fallback
         if (url.includes('/api/artist')) {
-          console.warn('🔄 Artist API failed, attempting to use fallback data')
+          console.warn(
+            '🔄 Artist request failed, attempting to use fallback data'
+          )
           try {
             const { fallbackArtistData } = await import('@/lib/artworks')
             return fallbackArtistData as unknown as T
           } catch (importError) {
             console.error('Failed to import fallback artist data:', importError)
-            throw new Error(`HTTP error! status: ${response.status}`)
           }
         }
-        
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
 
-      const contentType = response.headers.get('content-type')
-      if (contentType && contentType.includes('application/json')) {
-        const result = await response.json()
-        return result.data ?? result
-      }
-
-      return response.text() as unknown as T
-    } catch (error) {
-      // If it's an AbortError, re-throw it
-      if ((error as Error).name === 'AbortError') {
         throw error
       }
-      
-      // For other errors on artworks endpoint, try fallback
-      if (url.includes('/api/artworks')) {
-        console.warn('🔄 Request failed, attempting to use fallback data')
-        try {
-          const { fallbackArtworksData } = await import('@/lib/artworks')
-          return fallbackArtworksData as unknown as T
-        } catch (importError) {
-          console.error('Failed to import fallback data:', importError)
-        }
-      }
-      
-      // For other errors on artist endpoint, try fallback
-      if (url.includes('/api/artist')) {
-        console.warn('🔄 Artist request failed, attempting to use fallback data')
-        try {
-          const { fallbackArtistData } = await import('@/lib/artworks')
-          return fallbackArtistData as unknown as T
-        } catch (importError) {
-          console.error('Failed to import fallback artist data:', importError)
-        }
-      }
-      
-      throw error
-    }
-  }, [url, fetchOptions])
+    },
+    [url, fetchOptions]
+  )
 
   return useApiRequest(requestFn, {
     immediate,
     revalidateOnFocus,
     retryAttempts,
     retryDelay,
-    timeout
+    timeout,
   })
 }
 
@@ -314,16 +337,19 @@ export function useMultipleApiRequests<T extends Record<string, any>>(
   },
   options: UseApiRequestOptions = {}
 ): UseApiRequestReturn<T> {
-  const requestFn = useCallback(async (signal: AbortSignal): Promise<T> => {
-    const results = await Promise.all(
-      Object.entries(requests).map(async ([key, fn]) => {
-        const result = await fn(signal)
-        return [key, result]
-      })
-    )
+  const requestFn = useCallback(
+    async (signal: AbortSignal): Promise<T> => {
+      const results = await Promise.all(
+        Object.entries(requests).map(async ([key, fn]) => {
+          const result = await fn(signal)
+          return [key, result]
+        })
+      )
 
-    return Object.fromEntries(results) as T
-  }, [requests])
+      return Object.fromEntries(results) as T
+    },
+    [requests]
+  )
 
   return useApiRequest(requestFn, options)
 }

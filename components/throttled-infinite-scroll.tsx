@@ -1,7 +1,10 @@
 'use client'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useThrottledIntersection, useThrottledScroll } from '@/lib/hooks/use-throttled-handlers'
+import {
+  useThrottledIntersection,
+  useThrottledScroll,
+} from '@/lib/hooks/use-throttled-handlers'
 import { Loader2 } from 'lucide-react'
 
 interface ThrottledInfiniteScrollProps {
@@ -27,7 +30,7 @@ export function ThrottledInfiniteScroll({
   threshold = 200,
   className = '',
   loadingComponent,
-  endMessage
+  endMessage,
 }: ThrottledInfiniteScrollProps) {
   const [hasTriggered, setHasTriggered] = useState(false)
   const triggerRef = useRef<HTMLDivElement>(null)
@@ -37,7 +40,7 @@ export function ThrottledInfiniteScroll({
   // Throttled load more function to prevent excessive calls
   const throttledLoadMore = useCallback(() => {
     const now = Date.now()
-    
+
     // Prevent rapid successive calls (minimum 500ms between loads)
     if (now - lastLoadTime.current < 500) {
       return
@@ -66,15 +69,18 @@ export function ThrottledInfiniteScroll({
 
   // Intersection observer for trigger element
   const { observe, unobserve } = useThrottledIntersection(
-    useCallback((entries: IntersectionObserverEntry[]) => {
-      const entry = entries[0]
-      if (entry?.isIntersecting && !hasTriggered) {
-        throttledLoadMore()
-      }
-    }, [throttledLoadMore, hasTriggered]),
+    useCallback(
+      (entries: IntersectionObserverEntry[]) => {
+        const entry = entries[0]
+        if (entry?.isIntersecting && !hasTriggered) {
+          throttledLoadMore()
+        }
+      },
+      [throttledLoadMore, hasTriggered]
+    ),
     {
       rootMargin: `${threshold}px`,
-      threshold: 0.1
+      threshold: 0.1,
     },
     100, // 100ms throttle for intersection
     [threshold]
@@ -107,23 +113,28 @@ export function ThrottledInfiniteScroll({
   )
 
   const defaultLoadingComponent = (
-    <div className="flex justify-center items-center py-8">
-      <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
-        <Loader2 className="w-5 h-5 animate-spin" />
-        <span className="text-sm">작품을 불러오는 중...</span>
+    <div className='flex justify-center items-center py-8'>
+      <div className='flex items-center gap-3 text-gray-600 dark:text-gray-400'>
+        <Loader2 className='w-5 h-5 animate-spin' />
+        <span className='text-sm'>작품을 불러오는 중...</span>
       </div>
     </div>
   )
 
   const defaultEndMessage = (
-    <div className="text-center py-8">
-      <div className="text-gray-600 dark:text-gray-400">
-        <div className="w-12 h-12 mx-auto mb-3 opacity-50">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M5 13l4 4L19 7" />
+    <div className='text-center py-8'>
+      <div className='text-gray-600 dark:text-gray-400'>
+        <div className='w-12 h-12 mx-auto mb-3 opacity-50'>
+          <svg fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={1}
+              d='M5 13l4 4L19 7'
+            />
           </svg>
         </div>
-        <p className="text-sm">모든 작품을 확인했습니다</p>
+        <p className='text-sm'>모든 작품을 확인했습니다</p>
       </div>
     </div>
   )
@@ -131,19 +142,15 @@ export function ThrottledInfiniteScroll({
   return (
     <div className={className}>
       {children}
-      
+
       {/* Trigger element for intersection observer */}
       {hasMore && (
-        <div
-          ref={triggerRef}
-          className="w-full h-4"
-          aria-hidden="true"
-        />
+        <div ref={triggerRef} className='w-full h-4' aria-hidden='true' />
       )}
-      
+
       {/* Loading state */}
       {isLoading && (loadingComponent || defaultLoadingComponent)}
-      
+
       {/* End message */}
       {!hasMore && !isLoading && (endMessage || defaultEndMessage)}
     </div>
@@ -170,21 +177,23 @@ export function useThrottledInfiniteScrollState<T>(
     try {
       setIsLoading(true)
       setError(null)
-      
+
       const newData = await fetchMore(offsetRef.current, pageSize)
-      
+
       if (newData.length < pageSize) {
         setHasMore(false)
       }
-      
+
       if (newData.length > 0) {
-        setData(prev => [...prev, ...newData])
+        setData((prev) => [...prev, ...newData])
         offsetRef.current += newData.length
       } else {
         setHasMore(false)
       }
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to load more data'))
+      setError(
+        err instanceof Error ? err : new Error('Failed to load more data')
+      )
     } finally {
       setIsLoading(false)
     }
@@ -212,7 +221,7 @@ export function useThrottledInfiniteScrollState<T>(
     error,
     loadMore,
     reset,
-    retry
+    retry,
   }
 }
 
@@ -229,7 +238,7 @@ export function VirtualizedInfiniteScroll<T>({
   onLoadMore,
   containerHeight = 600,
   overscan = 5,
-  className = ''
+  className = '',
 }: {
   items: T[]
   itemHeight: number
@@ -250,19 +259,26 @@ export function VirtualizedInfiniteScroll<T>({
     items.length
   )
 
-  const throttledScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement
-    setScrollTop(target.scrollTop)
+  const throttledScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      const target = e.target as HTMLDivElement
+      setScrollTop(target.scrollTop)
 
-    // Check if we need to load more
-    const scrollHeight = target.scrollHeight
-    const clientHeight = target.clientHeight
-    const currentScrollTop = target.scrollTop
+      // Check if we need to load more
+      const scrollHeight = target.scrollHeight
+      const clientHeight = target.clientHeight
+      const currentScrollTop = target.scrollTop
 
-    if (scrollHeight - currentScrollTop - clientHeight < 200 && hasMore && !isLoading) {
-      onLoadMore()
-    }
-  }, [hasMore, isLoading, onLoadMore])
+      if (
+        scrollHeight - currentScrollTop - clientHeight < 200 &&
+        hasMore &&
+        !isLoading
+      ) {
+        onLoadMore()
+      }
+    },
+    [hasMore, isLoading, onLoadMore]
+  )
 
   return (
     <div
@@ -281,14 +297,14 @@ export function VirtualizedInfiniteScroll<T>({
                 position: 'absolute',
                 top: actualIndex * itemHeight,
                 height: itemHeight,
-                width: '100%'
+                width: '100%',
               }}
             >
               {renderItem(item, actualIndex)}
             </div>
           )
         })}
-        
+
         {isLoading && (
           <div
             style={{
@@ -296,10 +312,10 @@ export function VirtualizedInfiniteScroll<T>({
               top: items.length * itemHeight,
               width: '100%',
               padding: '20px',
-              textAlign: 'center'
+              textAlign: 'center',
             }}
           >
-            <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+            <Loader2 className='w-5 h-5 animate-spin mx-auto' />
           </div>
         )}
       </div>

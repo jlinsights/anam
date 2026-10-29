@@ -40,7 +40,7 @@ export function SearchFilter({
   // Throttled search handler for better performance
   const throttledSearchUpdate = useThrottledSearch(
     (searchTerm: string) => {
-      setFilters(prev => ({ ...prev, searchTerm }))
+      setFilters((prev) => ({ ...prev, searchTerm }))
     },
     300, // 300ms delay for search input
     []
@@ -149,8 +149,8 @@ export function SearchFilter({
           <label htmlFor='artwork-search' className='sr-only'>
             작품 검색
           </label>
-          <Search 
-            className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground dark:text-neutral-400' 
+          <Search
+            className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground dark:text-neutral-400'
             aria-hidden='true'
           />
           <Input
@@ -181,7 +181,7 @@ export function SearchFilter({
             <Filter className='h-4 w-4' aria-hidden='true' />
             필터
             {filters.selectedMediums.length > 0 && (
-              <span 
+              <span
                 className='ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground dark:bg-neutral-700 dark:text-neutral-200'
                 aria-label={`${filters.selectedMediums.length}개 필터 적용됨`}
               >
@@ -207,7 +207,7 @@ export function SearchFilter({
           </div>
 
           {/* 검색 결과 요약 */}
-          <div 
+          <div
             className='text-sm text-ink-light'
             role='status'
             aria-live='polite'
@@ -219,13 +219,13 @@ export function SearchFilter({
 
         {/* 활성 필터 태그 */}
         {activeFiltersCount > 0 && (
-          <div 
+          <div
             className='flex flex-wrap gap-2'
             role='list'
             aria-label='적용된 필터 목록'
           >
             {filters.searchTerm && (
-              <span 
+              <span
                 className='inline-flex items-center px-2 py-1 rounded-full text-xs bg-ink/10 text-ink'
                 role='listitem'
               >
@@ -261,7 +261,7 @@ export function SearchFilter({
 
             {(filters.yearRange[0] !== availableYears[0] ||
               filters.yearRange[1] !== availableYears[1]) && (
-              <span 
+              <span
                 className='inline-flex items-center px-2 py-1 rounded-full text-xs bg-ink/10 text-ink'
                 role='listitem'
               >
@@ -300,7 +300,9 @@ export function SearchFilter({
               </legend>
               <div className='flex gap-2'>
                 <div className='flex-1'>
-                  <label htmlFor='sort-by' className='sr-only'>정렬 기준 선택</label>
+                  <label htmlFor='sort-by' className='sr-only'>
+                    정렬 기준 선택
+                  </label>
                   <select
                     id='sort-by'
                     value={filters.sortBy}
@@ -317,10 +319,14 @@ export function SearchFilter({
                     <option value='title'>작품명</option>
                     <option value='medium'>재료</option>
                   </select>
-                  <div id='sort-by-help' className='sr-only'>정렬할 기준을 선택하세요</div>
+                  <div id='sort-by-help' className='sr-only'>
+                    정렬할 기준을 선택하세요
+                  </div>
                 </div>
                 <div>
-                  <label htmlFor='sort-order' className='sr-only'>정렬 순서 선택</label>
+                  <label htmlFor='sort-order' className='sr-only'>
+                    정렬 순서 선택
+                  </label>
                   <select
                     id='sort-order'
                     value={filters.sortOrder}
@@ -336,7 +342,9 @@ export function SearchFilter({
                     <option value='desc'>내림차순</option>
                     <option value='asc'>오름차순</option>
                   </select>
-                  <div id='sort-order-help' className='sr-only'>정렬 순서를 선택하세요</div>
+                  <div id='sort-order-help' className='sr-only'>
+                    정렬 순서를 선택하세요
+                  </div>
                 </div>
               </div>
             </fieldset>
@@ -349,7 +357,9 @@ export function SearchFilter({
               </legend>
               <div className='flex items-center gap-2'>
                 <div>
-                  <label htmlFor='year-from' className='sr-only'>시작 년도</label>
+                  <label htmlFor='year-from' className='sr-only'>
+                    시작 년도
+                  </label>
                   <Input
                     id='year-from'
                     type='number'
@@ -359,16 +369,23 @@ export function SearchFilter({
                     onChange={(e) =>
                       setFilters((prev) => ({
                         ...prev,
-                        yearRange: [parseInt(e.target.value) || availableYears[0], prev.yearRange[1]],
+                        yearRange: [
+                          parseInt(e.target.value) || availableYears[0],
+                          prev.yearRange[1],
+                        ],
                       }))
                     }
                     className='w-20 focus:ring-2 focus:ring-gold'
                     aria-describedby='year-range-help'
                   />
                 </div>
-                <span className='text-ink-light' aria-hidden='true'>-</span>
+                <span className='text-ink-light' aria-hidden='true'>
+                  -
+                </span>
                 <div>
-                  <label htmlFor='year-to' className='sr-only'>종료 년도</label>
+                  <label htmlFor='year-to' className='sr-only'>
+                    종료 년도
+                  </label>
                   <Input
                     id='year-to'
                     type='number'
@@ -378,7 +395,10 @@ export function SearchFilter({
                     onChange={(e) =>
                       setFilters((prev) => ({
                         ...prev,
-                        yearRange: [prev.yearRange[0], parseInt(e.target.value) || availableYears[1]],
+                        yearRange: [
+                          prev.yearRange[0],
+                          parseInt(e.target.value) || availableYears[1],
+                        ],
                       }))
                     }
                     className='w-20 focus:ring-2 focus:ring-gold'
@@ -387,7 +407,8 @@ export function SearchFilter({
                 </div>
               </div>
               <div id='year-range-help' className='sr-only'>
-                {availableYears[0]}년부터 {availableYears[1]}년까지 범위에서 선택할 수 있습니다
+                {availableYears[0]}년부터 {availableYears[1]}년까지 범위에서
+                선택할 수 있습니다
               </div>
             </fieldset>
 
@@ -397,7 +418,7 @@ export function SearchFilter({
                 <Ruler className='h-4 w-4' aria-hidden='true' />
                 재료
               </legend>
-              <div 
+              <div
                 className='flex flex-wrap gap-2'
                 role='group'
                 aria-label='재료 필터 선택'
@@ -421,20 +442,21 @@ export function SearchFilter({
                 ))}
               </div>
               <div id='medium-help' className='sr-only'>
-                여러 재료를 선택할 수 있습니다. 선택된 재료로 작품을 필터링합니다.
+                여러 재료를 선택할 수 있습니다. 선택된 재료로 작품을
+                필터링합니다.
               </div>
             </fieldset>
 
             {/* 모달 액션 버튼 */}
             <div className='flex justify-end gap-2 pt-4 border-t border-border'>
-              <Button 
-                variant='outline' 
+              <Button
+                variant='outline'
                 onClick={resetFilters}
                 aria-label='모든 필터 설정 초기화'
               >
                 초기화
               </Button>
-              <Button 
+              <Button
                 onClick={() => setIsFilterOpen(false)}
                 aria-label='필터 설정 적용하고 닫기'
               >
@@ -447,4 +469,3 @@ export function SearchFilter({
     </div>
   )
 }
-

@@ -21,21 +21,55 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60 * 60 * 24 * 365, // 1년 캐시
+    // ✅ PERFORMANCE: Image quality는 Image 컴포넌트의 quality prop으로 설정 (기본값: 75, 권장: 85)
+    // Next.js 15에서는 next.config.mjs에서 quality 옵션을 지원하지 않음
+    // ✅ PERFORMANCE: Enable image optimization
+    dangerouslyAllowSVG: false,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     domains: [
       "imagedelivery.net",
       // 필요시 다른 외부 도메인도 추가
     ],
+    // ✅ PERFORMANCE: Remote pattern for better optimization
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'imagedelivery.net',
+        pathname: '/**',
+      },
+    ],
   },
   experimental: {
-    // ✅ REDUCED OPTIMIZATION SCOPE - Prevent chunk conflicts
+    // ✅ ENHANCED PACKAGE OPTIMIZATION - Reduce bundle size
     optimizePackageImports: [
       "lucide-react",
       "date-fns",
       "clsx",
-      "tailwind-merge"
+      "tailwind-merge",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-toast",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-select",
+      "framer-motion",
+      "zustand",
+      "next-themes",
+      "react-hook-form",
+      "@hookform/resolvers",
+      "zod",
     ],
     // ✅ WEBPACK OPTIMIZATION FOR CHUNK STABILITY
     webpackBuildWorker: false,
+    // ✅ TURBOPACK OPTIMIZATION (if available)
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
     // ✅ FIXED: Disable problematic CSS optimization causing critters error
     // optimizeCss: true,
   },
@@ -185,16 +219,6 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production' ? {
       exclude: ['error', 'warn']
     } : false,
-  },
-  // Bundle optimization
-  modularizeImports: {
-    'lucide-react': {
-      transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
-      preventFullImport: true,
-    },
-    'date-fns': {
-      transform: 'date-fns/{{member}}',
-    },
   },
   async redirects() {
     return [];

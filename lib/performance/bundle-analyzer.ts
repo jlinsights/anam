@@ -56,13 +56,19 @@ class BundleAnalyzer {
 
     // Collect all performance entries
     this.performanceEntries = performance.getEntries()
-    this.resourceTimings = performance.getEntriesByType('resource') as PerformanceResourceTiming[]
+    this.resourceTimings = performance.getEntriesByType(
+      'resource'
+    ) as PerformanceResourceTiming[]
 
     // Listen for new entries
     const observer = new PerformanceObserver((list) => {
       this.performanceEntries.push(...list.getEntries())
       this.resourceTimings.push(
-        ...list.getEntries().filter(entry => entry.entryType === 'resource') as PerformanceResourceTiming[]
+        ...(list
+          .getEntries()
+          .filter(
+            (entry) => entry.entryType === 'resource'
+          ) as PerformanceResourceTiming[])
       )
     })
 
@@ -82,7 +88,7 @@ class BundleAnalyzer {
       chunks,
       recommendations,
       score,
-      metrics
+      metrics,
     }
   }
 
@@ -91,7 +97,9 @@ class BundleAnalyzer {
 
     // Analyze JavaScript chunks
     const jsResources = this.resourceTimings.filter(
-      resource => resource.name.endsWith('.js') || resource.name.includes('/_next/static/chunks/')
+      (resource) =>
+        resource.name.endsWith('.js') ||
+        resource.name.includes('/_next/static/chunks/')
     )
 
     for (const resource of jsResources) {
@@ -105,7 +113,9 @@ class BundleAnalyzer {
     return chunks.sort((a, b) => b.size - a.size)
   }
 
-  private async analyzeChunk(resource: PerformanceResourceTiming): Promise<ChunkInfo | null> {
+  private async analyzeChunk(
+    resource: PerformanceResourceTiming
+  ): Promise<ChunkInfo | null> {
     try {
       const response = await fetch(resource.name, { method: 'HEAD' })
       const contentLength = response.headers.get('content-length')
@@ -114,7 +124,8 @@ class BundleAnalyzer {
       if (!contentLength) return null
 
       const size = parseInt(contentLength, 10)
-      const gzippedSize = contentEncoding === 'gzip' ? size : Math.floor(size * 0.3) // Estimate
+      const gzippedSize =
+        contentEncoding === 'gzip' ? size : Math.floor(size * 0.3) // Estimate
 
       // Extract chunk name and route
       const urlParts = resource.name.split('/')
@@ -131,7 +142,7 @@ class BundleAnalyzer {
         gzippedSize,
         modules: [], // Would need webpack bundle analyzer for detailed module info
         route,
-        priority
+        priority,
       }
     } catch (error) {
       console.warn('Failed to analyze chunk:', resource.name, error)
@@ -145,7 +156,7 @@ class BundleAnalyzer {
       const match = resourceUrl.match(/pages\/(.+?)[-.]/)
       return match ? `/${match[1]}` : undefined
     }
-    
+
     if (resourceUrl.includes('app/')) {
       const match = resourceUrl.match(/app\/(.+?)[-.]/)
       return match ? `/${match[1]}` : undefined
@@ -154,14 +165,20 @@ class BundleAnalyzer {
     return undefined
   }
 
-  private determinePriority(resource: PerformanceResourceTiming, route?: string): 'critical' | 'high' | 'medium' | 'low' {
+  private determinePriority(
+    resource: PerformanceResourceTiming,
+    route?: string
+  ): 'critical' | 'high' | 'medium' | 'low' {
     // Critical: Main bundle, polyfills
     if (resource.name.includes('main') || resource.name.includes('polyfill')) {
       return 'critical'
     }
 
     // High: Current page, shared components
-    if (route === window.location.pathname || resource.name.includes('shared')) {
+    if (
+      route === window.location.pathname ||
+      resource.name.includes('shared')
+    ) {
       return 'high'
     }
 
@@ -175,91 +192,116 @@ class BundleAnalyzer {
   }
 
   private calculateMetrics(): BundleMetrics {
-    const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
+    const navigationEntry = performance.getEntriesByType(
+      'navigation'
+    )[0] as PerformanceNavigationTiming
 
     const loadTime = navigationEntry.loadEventEnd - navigationEntry.fetchStart
-    const parseTime = navigationEntry.domInteractive - navigationEntry.responseEnd
-    const executeTime = navigationEntry.domContentLoadedEventEnd - navigationEntry.domInteractive
+    const parseTime =
+      navigationEntry.domInteractive - navigationEntry.responseEnd
+    const executeTime =
+      navigationEntry.domContentLoadedEventEnd - navigationEntry.domInteractive
 
     // Calculate cache hit rate
     const cachedResources = this.resourceTimings.filter(
-      resource => resource.transferSize === 0 && resource.decodedBodySize > 0
+      (resource) => resource.transferSize === 0 && resource.decodedBodySize > 0
     )
     const cacheHitRate = cachedResources.length / this.resourceTimings.length
 
     // Estimate compression ratio
-    const totalTransferSize = this.resourceTimings.reduce((sum, r) => sum + (r.transferSize || 0), 0)
-    const totalDecodedSize = this.resourceTimings.reduce((sum, r) => sum + (r.decodedBodySize || 0), 0)
-    const compressionRatio = totalDecodedSize > 0 ? totalTransferSize / totalDecodedSize : 1
+    const totalTransferSize = this.resourceTimings.reduce(
+      (sum, r) => sum + (r.transferSize || 0),
+      0
+    )
+    const totalDecodedSize = this.resourceTimings.reduce(
+      (sum, r) => sum + (r.decodedBodySize || 0),
+      0
+    )
+    const compressionRatio =
+      totalDecodedSize > 0 ? totalTransferSize / totalDecodedSize : 1
 
     return {
       loadTime,
       parseTime,
       executeTime,
       cacheHitRate,
-      compressionRatio
+      compressionRatio,
     }
   }
 
-  private generateRecommendations(chunks: ChunkInfo[], metrics: BundleMetrics): OptimizationRecommendation[] {
+  private generateRecommendations(
+    chunks: ChunkInfo[],
+    metrics: BundleMetrics
+  ): OptimizationRecommendation[] {
     const recommendations: OptimizationRecommendation[] = []
 
     // Large chunk recommendations
-    chunks.forEach(chunk => {
-      if (chunk.size > 500 * 1024) { // > 500KB
+    chunks.forEach((chunk) => {
+      if (chunk.size > 500 * 1024) {
+        // > 500KB
         recommendations.push({
           type: 'code-split',
           target: chunk.name,
           impact: 'high',
           description: `Chunk "${chunk.name}" is ${Math.round(chunk.size / 1024)}KB. Consider code splitting.`,
-          implementation: 'Use dynamic imports: const Component = lazy(() => import("./Component"))',
-          estimatedSavings: Math.floor(chunk.size * 0.6) // Estimate 60% reduction
+          implementation:
+            'Use dynamic imports: const Component = lazy(() => import("./Component"))',
+          estimatedSavings: Math.floor(chunk.size * 0.6), // Estimate 60% reduction
         })
       }
 
-      if (chunk.size > 100 * 1024 && chunk.priority === 'low') { // > 100KB low priority
+      if (chunk.size > 100 * 1024 && chunk.priority === 'low') {
+        // > 100KB low priority
         recommendations.push({
           type: 'lazy-load',
           target: chunk.name,
           impact: 'medium',
           description: `Low priority chunk "${chunk.name}" should be lazy loaded.`,
-          implementation: 'Implement route-based code splitting and lazy loading',
-          estimatedSavings: chunk.size // Full savings from initial load
+          implementation:
+            'Implement route-based code splitting and lazy loading',
+          estimatedSavings: chunk.size, // Full savings from initial load
         })
       }
     })
 
     // Performance-based recommendations
-    if (metrics.loadTime > 3000) { // > 3 seconds
+    if (metrics.loadTime > 3000) {
+      // > 3 seconds
       recommendations.push({
         type: 'preload',
         target: 'critical-resources',
         impact: 'high',
         description: 'Load time is slow. Preload critical resources.',
         implementation: '<link rel="preload" href="/critical.js" as="script">',
-        estimatedSavings: 1000 // Estimate 1s improvement
+        estimatedSavings: 1000, // Estimate 1s improvement
       })
     }
 
-    if (metrics.compressionRatio > 0.8) { // Poor compression
+    if (metrics.compressionRatio > 0.8) {
+      // Poor compression
       recommendations.push({
         type: 'compress',
         target: 'all-assets',
         impact: 'medium',
         description: 'Enable better compression (Brotli/Gzip).',
-        implementation: 'Configure server compression: Accept-Encoding: br, gzip',
-        estimatedSavings: Math.floor(chunks.reduce((sum, c) => sum + c.size, 0) * 0.3)
+        implementation:
+          'Configure server compression: Accept-Encoding: br, gzip',
+        estimatedSavings: Math.floor(
+          chunks.reduce((sum, c) => sum + c.size, 0) * 0.3
+        ),
       })
     }
 
-    if (metrics.cacheHitRate < 0.7) { // < 70% cache hit rate
+    if (metrics.cacheHitRate < 0.7) {
+      // < 70% cache hit rate
       recommendations.push({
         type: 'preload',
         target: 'static-assets',
         impact: 'medium',
         description: 'Improve caching strategy for better cache hit rate.',
-        implementation: 'Set appropriate Cache-Control headers and implement service worker caching',
-        estimatedSavings: 2000 // Estimate 2s improvement from caching
+        implementation:
+          'Set appropriate Cache-Control headers and implement service worker caching',
+        estimatedSavings: 2000, // Estimate 2s improvement from caching
       })
     }
 
@@ -269,11 +311,14 @@ class BundleAnalyzer {
     })
   }
 
-  private calculateOptimizationScore(chunks: ChunkInfo[], metrics: BundleMetrics): number {
+  private calculateOptimizationScore(
+    chunks: ChunkInfo[],
+    metrics: BundleMetrics
+  ): number {
     let score = 100
 
     // Penalize large chunks
-    chunks.forEach(chunk => {
+    chunks.forEach((chunk) => {
       if (chunk.size > 500 * 1024) score -= 20
       else if (chunk.size > 250 * 1024) score -= 10
       else if (chunk.size > 100 * 1024) score -= 5
@@ -295,16 +340,22 @@ class BundleAnalyzer {
   }
 
   // 🎯 SuperClaude Pattern: Real-time Bundle Monitoring
-  public startRealTimeMonitoring(callback: (report: BundleAnalysisReport) => void) {
+  public startRealTimeMonitoring(
+    callback: (report: BundleAnalysisReport) => void
+  ) {
     // Initial analysis
     this.analyzeBundles().then(callback)
 
     // Monitor for new chunks (e.g., lazy loaded)
     const observer = new PerformanceObserver((list) => {
-      const newResources = list.getEntries().filter(
-        entry => entry.entryType === 'resource' && 
-        (entry.name.endsWith('.js') || entry.name.includes('/_next/static/'))
-      )
+      const newResources = list
+        .getEntries()
+        .filter(
+          (entry) =>
+            entry.entryType === 'resource' &&
+            (entry.name.endsWith('.js') ||
+              entry.name.includes('/_next/static/'))
+        )
 
       if (newResources.length > 0) {
         // Re-analyze when new resources are loaded

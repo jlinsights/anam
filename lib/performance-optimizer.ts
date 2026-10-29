@@ -9,13 +9,13 @@ export function getNetworkInfo() {
       effectiveType: '4g',
       downlink: 10,
       rtt: 100,
-      isSlowConnection: false
+      isSlowConnection: false,
     }
   }
 
   const connection = (navigator as any).connection
-  const isSlowConnection = 
-    connection.effectiveType === '2g' || 
+  const isSlowConnection =
+    connection.effectiveType === '2g' ||
     connection.effectiveType === 'slow-2g' ||
     connection.downlink < 1
 
@@ -23,7 +23,7 @@ export function getNetworkInfo() {
     effectiveType: connection.effectiveType || '4g',
     downlink: connection.downlink || 10,
     rtt: connection.rtt || 100,
-    isSlowConnection
+    isSlowConnection,
   }
 }
 
@@ -33,7 +33,7 @@ export function getDeviceInfo() {
     return {
       hardwareConcurrency: 4,
       deviceMemory: 8,
-      isLowEndDevice: false
+      isLowEndDevice: false,
     }
   }
 
@@ -44,7 +44,7 @@ export function getDeviceInfo() {
   return {
     hardwareConcurrency,
     deviceMemory,
-    isLowEndDevice
+    isLowEndDevice,
   }
 }
 
@@ -54,10 +54,11 @@ export function identifyLCPCandidate(elements: Element[]): Element | null {
   let largestElement: Element | null = null
   let largestSize = 0
 
-  elements.forEach(element => {
+  elements.forEach((element) => {
     const rect = element.getBoundingClientRect()
-    const isVisible = rect.top < window.innerHeight && rect.left < window.innerWidth
-    
+    const isVisible =
+      rect.top < window.innerHeight && rect.left < window.innerWidth
+
     if (isVisible) {
       const size = rect.width * rect.height
       if (size > largestSize) {
@@ -83,14 +84,14 @@ export function calculateImagePriority(
   const rect = element.getBoundingClientRect()
   const isAboveFold = rect.top < window.innerHeight
   const isFirstImages = index < 6 // First 6 images get priority
-  
+
   // High priority: above fold OR first 3 images
   const priority = isAboveFold || index < 3
-  
+
   return {
     priority,
-    fetchPriority: priority ? 'high' : (index < 6 ? 'auto' : 'low'),
-    loading: priority ? 'eager' : 'lazy'
+    fetchPriority: priority ? 'high' : index < 6 ? 'auto' : 'low',
+    loading: priority ? 'eager' : 'lazy',
   }
 }
 
@@ -104,15 +105,13 @@ export function checkLayoutStability(element: Element): {
   const computedStyle = window.getComputedStyle(element)
   const recommendations: string[] = []
 
-  const hasExplicitDimensions = 
-    computedStyle.width !== 'auto' && 
-    computedStyle.height !== 'auto'
+  const hasExplicitDimensions =
+    computedStyle.width !== 'auto' && computedStyle.height !== 'auto'
 
-  const hasAspectRatio = 
-    computedStyle.aspectRatio !== 'auto'
+  const hasAspectRatio = computedStyle.aspectRatio !== 'auto'
 
-  const hasReservedSpace = 
-    hasExplicitDimensions || 
+  const hasReservedSpace =
+    hasExplicitDimensions ||
     hasAspectRatio ||
     computedStyle.containIntrinsicSize !== 'none'
 
@@ -128,7 +127,7 @@ export function checkLayoutStability(element: Element): {
     hasExplicitDimensions,
     hasAspectRatio,
     hasReservedSpace,
-    recommendations
+    recommendations,
   }
 }
 
@@ -136,21 +135,21 @@ export function checkLayoutStability(element: Element): {
 export class AdaptiveLoadingStrategy {
   private networkInfo = getNetworkInfo()
   private deviceInfo = getDeviceInfo()
-  
+
   shouldPreloadImages(): boolean {
     return !this.networkInfo.isSlowConnection && !this.deviceInfo.isLowEndDevice
   }
 
   getOptimalImageFormat(): 'avif' | 'webp' | 'jpg' {
     if (this.deviceInfo.isLowEndDevice) return 'jpg'
-    
+
     // Check browser support
     const canvas = document.createElement('canvas')
     canvas.width = canvas.height = 1
-    
+
     if (canvas.toDataURL('image/avif').includes('avif')) return 'avif'
     if (canvas.toDataURL('image/webp').includes('webp')) return 'webp'
-    
+
     return 'jpg'
   }
 
@@ -162,7 +161,7 @@ export class AdaptiveLoadingStrategy {
     if (isSlowConnection || isLowEndDevice) return 'thumb'
     if (screenWidth < 768) return 'medium'
     if (screenWidth < 1200) return 'medium'
-    
+
     return 'large'
   }
 
@@ -173,7 +172,7 @@ export class AdaptiveLoadingStrategy {
   getIntersectionObserverMargin(): string {
     if (this.networkInfo.isSlowConnection) return '50px 0px'
     if (this.deviceInfo.isLowEndDevice) return '100px 0px'
-    
+
     return '200px 0px' // Aggressive preloading for good connections
   }
 }
@@ -184,28 +183,30 @@ export const PERFORMANCE_BUDGETS = {
   LCP: { good: 2500, poor: 4000 },
   FID: { good: 100, poor: 300 },
   CLS: { good: 0.1, poor: 0.25 },
-  
+
   // Custom thresholds
   TTI: { good: 3800, poor: 7300 },
   FCP: { good: 1800, poor: 3000 },
-  
+
   // Resource budgets
   BUNDLE_SIZE: { good: 200 * 1024, poor: 400 * 1024 }, // bytes
   IMAGE_SIZE: { good: 500 * 1024, poor: 1024 * 1024 },
-  FONT_SIZE: { good: 100 * 1024, poor: 200 * 1024 }
+  FONT_SIZE: { good: 100 * 1024, poor: 200 * 1024 },
 } as const
 
 // Real-time performance monitoring
 export class PerformanceWatcher {
   private metrics: Map<string, number> = new Map()
-  
+
   recordMetric(name: string, value: number) {
     this.metrics.set(name, value)
-    
+
     // Check against budgets
     const budget = (PERFORMANCE_BUDGETS as any)[name.toUpperCase()]
     if (budget && value > budget.poor) {
-      console.warn(`Performance budget exceeded for ${name}: ${value} > ${budget.poor}`)
+      console.warn(
+        `Performance budget exceeded for ${name}: ${value} > ${budget.poor}`
+      )
     }
   }
 
@@ -227,12 +228,12 @@ export async function optimizeImageLoading(
   const deferredImages = images.slice(6)
 
   // Load priority images immediately
-  const priorityPromises = priorityImages.map(img => {
+  const priorityPromises = priorityImages.map((img) => {
     if (img.dataset.src) {
       img.src = img.dataset.src
       img.removeAttribute('data-src')
     }
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       img.onload = img.onerror = resolve
     })
   })
@@ -243,7 +244,7 @@ export async function optimizeImageLoading(
   if (strategy.shouldPreloadImages()) {
     // Fast connection: load remaining images with slight delay
     setTimeout(() => {
-      deferredImages.forEach(img => {
+      deferredImages.forEach((img) => {
         if (img.dataset.src) {
           img.src = img.dataset.src
           img.removeAttribute('data-src')

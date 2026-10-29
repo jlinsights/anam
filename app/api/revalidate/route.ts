@@ -1,16 +1,42 @@
 import { clearCacheAndRevalidate } from '@/lib/cache'
-import { createErrorResponse, createSuccessResponse, handleAuthError } from '@/lib/error-handler'
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  handleAuthError,
+} from '@/lib/error-handler'
 import { NextRequest, NextResponse } from 'next/server'
+import crypto from 'crypto'
 
-// Optional secret to protect endpoint
+// 시크릿이 없으면 누구나 캐시를 무효화할 수 있으므로 필수로 둔다
 const WEBHOOK_SECRET = process.env.REVALIDATE_SECRET
+
+function isValidSecret(provided: unknown, expected: string): boolean {
+  if (typeof provided !== 'string') {
+    return false
+  }
+  // 문자 수가 아니라 바이트 수를 비교해야 한다: 길이가 다르면 timingSafeEqual이 예외를 던진다
+  const providedBuf = Buffer.from(provided, 'utf8')
+  const expectedBuf = Buffer.from(expected, 'utf8')
+  if (providedBuf.length !== expectedBuf.length) {
+    return false
+  }
+  return crypto.timingSafeEqual(providedBuf, expectedBuf)
+}
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const { tag, secret } = body
 
-    if (WEBHOOK_SECRET && secret !== WEBHOOK_SECRET) {
+    if (!WEBHOOK_SECRET) {
+      return createErrorResponse(
+        new Error('REVALIDATE_SECRET is not configured'),
+        503,
+        'Revalidation is not configured'
+      )
+    }
+
+    if (!isValidSecret(secret, WEBHOOK_SECRET)) {
       return handleAuthError('Invalid secret')
     }
 
@@ -24,7 +50,10 @@ export async function POST(req: NextRequest) {
 
     clearCacheAndRevalidate(tag)
 
-    return createSuccessResponse({ revalidated: true, tag }, 'Cache revalidated successfully')
+    return createSuccessResponse(
+      { revalidated: true, tag },
+      'Cache revalidated successfully'
+    )
   } catch (error: any) {
     return createErrorResponse(error, 400)
   }

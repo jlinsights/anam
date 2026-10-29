@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// 인증이 없는 내부 분석 도구라 프로덕션에서는 막는다 (DELETE로 누구나 데이터를 지울 수 있었음)
+function blockInProduction(): NextResponse | null {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json(
+      { error: 'Not available in production' },
+      { status: 403 }
+    )
+  }
+  return null
+}
+
 interface PerformanceAnalyticsData {
   metrics: Record<string, number>
   userAgent: string
@@ -66,7 +77,7 @@ const PERFORMANCE_THRESHOLDS = {
   TTFB_GOOD: 800,
   TTFB_POOR: 1800,
   INP_GOOD: 200,
-  INP_POOR: 500
+  INP_POOR: 500,
 }
 
 // Performance budgets
@@ -77,7 +88,7 @@ const PERFORMANCE_BUDGETS = {
   FILTER_RESPONSE: 200,
   IMAGE_LOAD_BUDGET: 3000,
   THUMBNAIL_LOAD_BUDGET: 500,
-  MODAL_OPEN_BUDGET: 150
+  MODAL_OPEN_BUDGET: 150,
 }
 
 function analyzePerformanceData(data: PerformanceAnalyticsData): {
@@ -94,11 +105,15 @@ function analyzePerformanceData(data: PerformanceAnalyticsData): {
     if (data.metrics.lcp > PERFORMANCE_THRESHOLDS.LCP_POOR) {
       score -= 25
       issues.push(`Poor LCP: ${data.metrics.lcp}ms`)
-      recommendations.push('Optimize Largest Contentful Paint by improving server response times and optimizing critical resources')
+      recommendations.push(
+        'Optimize Largest Contentful Paint by improving server response times and optimizing critical resources'
+      )
     } else if (data.metrics.lcp > PERFORMANCE_THRESHOLDS.LCP_GOOD) {
       score -= 10
       issues.push(`Needs improvement LCP: ${data.metrics.lcp}ms`)
-      recommendations.push('Consider optimizing images and critical CSS for better LCP')
+      recommendations.push(
+        'Consider optimizing images and critical CSS for better LCP'
+      )
     }
   }
 
@@ -106,11 +121,15 @@ function analyzePerformanceData(data: PerformanceAnalyticsData): {
     if (data.metrics.inp > PERFORMANCE_THRESHOLDS.INP_POOR) {
       score -= 25
       issues.push(`Poor INP: ${data.metrics.inp}ms`)
-      recommendations.push('Optimize JavaScript execution and reduce main thread blocking')
+      recommendations.push(
+        'Optimize JavaScript execution and reduce main thread blocking'
+      )
     } else if (data.metrics.inp > PERFORMANCE_THRESHOLDS.INP_GOOD) {
       score -= 10
       issues.push(`Needs improvement INP: ${data.metrics.inp}ms`)
-      recommendations.push('Consider code splitting and optimizing event handlers')
+      recommendations.push(
+        'Consider code splitting and optimizing event handlers'
+      )
     }
   }
 
@@ -118,50 +137,77 @@ function analyzePerformanceData(data: PerformanceAnalyticsData): {
     if (data.metrics.cls > PERFORMANCE_THRESHOLDS.CLS_POOR) {
       score -= 25
       issues.push(`Poor CLS: ${data.metrics.cls}`)
-      recommendations.push('Fix layout shifts by reserving space for images and dynamic content')
+      recommendations.push(
+        'Fix layout shifts by reserving space for images and dynamic content'
+      )
     } else if (data.metrics.cls > PERFORMANCE_THRESHOLDS.CLS_GOOD) {
       score -= 10
       issues.push(`Needs improvement CLS: ${data.metrics.cls}`)
-      recommendations.push('Consider adding size attributes to images and optimize font loading')
+      recommendations.push(
+        'Consider adding size attributes to images and optimize font loading'
+      )
     }
   }
 
   // Analyze gallery-specific metrics
-  if (data.metrics.artworkListLoadTime && data.metrics.artworkListLoadTime > PERFORMANCE_BUDGETS.GALLERY_LOAD_TIME) {
+  if (
+    data.metrics.artworkListLoadTime &&
+    data.metrics.artworkListLoadTime > PERFORMANCE_BUDGETS.GALLERY_LOAD_TIME
+  ) {
     score -= 15
     issues.push(`Slow gallery loading: ${data.metrics.artworkListLoadTime}ms`)
-    recommendations.push('Implement virtual scrolling and optimize image loading strategy')
+    recommendations.push(
+      'Implement virtual scrolling and optimize image loading strategy'
+    )
   }
 
-  if (data.metrics.searchResponseTime && data.metrics.searchResponseTime > PERFORMANCE_BUDGETS.SEARCH_RESPONSE) {
+  if (
+    data.metrics.searchResponseTime &&
+    data.metrics.searchResponseTime > PERFORMANCE_BUDGETS.SEARCH_RESPONSE
+  ) {
     score -= 10
     issues.push(`Slow search response: ${data.metrics.searchResponseTime}ms`)
     recommendations.push('Implement search debouncing and result caching')
   }
 
-  if (data.metrics.imageLoadingTime && data.metrics.imageLoadingTime > PERFORMANCE_BUDGETS.IMAGE_LOAD_BUDGET) {
+  if (
+    data.metrics.imageLoadingTime &&
+    data.metrics.imageLoadingTime > PERFORMANCE_BUDGETS.IMAGE_LOAD_BUDGET
+  ) {
     score -= 10
     issues.push(`Slow image loading: ${data.metrics.imageLoadingTime}ms`)
-    recommendations.push('Optimize image formats and implement progressive loading')
+    recommendations.push(
+      'Optimize image formats and implement progressive loading'
+    )
   }
 
   // Device-specific recommendations
   if (data.deviceInfo.deviceType === 'mobile') {
-    if (data.metrics.lcp && data.metrics.lcp > PERFORMANCE_THRESHOLDS.LCP_GOOD) {
-      recommendations.push('Consider mobile-specific optimizations for slower networks')
+    if (
+      data.metrics.lcp &&
+      data.metrics.lcp > PERFORMANCE_THRESHOLDS.LCP_GOOD
+    ) {
+      recommendations.push(
+        'Consider mobile-specific optimizations for slower networks'
+      )
     }
   }
 
   // Network-specific recommendations
-  if (data.networkInfo.effectiveType === '3g' || data.networkInfo.effectiveType === 'slow-2g') {
+  if (
+    data.networkInfo.effectiveType === '3g' ||
+    data.networkInfo.effectiveType === 'slow-2g'
+  ) {
     recommendations.push('Implement adaptive loading for slower connections')
-    recommendations.push('Consider offering a lightweight version for slow networks')
+    recommendations.push(
+      'Consider offering a lightweight version for slow networks'
+    )
   }
 
   return {
     score: Math.max(0, score),
     issues,
-    recommendations
+    recommendations,
   }
 }
 
@@ -178,8 +224,10 @@ function detectAnomalies(data: PerformanceAnalyticsData[]): {
   const older = data.slice(-20, -10)
 
   // Calculate averages
-  const recentLCP = recent.filter(d => d.metrics.lcp).map(d => d.metrics.lcp!)
-  const olderLCP = older.filter(d => d.metrics.lcp).map(d => d.metrics.lcp!)
+  const recentLCP = recent
+    .filter((d) => d.metrics.lcp)
+    .map((d) => d.metrics.lcp!)
+  const olderLCP = older.filter((d) => d.metrics.lcp).map((d) => d.metrics.lcp!)
 
   if (recentLCP.length > 0 && olderLCP.length > 0) {
     const recentAvg = recentLCP.reduce((a, b) => a + b, 0) / recentLCP.length
@@ -195,12 +243,18 @@ function detectAnomalies(data: PerformanceAnalyticsData[]): {
   }
 
   // Check for error rate increases
-  const recentErrors = recent.filter(d => d.metrics.errorRate).map(d => d.metrics.errorRate!)
-  const olderErrors = older.filter(d => d.metrics.errorRate).map(d => d.metrics.errorRate!)
+  const recentErrors = recent
+    .filter((d) => d.metrics.errorRate)
+    .map((d) => d.metrics.errorRate!)
+  const olderErrors = older
+    .filter((d) => d.metrics.errorRate)
+    .map((d) => d.metrics.errorRate!)
 
   if (recentErrors.length > 0 && olderErrors.length > 0) {
-    const recentErrorAvg = recentErrors.reduce((a, b) => a + b, 0) / recentErrors.length
-    const olderErrorAvg = olderErrors.reduce((a, b) => a + b, 0) / olderErrors.length
+    const recentErrorAvg =
+      recentErrors.reduce((a, b) => a + b, 0) / recentErrors.length
+    const olderErrorAvg =
+      olderErrors.reduce((a, b) => a + b, 0) / olderErrors.length
 
     if (recentErrorAvg > olderErrorAvg * 1.5) {
       anomalies.push(`Error rate spike: ${(recentErrorAvg * 100).toFixed(2)}%`)
@@ -222,31 +276,47 @@ function generateInsights(data: PerformanceAnalyticsData[]): {
   const networkBreakdown: Record<string, number> = {}
 
   // Analyze device distribution
-  data.forEach(d => {
+  data.forEach((d) => {
     const deviceType = d.deviceInfo.deviceType || 'unknown'
     deviceBreakdown[deviceType] = (deviceBreakdown[deviceType] || 0) + 1
-    
+
     const networkType = d.networkInfo.effectiveType || 'unknown'
     networkBreakdown[networkType] = (networkBreakdown[networkType] || 0) + 1
   })
 
   // Find common performance issues
-  const slowLCP = data.filter(d => d.metrics.lcp && d.metrics.lcp > PERFORMANCE_THRESHOLDS.LCP_POOR).length
-  const slowGallery = data.filter(d => d.metrics.artworkListLoadTime && d.metrics.artworkListLoadTime > PERFORMANCE_BUDGETS.GALLERY_LOAD_TIME).length
-  const slowSearch = data.filter(d => d.metrics.searchResponseTime && d.metrics.searchResponseTime > PERFORMANCE_BUDGETS.SEARCH_RESPONSE).length
+  const slowLCP = data.filter(
+    (d) => d.metrics.lcp && d.metrics.lcp > PERFORMANCE_THRESHOLDS.LCP_POOR
+  ).length
+  const slowGallery = data.filter(
+    (d) =>
+      d.metrics.artworkListLoadTime &&
+      d.metrics.artworkListLoadTime > PERFORMANCE_BUDGETS.GALLERY_LOAD_TIME
+  ).length
+  const slowSearch = data.filter(
+    (d) =>
+      d.metrics.searchResponseTime &&
+      d.metrics.searchResponseTime > PERFORMANCE_BUDGETS.SEARCH_RESPONSE
+  ).length
 
   if (slowLCP > data.length * 0.1) {
-    topIssues.push(`${((slowLCP / data.length) * 100).toFixed(1)}% of users experience slow LCP`)
+    topIssues.push(
+      `${((slowLCP / data.length) * 100).toFixed(1)}% of users experience slow LCP`
+    )
     recommendations.push('Prioritize LCP optimization across all pages')
   }
 
   if (slowGallery > data.length * 0.1) {
-    topIssues.push(`${((slowGallery / data.length) * 100).toFixed(1)}% of users experience slow gallery loading`)
+    topIssues.push(
+      `${((slowGallery / data.length) * 100).toFixed(1)}% of users experience slow gallery loading`
+    )
     recommendations.push('Implement virtual scrolling and image optimization')
   }
 
   if (slowSearch > data.length * 0.1) {
-    topIssues.push(`${((slowSearch / data.length) * 100).toFixed(1)}% of users experience slow search`)
+    topIssues.push(
+      `${((slowSearch / data.length) * 100).toFixed(1)}% of users experience slow search`
+    )
     recommendations.push('Optimize search algorithm and implement caching')
   }
 
@@ -257,7 +327,10 @@ function generateInsights(data: PerformanceAnalyticsData[]): {
   }
 
   // Network-specific recommendations
-  if ((networkBreakdown['3g'] || 0) + (networkBreakdown['slow-2g'] || 0) > data.length * 0.2) {
+  if (
+    (networkBreakdown['3g'] || 0) + (networkBreakdown['slow-2g'] || 0) >
+    data.length * 0.2
+  ) {
     recommendations.push('Implement adaptive loading for slower networks')
     recommendations.push('Consider offering offline functionality')
   }
@@ -266,14 +339,17 @@ function generateInsights(data: PerformanceAnalyticsData[]): {
     topIssues,
     recommendations,
     deviceBreakdown,
-    networkBreakdown
+    networkBreakdown,
   }
 }
 
 export async function POST(request: NextRequest) {
+  const blocked = blockInProduction()
+  if (blocked) return blocked
+
   try {
     const body = await request.json()
-    
+
     // Handle different types of performance data
     switch (body.type) {
       case 'custom-performance-metrics': {
@@ -286,15 +362,15 @@ export async function POST(request: NextRequest) {
           pageInfo: {
             url: body.data.url || '',
             referrer: body.data.referrer,
-            loadTime: body.data.loadTime
+            loadTime: body.data.loadTime,
           },
           timestamp: body.data.timestamp || Date.now(),
-          sessionId: body.data.sessionId || 'unknown'
+          sessionId: body.data.sessionId || 'unknown',
         }
 
         // Store performance data
         performanceData.push(analyticsData)
-        
+
         // Keep only last 1000 entries
         if (performanceData.length > 1000) {
           performanceData.splice(0, performanceData.length - 1000)
@@ -302,11 +378,11 @@ export async function POST(request: NextRequest) {
 
         // Analyze performance
         const analysis = analyzePerformanceData(analyticsData)
-        
+
         return NextResponse.json({
           success: true,
           analysis,
-          stored: true
+          stored: true,
         })
       }
 
@@ -321,11 +397,11 @@ export async function POST(request: NextRequest) {
           message: body.data.message || 'Performance alert',
           timestamp: body.data.timestamp || Date.now(),
           url: body.data.url || '',
-          userAgent: body.data.userAgent || ''
+          userAgent: body.data.userAgent || '',
         }
 
         performanceAlerts.push(alert)
-        
+
         // Keep only last 500 alerts
         if (performanceAlerts.length > 500) {
           performanceAlerts.splice(0, performanceAlerts.length - 500)
@@ -339,7 +415,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           alert,
-          stored: true
+          stored: true,
         })
       }
 
@@ -351,11 +427,11 @@ export async function POST(request: NextRequest) {
           percentage: body.data.percentage || 0,
           url: body.data.url || '',
           timestamp: body.data.timestamp || Date.now(),
-          userAgent: body.data.userAgent || ''
+          userAgent: body.data.userAgent || '',
         }
 
         budgetViolations.push(violation)
-        
+
         // Keep only last 500 violations
         if (budgetViolations.length > 500) {
           budgetViolations.splice(0, budgetViolations.length - 500)
@@ -364,7 +440,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           violation,
-          stored: true
+          stored: true,
         })
       }
 
@@ -384,6 +460,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const blocked = blockInProduction()
+  if (blocked) return blocked
+
   try {
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type')
@@ -392,29 +471,37 @@ export async function GET(request: NextRequest) {
 
     // Calculate time filter
     const now = Date.now()
-    const timeRangeMs = {
-      '1h': 60 * 60 * 1000,
-      '24h': 24 * 60 * 60 * 1000,
-      '7d': 7 * 24 * 60 * 60 * 1000,
-      '30d': 30 * 24 * 60 * 60 * 1000
-    }[timeRange] || 24 * 60 * 60 * 1000
+    const timeRangeMs =
+      {
+        '1h': 60 * 60 * 1000,
+        '24h': 24 * 60 * 60 * 1000,
+        '7d': 7 * 24 * 60 * 60 * 1000,
+        '30d': 30 * 24 * 60 * 60 * 1000,
+      }[timeRange] || 24 * 60 * 60 * 1000
 
     const startTime = now - timeRangeMs
 
     switch (type) {
       case 'summary': {
-        const filteredData = performanceData.filter(d => d.timestamp >= startTime)
-        const filteredAlerts = performanceAlerts.filter(a => a.timestamp >= startTime)
-        const filteredViolations = budgetViolations.filter(v => v.timestamp >= startTime)
+        const filteredData = performanceData.filter(
+          (d) => d.timestamp >= startTime
+        )
+        const filteredAlerts = performanceAlerts.filter(
+          (a) => a.timestamp >= startTime
+        )
+        const filteredViolations = budgetViolations.filter(
+          (v) => v.timestamp >= startTime
+        )
 
         const { anomalies, trends } = detectAnomalies(filteredData)
         const insights = generateInsights(filteredData)
 
         // Calculate average performance score
-        const analyses = filteredData.map(d => analyzePerformanceData(d))
-        const averageScore = analyses.length > 0 
-          ? analyses.reduce((sum, a) => sum + a.score, 0) / analyses.length 
-          : 0
+        const analyses = filteredData.map((d) => analyzePerformanceData(d))
+        const averageScore =
+          analyses.length > 0
+            ? analyses.reduce((sum, a) => sum + a.score, 0) / analyses.length
+            : 0
 
         return NextResponse.json({
           timeRange,
@@ -423,49 +510,51 @@ export async function GET(request: NextRequest) {
             averageScore: Math.round(averageScore),
             totalAlerts: filteredAlerts.length,
             totalViolations: filteredViolations.length,
-            criticalAlerts: filteredAlerts.filter(a => a.severity === 'critical').length
+            criticalAlerts: filteredAlerts.filter(
+              (a) => a.severity === 'critical'
+            ).length,
           },
           insights,
           anomalies,
           trends,
           recentAlerts: filteredAlerts.slice(0, 10),
-          recentViolations: filteredViolations.slice(0, 10)
+          recentViolations: filteredViolations.slice(0, 10),
         })
       }
 
       case 'metrics': {
         const filteredData = performanceData
-          .filter(d => d.timestamp >= startTime)
+          .filter((d) => d.timestamp >= startTime)
           .slice(0, limit)
 
         return NextResponse.json({
           data: filteredData,
           count: filteredData.length,
-          timeRange
+          timeRange,
         })
       }
 
       case 'alerts': {
         const filteredAlerts = performanceAlerts
-          .filter(a => a.timestamp >= startTime)
+          .filter((a) => a.timestamp >= startTime)
           .slice(0, limit)
 
         return NextResponse.json({
           alerts: filteredAlerts,
           count: filteredAlerts.length,
-          timeRange
+          timeRange,
         })
       }
 
       case 'violations': {
         const filteredViolations = budgetViolations
-          .filter(v => v.timestamp >= startTime)
+          .filter((v) => v.timestamp >= startTime)
           .slice(0, limit)
 
         return NextResponse.json({
           violations: filteredViolations,
           count: filteredViolations.length,
-          timeRange
+          timeRange,
         })
       }
 
@@ -475,8 +564,8 @@ export async function GET(request: NextRequest) {
           parameters: {
             type: 'Type of data to retrieve',
             limit: 'Maximum number of records (default: 100)',
-            timeRange: 'Time range: 1h, 24h, 7d, 30d (default: 24h)'
-          }
+            timeRange: 'Time range: 1h, 24h, 7d, 30d (default: 24h)',
+          },
         })
       }
     }
@@ -490,6 +579,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const blocked = blockInProduction()
+  if (blocked) return blocked
+
   try {
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type')
@@ -518,7 +610,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Cleared ${type} data`
+      message: `Cleared ${type} data`,
     })
   } catch (error) {
     console.error('Performance analytics DELETE error:', error)

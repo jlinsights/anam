@@ -1,7 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { RootErrorBoundary, useGlobalErrorHandler } from '@/components/error-boundary/RootErrorBoundary'
+import {
+  RootErrorBoundary,
+  useGlobalErrorHandler,
+} from '@/components/error-boundary/RootErrorBoundary'
 import { ErrorBoundary } from '@/components/error-boundary'
 import { I18nProvider } from '@/components/i18n-provider'
 import { PWAInstallPrompt } from '@/components/pwa-install-prompt'
@@ -20,18 +23,14 @@ export function ClientLayout({ children }: ClientLayoutProps) {
 
   useEffect(() => {
     setMounted(true)
-    
+
     // ✅ SIMPLIFIED: Basic mounting only, no complex error handling
     console.log('✅ Client layout mounted')
   }, [])
 
   // 서버 사이드에서는 기본 레이아웃만 렌더링
   if (!mounted) {
-    return (
-      <div className='min-h-screen bg-paper text-ink'>
-        {children}
-      </div>
-    )
+    return <div className='min-h-screen bg-paper text-ink'>{children}</div>
   }
 
   // 클라이언트 사이드에서는 완전한 레이아웃 렌더링

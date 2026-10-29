@@ -26,7 +26,7 @@ export function ProgressiveImage({
   sizes = '100vw',
   onLoad,
   onError,
-  fallbackSrc
+  fallbackSrc,
 }: ProgressiveImageProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isError, setIsError] = useState(false)
@@ -45,7 +45,7 @@ export function ProgressiveImage({
   const handleError = useCallback(() => {
     setIsError(true)
     setIsLoading(false)
-    
+
     if (fallbackSrc && currentSrc !== fallbackSrc) {
       setCurrentSrc(fallbackSrc)
       setIsLoading(true)
@@ -78,7 +78,7 @@ export function ProgressiveImage({
       },
       {
         rootMargin: '100px 0px', // Increased for better UX
-        threshold: 0.01
+        threshold: 0.01,
       }
     )
 
@@ -100,19 +100,19 @@ export function ProgressiveImage({
     if (blurDataURL) {
       return blurDataURL
     }
-    
+
     // Only generate canvas placeholder on client side
     if (typeof window === 'undefined') {
       return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCA0MCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjZjNmNGY2Ii8+Cjwvc3ZnPgo='
     }
-    
+
     try {
       // Generate a simple gradient placeholder
       const canvas = document.createElement('canvas')
       canvas.width = 40
       canvas.height = 30
       const ctx = canvas.getContext('2d')
-      
+
       if (ctx) {
         const gradient = ctx.createLinearGradient(0, 0, 40, 30)
         gradient.addColorStop(0, '#f3f4f6')
@@ -124,7 +124,7 @@ export function ProgressiveImage({
     } catch (error) {
       console.warn('Error generating placeholder:', error)
     }
-    
+
     // Fallback SVG placeholder
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCA0MCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjZjNmNGY2Ii8+Cjwvc3ZnPgo='
   }
@@ -145,15 +145,15 @@ export function ProgressiveImage({
             {/* Blur placeholder */}
             <img
               src={placeholderSrc}
-              alt=""
-              className="w-full h-full object-cover filter blur-md scale-110"
-              aria-hidden="true"
+              alt=''
+              className='w-full h-full object-cover filter blur-md scale-110'
+              aria-hidden='true'
             />
-            
+
             {/* Loading overlay */}
-            <div className="absolute inset-0 bg-paper/20 flex items-center justify-center">
+            <div className='absolute inset-0 bg-paper/20 flex items-center justify-center'>
               <motion.div
-                className="w-8 h-8 border-2 border-ink/30 border-t-ink rounded-full"
+                className='w-8 h-8 border-2 border-ink/30 border-t-ink rounded-full'
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               />
@@ -183,16 +183,16 @@ export function ProgressiveImage({
       <AnimatePresence>
         {isError && !isLoading && (
           <motion.div
-            className="absolute inset-0 bg-paper-warm border-2 border-ink/20 flex flex-col items-center justify-center"
+            className='absolute inset-0 bg-paper-warm border-2 border-ink/20 flex flex-col items-center justify-center'
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="text-center p-4">
-              <div className="w-12 h-12 border-2 border-ink/30 rounded-full mb-2 flex items-center justify-center mx-auto">
-                <span className="text-ink/60">📷</span>
+            <div className='text-center p-4'>
+              <div className='w-12 h-12 border-2 border-ink/30 rounded-full mb-2 flex items-center justify-center mx-auto'>
+                <span className='text-ink/60'>📷</span>
               </div>
-              <p className="font-display text-ink-light text-sm">
+              <p className='font-display text-ink-light text-sm'>
                 이미지를 불러올 수 없습니다
               </p>
               <button
@@ -201,7 +201,7 @@ export function ProgressiveImage({
                   setIsLoading(true)
                   setCurrentSrc(src)
                 }}
-                className="mt-2 text-xs text-gold hover:text-ink transition-colors duration-300"
+                className='mt-2 text-xs text-gold hover:text-ink transition-colors duration-300'
               >
                 다시 시도
               </button>
@@ -228,15 +228,18 @@ interface ArtworkImageProps extends Omit<ProgressiveImageProps, 'src' | 'alt'> {
   alt?: string
 }
 
-export function ArtworkImage({ 
-  artwork, 
-  size = 'medium', 
+export function ArtworkImage({
+  artwork,
+  size = 'medium',
   quality = 75,
   alt,
-  ...props 
+  ...props
 }: ArtworkImageProps) {
   // Generate optimized image URLs with enhanced error handling
-  const generateImageUrl = (artwork: ArtworkImageProps['artwork'], size: string) => {
+  const generateImageUrl = (
+    artwork: ArtworkImageProps['artwork'],
+    size: string
+  ) => {
     try {
       // 우선순위 1: slug에서 숫자 추출 (new format: "01", "02", etc.)
       if (artwork.slug && typeof artwork.slug === 'string') {
@@ -252,13 +255,13 @@ export function ArtworkImage({
           return `/Images/Artworks/optimized/${paddedNumber}/${paddedNumber}-${size}.jpg`
         }
       }
-      
+
       // 우선순위 2: number 필드 사용
       if (artwork.number) {
         const paddedNumber = String(artwork.number).padStart(2, '0')
         return `/Images/Artworks/optimized/${paddedNumber}/${paddedNumber}-${size}.jpg`
       }
-      
+
       // 우선순위 3: id 필드에서 숫자 추출
       if (artwork.id && typeof artwork.id === 'string') {
         const idNumber = parseInt(artwork.id)
@@ -267,24 +270,29 @@ export function ArtworkImage({
           return `/Images/Artworks/optimized/${paddedNumber}/${paddedNumber}-${size}.jpg`
         }
       }
-      
+
       console.warn('Could not generate image URL for artwork:', {
         title: artwork.title,
         slug: artwork.slug,
         number: artwork.number,
-        id: artwork.id
+        id: artwork.id,
       })
       // Fallback to legacy system or placeholder
       return artwork.imageUrl || '/images/placeholder-artwork.svg'
     } catch (error) {
-      console.error('Error generating image URL:', error, 'for artwork:', artwork.title)
+      console.error(
+        'Error generating image URL:',
+        error,
+        'for artwork:',
+        artwork.title
+      )
       return '/images/placeholder-artwork.svg'
     }
   }
 
   const src = generateImageUrl(artwork, size)
   const fallbackSrc = generateImageUrl(artwork, 'thumb')
-  
+
   // Enhanced blur data URL with Korean traditional colors (SSR-safe)
   const generateBlurDataURL = () => {
     const svgString = `
@@ -301,7 +309,7 @@ export function ArtworkImage({
         </text>
       </svg>
     `.trim()
-    
+
     // Use Buffer.from for Node.js SSR compatibility
     if (typeof window === 'undefined') {
       return `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}`

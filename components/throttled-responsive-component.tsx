@@ -20,7 +20,7 @@ const DEFAULT_BREAKPOINTS: ResponsiveBreakpoints = {
   mobile: 640,
   tablet: 768,
   desktop: 1024,
-  wide: 1280
+  wide: 1280,
 }
 
 /**
@@ -34,11 +34,11 @@ export function useThrottledResponsive(
     if (typeof window === 'undefined') {
       return { width: 1024, height: 768, breakpoint: 'desktop' }
     }
-    
+
     const width = window.innerWidth
     const height = window.innerHeight
     const breakpoint = getBreakpoint(width, breakpoints)
-    
+
     return { width, height, breakpoint }
   })
 
@@ -46,10 +46,14 @@ export function useThrottledResponsive(
     const width = window.innerWidth
     const height = window.innerHeight
     const breakpoint = getBreakpoint(width, breakpoints)
-    
-    setViewport(prev => {
+
+    setViewport((prev) => {
       // Only update if values actually changed to prevent unnecessary re-renders
-      if (prev.width !== width || prev.height !== height || prev.breakpoint !== breakpoint) {
+      if (
+        prev.width !== width ||
+        prev.height !== height ||
+        prev.breakpoint !== breakpoint
+      ) {
         return { width, height, breakpoint }
       }
       return prev
@@ -62,7 +66,10 @@ export function useThrottledResponsive(
   return viewport
 }
 
-function getBreakpoint(width: number, breakpoints: ResponsiveBreakpoints): keyof ResponsiveBreakpoints {
+function getBreakpoint(
+  width: number,
+  breakpoints: ResponsiveBreakpoints
+): keyof ResponsiveBreakpoints {
   if (width >= breakpoints.wide) return 'wide'
   if (width >= breakpoints.desktop) return 'desktop'
   if (width >= breakpoints.tablet) return 'tablet'
@@ -80,9 +87,9 @@ export function ThrottledResponsiveGrid({
     mobile: 1,
     tablet: 2,
     desktop: 3,
-    wide: 4
+    wide: 4,
   },
-  gap = 4
+  gap = 4,
 }: {
   children: React.ReactNode
   className?: string
@@ -97,7 +104,7 @@ export function ThrottledResponsiveGrid({
       className={`grid ${className}`}
       style={{
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
-        gap: `${gap * 0.25}rem`
+        gap: `${gap * 0.25}rem`,
       }}
     >
       {children}
@@ -117,7 +124,7 @@ export function ThrottledResponsiveImage({
   sizes,
   priority = false,
   onLoad,
-  onError
+  onError,
 }: {
   src: string
   alt: string
@@ -134,7 +141,9 @@ export function ThrottledResponsiveImage({
   const imgRef = useRef<HTMLImageElement>(null)
 
   // Generate responsive sizes if not provided
-  const responsiveSizes = sizes || `
+  const responsiveSizes =
+    sizes ||
+    `
     (max-width: 640px) 100vw,
     (max-width: 768px) 50vw,
     (max-width: 1024px) 33vw,
@@ -159,7 +168,7 @@ export function ThrottledResponsiveImage({
       link.as = 'image'
       link.href = src
       document.head.appendChild(link)
-      
+
       return () => {
         document.head.removeChild(link)
       }
@@ -184,27 +193,32 @@ export function ThrottledResponsiveImage({
             onLoad={handleLoad}
             onError={handleError}
             loading={priority ? 'eager' : 'lazy'}
-            decoding="async"
+            decoding='async'
           />
-          
+
           {/* Loading placeholder */}
           {!isLoaded && (
-            <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
+            <div className='absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse'>
+              <div className='absolute inset-0 flex items-center justify-center'>
+                <div className='w-8 h-8 border-2 border-gray-300 border-t-transparent rounded-full animate-spin' />
               </div>
             </div>
           )}
         </>
       ) : (
-        <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-          <div className="text-center text-gray-400 dark:text-gray-500">
-            <div className="w-12 h-12 mx-auto mb-2 opacity-50">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2v12a2 2 0 002 2z" />
+        <div className='absolute inset-0 bg-gray-100 dark:bg-gray-800 flex items-center justify-center'>
+          <div className='text-center text-gray-400 dark:text-gray-500'>
+            <div className='w-12 h-12 mx-auto mb-2 opacity-50'>
+              <svg fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={1}
+                  d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2v12a2 2 0 002 2z'
+                />
               </svg>
             </div>
-            <span className="text-sm">이미지를 불러올 수 없습니다</span>
+            <span className='text-sm'>이미지를 불러올 수 없습니다</span>
           </div>
         </div>
       )}
@@ -223,9 +237,9 @@ export function ThrottledResponsiveContainer({
     mobile: 4,
     tablet: 6,
     desktop: 8,
-    wide: 12
+    wide: 12,
   },
-  maxWidth = '1280px'
+  maxWidth = '1280px',
 }: {
   children: React.ReactNode
   className?: string
@@ -240,7 +254,7 @@ export function ThrottledResponsiveContainer({
       className={`mx-auto ${className}`}
       style={{
         maxWidth,
-        padding: `${padding * 0.25}rem`
+        padding: `${padding * 0.25}rem`,
       }}
     >
       {children}
@@ -254,7 +268,7 @@ export function ThrottledResponsiveContainer({
  */
 export function useThrottledElementSize<T extends HTMLElement>(): [
   React.RefObject<T>,
-  { width: number; height: number }
+  { width: number; height: number },
 ] {
   const elementRef = useRef<T>(null)
   const [size, setSize] = useState({ width: 0, height: 0 })
@@ -272,7 +286,7 @@ export function useThrottledElementSize<T extends HTMLElement>(): [
         const entry = entries[0]
         if (entry) {
           const { width, height } = entry.contentRect
-          setSize(prev => {
+          setSize((prev) => {
             if (prev.width !== width || prev.height !== height) {
               return { width, height }
             }
@@ -305,8 +319,8 @@ export function ThrottledResponsiveText({
     mobile: 'text-sm',
     tablet: 'text-base',
     desktop: 'text-lg',
-    wide: 'text-xl'
-  }
+    wide: 'text-xl',
+  },
 }: {
   children: React.ReactNode
   className?: string
@@ -315,9 +329,5 @@ export function ThrottledResponsiveText({
   const { breakpoint } = useThrottledResponsive()
   const fontSize = sizeConfig[breakpoint] || 'text-base'
 
-  return (
-    <div className={`${fontSize} ${className}`}>
-      {children}
-    </div>
-  )
+  return <div className={`${fontSize} ${className}`}>{children}</div>
 }

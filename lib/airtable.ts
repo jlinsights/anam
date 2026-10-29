@@ -151,14 +151,14 @@ function getFieldValue(fields: any, fieldNames: string[]): any {
 function createSlug(title: string, year: number | string): string {
   // First sanitize the title
   const sanitizedTitle = sanitizeText(title)
-  
+
   if (!sanitizedTitle || sanitizedTitle.trim() === '') {
     return `anam-untitled-${year || 2024}`
   }
-  
+
   // Clean and normalize the year
   const cleanYear = year && year.toString().trim() !== '' ? year : 2024
-  
+
   const cleanTitle = sanitizedTitle
     .toLowerCase()
     .replace(/[^\w\s가-힣]/g, '') // Remove special characters
@@ -166,29 +166,29 @@ function createSlug(title: string, year: number | string): string {
     .replace(/-+/g, '-') // Replace multiple dashes with single dash
     .replace(/^-+|-+$/g, '') // Remove leading and trailing dashes
     .trim()
-  
+
   // Ensure we don't have empty title after cleaning
   const finalTitle = cleanTitle || 'untitled'
-  
+
   // Create final slug - make sure year is valid
   let slug = `anam-${finalTitle}-${cleanYear}`
-  
+
   // Final cleanup to ensure no trailing dashes or invalid characters
   slug = slug
     .replace(/-+/g, '-') // Replace multiple dashes with single dash
     .replace(/^-+|-+$/g, '') // Remove leading and trailing dashes
     .replace(/[^a-zA-Z0-9가-힣\-]/g, '') // Remove any remaining invalid characters
-  
+
   // Final check to ensure we don't have trailing dashes
   while (slug.endsWith('-')) {
     slug = slug.slice(0, -1)
   }
-  
+
   // Ensure we have a valid slug
   if (!slug || slug === 'anam' || slug === 'anam-') {
     slug = `anam-untitled-${cleanYear}`
   }
-  
+
   return slug
 }
 
@@ -239,12 +239,27 @@ const ARTWORK_FIELD_MAP: Record<string, string[]> = {
   medium: ['medium', 'Medium', '재료'],
   dimensions: ['dimensions', 'Dimensions', '크기'],
   description: ['description', 'Description', '설명', 'desc'],
-  artistNote: ['artistNote', 'ArtistNote', 'artist_note', 'Artist Note', '작가노트', '작가 노트'],
+  artistNote: [
+    'artistNote',
+    'ArtistNote',
+    'artist_note',
+    'Artist Note',
+    '작가노트',
+    '작가 노트',
+  ],
   tags: ['tags', 'Tags', '태그'],
   featured: ['featured', 'Featured', '추천'],
   category: ['category', 'Category', '카테고리'],
   available: ['available', 'Available', '판매여부'],
-  number: ['number', 'Number', '번호', 'ID', 'id', 'ArtworkNumber', 'artwork_number'],
+  number: [
+    'number',
+    'Number',
+    '번호',
+    'ID',
+    'id',
+    'ArtworkNumber',
+    'artwork_number',
+  ],
   slug: ['slug', 'Slug', 'SLUG', 'slug_id', 'SlugId', '슬러그'],
 }
 
@@ -381,8 +396,14 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
         console.log('🔍 Sample record fields:', Object.keys(fields))
         console.log('🔍 Sample record field values:')
         Object.entries(fields).forEach(([key, value]) => {
-          if (key.toLowerCase().includes('image') || key.toLowerCase().includes('url')) {
-            console.log(`  ${key}:`, typeof value === 'object' ? JSON.stringify(value, null, 2) : value)
+          if (
+            key.toLowerCase().includes('image') ||
+            key.toLowerCase().includes('url')
+          ) {
+            console.log(
+              `  ${key}:`,
+              typeof value === 'object' ? JSON.stringify(value, null, 2) : value
+            )
           }
         })
       }
@@ -408,21 +429,25 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
       // 우선순위 1: Airtable slug 필드 사용
       const airtableSlug = pickField<string>(fields, ARTWORK_FIELD_MAP, 'slug')
       let slug = airtableSlug
-      
+
       // 우선순위 2: Number 필드를 이용한 slug 생성
       if (!slug) {
-        const artworkNumber = pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number')
-        slug = artworkNumber 
+        const artworkNumber = pickField<number | string>(
+          fields,
+          ARTWORK_FIELD_MAP,
+          'number'
+        )
+        slug = artworkNumber
           ? `anam-${String(artworkNumber).padStart(2, '0')}` // anam-01, anam-02 형식
           : createSlug(title, year || 2024) // Fallback to title-based slug
       }
-      
+
       // slug 유효성 검사
       if (!slug || slug.trim() === '') {
         console.warn(`⚠️ Skipping record ${index + 1}: invalid slug`)
         return
       }
-      
+
       // Airtable에서 받은 slug가 anam-XX-2024 형식이면 anam-XX로 변환
       if (slug && slug.includes('-2024')) {
         const cleanSlug = slug.replace('-2024', '')
@@ -431,57 +456,87 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
           console.log(`✅ Cleaned slug: ${slug}`)
         }
       }
-      
+
       // Validate slug format - ensure it's anam-XX format
       if (slug && !/^anam-\d+$/.test(slug)) {
         console.warn(`⚠️ Invalid slug format for artwork: ${slug}`)
         // Use number-based slug as fallback
-        const artworkNumber = pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number')
-        slug = artworkNumber 
+        const artworkNumber = pickField<number | string>(
+          fields,
+          ARTWORK_FIELD_MAP,
+          'number'
+        )
+        slug = artworkNumber
           ? `anam-${String(artworkNumber).padStart(2, '0')}`
           : `anam-${String(index + 1).padStart(2, '0')}`
       }
-      
+
       const artwork: Artwork = {
         id: record.id,
         slug: slug,
         title,
         year: year ? parseInt(year.toString()) : 2024,
         medium: mediumValue,
-        dimensions: pickField<string>(fields, ARTWORK_FIELD_MAP, 'dimensions') || '70 x 140 cm',
+        dimensions:
+          pickField<string>(fields, ARTWORK_FIELD_MAP, 'dimensions') ||
+          '70 x 140 cm',
         aspectRatio:
           fields.aspectRatio ||
-          calculateAspectRatio(pickField<string>(fields, ARTWORK_FIELD_MAP, 'dimensions') || '70 x 140 cm'),
-        description: pickField<string>(fields, ARTWORK_FIELD_MAP, 'description') || '',
+          calculateAspectRatio(
+            pickField<string>(fields, ARTWORK_FIELD_MAP, 'dimensions') ||
+              '70 x 140 cm'
+          ),
+        description:
+          pickField<string>(fields, ARTWORK_FIELD_MAP, 'description') || '',
         number: pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number'), // Airtable Number 필드
         imageUrl: (() => {
           // 우선순위 1: Airtable slug 필드를 이용한 최적화된 이미지 매칭
-          const airtableSlug = pickField<string>(fields, ARTWORK_FIELD_MAP, 'slug')
+          const airtableSlug = pickField<string>(
+            fields,
+            ARTWORK_FIELD_MAP,
+            'slug'
+          )
           if (airtableSlug) {
             // slug에서 숫자 추출 (anam-01, anam-02 형식)
             const slugMatch = airtableSlug.match(/anam-(\d+)/)
             if (slugMatch) {
               const slugNumber = slugMatch[1].padStart(2, '0') // 01, 02, 03...
               const slugBasedPath = `/Images/Artworks/optimized/${slugNumber}/${slugNumber}-medium.jpg`
-              
+
               if (index === 0) {
-                console.log('✅ Using Airtable slug-based image path:', slugBasedPath, '(Slug:', airtableSlug, ')')
+                console.log(
+                  '✅ Using Airtable slug-based image path:',
+                  slugBasedPath,
+                  '(Slug:',
+                  airtableSlug,
+                  ')'
+                )
               }
               return slugBasedPath
             }
           }
-          
+
           // 우선순위 2: Airtable Number 필드를 이용한 로컬 이미지 매칭 (fallback)
-          const artworkNumber = pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number')
+          const artworkNumber = pickField<number | string>(
+            fields,
+            ARTWORK_FIELD_MAP,
+            'number'
+          )
           if (artworkNumber) {
             const numberBasedPath = `/Images/Artworks/optimized/${String(artworkNumber).padStart(2, '0')}/${String(artworkNumber).padStart(2, '0')}-medium.jpg`
-            
+
             if (index === 0) {
-              console.log('✅ Using number-based image path:', numberBasedPath, '(Number:', artworkNumber, ')')
+              console.log(
+                '✅ Using number-based image path:',
+                numberBasedPath,
+                '(Number:',
+                artworkNumber,
+                ')'
+              )
             }
             return numberBasedPath
           }
-          
+
           // 우선순위 3: Airtable Attachment 필드에서 URL 추출
           const imageField = getFieldValue(fields, [
             'image',
@@ -492,15 +547,19 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
             'artwork_image',
             'Artwork Image',
             'artworkImage',
-            'ArtworkImage'
+            'ArtworkImage',
           ])
-          
+
           if (index === 0) {
             console.log('🖼️ Image field found:', imageField)
           }
-          
+
           // Airtable Attachment 필드는 배열로 오며, 각 요소에 url 속성이 있음
-          if (imageField && Array.isArray(imageField) && imageField.length > 0) {
+          if (
+            imageField &&
+            Array.isArray(imageField) &&
+            imageField.length > 0
+          ) {
             const firstImage = imageField[0]
             if (firstImage && firstImage.url) {
               if (index === 0) {
@@ -509,7 +568,7 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
               return firstImage.url
             }
           }
-          
+
           // 우선순위 4: 직접 URL 필드 확인 (문자열로 저장된 경우)
           const directUrl = getFieldValue(fields, [
             'imageUrl',
@@ -517,30 +576,38 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
             'imageURL',
             'ImageURL',
             'image_url',
-            'Image_Url'
+            'Image_Url',
           ])
-          
-          if (directUrl && typeof directUrl === 'string' && directUrl.startsWith('http')) {
+
+          if (
+            directUrl &&
+            typeof directUrl === 'string' &&
+            directUrl.startsWith('http')
+          ) {
             if (index === 0) {
               console.log('✅ Using direct URL field:', directUrl)
             }
             return directUrl
           }
-          
+
           // 우선순위 5: 최종 fallback - 기본 이미지 경로
           const defaultPath = `/Images/Artworks/optimized/01/01-medium.jpg`
-          
+
           if (index === 0) {
             console.log('⚠️ Using default fallback path:', defaultPath)
           }
-          
+
           return defaultPath
         })(),
         imageUrlQuery: `${title} calligraphy art`,
-        artistNote: pickField<string>(fields, ARTWORK_FIELD_MAP, 'artistNote') || '',
-        featured: pickField<boolean>(fields, ARTWORK_FIELD_MAP, 'featured') || false,
-        category: pickField<string>(fields, ARTWORK_FIELD_MAP, 'category') || '회화',
-        available: pickField<boolean>(fields, ARTWORK_FIELD_MAP, 'available') !== false,
+        artistNote:
+          pickField<string>(fields, ARTWORK_FIELD_MAP, 'artistNote') || '',
+        featured:
+          pickField<boolean>(fields, ARTWORK_FIELD_MAP, 'featured') || false,
+        category:
+          pickField<string>(fields, ARTWORK_FIELD_MAP, 'category') || '회화',
+        available:
+          pickField<boolean>(fields, ARTWORK_FIELD_MAP, 'available') !== false,
         tags: parseTagsField(pickField<any>(fields, ARTWORK_FIELD_MAP, 'tags')),
         price: fields.price || undefined,
         exhibition: fields.exhibition || '',
@@ -821,22 +888,22 @@ export async function fetchTreasureArtworks(): Promise<Artwork[]> {
 export function clearAirtableCache(): void {
   // 메모리 캐시 클리어
   const keys = ['artworks', 'artist', 'treasure']
-  keys.forEach(key => {
+  keys.forEach((key) => {
     setCachedData(key, null)
   })
-  
+
   // 로컬 스토리지 캐시 클리어 (클라이언트 사이드에서만)
   if (typeof window !== 'undefined') {
-    keys.forEach(key => {
+    keys.forEach((key) => {
       localStorage.removeItem(`airtable_${key}`)
     })
-    
+
     // 전역 함수로 노출 (개발 환경에서만)
     if (process.env.NODE_ENV === 'development') {
       ;(window as any).clearAirtableCache = clearAirtableCache
     }
   }
-  
+
   console.log('🧹 Airtable cache cleared')
 }
 

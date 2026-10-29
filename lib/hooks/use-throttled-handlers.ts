@@ -9,7 +9,7 @@ import {
   createThrottledResizeHandler,
   createThrottledSearchHandler,
   THROTTLE_DELAYS,
-  type ThrottledFunction
+  type ThrottledFunction,
 } from '@/lib/utils/throttle'
 
 /**
@@ -24,7 +24,7 @@ export function useThrottledMouseMove<T extends HTMLElement = HTMLElement>(
 
   useEffect(() => {
     throttledHandler.current = createThrottledMouseHandler(handler)
-    
+
     return () => {
       throttledHandler.current?.cancel()
     }
@@ -54,7 +54,7 @@ export function useThrottledScroll(
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
-    
+
     return () => {
       window.removeEventListener('scroll', handleScroll)
       throttledHandler.current?.cancel()
@@ -85,7 +85,7 @@ export function useThrottledResize(
     }
 
     window.addEventListener('resize', handleResize, { passive: true })
-    
+
     return () => {
       window.removeEventListener('resize', handleResize)
       throttledHandler.current?.cancel()
@@ -110,7 +110,7 @@ export function useThrottledSearch(
 
   useEffect(() => {
     throttledHandler.current = createThrottledSearchHandler(handler, delay)
-    
+
     return () => {
       throttledHandler.current?.cancel()
     }
@@ -141,13 +141,16 @@ export function useThrottledIntersection(
   useEffect(() => {
     throttledHandler.current = throttle(handler, delay)
 
-    observerRef.current = new IntersectionObserver((entries) => {
-      throttledHandler.current?.(entries)
-    }, {
-      rootMargin: '50px',
-      threshold: 0.1,
-      ...options
-    })
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        throttledHandler.current?.(entries)
+      },
+      {
+        rootMargin: '50px',
+        threshold: 0.1,
+        ...options,
+      }
+    )
 
     return () => {
       observerRef.current?.disconnect()
@@ -182,7 +185,7 @@ export function useThrottledAnimation<T extends (...args: any[]) => void>(
 
   useEffect(() => {
     throttledHandler.current = throttleAnimationFrame(handler)
-    
+
     return () => {
       throttledHandler.current?.cancel()
     }
@@ -206,7 +209,7 @@ export function useThrottledApiCall<T extends (...args: any[]) => Promise<any>>(
 
   useEffect(() => {
     throttledCall.current = throttle(apiCall, delay)
-    
+
     return () => {
       throttledCall.current?.cancel()
     }
@@ -246,7 +249,11 @@ export function useThrottledGalleryScroll(
  * Optimized for search and filter components
  */
 export function useThrottledFilter<T>(
-  filterFunction: (data: T[], query: string, filters: Record<string, any>) => T[],
+  filterFunction: (
+    data: T[],
+    query: string,
+    filters: Record<string, any>
+  ) => T[],
   data: T[],
   delay: number = THROTTLE_DELAYS.SEARCH
 ): {
@@ -263,26 +270,32 @@ export function useThrottledFilter<T>(
   }, [data])
 
   useEffect(() => {
-    filterRef.current = throttle((data: T[], query: string, filters: Record<string, any>) => {
-      const result = filterFunction(data, query, filters)
-      setFilteredData(result)
-      setIsFiltering(false)
-    }, delay)
+    filterRef.current = throttle(
+      (data: T[], query: string, filters: Record<string, any>) => {
+        const result = filterFunction(data, query, filters)
+        setFilteredData(result)
+        setIsFiltering(false)
+      },
+      delay
+    )
 
     return () => {
       filterRef.current?.cancel()
     }
   }, [filterFunction, delay])
 
-  const filter = useCallback((query: string, filters: Record<string, any>) => {
-    setIsFiltering(true)
-    filterRef.current?.(data, query, filters)
-  }, [data])
+  const filter = useCallback(
+    (query: string, filters: Record<string, any>) => {
+      setIsFiltering(true)
+      filterRef.current?.(data, query, filters)
+    },
+    [data]
+  )
 
   return {
     filter,
     filteredData,
-    isFiltering
+    isFiltering,
   }
 }
 
@@ -301,12 +314,16 @@ export function useThrottlePerformance(name: string) {
   const endMeasure = useCallback(() => {
     if (startTime.current) {
       const duration = performance.now() - startTime.current
-      
+
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[Throttle Performance] ${name}: ${duration.toFixed(2)}ms (call #${callCount.current})`)
-        
+        console.log(
+          `[Throttle Performance] ${name}: ${duration.toFixed(2)}ms (call #${callCount.current})`
+        )
+
         if (duration > 16.67) {
-          console.warn(`[Throttle Performance] ${name} exceeded 60fps budget (${duration.toFixed(2)}ms)`)
+          console.warn(
+            `[Throttle Performance] ${name} exceeded 60fps budget (${duration.toFixed(2)}ms)`
+          )
         }
       }
     }

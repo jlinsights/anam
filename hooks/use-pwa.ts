@@ -39,12 +39,12 @@ export function usePWA() {
     updateAvailable: false,
     isUpdating: false,
     cacheSize: 0,
-    networkSpeed: 'unknown'
+    networkSpeed: 'unknown',
   })
 
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null)
-  
+
   const [updatePromptVisible, setUpdatePromptVisible] = useState(false)
   const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null)
 
@@ -53,9 +53,12 @@ export function usePWA() {
     const registerServiceWorker = async () => {
       if ('serviceWorker' in navigator) {
         try {
-          const registration = await navigator.serviceWorker.register('/sw.js', {
-            updateViaCache: 'none' // 항상 최신 SW 확인
-          })
+          const registration = await navigator.serviceWorker.register(
+            '/sw.js',
+            {
+              updateViaCache: 'none', // 항상 최신 SW 확인
+            }
+          )
           console.log('📦 Service Worker registered:', registration)
 
           // 즉시 업데이트 확인
@@ -68,17 +71,19 @@ export function usePWA() {
 
             if (newWorker) {
               setWaitingWorker(newWorker)
-              
+
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed') {
                   if (navigator.serviceWorker.controller) {
                     // 새 버전이 대기 중 - 사용자에게 업데이트 옵션 제공
-                    setState(prev => ({ ...prev, updateAvailable: true }))
+                    setState((prev) => ({ ...prev, updateAvailable: true }))
                     setUpdatePromptVisible(true)
                   } else {
                     // 첫 설치 완료
-                    setState(prev => ({ ...prev, hasUpdate: false }))
-                    console.log('📦 Service Worker installed for the first time')
+                    setState((prev) => ({ ...prev, hasUpdate: false }))
+                    console.log(
+                      '📦 Service Worker installed for the first time'
+                    )
                   }
                 }
               })
@@ -89,10 +94,12 @@ export function usePWA() {
           navigator.serviceWorker.addEventListener('message', handleSWMessage)
 
           // 주기적 업데이트 확인 (1시간마다)
-          setInterval(() => {
-            registration.update()
-          }, 1000 * 60 * 60)
-
+          setInterval(
+            () => {
+              registration.update()
+            },
+            1000 * 60 * 60
+          )
         } catch (error) {
           console.error('❌ Service Worker registration failed:', error)
         }
@@ -104,11 +111,11 @@ export function usePWA() {
     // 서비스 워커 메시지 처리
     const handleSWMessage = (event: MessageEvent<ServiceWorkerMessage>) => {
       const { type, version, payload } = event.data
-      
+
       switch (type) {
         case 'SW_UPDATED':
           console.log('📱 App updated to version:', version)
-          setState(prev => ({ ...prev, hasUpdate: true, isUpdating: false }))
+          setState((prev) => ({ ...prev, hasUpdate: true, isUpdating: false }))
           break
         case 'CACHE_UPDATED':
           console.log('💾 Cache updated')
@@ -118,7 +125,7 @@ export function usePWA() {
           console.log('📱 App ready for offline use')
           break
         case 'UPDATE_AVAILABLE':
-          setState(prev => ({ ...prev, updateAvailable: true }))
+          setState((prev) => ({ ...prev, updateAvailable: true }))
           setUpdatePromptVisible(true)
           break
       }
@@ -136,7 +143,7 @@ export function usePWA() {
       console.log('🎉 PWA installed successfully')
       setState((prev) => ({ ...prev, isInstalled: true, isInstallable: false }))
       setDeferredPrompt(null)
-      
+
       // 설치 완료 후 푸시 알림 권한 요청
       requestNotificationPermission()
     }
@@ -148,7 +155,11 @@ export function usePWA() {
     }
 
     const handleOffline = () => {
-      setState((prev) => ({ ...prev, isOffline: true, networkSpeed: 'unknown' }))
+      setState((prev) => ({
+        ...prev,
+        isOffline: true,
+        networkSpeed: 'unknown',
+      }))
     }
 
     // 네트워크 연결 변경 감지
@@ -163,7 +174,10 @@ export function usePWA() {
     window.addEventListener('offline', handleOffline)
 
     // 네트워크 연결 상태 변경 감지
-    const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection
+    const connection =
+      (navigator as any).connection ||
+      (navigator as any).mozConnection ||
+      (navigator as any).webkitConnection
     if (connection) {
       connection.addEventListener('change', handleConnectionChange)
     }
@@ -171,32 +185,35 @@ export function usePWA() {
     // 초기 상태 설정
     const initializeState = async () => {
       const cacheSize = await getCacheSize()
-      
+
       setState((prev) => ({
         ...prev,
         isOffline: !navigator.onLine,
         isInstalled: checkIfInstalled(),
         isLoading: false,
-        cacheSize
+        cacheSize,
       }))
-      
+
       // 초기 네트워크 속도 측정
       measureNetworkSpeed()
     }
-    
+
     initializeState()
 
     // 클린업
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+      window.removeEventListener(
+        'beforeinstallprompt',
+        handleBeforeInstallPrompt
+      )
       window.removeEventListener('appinstalled', handleAppInstalled)
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
-      
+
       if (connection) {
         connection.removeEventListener('change', handleConnectionChange)
       }
-      
+
       navigator.serviceWorker?.removeEventListener('message', handleSWMessage)
     }
   }, [])
@@ -241,9 +258,13 @@ export function usePWA() {
       const connection = (navigator as any).connection
       if (connection) {
         const effectiveType = connection.effectiveType
-        const networkSpeed = effectiveType === '4g' ? 'fast' : 
-                           effectiveType === '3g' ? 'slow' : 'unknown'
-        setState(prev => ({ ...prev, networkSpeed }))
+        const networkSpeed =
+          effectiveType === '4g'
+            ? 'fast'
+            : effectiveType === '3g'
+              ? 'slow'
+              : 'unknown'
+        setState((prev) => ({ ...prev, networkSpeed }))
       }
     } catch (error) {
       console.warn('Network speed measurement failed:', error)
@@ -253,7 +274,7 @@ export function usePWA() {
   // 캐시 크기 업데이트
   const updateCacheSize = async () => {
     const size = await getCacheSize()
-    setState(prev => ({ ...prev, cacheSize: size }))
+    setState((prev) => ({ ...prev, cacheSize: size }))
   }
 
   // 알림 권한 요청
@@ -276,7 +297,7 @@ export function usePWA() {
     if (!waitingWorker) return false
 
     try {
-      setState(prev => ({ ...prev, isUpdating: true }))
+      setState((prev) => ({ ...prev, isUpdating: true }))
       setUpdatePromptVisible(false)
 
       // 대기 중인 서비스 워커에게 메시지 전송
@@ -285,11 +306,11 @@ export function usePWA() {
       // 새로운 SW가 활성화될 때까지 대기
       return new Promise((resolve) => {
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-          setState(prev => ({ 
-            ...prev, 
-            isUpdating: false, 
+          setState((prev) => ({
+            ...prev,
+            isUpdating: false,
             updateAvailable: false,
-            hasUpdate: true 
+            hasUpdate: true,
           }))
           setWaitingWorker(null)
           resolve(true)
@@ -299,7 +320,7 @@ export function usePWA() {
       })
     } catch (error) {
       console.error('Failed to apply update:', error)
-      setState(prev => ({ ...prev, isUpdating: false }))
+      setState((prev) => ({ ...prev, isUpdating: false }))
       return false
     }
   }
@@ -307,7 +328,7 @@ export function usePWA() {
   // 업데이트 무시
   const dismissUpdate = () => {
     setUpdatePromptVisible(false)
-    setState(prev => ({ ...prev, updateAvailable: false }))
+    setState((prev) => ({ ...prev, updateAvailable: false }))
   }
 
   // 캐시 크기 계산 (향상된 버전)
@@ -330,20 +351,25 @@ export function usePWA() {
       if (selective) {
         // 선택적 캐시 정리 (오래된 것만)
         const cacheNames = await caches.keys()
-        const oldCaches = cacheNames.filter(name => 
-          !name.includes('v2.0.0') && // 현재 버전 제외
-          (name.includes('images') || name.includes('runtime'))
+        const oldCaches = cacheNames.filter(
+          (name) =>
+            !name.includes('v2.0.0') && // 현재 버전 제외
+            (name.includes('images') || name.includes('runtime'))
         )
-        
-        await Promise.all(oldCaches.map(cacheName => caches.delete(cacheName)))
+
+        await Promise.all(
+          oldCaches.map((cacheName) => caches.delete(cacheName))
+        )
         console.log('🗑️ Old caches cleared:', oldCaches)
       } else {
         // 전체 캐시 정리
         const cacheNames = await caches.keys()
-        await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)))
+        await Promise.all(
+          cacheNames.map((cacheName) => caches.delete(cacheName))
+        )
         console.log('🗑️ All caches cleared')
       }
-      
+
       await updateCacheSize()
       return true
     } catch (error) {
@@ -377,7 +403,7 @@ export function usePWA() {
     canInstall: state.isInstallable && !state.isInstalled,
     updatePromptVisible,
     networkSpeed: state.networkSpeed,
-    cacheSize: state.cacheSize
+    cacheSize: state.cacheSize,
   }
 }
 

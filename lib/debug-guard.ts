@@ -31,17 +31,17 @@ export function isDebugAllowed(context?: SecurityContext): boolean {
     // Production debug access requires explicit flag AND IP whitelist
     const explicitlyEnabled = process.env.ENABLE_DEBUG_ROUTES === 'true'
     const ipAllowed = context?.ip ? ALLOWED_IPS.includes(context.ip) : false
-    
+
     // Log security attempts in production
     if (explicitlyEnabled || context) {
       console.warn('🔒 Production debug access attempt:', {
         enabled: explicitlyEnabled,
         ip: context?.ip,
         allowed: ipAllowed,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
     }
-    
+
     return explicitlyEnabled && ipAllowed
   }
 
@@ -52,27 +52,27 @@ export function isDebugAllowed(context?: SecurityContext): boolean {
 // 🎯 SuperClaude Pattern: Request Context Extraction
 export function getSecurityContext(request?: Request): SecurityContext {
   const headers = request?.headers
-  
+
   return {
     ip: getClientIP(headers),
     userAgent: headers?.get('user-agent') || 'unknown',
     environment: process.env.NODE_ENV || 'unknown',
-    timestamp: Date.now()
+    timestamp: Date.now(),
   }
 }
 
 function getClientIP(headers?: Headers): string {
   if (!headers) return 'unknown'
-  
+
   // Check various IP headers in order of preference
   const ipHeaders = [
     'x-forwarded-for',
     'x-real-ip',
     'x-client-ip',
     'cf-connecting-ip', // Cloudflare
-    'x-cluster-client-ip'
+    'x-cluster-client-ip',
   ]
-  
+
   for (const header of ipHeaders) {
     const value = headers.get(header)
     if (value) {
@@ -80,7 +80,7 @@ function getClientIP(headers?: Headers): string {
       return value.split(',')[0].trim()
     }
   }
-  
+
   return 'unknown'
 }
 
@@ -92,15 +92,16 @@ export function validateDebugAccess(request?: Request): {
 } {
   const context = getSecurityContext(request)
   const allowed = isDebugAllowed(context)
-  
+
   let reason = 'Access denied'
   if (allowed) {
-    reason = context.environment === 'production' 
-      ? 'Production access granted (IP whitelisted)' 
-      : 'Development access granted'
+    reason =
+      context.environment === 'production'
+        ? 'Production access granted (IP whitelisted)'
+        : 'Development access granted'
   } else if (context.environment === 'production') {
     reason = 'Production access denied (debug disabled or IP not whitelisted)'
   }
-  
+
   return { allowed, reason, context }
 }

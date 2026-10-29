@@ -52,7 +52,7 @@ export class GlobalErrorBoundary extends Component<
 
   constructor(props: GlobalErrorBoundaryProps) {
     super(props)
-    
+
     this.state = {
       hasError: false,
       error: null,
@@ -60,25 +60,28 @@ export class GlobalErrorBoundary extends Component<
       errorInfo: null,
       retryCount: 0,
       isReporting: false,
-      culturalContext: props.culturalContext || 'eternal'
+      culturalContext: props.culturalContext || 'eternal',
     }
   }
 
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     const errorId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    
+
     // 🎯 SuperClaude Pattern: Handle specific error types
-    if (error.name === 'ChunkLoadError' || error.message.includes('Loading chunk')) {
+    if (
+      error.name === 'ChunkLoadError' ||
+      error.message.includes('Loading chunk')
+    ) {
       // Automatically reload for chunk loading errors
       setTimeout(() => {
         window.location.reload()
       }, 1000)
-      
+
       return {
         hasError: true,
         error,
         errorId,
-        retryCount: 0
+        retryCount: 0,
       }
     }
 
@@ -86,7 +89,7 @@ export class GlobalErrorBoundary extends Component<
       hasError: true,
       error,
       errorId,
-      retryCount: 0
+      retryCount: 0,
     }
   }
 
@@ -115,14 +118,16 @@ export class GlobalErrorBoundary extends Component<
       error: {
         name: error.name,
         message: error.message,
-        stack: error.stack
+        stack: error.stack,
       },
       componentStack: errorInfo.componentStack,
-      memory: (performance as any).memory ? {
-        used: (performance as any).memory.usedJSHeapSize,
-        total: (performance as any).memory.totalJSHeapSize,
-        limit: (performance as any).memory.jsHeapSizeLimit
-      } : null
+      memory: (performance as any).memory
+        ? {
+            used: (performance as any).memory.usedJSHeapSize,
+            total: (performance as any).memory.totalJSHeapSize,
+            limit: (performance as any).memory.jsHeapSizeLimit,
+          }
+        : null,
     }
 
     console.group('🚨 Global Error Boundary')
@@ -133,7 +138,9 @@ export class GlobalErrorBoundary extends Component<
 
     // Store in localStorage for persistence
     try {
-      const errorHistory = JSON.parse(localStorage.getItem('anam-error-history') || '[]')
+      const errorHistory = JSON.parse(
+        localStorage.getItem('anam-error-history') || '[]'
+      )
       errorHistory.push(context)
       // Keep only last 10 errors
       if (errorHistory.length > 10) {
@@ -148,26 +155,30 @@ export class GlobalErrorBoundary extends Component<
   private trackErrorMetrics(error: Error, errorInfo: ErrorInfo) {
     // 📊 Integration with Performance Monitoring
     if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'exception', {
+      ;(window as any).gtag('event', 'exception', {
         description: error.message,
         fatal: false,
         custom_map: {
           cultural_context: this.state.culturalContext,
-          component_stack: errorInfo.componentStack
-        }
+          component_stack: errorInfo.componentStack,
+        },
       })
     }
 
     // 🎯 SuperClaude Pattern: Performance Impact Assessment
-    const performanceEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
+    const performanceEntry = performance.getEntriesByType(
+      'navigation'
+    )[0] as PerformanceNavigationTiming
     if (performanceEntry) {
       const errorMetrics = {
         errorId: this.state.errorId,
         loadTime: performanceEntry.loadEventEnd - performanceEntry.fetchStart,
-        domContentLoaded: performanceEntry.domContentLoadedEventEnd - performanceEntry.fetchStart,
-        memoryUsage: (performance as any).memory?.usedJSHeapSize || 0
+        domContentLoaded:
+          performanceEntry.domContentLoadedEventEnd -
+          performanceEntry.fetchStart,
+        memoryUsage: (performance as any).memory?.usedJSHeapSize || 0,
       }
-      
+
       console.info('📊 Error Performance Context:', errorMetrics)
     }
   }
@@ -189,13 +200,12 @@ export class GlobalErrorBoundary extends Component<
         culturalContext: this.state.culturalContext,
         performanceMetrics: {
           memory: (performance as any).memory?.usedJSHeapSize || 0,
-          timing: performance.timing
-        }
+          timing: performance.timing,
+        },
       }
 
       // Send to error reporting service (implement as needed)
       await this.sendErrorReport(report)
-      
     } catch (reportError) {
       console.error('Failed to report error:', reportError)
     } finally {
@@ -210,7 +220,7 @@ export class GlobalErrorBoundary extends Component<
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(report)
+      body: JSON.stringify(report),
     })
 
     if (!response.ok) {
@@ -220,13 +230,13 @@ export class GlobalErrorBoundary extends Component<
 
   private handleRetry = () => {
     const { maxRetries = 3 } = this.props
-    
+
     if (this.state.retryCount < maxRetries) {
-      this.setState(prevState => ({
+      this.setState((prevState) => ({
         hasError: false,
         error: null,
         errorInfo: null,
-        retryCount: prevState.retryCount + 1
+        retryCount: prevState.retryCount + 1,
       }))
 
       // Clear any existing timeout
@@ -254,7 +264,7 @@ export class GlobalErrorBoundary extends Component<
       errorId: this.state.errorId,
       message: this.state.error?.message || 'Unknown error',
       url: window.location.href,
-      userAgent: navigator.userAgent
+      userAgent: navigator.userAgent,
     }
 
     const subject = encodeURIComponent(`Bug Report: ${errorDetails.message}`)
@@ -268,7 +278,9 @@ Please describe what you were doing when this error occurred:
 [Your description here]
     `)
 
-    window.open(`mailto:support@anam-gallery.com?subject=${subject}&body=${body}`)
+    window.open(
+      `mailto:support@anam-gallery.com?subject=${subject}&body=${body}`
+    )
   }
 
   render() {
@@ -276,103 +288,115 @@ Please describe what you were doing when this error occurred:
       // 🎨 Cultural Context Styling
       const culturalStyles = {
         spring: 'from-spring-primary/5 to-spring-secondary/5',
-        summer: 'from-summer-primary/5 to-summer-secondary/5', 
+        summer: 'from-summer-primary/5 to-summer-secondary/5',
         autumn: 'from-autumn-primary/5 to-autumn-secondary/5',
         winter: 'from-winter-primary/5 to-winter-secondary/5',
-        eternal: 'from-ink/5 to-gold/5'
+        eternal: 'from-ink/5 to-gold/5',
       }
 
-      const currentStyle = culturalStyles[this.state.culturalContext as keyof typeof culturalStyles] || culturalStyles.eternal
+      const currentStyle =
+        culturalStyles[
+          this.state.culturalContext as keyof typeof culturalStyles
+        ] || culturalStyles.eternal
 
       if (this.props.fallbackComponent) {
         return this.props.fallbackComponent
       }
 
       return (
-        <div className={cn(
-          'min-h-screen flex items-center justify-center p-4',
-          `bg-gradient-to-br ${currentStyle}`,
-          this.props.className
-        )}>
+        <div
+          className={cn(
+            'min-h-screen flex items-center justify-center p-4',
+            `bg-gradient-to-br ${currentStyle}`,
+            this.props.className
+          )}
+        >
           <AnimatePresence>
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
               transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-              className="bg-white rounded-xl shadow-zen-depth max-w-lg w-full p-8 text-center"
+              className='bg-white rounded-xl shadow-zen-depth max-w-lg w-full p-8 text-center'
             >
               {/* Error Icon */}
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.1, duration: 0.3, ease: 'backOut' }}
-                className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-full bg-red-100"
+                className='w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-full bg-red-100'
               >
-                <AlertTriangle className="w-8 h-8 text-red-600" />
+                <AlertTriangle className='w-8 h-8 text-red-600' />
               </motion.div>
 
               {/* Error Title */}
-              <h1 className="font-display text-2xl text-ink mb-3">
+              <h1 className='font-display text-2xl text-ink mb-3'>
                 문제가 발생했습니다
               </h1>
-              
-              <p className="text-ink-light mb-6 leading-relaxed">
+
+              <p className='text-ink-light mb-6 leading-relaxed'>
                 예상치 못한 오류가 발생했습니다. 불편을 드려 죄송합니다.
               </p>
 
               {/* Error Details (Development Only) */}
               {process.env.NODE_ENV === 'development' && (
-                <details className="mb-6 text-left">
-                  <summary className="cursor-pointer text-sm font-medium text-ink-light mb-2">
+                <details className='mb-6 text-left'>
+                  <summary className='cursor-pointer text-sm font-medium text-ink-light mb-2'>
                     개발자 정보
                   </summary>
-                  <div className="bg-gray-50 p-3 rounded-lg text-xs font-mono text-gray-600 overflow-auto max-h-32">
-                    <div><strong>Error:</strong> {this.state.error.message}</div>
-                    <div><strong>ID:</strong> {this.state.errorId}</div>
+                  <div className='bg-gray-50 p-3 rounded-lg text-xs font-mono text-gray-600 overflow-auto max-h-32'>
+                    <div>
+                      <strong>Error:</strong> {this.state.error.message}
+                    </div>
+                    <div>
+                      <strong>ID:</strong> {this.state.errorId}
+                    </div>
                     {this.state.error.stack && (
-                      <div><strong>Stack:</strong> {this.state.error.stack.split('\n')[0]}</div>
+                      <div>
+                        <strong>Stack:</strong>{' '}
+                        {this.state.error.stack.split('\n')[0]}
+                      </div>
                     )}
                   </div>
                 </details>
               )}
 
               {/* Action Buttons */}
-              <div className="space-y-3">
+              <div className='space-y-3'>
                 {/* Retry Button */}
                 {this.state.retryCount < (this.props.maxRetries || 3) && (
                   <motion.button
                     onClick={this.handleRetry}
-                    className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-ink text-paper rounded-lg font-medium transition-all duration-200 hover:bg-ink-dark hover:shadow-zen-depth"
+                    className='w-full flex items-center justify-center space-x-2 px-6 py-3 bg-ink text-paper rounded-lg font-medium transition-all duration-200 hover:bg-ink-dark hover:shadow-zen-depth'
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     disabled={this.state.isReporting}
                   >
-                    <RefreshCw className="w-4 h-4" />
+                    <RefreshCw className='w-4 h-4' />
                     <span>다시 시도하기</span>
                   </motion.button>
                 )}
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className='grid grid-cols-2 gap-3'>
                   {/* Home Button */}
                   <motion.button
                     onClick={this.handleGoHome}
-                    className="flex items-center justify-center space-x-2 px-4 py-3 border-2 border-ink text-ink rounded-lg font-medium transition-all duration-200 hover:bg-ink hover:text-paper"
+                    className='flex items-center justify-center space-x-2 px-4 py-3 border-2 border-ink text-ink rounded-lg font-medium transition-all duration-200 hover:bg-ink hover:text-paper'
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <Home className="w-4 h-4" />
+                    <Home className='w-4 h-4' />
                     <span>홈으로</span>
                   </motion.button>
 
                   {/* Report Bug Button */}
                   <motion.button
                     onClick={this.handleReportBug}
-                    className="flex items-center justify-center space-x-2 px-4 py-3 border-2 border-gold text-gold rounded-lg font-medium transition-all duration-200 hover:bg-gold hover:text-paper"
+                    className='flex items-center justify-center space-x-2 px-4 py-3 border-2 border-gold text-gold rounded-lg font-medium transition-all duration-200 hover:bg-gold hover:text-paper'
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <Bug className="w-4 h-4" />
+                    <Bug className='w-4 h-4' />
                     <span>신고</span>
                   </motion.button>
                 </div>
@@ -380,7 +404,7 @@ Please describe what you were doing when this error occurred:
                 {/* Reload Button */}
                 <motion.button
                   onClick={this.handleReload}
-                  className="w-full px-6 py-2 text-sm text-ink-light hover:text-ink transition-colors underline"
+                  className='w-full px-6 py-2 text-sm text-ink-light hover:text-ink transition-colors underline'
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -390,16 +414,15 @@ Please describe what you were doing when this error occurred:
 
               {/* Retry Count Indicator */}
               {this.state.retryCount > 0 && (
-                <p className="mt-4 text-xs text-ink-light">
-                  재시도 횟수: {this.state.retryCount}/{this.props.maxRetries || 3}
+                <p className='mt-4 text-xs text-ink-light'>
+                  재시도 횟수: {this.state.retryCount}/
+                  {this.props.maxRetries || 3}
                 </p>
               )}
 
               {/* Reporting Status */}
               {this.state.isReporting && (
-                <p className="mt-4 text-xs text-gold">
-                  오류 보고 중...
-                </p>
+                <p className='mt-4 text-xs text-gold'>오류 보고 중...</p>
               )}
             </motion.div>
           </AnimatePresence>

@@ -13,21 +13,14 @@ const path = require('path')
 const CONFIG = {
   baseUrl: process.env.BASE_URL || 'http://localhost:3000',
   outputDir: process.env.OUTPUT_DIR || './test-results/accessibility',
-  pages: [
-    '/',
-    '/gallery',
-    '/gallery/01',
-    '/contact',
-    '/artist',
-    '/exhibition'
-  ],
+  pages: ['/', '/gallery', '/gallery/01', '/contact', '/artist', '/exhibition'],
   testSuites: {
     axe: true,
     colorContrast: true,
     keyboard: true,
     screenReader: true,
-    focusManagement: true
-  }
+    focusManagement: true,
+  },
 }
 
 /**
@@ -42,7 +35,7 @@ class AccessibilityReportGenerator {
         baseUrl: CONFIG.baseUrl,
         testSuites: CONFIG.testSuites,
         wcagLevel: '2.1 AA',
-        totalPages: CONFIG.pages.length
+        totalPages: CONFIG.pages.length,
       },
       summary: {
         overallScore: 0,
@@ -53,8 +46,8 @@ class AccessibilityReportGenerator {
           perceivable: { score: 0, violations: 0 },
           operable: { score: 0, violations: 0 },
           understandable: { score: 0, violations: 0 },
-          robust: { score: 0, violations: 0 }
-        }
+          robust: { score: 0, violations: 0 },
+        },
       },
       pages: [],
       violations: [],
@@ -62,17 +55,17 @@ class AccessibilityReportGenerator {
       trends: {
         improvement: 0,
         regression: 0,
-        stable: 0
-      }
+        stable: 0,
+      },
     }
   }
 
   async init() {
     this.browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     })
-    
+
     await fs.mkdir(CONFIG.outputDir, { recursive: true })
   }
 
@@ -87,42 +80,42 @@ class AccessibilityReportGenerator {
    */
   async generateReport() {
     console.log('🔍 Generating comprehensive accessibility report...')
-    
+
     for (const pagePath of CONFIG.pages) {
       console.log(`Analyzing page: ${pagePath}`)
-      
+
       try {
         const pageResult = await this.analyzePage(pagePath)
         this.results.pages.push(pageResult)
-        
+
         console.log(`✓ Page ${pagePath}: Score ${pageResult.score}/100`)
       } catch (error) {
         console.error(`✗ Error analyzing page ${pagePath}:`, error.message)
-        
+
         this.results.pages.push({
           url: `${CONFIG.baseUrl}${pagePath}`,
           error: error.message,
           score: 0,
-          violations: []
+          violations: [],
         })
       }
     }
 
     // Calculate summary
     this.calculateSummary()
-    
+
     // Generate recommendations
     this.generateRecommendations()
-    
+
     // Save results
     await this.saveResults()
-    
+
     // Generate HTML report
     await this.generateHTMLReport()
-    
+
     // Generate CSV export
     await this.generateCSVReport()
-    
+
     return this.results
   }
 
@@ -131,19 +124,19 @@ class AccessibilityReportGenerator {
    */
   async analyzePage(pagePath) {
     const page = await this.browser.newPage()
-    
+
     try {
       await page.setViewport({ width: 1440, height: 900 })
-      await page.goto(`${CONFIG.baseUrl}${pagePath}`, { 
+      await page.goto(`${CONFIG.baseUrl}${pagePath}`, {
         waitUntil: 'networkidle0',
-        timeout: 30000 
+        timeout: 30000,
       })
 
       await page.waitForTimeout(2000)
 
       // Run comprehensive accessibility analysis
       const analysis = await page.evaluate(this.runComprehensiveAnalysis)
-      
+
       return {
         url: `${CONFIG.baseUrl}${pagePath}`,
         path: pagePath,
@@ -152,7 +145,7 @@ class AccessibilityReportGenerator {
         wcagLevel: analysis.wcagLevel,
         violations: analysis.violations,
         tests: analysis.tests,
-        recommendations: analysis.recommendations
+        recommendations: analysis.recommendations,
       }
     } finally {
       await page.close()
@@ -172,38 +165,43 @@ class AccessibilityReportGenerator {
         keyboard: { score: 0, violations: [] },
         screenReader: { score: 0, violations: [] },
         focusManagement: { score: 0, violations: [] },
-        structure: { score: 0, violations: [] }
+        structure: { score: 0, violations: [] },
       },
-      recommendations: []
+      recommendations: [],
     }
 
     // Test 1: Color Contrast
     analysis.tests.colorContrast = this.testColorContrast()
-    
+
     // Test 2: Keyboard Navigation
     analysis.tests.keyboard = this.testKeyboardNavigation()
-    
+
     // Test 3: Screen Reader Support
     analysis.tests.screenReader = this.testScreenReaderSupport()
-    
+
     // Test 4: Focus Management
     analysis.tests.focusManagement = this.testFocusManagement()
-    
+
     // Test 5: Document Structure
     analysis.tests.structure = this.testDocumentStructure()
 
     // Calculate overall score
-    const testScores = Object.values(analysis.tests).map(test => test.score)
-    analysis.overallScore = Math.round(testScores.reduce((sum, score) => sum + score, 0) / testScores.length)
-    
+    const testScores = Object.values(analysis.tests).map((test) => test.score)
+    analysis.overallScore = Math.round(
+      testScores.reduce((sum, score) => sum + score, 0) / testScores.length
+    )
+
     // Determine WCAG level
-    analysis.wcagLevel = this.determineWCAGLevel(analysis.overallScore, analysis.tests)
-    
+    analysis.wcagLevel = this.determineWCAGLevel(
+      analysis.overallScore,
+      analysis.tests
+    )
+
     // Collect all violations
-    Object.values(analysis.tests).forEach(test => {
+    Object.values(analysis.tests).forEach((test) => {
       analysis.violations.push(...test.violations)
     })
-    
+
     // Generate recommendations
     analysis.recommendations = this.generatePageRecommendations(analysis.tests)
 
@@ -212,23 +210,26 @@ class AccessibilityReportGenerator {
     // Helper function implementations
     function testColorContrast() {
       const results = { score: 100, violations: [] }
-      
-      const textElements = Array.from(document.querySelectorAll('p, span, div, h1, h2, h3, h4, h5, h6, a, button, label'))
-        .filter(el => el.textContent?.trim().length > 0)
+
+      const textElements = Array.from(
+        document.querySelectorAll(
+          'p, span, div, h1, h2, h3, h4, h5, h6, a, button, label'
+        )
+      ).filter((el) => el.textContent?.trim().length > 0)
 
       let totalElements = 0
       let passingElements = 0
 
-      textElements.forEach(element => {
+      textElements.forEach((element) => {
         const styles = getComputedStyle(element)
         const foreground = styles.color
         const background = getEffectiveBackgroundColor(element)
-        
+
         if (foreground && background) {
           totalElements++
           const ratio = calculateContrastRatio(foreground, background)
           const required = getTextSize(element) === 'large' ? 3 : 4.5
-          
+
           if (ratio >= required) {
             passingElements++
           } else {
@@ -237,7 +238,7 @@ class AccessibilityReportGenerator {
               severity: ratio < required * 0.7 ? 'critical' : 'serious',
               element: getElementSelector(element),
               description: `Color contrast ratio ${ratio.toFixed(2)}:1 is below WCAG AA requirement`,
-              wcagCriteria: '1.4.3'
+              wcagCriteria: '1.4.3',
             })
           }
         }
@@ -252,21 +253,23 @@ class AccessibilityReportGenerator {
 
     function testKeyboardNavigation() {
       const results = { score: 100, violations: [] }
-      
-      const interactiveElements = Array.from(document.querySelectorAll(
-        'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"]), [role="button"], [role="link"]'
-      ))
+
+      const interactiveElements = Array.from(
+        document.querySelectorAll(
+          'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"]), [role="button"], [role="link"]'
+        )
+      )
 
       let totalElements = 0
       let accessibleElements = 0
 
-      interactiveElements.forEach(element => {
+      interactiveElements.forEach((element) => {
         totalElements++
-        
+
         const isFocusable = isElementFocusable(element)
         const hasKeyboardSupport = hasKeyboardEventSupport(element)
         const hasProperRole = hasProperRole(element)
-        
+
         if (isFocusable && hasKeyboardSupport && hasProperRole) {
           accessibleElements++
         } else {
@@ -274,13 +277,13 @@ class AccessibilityReportGenerator {
           if (!isFocusable) issues.push('not focusable')
           if (!hasKeyboardSupport) issues.push('no keyboard support')
           if (!hasProperRole) issues.push('improper role')
-          
+
           results.violations.push({
             type: 'keyboard-navigation',
             severity: 'serious',
             element: getElementSelector(element),
             description: `Interactive element has keyboard issues: ${issues.join(', ')}`,
-            wcagCriteria: '2.1.1'
+            wcagCriteria: '2.1.1',
           })
         }
       })
@@ -298,12 +301,14 @@ class AccessibilityReportGenerator {
       let passingTests = 0
 
       // Test 1: Images have alt text
-      const images = Array.from(document.querySelectorAll('img, svg[role="img"]'))
-      images.forEach(img => {
+      const images = Array.from(
+        document.querySelectorAll('img, svg[role="img"]')
+      )
+      images.forEach((img) => {
         totalTests++
         const alt = img.getAttribute('alt')
         const ariaLabel = img.getAttribute('aria-label')
-        
+
         if (alt !== null || ariaLabel) {
           passingTests++
         } else {
@@ -312,17 +317,19 @@ class AccessibilityReportGenerator {
             severity: 'serious',
             element: getElementSelector(img),
             description: 'Image missing alternative text',
-            wcagCriteria: '1.1.1'
+            wcagCriteria: '1.1.1',
           })
         }
       })
 
       // Test 2: Form labels
-      const formControls = Array.from(document.querySelectorAll('input, select, textarea'))
-      formControls.forEach(control => {
+      const formControls = Array.from(
+        document.querySelectorAll('input, select, textarea')
+      )
+      formControls.forEach((control) => {
         totalTests++
         const hasLabel = hasAccessibleLabel(control)
-        
+
         if (hasLabel) {
           passingTests++
         } else {
@@ -331,19 +338,21 @@ class AccessibilityReportGenerator {
             severity: 'serious',
             element: getElementSelector(control),
             description: 'Form control missing accessible label',
-            wcagCriteria: '3.3.2'
+            wcagCriteria: '3.3.2',
           })
         }
       })
 
       // Test 3: Headings structure
-      const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
+      const headings = Array.from(
+        document.querySelectorAll('h1, h2, h3, h4, h5, h6')
+      )
       let previousLevel = 0
-      
-      headings.forEach(heading => {
+
+      headings.forEach((heading) => {
         totalTests++
         const level = parseInt(heading.tagName.charAt(1))
-        
+
         if (level <= previousLevel + 1) {
           passingTests++
         } else {
@@ -352,10 +361,10 @@ class AccessibilityReportGenerator {
             severity: 'moderate',
             element: getElementSelector(heading),
             description: `Heading level ${level} skips hierarchy (previous was ${previousLevel})`,
-            wcagCriteria: '1.3.1'
+            wcagCriteria: '1.3.1',
           })
         }
-        
+
         previousLevel = level
       })
 
@@ -368,18 +377,20 @@ class AccessibilityReportGenerator {
 
     function testFocusManagement() {
       const results = { score: 100, violations: [] }
-      
+
       // Test focus indicators
-      const focusableElements = Array.from(document.querySelectorAll(
-        'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      ))
+      const focusableElements = Array.from(
+        document.querySelectorAll(
+          'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+      )
 
       let totalElements = 0
       let elementsWithFocus = 0
 
-      focusableElements.forEach(element => {
+      focusableElements.forEach((element) => {
         totalElements++
-        
+
         if (hasFocusIndicator(element)) {
           elementsWithFocus++
         } else {
@@ -388,14 +399,18 @@ class AccessibilityReportGenerator {
             severity: 'serious',
             element: getElementSelector(element),
             description: 'Interactive element missing visible focus indicator',
-            wcagCriteria: '2.4.7'
+            wcagCriteria: '2.4.7',
           })
         }
       })
 
       // Test for positive tabindex (anti-pattern)
-      const positiveTabIndex = Array.from(document.querySelectorAll('[tabindex]:not([tabindex="0"]):not([tabindex="-1"])'))
-      positiveTabIndex.forEach(element => {
+      const positiveTabIndex = Array.from(
+        document.querySelectorAll(
+          '[tabindex]:not([tabindex="0"]):not([tabindex="-1"])'
+        )
+      )
+      positiveTabIndex.forEach((element) => {
         const tabIndex = parseInt(element.getAttribute('tabindex'))
         if (tabIndex > 0) {
           results.violations.push({
@@ -403,7 +418,7 @@ class AccessibilityReportGenerator {
             severity: 'moderate',
             element: getElementSelector(element),
             description: 'Positive tabindex disrupts natural tab order',
-            wcagCriteria: '2.4.3'
+            wcagCriteria: '2.4.3',
           })
         }
       })
@@ -430,7 +445,7 @@ class AccessibilityReportGenerator {
           severity: 'serious',
           element: 'document',
           description: 'Page missing or empty title',
-          wcagCriteria: '2.4.2'
+          wcagCriteria: '2.4.2',
         })
       }
 
@@ -445,7 +460,7 @@ class AccessibilityReportGenerator {
           severity: 'moderate',
           element: 'html',
           description: 'Page language not specified',
-          wcagCriteria: '3.1.1'
+          wcagCriteria: '3.1.1',
         })
       }
 
@@ -460,7 +475,7 @@ class AccessibilityReportGenerator {
           severity: 'moderate',
           element: 'document',
           description: 'Page missing main landmark',
-          wcagCriteria: '1.3.1'
+          wcagCriteria: '1.3.1',
         })
       }
 
@@ -475,7 +490,7 @@ class AccessibilityReportGenerator {
           severity: 'moderate',
           element: 'document',
           description: `Page has ${h1Elements.length} h1 elements (should have exactly 1)`,
-          wcagCriteria: '1.3.1'
+          wcagCriteria: '1.3.1',
         })
       }
 
@@ -490,8 +505,10 @@ class AccessibilityReportGenerator {
     function getElementSelector(element) {
       const tagName = element.tagName.toLowerCase()
       const id = element.id ? `#${element.id}` : ''
-      const classes = element.className ? `.${element.className.split(' ').slice(0, 2).join('.')}` : ''
-      
+      const classes = element.className
+        ? `.${element.className.split(' ').slice(0, 2).join('.')}`
+        : ''
+
       return `${tagName}${id}${classes}`.slice(0, 100)
     }
 
@@ -523,28 +540,33 @@ class AccessibilityReportGenerator {
       if (tabIndex !== null) {
         return parseInt(tabIndex) >= 0
       }
-      
+
       const focusableTags = ['a', 'button', 'input', 'select', 'textarea']
-      return focusableTags.includes(element.tagName.toLowerCase()) && !element.disabled
+      return (
+        focusableTags.includes(element.tagName.toLowerCase()) &&
+        !element.disabled
+      )
     }
 
     function hasKeyboardEventSupport(element) {
       // Check for keyboard event handlers or appropriate role
-      return element.hasAttribute('onclick') || 
-             element.hasAttribute('onkeydown') ||
-             element.tagName.toLowerCase() === 'button' ||
-             (element.tagName.toLowerCase() === 'a' && element.hasAttribute('href'))
+      return (
+        element.hasAttribute('onclick') ||
+        element.hasAttribute('onkeydown') ||
+        element.tagName.toLowerCase() === 'button' ||
+        (element.tagName.toLowerCase() === 'a' && element.hasAttribute('href'))
+      )
     }
 
     function hasProperRole(element) {
       const role = element.getAttribute('role')
       const tagName = element.tagName.toLowerCase()
-      
+
       // Elements with implicit roles
       if (['button', 'a', 'input', 'select', 'textarea'].includes(tagName)) {
         return true
       }
-      
+
       // Elements with explicit interactive roles
       const interactiveRoles = ['button', 'link', 'tab', 'menuitem', 'option']
       return role && interactiveRoles.includes(role)
@@ -555,23 +577,30 @@ class AccessibilityReportGenerator {
       const ariaLabelledby = element.getAttribute('aria-labelledby')
       const id = element.getAttribute('id')
       const label = id ? document.querySelector(`label[for="${id}"]`) : null
-      
-      return !!(ariaLabel || ariaLabelledby || label || element.closest('label'))
+
+      return !!(
+        ariaLabel ||
+        ariaLabelledby ||
+        label ||
+        element.closest('label')
+      )
     }
 
     function hasFocusIndicator(element) {
       // This would need actual focus testing - simplified version
       const styles = getComputedStyle(element)
-      return styles.outline !== 'none' || 
-             element.classList.contains('focus-visible') ||
-             element.style.outline !== 'none'
+      return (
+        styles.outline !== 'none' ||
+        element.classList.contains('focus-visible') ||
+        element.style.outline !== 'none'
+      )
     }
 
     function determineWCAGLevel(score, tests) {
       const criticalViolations = Object.values(tests)
-        .flatMap(test => test.violations)
-        .filter(v => v.severity === 'critical')
-      
+        .flatMap((test) => test.violations)
+        .filter((v) => v.severity === 'critical')
+
       if (criticalViolations.length > 0 || score < 70) return 'fail'
       if (score < 90) return 'AA'
       return 'AAA'
@@ -579,32 +608,36 @@ class AccessibilityReportGenerator {
 
     function generatePageRecommendations(tests) {
       const recommendations = []
-      
+
       Object.entries(tests).forEach(([testName, testResult]) => {
         if (testResult.score < 90) {
-          const criticalViolations = testResult.violations.filter(v => v.severity === 'critical').length
-          const seriousViolations = testResult.violations.filter(v => v.severity === 'serious').length
-          
+          const criticalViolations = testResult.violations.filter(
+            (v) => v.severity === 'critical'
+          ).length
+          const seriousViolations = testResult.violations.filter(
+            (v) => v.severity === 'serious'
+          ).length
+
           if (criticalViolations > 0) {
             recommendations.push({
               priority: 'critical',
               category: testName,
               title: `Fix ${criticalViolations} critical ${testName} issues`,
-              impact: 'high'
+              impact: 'high',
             })
           }
-          
+
           if (seriousViolations > 0) {
             recommendations.push({
               priority: 'high',
               category: testName,
               title: `Address ${seriousViolations} ${testName} violations`,
-              impact: 'medium'
+              impact: 'medium',
             })
           }
         }
       })
-      
+
       return recommendations
     }
   }
@@ -618,21 +651,27 @@ class AccessibilityReportGenerator {
 
     // Calculate overall score
     const pageScores = this.results.pages
-      .filter(page => page.score !== undefined)
-      .map(page => page.score)
-    
-    this.results.summary.overallScore = pageScores.length > 0
-      ? Math.round(pageScores.reduce((sum, score) => sum + score, 0) / pageScores.length)
-      : 0
+      .filter((page) => page.score !== undefined)
+      .map((page) => page.score)
+
+    this.results.summary.overallScore =
+      pageScores.length > 0
+        ? Math.round(
+            pageScores.reduce((sum, score) => sum + score, 0) /
+              pageScores.length
+          )
+        : 0
 
     // Count violations
-    this.results.pages.forEach(page => {
+    this.results.pages.forEach((page) => {
       if (page.violations) {
         this.results.summary.totalViolations += page.violations.length
-        this.results.summary.criticalIssues += page.violations.filter(v => v.severity === 'critical').length
-        
+        this.results.summary.criticalIssues += page.violations.filter(
+          (v) => v.severity === 'critical'
+        ).length
+
         // Categorize by WCAG principle
-        page.violations.forEach(violation => {
+        page.violations.forEach((violation) => {
           const principle = this.getWCAGPrinciple(violation.wcagCriteria)
           if (this.results.summary.byCategory[principle]) {
             this.results.summary.byCategory[principle].violations++
@@ -642,15 +681,25 @@ class AccessibilityReportGenerator {
     })
 
     // Calculate pass rate
-    const passingPages = this.results.pages.filter(page => page.score >= 90).length
-    this.results.summary.passRate = Math.round((passingPages / totalPages) * 100)
+    const passingPages = this.results.pages.filter(
+      (page) => page.score >= 90
+    ).length
+    this.results.summary.passRate = Math.round(
+      (passingPages / totalPages) * 100
+    )
 
     // Calculate category scores
-    Object.keys(this.results.summary.byCategory).forEach(category => {
-      const categoryViolations = this.results.summary.byCategory[category].violations
+    Object.keys(this.results.summary.byCategory).forEach((category) => {
+      const categoryViolations =
+        this.results.summary.byCategory[category].violations
       const maxPossibleViolations = totalPages * 10 // Rough estimate
-      this.results.summary.byCategory[category].score = Math.max(0, 
-        Math.round(((maxPossibleViolations - categoryViolations) / maxPossibleViolations) * 100)
+      this.results.summary.byCategory[category].score = Math.max(
+        0,
+        Math.round(
+          ((maxPossibleViolations - categoryViolations) /
+            maxPossibleViolations) *
+            100
+        )
       )
     })
   }
@@ -662,9 +711,9 @@ class AccessibilityReportGenerator {
     const allRecommendations = new Map()
 
     // Collect recommendations from all pages
-    this.results.pages.forEach(page => {
+    this.results.pages.forEach((page) => {
       if (page.recommendations) {
-        page.recommendations.forEach(rec => {
+        page.recommendations.forEach((rec) => {
           const key = `${rec.category}-${rec.title}`
           if (allRecommendations.has(key)) {
             allRecommendations.get(key).count++
@@ -673,7 +722,7 @@ class AccessibilityReportGenerator {
             allRecommendations.set(key, {
               ...rec,
               count: 1,
-              pages: [page.path]
+              pages: [page.path],
             })
           }
         })
@@ -684,7 +733,8 @@ class AccessibilityReportGenerator {
     this.results.recommendations = Array.from(allRecommendations.values())
       .sort((a, b) => {
         const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 }
-        const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority]
+        const priorityDiff =
+          priorityOrder[b.priority] - priorityOrder[a.priority]
         return priorityDiff !== 0 ? priorityDiff : b.count - a.count
       })
       .slice(0, 20) // Top 20 recommendations
@@ -695,14 +745,19 @@ class AccessibilityReportGenerator {
    */
   getWCAGPrinciple(criteria) {
     if (!criteria) return 'robust'
-    
+
     const number = criteria.split('.')[0]
     switch (number) {
-      case '1': return 'perceivable'
-      case '2': return 'operable'
-      case '3': return 'understandable'
-      case '4': return 'robust'
-      default: return 'robust'
+      case '1':
+        return 'perceivable'
+      case '2':
+        return 'operable'
+      case '3':
+        return 'understandable'
+      case '4':
+        return 'robust'
+      default:
+        return 'robust'
     }
   }
 
@@ -713,7 +768,7 @@ class AccessibilityReportGenerator {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
     const filename = `accessibility-report-${timestamp}.json`
     const filepath = path.join(CONFIG.outputDir, filename)
-    
+
     await fs.writeFile(filepath, JSON.stringify(this.results, null, 2))
     console.log(`📊 Results saved to: ${filepath}`)
   }
@@ -797,33 +852,48 @@ class AccessibilityReportGenerator {
         <div class="chart-container">
             <h2>WCAG 2.1 Principles Compliance</h2>
             <div class="wcag-principles">
-                ${Object.entries(this.results.summary.byCategory).map(([principle, data]) => `
+                ${Object.entries(this.results.summary.byCategory)
+                  .map(
+                    ([principle, data]) => `
                     <div class="principle-card">
                         <h3>${principle.charAt(0).toUpperCase() + principle.slice(1)}</h3>
                         <div class="score-value ${this.getScoreClass(data.score)}">${data.score}%</div>
                         <p>${data.violations} violations</p>
                     </div>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </div>
         </div>
 
-        ${this.results.recommendations.length > 0 ? `
+        ${
+          this.results.recommendations.length > 0
+            ? `
         <div class="recommendations">
             <h2>🎯 Priority Recommendations</h2>
-            ${this.results.recommendations.slice(0, 10).map(rec => `
+            ${this.results.recommendations
+              .slice(0, 10)
+              .map(
+                (rec) => `
                 <div class="recommendation-item">
                     <h3>${rec.title}</h3>
                     <p><strong>Priority:</strong> ${rec.priority.toUpperCase()} | <strong>Affects:</strong> ${rec.count} page(s)</p>
                     <p><strong>Pages:</strong> ${rec.pages.join(', ')}</p>
                 </div>
-            `).join('')}
+            `
+              )
+              .join('')}
         </div>
-        ` : ''}
+        `
+            : ''
+        }
 
         <div class="chart-container">
             <h2>📊 Page-by-Page Analysis</h2>
             <div class="page-grid">
-                ${this.results.pages.map(page => `
+                ${this.results.pages
+                  .map(
+                    (page) => `
                     <div class="page-card">
                         <h3>${page.path}</h3>
                         <div class="score-value ${this.getScoreClass(page.score || 0)}">${page.score || 0}%</div>
@@ -831,14 +901,21 @@ class AccessibilityReportGenerator {
                         <p><strong>Violations:</strong> ${page.violations ? page.violations.length : 0}</p>
                         ${page.error ? `<p style="color: #ef4444;"><strong>Error:</strong> ${page.error}</p>` : ''}
                     </div>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </div>
         </div>
 
-        ${this.results.violations.length > 0 ? `
+        ${
+          this.results.violations.length > 0
+            ? `
         <div class="violations-list">
             <h2>⚠️ All Accessibility Violations</h2>
-            ${this.results.violations.slice(0, 50).map(violation => `
+            ${this.results.violations
+              .slice(0, 50)
+              .map(
+                (violation) => `
                 <div class="violation-item violation-${violation.severity}">
                     <h3>${violation.element}</h3>
                     <p><strong>${violation.description}</strong></p>
@@ -846,10 +923,14 @@ class AccessibilityReportGenerator {
                     <p><strong>Severity:</strong> ${violation.severity}</p>
                     <p><strong>Type:</strong> ${violation.type}</p>
                 </div>
-            `).join('')}
+            `
+              )
+              .join('')}
             ${this.results.violations.length > 50 ? `<p><em>... and ${this.results.violations.length - 50} more violations</em></p>` : ''}
         </div>
-        ` : ''}
+        `
+            : ''
+        }
 
         <div class="chart-container">
             <h2>📈 Detailed Test Results</h2>
@@ -866,7 +947,9 @@ class AccessibilityReportGenerator {
                     </tr>
                 </thead>
                 <tbody>
-                    ${this.results.pages.map(page => `
+                    ${this.results.pages
+                      .map(
+                        (page) => `
                         <tr>
                             <td>${page.path}</td>
                             <td class="${this.getScoreClass(page.score || 0)}">${page.score || 0}%</td>
@@ -876,7 +959,9 @@ class AccessibilityReportGenerator {
                             <td>${page.tests?.focusManagement?.score || 'N/A'}%</td>
                             <td>${page.tests?.structure?.score || 'N/A'}%</td>
                         </tr>
-                    `).join('')}
+                    `
+                      )
+                      .join('')}
                 </tbody>
             </table>
         </div>
@@ -899,26 +984,37 @@ class AccessibilityReportGenerator {
    */
   async generateCSVReport() {
     const csvHeaders = [
-      'Page', 'URL', 'Overall Score', 'WCAG Level', 'Total Violations', 'Critical Issues',
-      'Color Contrast Score', 'Keyboard Score', 'Screen Reader Score', 'Focus Score', 'Structure Score'
+      'Page',
+      'URL',
+      'Overall Score',
+      'WCAG Level',
+      'Total Violations',
+      'Critical Issues',
+      'Color Contrast Score',
+      'Keyboard Score',
+      'Screen Reader Score',
+      'Focus Score',
+      'Structure Score',
     ]
 
-    const csvRows = this.results.pages.map(page => [
+    const csvRows = this.results.pages.map((page) => [
       page.path,
       page.url,
       page.score || 0,
       page.wcagLevel || 'Unknown',
       page.violations ? page.violations.length : 0,
-      page.violations ? page.violations.filter(v => v.severity === 'critical').length : 0,
+      page.violations
+        ? page.violations.filter((v) => v.severity === 'critical').length
+        : 0,
       page.tests?.colorContrast?.score || 'N/A',
       page.tests?.keyboard?.score || 'N/A',
       page.tests?.screenReader?.score || 'N/A',
       page.tests?.focusManagement?.score || 'N/A',
-      page.tests?.structure?.score || 'N/A'
+      page.tests?.structure?.score || 'N/A',
     ])
 
     const csvContent = [csvHeaders, ...csvRows]
-      .map(row => row.map(cell => `"${cell}"`).join(','))
+      .map((row) => row.map((cell) => `"${cell}"`).join(','))
       .join('\n')
 
     const csvPath = path.join(CONFIG.outputDir, 'accessibility-report.csv')
@@ -942,21 +1038,21 @@ class AccessibilityReportGenerator {
  */
 async function main() {
   const generator = new AccessibilityReportGenerator()
-  
+
   try {
     await generator.init()
     const results = await generator.generateReport()
-    
+
     console.log('\n♿ Accessibility Report Summary:')
     console.log(`Overall Score: ${results.summary.overallScore}%`)
     console.log(`Total Violations: ${results.summary.totalViolations}`)
     console.log(`Critical Issues: ${results.summary.criticalIssues}`)
     console.log(`Pass Rate: ${results.summary.passRate}%`)
-    
+
     // Exit with appropriate code
-    const hasFailures = results.summary.overallScore < 70 || results.summary.criticalIssues > 0
+    const hasFailures =
+      results.summary.overallScore < 70 || results.summary.criticalIssues > 0
     process.exit(hasFailures ? 1 : 0)
-    
   } catch (error) {
     console.error('❌ Accessibility report generation failed:', error)
     process.exit(1)

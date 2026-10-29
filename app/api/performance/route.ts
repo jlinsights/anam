@@ -60,7 +60,11 @@ export async function GET(request: NextRequest) {
       'Performance statistics retrieved successfully'
     )
   } catch (error) {
-    return createErrorResponse(error, 500, 'Failed to fetch performance statistics')
+    return createErrorResponse(
+      error,
+      500,
+      'Failed to fetch performance statistics'
+    )
   }
 }
 

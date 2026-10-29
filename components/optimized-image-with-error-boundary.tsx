@@ -6,7 +6,10 @@ import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import { useState } from 'react'
 import type { ErrorInfo } from 'react'
-import { ImageErrorBoundary, ImageErrorFallback } from '@/components/error-boundary/ImageErrorBoundary'
+import {
+  ImageErrorBoundary,
+  ImageErrorFallback,
+} from '@/components/error-boundary/ImageErrorBoundary'
 import { captureError } from '@/lib/error-logger'
 
 interface OptimizedArtworkImageProps {
@@ -35,9 +38,15 @@ export function OptimizedArtworkImageWithErrorBoundary({
 }: OptimizedArtworkImageProps) {
   return (
     <ImageErrorBoundary
-      imageContext={usage === 'gallery-grid' ? 'gallery' : 
-                   usage === 'gallery-detail' ? 'artwork' :
-                   usage === 'thumbnail' ? 'thumbnail' : 'artwork'}
+      imageContext={
+        usage === 'gallery-grid'
+          ? 'gallery'
+          : usage === 'gallery-detail'
+            ? 'artwork'
+            : usage === 'thumbnail'
+              ? 'thumbnail'
+              : 'artwork'
+      }
       artworkTitle={artwork.title}
       className={className}
       onError={(error: Error, errorInfo: ErrorInfo) => {
@@ -46,16 +55,16 @@ export function OptimizedArtworkImageWithErrorBoundary({
           errorInfo,
           artwork: artwork.title,
           usage,
-          imageUrl: artwork.imageUrl
+          imageUrl: artwork.imageUrl,
         })
-        
+
         // Send to error tracking
         captureError(error, {
           component: 'OptimizedArtworkImage',
           artworkTitle: artwork.title,
           usage,
           imageUrl: artwork.imageUrl,
-          errorBoundary: 'image'
+          errorBoundary: 'image',
         })
       }}
       fallback={
@@ -64,10 +73,7 @@ export function OptimizedArtworkImageWithErrorBoundary({
           resetError={() => window.location.reload()}
           imageContext={usage}
           compact={usage === 'thumbnail'}
-          className={cn(
-            aspectRatio || 'aspect-[3/4]',
-            className
-          )}
+          className={cn(aspectRatio || 'aspect-[3/4]', className)}
         />
       }
     >
@@ -109,13 +115,15 @@ function OptimizedArtworkImageInner({
       'OptimizedArtworkImage: artwork, slug, or year is missing',
       artwork
     )
-    
+
     // Throw error to be caught by error boundary
-    throw new Error(`Invalid artwork data: ${JSON.stringify({
-      hasArtwork: !!artwork,
-      hasSlug: !!(artwork?.slug),
-      hasYear: !!(artwork?.year)
-    })}`)
+    throw new Error(
+      `Invalid artwork data: ${JSON.stringify({
+        hasArtwork: !!artwork,
+        hasSlug: !!artwork?.slug,
+        hasYear: !!artwork?.year,
+      })}`
+    )
   }
 
   // artwork.number 또는 artwork.slug와 artwork.year를 사용해서 최적화된 이미지 메타데이터 생성
@@ -130,7 +138,7 @@ function OptimizedArtworkImageInner({
         src: artwork.imageUrl, // 이미 imageUrl에 올바른 경로가 설정되어 있음
         sizes: '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
         loading: 'lazy' as const,
-        priority: false
+        priority: false,
       }
     } catch (error) {
       console.error('Error generating image metadata:', error)
@@ -139,11 +147,11 @@ function OptimizedArtworkImageInner({
         src: artwork.imageUrl,
         sizes: '100vw',
         loading: 'lazy' as const,
-        priority: false
+        priority: false,
       }
     }
   })()
-  
+
   const altText = generateAltText(artwork.title, 'artwork')
 
   const handleLoad = () => {
@@ -151,7 +159,7 @@ function OptimizedArtworkImageInner({
       src: hasError ? artwork.imageUrl : imageMeta.src,
       title: artwork.title,
       usage,
-      retryCount
+      retryCount,
     })
     setIsLoading(false)
     setHasError(false)
@@ -167,25 +175,30 @@ function OptimizedArtworkImageInner({
       year: artwork.year,
       number: (artwork as any).number,
       retryCount,
-      usage
+      usage,
     })
-    
+
     // Try fallback or retry logic
     if (retryCount < maxRetries) {
       console.log(`Retrying image load (${retryCount + 1}/${maxRetries})...`)
-      setRetryCount(prev => prev + 1)
+      setRetryCount((prev) => prev + 1)
       // Trigger reload by changing the src slightly
-      setTimeout(() => {
-        setIsLoading(true)
-        setHasError(false)
-      }, 1000 * (retryCount + 1)) // Exponential backoff
+      setTimeout(
+        () => {
+          setIsLoading(true)
+          setHasError(false)
+        },
+        1000 * (retryCount + 1)
+      ) // Exponential backoff
     } else {
       setHasError(true)
       setIsLoading(false)
       onError?.()
-      
+
       // If all retries failed, throw error for error boundary
-      throw new Error(`Image failed to load after ${maxRetries} retries: ${artwork.title}`)
+      throw new Error(
+        `Image failed to load after ${maxRetries} retries: ${artwork.title}`
+      )
     }
   }
 
@@ -210,28 +223,28 @@ function OptimizedArtworkImageInner({
 
       {/* 에러 상태 표시 */}
       {hasError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-paper-warm border border-ink/20">
-          <div className="text-center space-y-zen-xs">
-            <span className="text-2xl">📷</span>
-            <p className="font-display text-ink-light text-xs">
+        <div className='absolute inset-0 flex items-center justify-center bg-paper-warm border border-ink/20'>
+          <div className='text-center space-y-zen-xs'>
+            <span className='text-2xl'>📷</span>
+            <p className='font-display text-ink-light text-xs'>
               이미지 로드 실패
             </p>
             {retryCount < maxRetries && (
               <button
                 onClick={(e) => {
                   e.stopPropagation()
-                  setRetryCount(prev => prev + 1)
+                  setRetryCount((prev) => prev + 1)
                   setIsLoading(true)
                   setHasError(false)
                 }}
-                className="
+                className='
                   px-zen-xs py-1 text-xs
                   bg-ink text-paper font-display
                   hover:bg-gold hover:text-ink
                   transition-all duration-300
                   border border-ink
                   focus:outline-none focus:ring-1 focus:ring-gold
-                "
+                '
               >
                 다시 시도
               </button>

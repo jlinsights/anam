@@ -11,14 +11,14 @@ function checkEnvironmentVariables() {
   console.log('📋 Step 1: 환경 변수 확인\n')
 
   const requiredVars = {
-    'NEXT_PUBLIC_SUPABASE_URL': process.env.NEXT_PUBLIC_SUPABASE_URL,
-    'SUPABASE_SERVICE_ROLE_KEY': process.env.SUPABASE_SERVICE_ROLE_KEY,
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
   }
 
   const optionalVars = {
-    'NEXT_PUBLIC_SUPABASE_ANON_KEY': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    'AIRTABLE_API_KEY': process.env.AIRTABLE_API_KEY,
-    'AIRTABLE_BASE_ID': process.env.AIRTABLE_BASE_ID,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    AIRTABLE_API_KEY: process.env.AIRTABLE_API_KEY,
+    AIRTABLE_BASE_ID: process.env.AIRTABLE_BASE_ID,
   }
 
   let allRequired = true
@@ -27,7 +27,7 @@ function checkEnvironmentVariables() {
   console.log('필수 환경 변수:')
   for (const [key, value] of Object.entries(requiredVars)) {
     if (value) {
-      const maskedValue = key.includes('KEY') 
+      const maskedValue = key.includes('KEY')
         ? `${value.substring(0, 8)}...${value.substring(value.length - 4)}`
         : value
       console.log(`  ✅ ${key}: ${maskedValue}`)
@@ -40,9 +40,10 @@ function checkEnvironmentVariables() {
   console.log('\n선택적 환경 변수:')
   for (const [key, value] of Object.entries(optionalVars)) {
     if (value) {
-      const maskedValue = key.includes('KEY') || key.includes('ID')
-        ? `${value.substring(0, 8)}...${value.substring(value.length - 4)}`
-        : value
+      const maskedValue =
+        key.includes('KEY') || key.includes('ID')
+          ? `${value.substring(0, 8)}...${value.substring(value.length - 4)}`
+          : value
       console.log(`  ✅ ${key}: ${maskedValue}`)
     } else {
       console.log(`  ⚠️  ${key}: 설정되지 않음 (fallback용)`)
@@ -73,9 +74,17 @@ async function checkSupabaseConnection() {
       .limit(1)
 
     if (error) {
-      if (error.code === 'PGRST116' || error.message.includes('relation') || error.message.includes('does not exist')) {
-        console.log('  ⚠️  연결은 성공했지만 artworks 테이블이 아직 생성되지 않았습니다.')
-        console.log('     → lib/supabase/schema.sql 파일을 Supabase SQL Editor에서 실행하세요.')
+      if (
+        error.code === 'PGRST116' ||
+        error.message.includes('relation') ||
+        error.message.includes('does not exist')
+      ) {
+        console.log(
+          '  ⚠️  연결은 성공했지만 artworks 테이블이 아직 생성되지 않았습니다.'
+        )
+        console.log(
+          '     → lib/supabase/schema.sql 파일을 Supabase SQL Editor에서 실행하세요.'
+        )
         return false
       }
       console.log(`  ❌ Supabase 연결 실패: ${error.message}`)
@@ -96,13 +105,13 @@ async function checkSupabaseConnection() {
       .limit(1)
 
     console.log('\n  테이블 상태:')
-    
+
     if (!artworksError && artworksData !== null) {
       // 작품 개수 확인
       const { count } = await supabase
         .from('artworks')
         .select('*', { count: 'exact', head: true })
-      
+
       console.log(`    ✅ artworks 테이블: 존재 (${count || 0}개 작품)`)
     } else {
       console.log('    ❌ artworks 테이블: 존재하지 않음')
@@ -123,7 +132,7 @@ async function checkSupabaseConnection() {
 
 async function main() {
   console.log('🚀 Supabase 설정 확인 시작\n')
-  console.log('=' .repeat(50) + '\n')
+  console.log('='.repeat(50) + '\n')
 
   const envOk = checkEnvironmentVariables()
 
@@ -155,11 +164,12 @@ async function main() {
     console.log('\n📝 다음 단계:')
     console.log('   1. Supabase Dashboard → SQL Editor에서 schema.sql 실행')
     console.log('   2. 설정 확인 재실행: node scripts/check-supabase-setup.js')
-    console.log('   3. 마이그레이션 실행: node scripts/migrate-airtable-to-supabase.js')
+    console.log(
+      '   3. 마이그레이션 실행: node scripts/migrate-airtable-to-supabase.js'
+    )
   }
 
   console.log('')
 }
 
 main().catch(console.error)
-

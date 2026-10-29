@@ -17,12 +17,12 @@ export function LayoutStableContainer({
   width,
   height,
   className = '',
-  reserveSpace = true
+  reserveSpace = true,
 }: LayoutStableContainerProps) {
   const aspectRatioStyle = getAspectRatioStyle(width, height)
 
   return (
-    <div 
+    <div
       className={`relative ${className}`}
       style={reserveSpace ? aspectRatioStyle : undefined}
     >
@@ -47,17 +47,17 @@ export function ArtworkGridContainer({
   children,
   itemCount,
   columns,
-  className = ''
+  className = '',
 }: ArtworkGridContainerProps) {
   // 최소 높이 계산 (4:5 비율 + 간격)
   const estimatedHeight = {
     mobile: Math.ceil(itemCount / columns.mobile) * (300 + 16), // 300px per row + gap
     tablet: Math.ceil(itemCount / columns.tablet) * (350 + 16),
-    desktop: Math.ceil(itemCount / columns.desktop) * (400 + 16)
+    desktop: Math.ceil(itemCount / columns.desktop) * (400 + 16),
   }
 
   return (
-    <div 
+    <div
       className={`
         grid gap-4 w-full
         grid-cols-${columns.mobile} 
@@ -70,7 +70,7 @@ export function ArtworkGridContainer({
         minHeight: `${estimatedHeight.mobile}px`,
         containIntrinsicSize: `100% ${estimatedHeight.desktop}px`,
         // CSS 격리로 성능 향상
-        contain: 'layout style paint'
+        contain: 'layout style paint',
       }}
     >
       {children}
@@ -84,7 +84,10 @@ interface ArtworkSkeletonProps {
   className?: string
 }
 
-export function ArtworkSkeleton({ count, className = '' }: ArtworkSkeletonProps) {
+export function ArtworkSkeleton({
+  count,
+  className = '',
+}: ArtworkSkeletonProps) {
   return (
     <>
       {Array.from({ length: count }).map((_, index) => (
@@ -99,22 +102,22 @@ export function ArtworkSkeleton({ count, className = '' }: ArtworkSkeletonProps)
           style={{ containIntrinsicSize: '300px 375px' }}
         >
           {/* Skeleton content */}
-          <div className="w-full h-full flex flex-col">
+          <div className='w-full h-full flex flex-col'>
             {/* Image placeholder */}
-            <div className="flex-1 bg-stone/10 relative">
+            <div className='flex-1 bg-stone/10 relative'>
               {/* Subtle shimmer effect */}
-              <div 
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-stone/20 to-transparent transform -skew-x-12 animate-shimmer"
+              <div
+                className='absolute inset-0 bg-gradient-to-r from-transparent via-stone/20 to-transparent transform -skew-x-12 animate-shimmer'
                 style={{
-                  animation: 'shimmer 2s infinite'
+                  animation: 'shimmer 2s infinite',
                 }}
               />
             </div>
-            
+
             {/* Title placeholder */}
-            <div className="p-3 space-y-2">
-              <div className="h-4 bg-stone/20 rounded animate-pulse" />
-              <div className="h-3 bg-stone/15 rounded w-3/4 animate-pulse" />
+            <div className='p-3 space-y-2'>
+              <div className='h-4 bg-stone/20 rounded animate-pulse' />
+              <div className='h-3 bg-stone/15 rounded w-3/4 animate-pulse' />
             </div>
           </div>
         </div>
@@ -130,10 +133,10 @@ interface LoadingProgressIndicatorProps {
   className?: string
 }
 
-export function LoadingProgressIndicator({ 
-  loaded, 
-  total, 
-  className = '' 
+export function LoadingProgressIndicator({
+  loaded,
+  total,
+  className = '',
 }: LoadingProgressIndicatorProps) {
   const progress = total > 0 ? (loaded / total) * 100 : 0
 
@@ -141,13 +144,13 @@ export function LoadingProgressIndicator({
 
   return (
     <div className={`fixed top-0 left-0 right-0 z-50 ${className}`}>
-      <div 
-        className="h-1 bg-gold/60 transition-all duration-300 ease-out"
-        style={{ 
+      <div
+        className='h-1 bg-gold/60 transition-all duration-300 ease-out'
+        style={{
           width: `${progress}%`,
           // Smooth transitions prevent layout shifts
           willChange: 'width',
-          transform: 'translateZ(0)' // Force GPU acceleration
+          transform: 'translateZ(0)', // Force GPU acceleration
         }}
       />
     </div>
@@ -161,18 +164,18 @@ interface PriorityContentProps {
   className?: string
 }
 
-export function PriorityContent({ 
-  children, 
-  isPriority, 
-  className = '' 
+export function PriorityContent({
+  children,
+  isPriority,
+  className = '',
 }: PriorityContentProps) {
   return (
-    <div 
+    <div
       className={className}
       style={{
         // 우선순위 콘텐츠는 즉시 표시
         contentVisibility: isPriority ? 'visible' : 'auto',
-        containIntrinsicSize: isPriority ? 'none' : '300px 375px'
+        containIntrinsicSize: isPriority ? 'none' : '300px 375px',
       }}
     >
       {children}

@@ -155,12 +155,17 @@ export default function RootLayout({
         <link rel='dns-prefetch' href='https://fonts.googleapis.com' />
         <link rel='dns-prefetch' href='https://fonts.gstatic.com' />
         <link rel='dns-prefetch' href='https://imagedelivery.net' />
-        
+
         {/* Hero/Featured 이미지 프리로드 */}
         <link rel='preload' as='image' href='/Images/hero-image.jpg' />
-        <link rel='preload' as='image' href='/Images/Artworks/featured/featured-01.webp' type='image/webp' />
+        <link
+          rel='preload'
+          as='image'
+          href='/Images/Artworks/featured/featured-01.webp'
+          type='image/webp'
+        />
         <link rel='preload' as='image' href='/Images/artist-profile.jpg' />
-        
+
         {/* 중요 CSS 프리로드 */}
         {/* ✅ FIXED: Removed non-existent font and CSS preloads that were causing 404 errors */}
         {/* <link rel='preload' href='/fonts/noto-serif-kr-subset.woff2' as='font' type='font/woff2' crossOrigin='anonymous' /> */}
@@ -243,7 +248,7 @@ export default function RootLayout({
             __html: JSON.stringify(generateStructuredData(), null, 2),
           }}
         />
-        
+
         {/* ✅ SIMPLE ERROR PREVENTION - Basic only */}
       </head>
       <body

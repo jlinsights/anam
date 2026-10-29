@@ -157,7 +157,7 @@ async function main() {
   let totalOriginalSize = 0
   let totalOptimizedSize = 0
   let processedCount = 0
-  let formatStats = {}
+  const formatStats = {}
 
   // 최적화된 이미지 저장할 디렉토리 생성
   const optimizedDir = 'public/Images/Artworks/optimized'

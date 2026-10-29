@@ -1,6 +1,13 @@
-import { fetchArtworksFromSupabase, fetchArtworkBySlugFromSupabase } from '@/lib/supabase/artworks'
+import {
+  fetchArtworksFromSupabase,
+  fetchArtworkBySlugFromSupabase,
+} from '@/lib/supabase/artworks'
 import { fallbackArtworksData } from '@/lib/artworks'
-import { createErrorResponse, createSuccessResponse, handleExternalServiceError } from '@/lib/error-handler'
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  handleExternalServiceError,
+} from '@/lib/error-handler'
 import { withRateLimit } from '@/lib/rate-limit'
 import type { Artwork } from '@/lib/types'
 import { NextRequest, NextResponse } from 'next/server'
@@ -35,7 +42,10 @@ async function getCachedArtworks(): Promise<Artwork[]> {
       return fallbackArtworksData
     }
   } catch (error) {
-    console.error('❌ Error fetching artworks from Supabase, using fallback data:', error)
+    console.error(
+      '❌ Error fetching artworks from Supabase, using fallback data:',
+      error
+    )
     cachedArtworks = fallbackArtworksData
     cacheTimestamp = now
     return fallbackArtworksData
@@ -59,7 +69,8 @@ export async function GET(request: NextRequest) {
 
       // getCachedArtworks() now always returns fallback data, so artworks should never be empty
       // But let's add a final safety net just in case
-      const finalArtworks = (artworks && artworks.length > 0) ? artworks : fallbackArtworksData
+      const finalArtworks =
+        artworks && artworks.length > 0 ? artworks : fallbackArtworksData
 
       // 특정 slug가 요청된 경우 (Supabase에서 직접 조회 시도)
       if (slug) {
@@ -73,16 +84,24 @@ export async function GET(request: NextRequest) {
             })
           }
         } catch (error) {
-          console.warn('⚠️ Error fetching artwork by slug from Supabase, falling back to cache:', error)
+          console.warn(
+            '⚠️ Error fetching artwork by slug from Supabase, falling back to cache:',
+            error
+          )
         }
 
         // Fallback to cached artworks
-        const artwork = finalArtworks.find((artwork: Artwork) => artwork.slug === slug)
-        return NextResponse.json({
-          success: !!artwork,
-          message: artwork ? 'Artwork found' : 'Artwork not found',
-          data: artwork || null,
-        }, { status: artwork ? 200 : 404 })
+        const artwork = finalArtworks.find(
+          (artwork: Artwork) => artwork.slug === slug
+        )
+        return NextResponse.json(
+          {
+            success: !!artwork,
+            message: artwork ? 'Artwork found' : 'Artwork not found',
+            data: artwork || null,
+          },
+          { status: artwork ? 200 : 404 }
+        )
       }
 
       // 모든 작품 반환
@@ -116,7 +135,8 @@ export async function POST(request: NextRequest) {
           message: 'Cache refreshed successfully',
           data: {
             count: artworks.length,
-            featuredCount: artworks.filter((artwork) => artwork.featured).length,
+            featuredCount: artworks.filter((artwork) => artwork.featured)
+              .length,
           },
         })
       }

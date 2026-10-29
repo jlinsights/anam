@@ -42,3 +42,6 @@ next-env.d.ts
 # Cache
 .cache/
 *.cache
+# Playwright 결과물
+/test-results/
+/playwright-report/

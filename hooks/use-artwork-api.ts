@@ -13,7 +13,7 @@ export function useArtworks() {
     revalidateOnFocus: true,
     retryAttempts: 1,
     retryDelay: 300,
-    timeout: 2000 // 2초 타임아웃으로 더 빠른 fallback 실행
+    timeout: 2000, // 2초 타임아웃으로 더 빠른 fallback 실행
   })
 }
 
@@ -25,7 +25,7 @@ export function useArtwork(slug: string) {
     immediate: !!slug,
     revalidateOnFocus: false,
     retryAttempts: 2,
-    retryDelay: 1000
+    retryDelay: 1000,
   })
 }
 
@@ -38,7 +38,7 @@ export function useArtist() {
     revalidateOnFocus: false,
     retryAttempts: 1,
     retryDelay: 300,
-    timeout: 2000 // 2초 타임아웃으로 더 빠른 fallback 실행
+    timeout: 2000, // 2초 타임아웃으로 더 빠른 fallback 실행
   })
 }
 
@@ -46,27 +46,32 @@ export function useArtist() {
  * Hook for fetching random artworks
  */
 export function useRandomArtworks(currentSlug?: string, count: number = 4) {
-  const requestFn = useCallback(async (signal: AbortSignal) => {
-    const params = new URLSearchParams()
-    if (currentSlug) params.set('exclude', currentSlug)
-    params.set('count', count.toString())
-    params.set('random', 'true')
+  const requestFn = useCallback(
+    async (signal: AbortSignal) => {
+      const params = new URLSearchParams()
+      if (currentSlug) params.set('exclude', currentSlug)
+      params.set('count', count.toString())
+      params.set('random', 'true')
 
-    const response = await fetch(`/api/artworks?${params.toString()}`, { signal })
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
+      const response = await fetch(`/api/artworks?${params.toString()}`, {
+        signal,
+      })
 
-    const result = await response.json()
-    return result.data || []
-  }, [currentSlug, count])
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      return result.data || []
+    },
+    [currentSlug, count]
+  )
 
   return useApiRequest<Artwork[]>(requestFn, {
     immediate: true,
     revalidateOnFocus: false,
     retryAttempts: 1,
-    retryDelay: 500
+    retryDelay: 500,
   })
 }
 
@@ -78,39 +83,47 @@ export function useFeaturedArtworks() {
     immediate: true,
     revalidateOnFocus: true,
     retryAttempts: 2,
-    retryDelay: 1000
+    retryDelay: 1000,
   })
 }
 
 /**
  * Hook for searching artworks
  */
-export function useArtworkSearch(query: string, filters?: {
-  category?: string
-  year?: number
-  medium?: string
-}) {
-  const requestFn = useCallback(async (signal: AbortSignal) => {
-    const params = new URLSearchParams()
-    if (query) params.set('search', query)
-    if (filters?.category) params.set('category', filters.category)
-    if (filters?.year) params.set('year', filters.year.toString())
-    if (filters?.medium) params.set('medium', filters.medium)
+export function useArtworkSearch(
+  query: string,
+  filters?: {
+    category?: string
+    year?: number
+    medium?: string
+  }
+) {
+  const requestFn = useCallback(
+    async (signal: AbortSignal) => {
+      const params = new URLSearchParams()
+      if (query) params.set('search', query)
+      if (filters?.category) params.set('category', filters.category)
+      if (filters?.year) params.set('year', filters.year.toString())
+      if (filters?.medium) params.set('medium', filters.medium)
 
-    const response = await fetch(`/api/artworks?${params.toString()}`, { signal })
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
+      const response = await fetch(`/api/artworks?${params.toString()}`, {
+        signal,
+      })
 
-    const result = await response.json()
-    return result.data || []
-  }, [query, filters])
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      return result.data || []
+    },
+    [query, filters]
+  )
 
   return useApiRequest<Artwork[]>(requestFn, {
     immediate: !!query,
     revalidateOnFocus: false,
     retryAttempts: 1,
-    retryDelay: 300
+    retryDelay: 300,
   })
 }

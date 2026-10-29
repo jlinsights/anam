@@ -1,4 +1,5 @@
 import { POST } from '@/app/api/contact/route'
+import { rateLimiters } from '@/lib/rate-limit'
 import nodemailer from 'nodemailer'
 
 // Mock nodemailer
@@ -38,6 +39,11 @@ global.Response = jest.fn().mockImplementation((body, options) => ({
 }))
 
 describe('/api/contact API Route', () => {
+  // 모듈 단위 rate limiter 상태가 테스트 사이에 누적되지 않도록 매번 초기화
+  beforeEach(() => {
+    Object.values(rateLimiters).forEach((limiter) => limiter.clear())
+  })
+
   let mockSendMail: jest.Mock
   let mockTransporter: any
 

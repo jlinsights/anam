@@ -47,7 +47,9 @@ export default function OfflinePage() {
                 작가 프로필 및 이력
               </li>
               <li className='flex items-center gap-2'>
-                <span className='w-4 h-4 flex items-center justify-center text-xs'>💾</span>
+                <span className='w-4 h-4 flex items-center justify-center text-xs'>
+                  💾
+                </span>
                 캐시된 모든 콘텐츠
               </li>
             </ul>
@@ -65,7 +67,8 @@ export default function OfflinePage() {
               <li>• 실시간 전시 정보</li>
             </ul>
             <p className='text-xs text-amber-600 mt-2 italic'>
-              * 문의 폼은 오프라인에서도 작성 가능하며, 온라인 복구 시 자동 전송됩니다.
+              * 문의 폼은 오프라인에서도 작성 가능하며, 온라인 복구 시 자동
+              전송됩니다.
             </p>
           </div>
 
@@ -125,4 +128,3 @@ export default function OfflinePage() {
 }
 
 export const dynamic = 'force-static'
-

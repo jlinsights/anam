@@ -85,13 +85,21 @@ async function createArtistsTable() {
       return true
     }
 
-    if (checkError.code === 'PGRST116' || checkError.message.includes('relation') || checkError.message.includes('does not exist')) {
+    if (
+      checkError.code === 'PGRST116' ||
+      checkError.message.includes('relation') ||
+      checkError.message.includes('does not exist')
+    ) {
       console.log('  ⚠️  artists 테이블이 존재하지 않습니다.')
-      console.log('  📝 Supabase Dashboard → SQL Editor에서 다음 SQL을 실행하세요:\n')
+      console.log(
+        '  📝 Supabase Dashboard → SQL Editor에서 다음 SQL을 실행하세요:\n'
+      )
       console.log('='.repeat(60))
       console.log(createArtistsTableSQL)
       console.log('='.repeat(60))
-      console.log('\n  또는 전체 schema.sql 파일을 실행하세요: lib/supabase/schema.sql')
+      console.log(
+        '\n  또는 전체 schema.sql 파일을 실행하세요: lib/supabase/schema.sql'
+      )
       return false
     }
 
@@ -102,7 +110,7 @@ async function createArtistsTable() {
   }
 }
 
-createArtistsTable().then(success => {
+createArtistsTable().then((success) => {
   if (success) {
     console.log('\n✅ 준비 완료!')
     process.exit(0)
@@ -111,4 +119,3 @@ createArtistsTable().then(success => {
     process.exit(1)
   }
 })
-

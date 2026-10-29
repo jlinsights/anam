@@ -30,20 +30,20 @@ export class RootErrorBoundary extends Component<Props, State> {
   static getDerivedStateFromError(error: Error): State {
     // Analyze error type with more comprehensive detection
     let errorType: State['errorType'] = 'unknown'
-    
+
     const errorName = error.name || ''
     const errorMessage = error.message || ''
     const errorStack = error.stack || ''
     const lowerMessage = errorMessage.toLowerCase()
     const lowerStack = errorStack.toLowerCase()
-    
+
     // Chunk loading errors
     if (
       errorName === 'ChunkLoadError' ||
       lowerMessage.includes('loading chunk') ||
       lowerMessage.includes('chunk load failed') ||
-      lowerMessage.includes('failed to fetch dynamically imported module') ||
-      lowerStack.includes('chunk')
+      // 스택은 보지 않는다: 프로덕션 스택은 전부 /_next/static/chunks/ 경로라 모든 오류가 chunk로 분류된다
+      lowerMessage.includes('failed to fetch dynamically imported module')
     ) {
       errorType = 'chunk'
     }
@@ -56,7 +56,8 @@ export class RootErrorBoundary extends Component<Props, State> {
       lowerMessage.includes('failed to load') ||
       lowerMessage.includes('networkerror') ||
       errorName === 'NetworkError' ||
-      errorName === 'TypeError' && (lowerMessage.includes('fetch') || lowerMessage.includes('network'))
+      (errorName === 'TypeError' &&
+        (lowerMessage.includes('fetch') || lowerMessage.includes('network')))
     ) {
       errorType = 'network'
     }
@@ -92,7 +93,7 @@ export class RootErrorBoundary extends Component<Props, State> {
     ) {
       errorType = 'network' // Database errors are treated as network issues
     }
-    
+
     // Log unknown errors for debugging with enhanced context
     if (errorType === 'unknown') {
       console.warn('Unknown error type detected:', {
@@ -103,7 +104,7 @@ export class RootErrorBoundary extends Component<Props, State> {
           name: errorName,
           message: errorMessage,
           stack: errorStack.substring(0, 1000),
-        }
+        },
       })
     }
 
@@ -111,7 +112,7 @@ export class RootErrorBoundary extends Component<Props, State> {
       hasError: true,
       error,
       errorId: `root_error_${Date.now()}`,
-      errorType
+      errorType,
     }
   }
 
@@ -124,7 +125,8 @@ export class RootErrorBoundary extends Component<Props, State> {
       errorBoundary: 'root',
       componentStack: errorInfo.componentStack,
       timestamp: new Date().toISOString(),
-      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'server',
+      userAgent:
+        typeof window !== 'undefined' ? window.navigator.userAgent : 'server',
       url: typeof window !== 'undefined' ? window.location.href : 'unknown',
       referrer: typeof window !== 'undefined' ? document.referrer : 'unknown',
       // Enhanced error details
@@ -132,19 +134,23 @@ export class RootErrorBoundary extends Component<Props, State> {
       errorMessage: error.message,
       errorStack: error.stack?.substring(0, 1000), // Limit stack length for logging
       // Browser/environment info
-      windowWidth: typeof window !== 'undefined' ? window.innerWidth : undefined,
-      windowHeight: typeof window !== 'undefined' ? window.innerHeight : undefined,
-      viewport: typeof window !== 'undefined' 
-        ? `${window.innerWidth}x${window.innerHeight}` 
-        : 'unknown',
+      windowWidth:
+        typeof window !== 'undefined' ? window.innerWidth : undefined,
+      windowHeight:
+        typeof window !== 'undefined' ? window.innerHeight : undefined,
+      viewport:
+        typeof window !== 'undefined'
+          ? `${window.innerWidth}x${window.innerHeight}`
+          : 'unknown',
       // Performance info
-      memory: typeof (performance as any)?.memory !== 'undefined' 
-        ? {
-            usedJSHeapSize: (performance as any).memory.usedJSHeapSize,
-            totalJSHeapSize: (performance as any).memory.totalJSHeapSize,
-            jsHeapSizeLimit: (performance as any).memory.jsHeapSizeLimit,
-          }
-        : undefined,
+      memory:
+        typeof (performance as any)?.memory !== 'undefined'
+          ? {
+              usedJSHeapSize: (performance as any).memory.usedJSHeapSize,
+              totalJSHeapSize: (performance as any).memory.totalJSHeapSize,
+              jsHeapSizeLimit: (performance as any).memory.jsHeapSizeLimit,
+            }
+          : undefined,
     }
 
     console.error('Root Error Boundary caught a critical error:', {
@@ -156,7 +162,7 @@ export class RootErrorBoundary extends Component<Props, State> {
       errorInfo: {
         componentStack: errorInfo.componentStack?.substring(0, 500),
       },
-      context: errorContext
+      context: errorContext,
     })
 
     // Send to error tracking service
@@ -167,7 +173,9 @@ export class RootErrorBoundary extends Component<Props, State> {
 
     // For chunk loading errors, try to reload the page automatically
     if (this.state.errorType === 'chunk' && this.retryCount === 0) {
-      console.log('Chunk loading error detected, attempting automatic reload...')
+      console.log(
+        'Chunk loading error detected, attempting automatic reload...'
+      )
       setTimeout(() => {
         window.location.reload()
       }, 3000)
@@ -178,7 +186,9 @@ export class RootErrorBoundary extends Component<Props, State> {
     if (this.retryCount < this.maxRetries) {
       this.retryCount++
       this.setState({ hasError: false, error: undefined, errorId: undefined })
-      console.log(`Root error retry attempt ${this.retryCount}/${this.maxRetries}`)
+      console.log(
+        `Root error retry attempt ${this.retryCount}/${this.maxRetries}`
+      )
     } else {
       // Force reload as last resort
       window.location.reload()
@@ -188,13 +198,13 @@ export class RootErrorBoundary extends Component<Props, State> {
   handleReload = () => {
     // Clear any cached data that might be causing issues
     if ('caches' in window) {
-      caches.keys().then(cacheNames => {
-        cacheNames.forEach(cacheName => {
+      caches.keys().then((cacheNames) => {
+        cacheNames.forEach((cacheName) => {
           caches.delete(cacheName)
         })
       })
     }
-    
+
     // Clear local storage if it might be corrupted
     try {
       localStorage.clear()
@@ -202,37 +212,40 @@ export class RootErrorBoundary extends Component<Props, State> {
     } catch (e) {
       console.warn('Could not clear storage:', e)
     }
-    
+
     window.location.reload()
   }
 
   getErrorMessage = () => {
     const { errorType, error } = this.state
-    
+
     switch (errorType) {
       case 'chunk':
         return {
           title: '앱 업데이트가 필요합니다',
-          description: '새로운 버전의 앱이 배포되었습니다. 페이지를 새로고침하여 업데이트해 주세요.',
-          autoReload: true
+          description:
+            '새로운 버전의 앱이 배포되었습니다. 페이지를 새로고침하여 업데이트해 주세요.',
+          autoReload: true,
         }
       case 'network':
         return {
           title: '네트워크 연결 오류',
           description: '인터넷 연결을 확인하고 다시 시도해 주세요.',
-          autoReload: false
+          autoReload: false,
         }
       case 'javascript':
         return {
           title: '앱 실행 오류',
-          description: '앱에 실행 오류가 발생했습니다. 페이지를 새로고침해 주세요.',
-          autoReload: false
+          description:
+            '앱에 실행 오류가 발생했습니다. 페이지를 새로고침해 주세요.',
+          autoReload: false,
         }
       default:
         return {
           title: '예기치 못한 오류가 발생했습니다',
-          description: '앱에 문제가 발생했습니다. 페이지를 새로고침하거나 잠시 후 다시 시도해 주세요.',
-          autoReload: false
+          description:
+            '앱에 문제가 발생했습니다. 페이지를 새로고침하거나 잠시 후 다시 시도해 주세요.',
+          autoReload: false,
         }
     }
   }
@@ -247,33 +260,33 @@ export class RootErrorBoundary extends Component<Props, State> {
       const canRetry = this.retryCount < this.maxRetries
 
       return (
-        <div className="min-h-screen bg-paper flex items-center justify-center p-zen-lg">
+        <div className='min-h-screen bg-paper flex items-center justify-center p-zen-lg'>
           <motion.div
-            className="max-w-2xl text-center space-y-zen-lg"
+            className='max-w-2xl text-center space-y-zen-lg'
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
           >
             {/* Error Icon */}
-            <div className="w-24 h-24 mx-auto border-4 border-ink bg-paper-warm flex items-center justify-center">
-              <span className="text-4xl">⚠️</span>
+            <div className='w-24 h-24 mx-auto border-4 border-ink bg-paper-warm flex items-center justify-center'>
+              <span className='text-4xl'>⚠️</span>
             </div>
 
             {/* Error Message */}
-            <div className="space-y-zen-sm">
-              <h1 className="font-calligraphy font-bold text-4xl text-ink">
+            <div className='space-y-zen-sm'>
+              <h1 className='font-calligraphy font-bold text-4xl text-ink'>
                 {title}
               </h1>
-              <p className="font-display text-ink-light text-lg leading-relaxed">
+              <p className='font-display text-ink-light text-lg leading-relaxed'>
                 {description}
               </p>
             </div>
 
             {/* Auto-reload notification */}
             {autoReload && this.retryCount === 0 && (
-              <div className="bg-gold/20 border border-gold p-zen-sm rounded text-sm text-ink">
-                <div className="flex items-center justify-center space-x-2">
-                  <div className="animate-spin w-4 h-4 border-2 border-ink border-t-transparent rounded-full"></div>
+              <div className='bg-gold/20 border border-gold p-zen-sm rounded text-sm text-ink'>
+                <div className='flex items-center justify-center space-x-2'>
+                  <div className='animate-spin w-4 h-4 border-2 border-ink border-t-transparent rounded-full'></div>
                   <span>3초 후 자동으로 새로고침됩니다...</span>
                 </div>
               </div>
@@ -281,7 +294,7 @@ export class RootErrorBoundary extends Component<Props, State> {
 
             {/* Error ID for support */}
             {this.state.errorId && (
-              <div className="text-sm text-ink-light bg-paper-warm border border-ink/20 p-zen-sm rounded">
+              <div className='text-sm text-ink-light bg-paper-warm border border-ink/20 p-zen-sm rounded'>
                 오류 ID: {this.state.errorId}
                 <br />
                 오류 유형: {this.state.errorType}
@@ -290,16 +303,19 @@ export class RootErrorBoundary extends Component<Props, State> {
 
             {/* Error Details (Development Only) */}
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="text-left bg-stone-100 p-zen-sm border border-ink/20 text-sm">
-                <summary className="cursor-pointer font-bold text-red-600 mb-zen-sm">
+              <details className='text-left bg-stone-100 p-zen-sm border border-ink/20 text-sm'>
+                <summary className='cursor-pointer font-bold text-red-600 mb-zen-sm'>
                   개발자 정보 (Development Only)
                 </summary>
-                <pre className="whitespace-pre-wrap text-gray-700 overflow-auto max-h-48">
+                <pre className='whitespace-pre-wrap text-gray-700 overflow-auto max-h-48'>
                   Error Type: {this.state.errorType}
                   {'\n'}
                   Retry Count: {this.retryCount}/{this.maxRetries}
                   {'\n'}
-                  URL: {typeof window !== 'undefined' ? window.location.href : 'unknown'}
+                  URL:{' '}
+                  {typeof window !== 'undefined'
+                    ? window.location.href
+                    : 'unknown'}
                   {'\n\n'}
                   {this.state.error.name}: {this.state.error.message}
                   {'\n\n'}
@@ -309,18 +325,18 @@ export class RootErrorBoundary extends Component<Props, State> {
             )}
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-zen-md justify-center">
+            <div className='flex flex-col sm:flex-row gap-zen-md justify-center'>
               {canRetry && !autoReload && (
                 <button
                   onClick={this.handleRetry}
-                  className="
+                  className='
                     px-zen-xl py-zen-md
                     bg-ink text-paper font-display font-bold text-lg
                     hover:bg-gold hover:text-ink
                     transition-all duration-300
                     border-2 border-ink
                     focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2
-                  "
+                  '
                 >
                   다시 시도 ({this.maxRetries - this.retryCount}회 남음)
                 </button>
@@ -328,26 +344,26 @@ export class RootErrorBoundary extends Component<Props, State> {
 
               <button
                 onClick={this.handleReload}
-                className="
+                className='
                   px-zen-xl py-zen-md
                   bg-paper border-2 border-ink text-ink font-display font-bold text-lg
                   hover:bg-ink hover:text-paper
                   transition-all duration-300
                   focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2
-                "
+                '
               >
                 새로고침
               </button>
 
               <Link
-                href="/"
-                className="
+                href='/'
+                className='
                   inline-block text-center px-zen-xl py-zen-md
                   bg-paper-warm border-2 border-gold text-ink font-display font-bold text-lg
                   hover:bg-gold hover:text-ink
                   transition-all duration-300
                   focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2
-                "
+                '
               >
                 홈으로 돌아가기
               </Link>
@@ -355,17 +371,18 @@ export class RootErrorBoundary extends Component<Props, State> {
 
             {/* Browser Compatibility Notice */}
             {this.state.errorType === 'javascript' && (
-              <div className="bg-paper-warm border border-ink/20 p-zen-sm rounded text-sm text-ink-light">
-                오래된 브라우저를 사용 중이시라면 최신 버전으로 업데이트해 주세요.
+              <div className='bg-paper-warm border border-ink/20 p-zen-sm rounded text-sm text-ink-light'>
+                오래된 브라우저를 사용 중이시라면 최신 버전으로 업데이트해
+                주세요.
               </div>
             )}
 
             {/* Help Text */}
-            <p className="text-sm text-ink-light">
+            <p className='text-sm text-ink-light'>
               문제가 계속되면{' '}
-              <Link 
-                href="/contact" 
-                className="text-gold hover:text-ink transition-colors focus:outline-none focus:underline"
+              <Link
+                href='/contact'
+                className='text-gold hover:text-ink transition-colors focus:outline-none focus:underline'
               >
                 문의하기
               </Link>
@@ -391,7 +408,7 @@ export function useGlobalErrorHandler() {
       captureError(new Error(`Unhandled Promise Rejection: ${event.reason}`), {
         type: 'unhandledrejection',
         reason: event.reason,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
     })
 
@@ -403,7 +420,7 @@ export function useGlobalErrorHandler() {
         filename: event.filename,
         lineno: event.lineno,
         colno: event.colno,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
     })
   }

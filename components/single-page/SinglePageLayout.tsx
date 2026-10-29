@@ -4,7 +4,10 @@ import { useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Artwork, Artist } from '@/lib/types'
-import { useSafeGalleryStore, useModalState } from '@/lib/stores/gallery-store-safe'
+import {
+  useSafeGalleryStore,
+  useModalState,
+} from '@/lib/stores/gallery-store-safe'
 
 // Import individual section components
 import { HeroSection } from './HeroSection'
@@ -20,7 +23,10 @@ interface SinglePageLayoutProps {
   artist?: Artist
 }
 
-export default function SinglePageLayout({ initialArtworks, artist }: SinglePageLayoutProps) {
+export default function SinglePageLayout({
+  initialArtworks,
+  artist,
+}: SinglePageLayoutProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -33,14 +39,17 @@ export default function SinglePageLayout({ initialArtworks, artist }: SinglePage
     setArtist,
     openModal,
     closeModal,
-    trackSectionView
+    trackSectionView,
   } = useSafeGalleryStore()
-  
+
   const { isOpen: isModalOpen, artwork: selectedArtwork } = useModalState()
 
   // Debug logging
   useEffect(() => {
-    console.log('SinglePageLayout mounted', { artworks: initialArtworks?.length, artist: !!artist })
+    console.log('SinglePageLayout mounted', {
+      artworks: initialArtworks?.length,
+      artist: !!artist,
+    })
   }, [])
 
   // Initialize store with server data
@@ -59,11 +68,11 @@ export default function SinglePageLayout({ initialArtworks, artist }: SinglePage
   useEffect(() => {
     const artworkId = searchParams.get('artwork')
     if (artworkId && initialArtworks.length > 0) {
-      const artwork = initialArtworks.find(a => a.id === artworkId)
+      const artwork = initialArtworks.find((a) => a.id === artworkId)
       if (artwork) {
         openModal(artwork)
         navigateToSection('gallery')
-        
+
         // Clean up URL parameter after opening modal (client-side only)
         if (typeof window !== 'undefined') {
           const url = new URL(window.location.href)
@@ -82,13 +91,16 @@ export default function SinglePageLayout({ initialArtworks, artist }: SinglePage
   // Intersection observer for active section tracking
   useEffect(() => {
     // Only run on client side
-    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') {
+    if (
+      typeof window === 'undefined' ||
+      typeof IntersectionObserver === 'undefined'
+    ) {
       return
     }
 
     const observerOptions = {
       threshold: 0.5,
-      rootMargin: '-50px 0px'
+      rootMargin: '-50px 0px',
     }
 
     const observer = new IntersectionObserver((entries) => {
@@ -103,7 +115,7 @@ export default function SinglePageLayout({ initialArtworks, artist }: SinglePage
 
     // Observe all sections
     const sections = ['hero', 'gallery', 'artist', 'exhibition', 'contact']
-    sections.forEach(sectionId => {
+    sections.forEach((sectionId) => {
       const element = document.getElementById(sectionId)
       if (element) observer.observe(element)
     })
@@ -115,38 +127,38 @@ export default function SinglePageLayout({ initialArtworks, artist }: SinglePage
     return (
       <>
         {/* Fixed Navigation */}
-        <Navigation 
+        <Navigation
           currentSection={currentSection}
           onNavigate={navigateToSection}
         />
 
         {/* Single Page Sections */}
-        <main className="min-h-screen bg-white">
+        <main className='min-h-screen bg-white'>
           {/* Hero Section */}
-          <section id="hero" className="min-h-screen">
+          <section id='hero' className='min-h-screen'>
             <HeroSection onNavigate={navigateToSection} />
           </section>
 
           {/* Gallery Section */}
-          <section id="gallery" className="min-h-screen py-32">
-            <GallerySection 
+          <section id='gallery' className='min-h-screen py-32'>
+            <GallerySection
               artworks={initialArtworks}
               onArtworkSelect={handleArtworkSelect}
             />
           </section>
 
           {/* Artist Section */}
-          <section id="artist" className="min-h-screen py-32">
+          <section id='artist' className='min-h-screen py-32'>
             <EnhancedArtistSection artist={artist} />
           </section>
 
           {/* Exhibition Section */}
-          <section id="exhibition" className="min-h-screen py-32">
+          <section id='exhibition' className='min-h-screen py-32'>
             <ExhibitionSection />
           </section>
 
           {/* Contact Section */}
-          <section id="contact" className="min-h-screen py-32">
+          <section id='contact' className='min-h-screen py-32'>
             <ContactSection />
           </section>
         </main>

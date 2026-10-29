@@ -210,3 +210,4 @@ export const testLazyLoading = (element: HTMLElement) => {
 export * from '@testing-library/react'
 export { customRender as render }
 export { axe, toHaveNoViolations }
+export { server } from '../mocks/server'

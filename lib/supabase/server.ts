@@ -1,76 +1,8 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-// Types for database tables
-export interface Database {
-  public: {
-    Tables: {
-      artworks: {
-        Row: {
-          id: string
-          slug: string
-          title: string
-          year: number
-          medium: string
-          dimensions: string | null
-          aspect_ratio: string | null
-          description: string | null
-          image_url: string
-          image_url_query: string | null
-          image_id: string | null
-          number: string | null
-          artist_note: string | null
-          featured: boolean
-          category: string | null
-          tags: string[] | null
-          price: number | null
-          available: boolean
-          exhibition: string | null
-          series: string | null
-          technique: string | null
-          inspiration: string | null
-          symbolism: string | null
-          cultural_context: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: Omit<Database['public']['Tables']['artworks']['Row'], 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<Database['public']['Tables']['artworks']['Row'], 'id' | 'created_at'>>
-      }
-      artists: {
-        Row: {
-          id: string
-          name: string
-          bio: string | null
-          statement: string | null
-          profile_image_url: string | null
-          birth_year: number | null
-          education: string[] | null
-          exhibitions: string[] | null
-          awards: string[] | null
-          collections: string[] | null
-          website: string | null
-          email: string | null
-          phone: string | null
-          social_links: Record<string, string> | null
-          birth_place: string | null
-          current_location: string | null
-          specialties: string[] | null
-          influences: string[] | null
-          teaching_experience: string[] | null
-          publications: string[] | null
-          memberships: string[] | null
-          philosophy: string | null
-          techniques: string[] | null
-          materials: string[] | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: Omit<Database['public']['Tables']['artists']['Row'], 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<Database['public']['Tables']['artists']['Row'], 'id' | 'created_at'>>
-      }
-    }
-  }
-}
+import type { Database } from './database.types'
+
+export type { Database }
 
 let supabaseClient: SupabaseClient<Database> | null = null
 
@@ -85,8 +17,12 @@ export function createSupabaseClient(): SupabaseClient<Database> | null {
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl || !supabaseKey) {
-    console.warn('⚠️ Supabase environment variables not configured, using fallback data sources')
-    console.warn('To enable Supabase: set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY')
+    console.warn(
+      '⚠️ Supabase environment variables not configured, using fallback data sources'
+    )
+    console.warn(
+      'To enable Supabase: set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY'
+    )
     // ✅ Return null instead of throwing error to allow graceful fallback
     return null
   }
@@ -94,11 +30,11 @@ export function createSupabaseClient(): SupabaseClient<Database> | null {
   supabaseClient = createClient<Database>(supabaseUrl, supabaseKey, {
     auth: {
       autoRefreshToken: false,
-      persistSession: false
+      persistSession: false,
     },
     db: {
-      schema: 'public'
-    }
+      schema: 'public',
+    },
   })
 
   return supabaseClient
@@ -119,14 +55,16 @@ export function createBrowserClient() {
 
   if (!supabaseUrl || !supabaseAnonKey) {
     console.warn('⚠️ Supabase browser environment variables not configured')
-    console.warn('To enable Supabase: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY')
+    console.warn(
+      'To enable Supabase: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY'
+    )
     // ✅ Return null instead of throwing error to allow graceful fallback
     return null
   }
 
   return createClient<Database>(supabaseUrl, supabaseAnonKey, {
     db: {
-      schema: 'public'
-    }
+      schema: 'public',
+    },
   })
 }

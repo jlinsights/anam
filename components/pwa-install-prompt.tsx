@@ -115,7 +115,7 @@ export function PWAInstallPrompt() {
         {isIOS ? (
           <div className='space-y-3'>
             <p className='text-sm text-ink/70'>
-              Safari에서 공유 버튼 → "홈 화면에 추가"를 선택하세요
+              Safari에서 공유 버튼 → &quot;홈 화면에 추가&quot;를 선택하세요
             </p>
             <Button
               onClick={handleDismiss}
@@ -140,4 +140,3 @@ export function PWAInstallPrompt() {
     </Card>
   )
 }
-

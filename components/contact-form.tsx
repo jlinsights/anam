@@ -54,12 +54,12 @@ export function ContactForm({ className = '' }: ContactFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     // Cancel any existing request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
-    
+
     // Create new abort controller
     abortControllerRef.current = new AbortController()
     setIsSubmitting(true)
@@ -110,7 +110,7 @@ export function ContactForm({ className = '' }: ContactFormProps) {
         console.log('Contact form submission was cancelled')
         return
       }
-      
+
       console.error('Form submission error:', error)
       toast({
         title: '전송 실패',
@@ -298,4 +298,3 @@ function FormField({
     </div>
   )
 }
-

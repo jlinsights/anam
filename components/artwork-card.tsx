@@ -251,4 +251,3 @@ export const ArtworkCardSkeleton = memo(function ArtworkCardSkeleton({
     </Card>
   )
 })
-

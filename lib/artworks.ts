@@ -8,7 +8,11 @@ import type { Artist, Artwork } from '@/lib/types'
 import { getArtistImageUrl } from './image-utils'
 
 // 레거시 이미지 경로 생성 함수 (로컬 정의)
-function createLegacyImagePath(slug: string, year: number, size: string = 'medium'): string {
+function createLegacyImagePath(
+  slug: string,
+  year: number,
+  size: string = 'medium'
+): string {
   return `/Images/Artworks/${year}/${slug}-${size}.jpg`
 }
 
@@ -64,56 +68,130 @@ export const fallbackArtistData: Artist = {
 }
 
 // Generate comprehensive fallback data for 61 artworks matching Number-based slugs
-export const fallbackArtworksData: Artwork[] = Array.from({ length: 61 }, (_, index) => {
-  const id = (index + 1).toString()
-  const slug = (index + 1).toString().padStart(2, '0') // 01, 02, 03, etc.
-  const year = 2021 + Math.floor(index / 15) // Distribute across years 2021-2024
-  
-  // Simple English titles to avoid InvalidCharacterError during build
-  const titles = [
-    'Harmony', 'Serenity', 'Tranquility', 'Balance', 'Flow', 'Essence', 'Spirit', 'Peace', 'Depth', 'Grace',
-    'Vitality', 'Energy', 'Moment', 'Eternal', 'Nature', 'Heart', 'Mind', 'Soul', 'Dream', 'Reality',
-    'Tradition', 'Modern', 'Meeting', 'Farewell', 'Longing', 'Hope', 'Love', 'Freedom', 'Release', 'Creation',
-    'Birth', 'Growth', 'Change', 'Completion', 'Beginning', 'End', 'Cycle', 'Essence', 'Truth', 'Wisdom',
-    'Insight', 'Enlightenment', 'Meditation', 'Practice', 'Path', 'Journey', 'Purpose', 'Meaning', 'Value', 'Beauty',
-    'Sublime', 'Sacred', 'Divine', 'Light', 'Shadow', 'Void', 'Silence', 'Breath', 'Rhythm', 'Movement', 'Unity'
-  ]
-  
-  const mediums = ['Ink on paper', 'Ink on hanji', 'Ink and color on paper', 'Traditional ink']
-  const dimensions = [
-    '70 x 140 cm', '90 x 90 cm', '70 x 100 cm', '50 x 70 cm', '100 x 70 cm',
-    '140 x 70 cm', '80 x 120 cm', '60 x 90 cm'
-  ]
-  
-  const title = titles[index] || `작품 ${slug}`
-  const medium = mediums[index % mediums.length]
-  const dimension = dimensions[index % dimensions.length]
-  
-  // Calculate aspect ratio from dimensions
-  const [width, height] = dimension.split(' x ').map(d => parseInt(d))
-  const aspectRatio = `${width}/${height}`
-  
-  return {
-    id,
-    slug,
-    title,
-    year,
-    medium,
-    dimensions: dimension,
-    aspectRatio,
-    description: `${title} - A contemporary calligraphy work that explores the relationship between tradition and modernity through the expressive power of ink and void space.`,
-    imageUrl: getOptimizedArtworkImagePath(slug, 'medium'),
-    imageId: slug,
-    imageUrlQuery: `${title} korean calligraphy art`,
-    artistNote: `A modern interpretation of ${title} through contemporary calligraphic expression.`,
-    featured: index < 3, // First 3 are featured
-    category: year >= 2024 ? 'recent' : year >= 2022 ? 'contemporary' : 'classic',
-    available: true,
-    tags: [title.length > 2 ? title.substring(0, 2) : title, medium.includes('color') ? 'color' : 'ink', year.toString()],
-    createdAt: `${year}-01-${(index % 28 + 1).toString().padStart(2, '0')}T00:00:00Z`,
-    updatedAt: `${year}-01-${(index % 28 + 1).toString().padStart(2, '0')}T00:00:00Z`,
+export const fallbackArtworksData: Artwork[] = Array.from(
+  { length: 61 },
+  (_, index) => {
+    const id = (index + 1).toString()
+    const slug = (index + 1).toString().padStart(2, '0') // 01, 02, 03, etc.
+    const year = 2021 + Math.floor(index / 15) // Distribute across years 2021-2024
+
+    // Simple English titles to avoid InvalidCharacterError during build
+    const titles = [
+      'Harmony',
+      'Serenity',
+      'Tranquility',
+      'Balance',
+      'Flow',
+      'Essence',
+      'Spirit',
+      'Peace',
+      'Depth',
+      'Grace',
+      'Vitality',
+      'Energy',
+      'Moment',
+      'Eternal',
+      'Nature',
+      'Heart',
+      'Mind',
+      'Soul',
+      'Dream',
+      'Reality',
+      'Tradition',
+      'Modern',
+      'Meeting',
+      'Farewell',
+      'Longing',
+      'Hope',
+      'Love',
+      'Freedom',
+      'Release',
+      'Creation',
+      'Birth',
+      'Growth',
+      'Change',
+      'Completion',
+      'Beginning',
+      'End',
+      'Cycle',
+      'Essence',
+      'Truth',
+      'Wisdom',
+      'Insight',
+      'Enlightenment',
+      'Meditation',
+      'Practice',
+      'Path',
+      'Journey',
+      'Purpose',
+      'Meaning',
+      'Value',
+      'Beauty',
+      'Sublime',
+      'Sacred',
+      'Divine',
+      'Light',
+      'Shadow',
+      'Void',
+      'Silence',
+      'Breath',
+      'Rhythm',
+      'Movement',
+      'Unity',
+    ]
+
+    const mediums = [
+      'Ink on paper',
+      'Ink on hanji',
+      'Ink and color on paper',
+      'Traditional ink',
+    ]
+    const dimensions = [
+      '70 x 140 cm',
+      '90 x 90 cm',
+      '70 x 100 cm',
+      '50 x 70 cm',
+      '100 x 70 cm',
+      '140 x 70 cm',
+      '80 x 120 cm',
+      '60 x 90 cm',
+    ]
+
+    const title = titles[index] || `작품 ${slug}`
+    const medium = mediums[index % mediums.length]
+    const dimension = dimensions[index % dimensions.length]
+
+    // Calculate aspect ratio from dimensions
+    const [width, height] = dimension.split(' x ').map((d) => parseInt(d))
+    const aspectRatio = `${width}/${height}`
+
+    return {
+      id,
+      slug,
+      title,
+      year,
+      medium,
+      dimensions: dimension,
+      aspectRatio,
+      description: `${title} - A contemporary calligraphy work that explores the relationship between tradition and modernity through the expressive power of ink and void space.`,
+      imageUrl: getOptimizedArtworkImagePath(slug, 'medium'),
+      imageId: slug,
+      imageUrlQuery: `${title} korean calligraphy art`,
+      artistNote: `A modern interpretation of ${title} through contemporary calligraphic expression.`,
+      featured: index < 3, // First 3 are featured
+      category:
+        year >= 2024 ? 'recent' : year >= 2022 ? 'contemporary' : 'classic',
+      available: true,
+      tags: [
+        title.length > 2 ? title.substring(0, 2) : title,
+        medium.includes('color') ? 'color' : 'ink',
+        year.toString(),
+      ],
+      createdAt: `${year}-01-${((index % 28) + 1).toString().padStart(2, '0')}T00:00:00Z`,
+      updatedAt: `${year}-01-${((index % 28) + 1).toString().padStart(2, '0')}T00:00:00Z`,
+    }
   }
-})
+)
 
 /**
  * 작품 데이터를 가져오는 메인 함수 (Supabase → Airtable → fallback 순서)
@@ -123,10 +201,13 @@ export async function getArtworks(): Promise<Artwork[]> {
   try {
     // 1. Try Supabase first (primary data source)
     try {
-      const { fetchArtworksFromSupabase } = await import('@/lib/supabase/artworks')
+      const { fetchArtworksFromSupabase } =
+        await import('@/lib/supabase/artworks')
       const artworksFromSupabase = await fetchArtworksFromSupabase()
       if (artworksFromSupabase && artworksFromSupabase.length > 0) {
-        console.log(`✅ Loaded ${artworksFromSupabase.length} artworks from Supabase`)
+        console.log(
+          `✅ Loaded ${artworksFromSupabase.length} artworks from Supabase`
+        )
         return artworksFromSupabase
       }
     } catch (supabaseError) {
@@ -137,15 +218,19 @@ export async function getArtworks(): Promise<Artwork[]> {
     try {
       const artworksFromAirtable = await fetchArtworksFromAirtable()
       if (artworksFromAirtable && artworksFromAirtable.length > 0) {
-        console.log(`✅ Loaded ${artworksFromAirtable.length} artworks from Airtable (fallback)`)
+        console.log(
+          `✅ Loaded ${artworksFromAirtable.length} artworks from Airtable (fallback)`
+        )
         return artworksFromAirtable
       }
     } catch (airtableError) {
       console.warn('⚠️ Airtable also unavailable:', airtableError)
     }
-    
+
     // 3. Final fallback to local data
-    console.warn('🔄 Using fallback artwork data (both Supabase and Airtable unavailable)')
+    console.warn(
+      '🔄 Using fallback artwork data (both Supabase and Airtable unavailable)'
+    )
     return fallbackArtworksData
   } catch (error) {
     console.error('❌ Error in getArtworks:', error)
@@ -162,10 +247,11 @@ export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
       console.warn('Invalid slug provided to getArtworkBySlug:', slug)
       return null
     }
-    
+
     // 1. Try Supabase first
     try {
-      const { fetchArtworkBySlugFromSupabase } = await import('@/lib/supabase/artworks')
+      const { fetchArtworkBySlugFromSupabase } =
+        await import('@/lib/supabase/artworks')
       const artwork = await fetchArtworkBySlugFromSupabase(slug)
       if (artwork) {
         console.log(`✅ Found artwork in Supabase for slug: "${slug}"`)
@@ -174,51 +260,58 @@ export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
     } catch (supabaseError) {
       console.warn('⚠️ Supabase query failed, trying fallback:', supabaseError)
     }
-    
+
     // 2. Fallback to getArtworks() which tries all sources
     const artworks = await getArtworks()
-    console.log(`🔍 Looking for artwork with slug: "${slug}" in ${artworks.length} artworks`)
-    
+    console.log(
+      `🔍 Looking for artwork with slug: "${slug}" in ${artworks.length} artworks`
+    )
+
     // Try exact slug match first
-    let found = artworks.find(artwork => artwork.slug === slug)
+    let found = artworks.find((artwork) => artwork.slug === slug)
     if (found) {
       console.log(`✅ Found exact slug match for "${slug}":`, found.title)
       return found
     }
-    
+
     // Try alternative matching patterns for slug format changes
     if (/^\d{1,2}$/.test(slug)) {
       // Slug is just a number (e.g., "01", "2", "25")
       const paddedSlug = slug.padStart(2, '0')
-      found = artworks.find(artwork => 
-        artwork.slug === paddedSlug || 
-        artwork.slug === `anam-${paddedSlug}` ||
-        artwork.number?.toString().padStart(2, '0') === paddedSlug ||
-        artwork.id === slug ||
-        artwork.id === paddedSlug
+      found = artworks.find(
+        (artwork) =>
+          artwork.slug === paddedSlug ||
+          artwork.slug === `anam-${paddedSlug}` ||
+          artwork.number?.toString().padStart(2, '0') === paddedSlug ||
+          artwork.id === slug ||
+          artwork.id === paddedSlug
       )
       if (found) {
         console.log(`✅ Found number-based match for "${slug}":`, found.title)
         return found
       }
     }
-    
-    // Try anam-XX format matching  
+
+    // Try anam-XX format matching
     if (slug.startsWith('anam-')) {
       const number = slug.replace('anam-', '')
-      found = artworks.find(artwork => 
-        artwork.number?.toString() === number ||
-        artwork.id === number ||
-        artwork.slug === number.padStart(2, '0')
+      found = artworks.find(
+        (artwork) =>
+          artwork.number?.toString() === number ||
+          artwork.id === number ||
+          artwork.slug === number.padStart(2, '0')
       )
       if (found) {
         console.log(`✅ Found anam-XX format match for "${slug}":`, found.title)
         return found
       }
     }
-    
+
     console.warn(`⚠️ No artwork found for slug: "${slug}"`)
-    console.log('Available slugs:', artworks.slice(0, 10).map(a => a.slug))
+    console.log(
+      'Available slugs:',
+      artworks.slice(0, 10).map((a) => a.slug)
+    )
     return null
   } catch (error) {
     console.error('❌ Error in getArtworkBySlug:', error)
@@ -229,11 +322,14 @@ export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
 /**
  * 작가 정보 가져오기 (Supabase → Airtable → fallback 순서)
  */
-export async function fetchArtist(fallbackKey = 'default'): Promise<Artist | null> {
+export async function fetchArtist(
+  fallbackKey = 'default'
+): Promise<Artist | null> {
   try {
     // 1. Try Supabase first (primary data source)
     try {
-      const { fetchArtistFromSupabase } = await import('@/lib/supabase/artworks')
+      const { fetchArtistFromSupabase } =
+        await import('@/lib/supabase/artworks')
       const artistFromSupabase = await fetchArtistFromSupabase()
       if (artistFromSupabase) {
         console.log('✅ Loaded artist data from Supabase')
@@ -255,7 +351,9 @@ export async function fetchArtist(fallbackKey = 'default'): Promise<Artist | nul
     }
 
     // 3. Final fallback 데이터 사용
-    console.warn('🔄 Using fallback artist data (both Supabase and Airtable unavailable)')
+    console.warn(
+      '🔄 Using fallback artist data (both Supabase and Airtable unavailable)'
+    )
     return fallbackArtistData
   } catch (error) {
     console.error('❌ Error in fetchArtist:', error)
@@ -291,13 +389,15 @@ export async function getArtworksFromSource(): Promise<Artwork[]> {
     }
 
     const artworks = (json.data || []) as Artwork[]
-    
+
     // 데이터가 없거나 비어있는 경우에도 fallback 사용
     if (!artworks || artworks.length === 0) {
-      console.warn('🔄 No artworks in API response, using fallback artwork data')
+      console.warn(
+        '🔄 No artworks in API response, using fallback artwork data'
+      )
       return fallbackArtworksData
     }
-    
+
     console.log(`✅ Loaded ${artworks.length} artworks from API`)
     return artworks
   } catch (error) {
