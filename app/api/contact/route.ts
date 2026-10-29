@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
       const nodemailer = require('nodemailer')
 
       // SMTP 설정 (환경변수 사용)
-      const transporter = nodemailer.createTransporter({
+      const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.gmail.com',
         port: parseInt(process.env.SMTP_PORT || '587'),
         secure: false, // true for 465, false for other ports
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
       // 이메일 내용 구성
       const mailOptions = {
         from: `"아남 갤러리 문의" <${process.env.SMTP_USER}>`,
-        to: 'heelang@orientalcalligraphy.org',
+        to: process.env.CONTACT_EMAIL || 'heelang@orientalcalligraphy.org',
         subject: `[아남 갤러리 문의] ${validatedData.subject}`,
         html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

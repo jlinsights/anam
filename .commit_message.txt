@@ -1,1 +1,1 @@
-🧪 Jest 공통 환경 수정: Web API 가짜 구현 제거, MSW 서버 공유, fetch·라우터 모킹 가능화, 시각 회귀 테스트 기본 실행 제외
+🐛 문의 메일 전송 실패 수정(createTransporter→createTransport), 수신 주소 CONTACT_EMAIL 지원, rate limiter 테스트 격리·타이머 unref

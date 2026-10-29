@@ -30,8 +30,9 @@ class RateLimiter {
   private blockedIPs = new Map<string, number>()
 
   constructor(private config: RateLimitConfig) {
-    // 5분마다 정리 작업 실행
-    setInterval(() => this.cleanup(), 5 * 60 * 1000)
+    // 5분마다 정리 작업 실행 (unref: 이 타이머 때문에 프로세스가 종료되지 못하는 일이 없게)
+    const timer = setInterval(() => this.cleanup(), 5 * 60 * 1000)
+    timer.unref?.()
   }
 
   /**
@@ -109,6 +110,14 @@ class RateLimiter {
   reset(identifier: string): void {
     this.store.delete(identifier)
     this.blockedIPs.delete(identifier)
+  }
+
+  /**
+   * 모든 제한·차단 상태 초기화 (테스트 격리용)
+   */
+  clear(): void {
+    this.store.clear()
+    this.blockedIPs.clear()
   }
 
   /**

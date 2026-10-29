@@ -1,4 +1,5 @@
 import { POST } from '@/app/api/contact/route'
+import { rateLimiters } from '@/lib/rate-limit'
 import type { ContactFormData } from '@/lib/types'
 
 // Nodemailer 모킹
@@ -29,6 +30,11 @@ afterAll(() => {
 })
 
 describe('/api/contact API Route', () => {
+  // 모듈 단위 rate limiter 상태가 테스트 사이에 누적되지 않도록 매번 초기화
+  beforeEach(() => {
+    Object.values(rateLimiters).forEach((limiter) => limiter.clear())
+  })
+
   const validContactData: ContactFormData = {
     name: '홍길동',
     email: 'test@example.com',
