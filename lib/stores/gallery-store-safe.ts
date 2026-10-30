@@ -97,6 +97,34 @@ const initialState: GalleryState = {
   },
 }
 
+export interface ArtworkFilters {
+  searchTerm: string
+  selectedYear: number | null
+  selectedMedium: string | null
+}
+
+// 스토어와 GallerySection의 동기화 전 첫 렌더가 같은 규칙으로 거르도록 순수 함수로 둔다
+export function filterArtworks(
+  artworks: Artwork[],
+  { searchTerm, selectedYear, selectedMedium }: ArtworkFilters
+): Artwork[] {
+  const term = searchTerm.toLowerCase()
+
+  return artworks.filter((artwork) => {
+    const matchesSearch =
+      !term ||
+      artwork.title.toLowerCase().includes(term) ||
+      artwork.medium.toLowerCase().includes(term) ||
+      (artwork.description && artwork.description.toLowerCase().includes(term))
+
+    const matchesYear = selectedYear === null || artwork.year === selectedYear
+    const matchesMedium =
+      selectedMedium === null || artwork.medium === selectedMedium
+
+    return matchesSearch && matchesYear && matchesMedium
+  })
+}
+
 // Create the store WITHOUT persistence to avoid hydration issues
 export const useGalleryStore = create<GalleryState & GalleryActions>()(
   devtools(
@@ -209,31 +237,7 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
 
       updateFilteredArtworks: () => {
         const state = get()
-
-        const filtered = state.artworks.filter((artwork) => {
-          const matchesSearch =
-            !state.searchTerm ||
-            artwork.title
-              .toLowerCase()
-              .includes(state.searchTerm.toLowerCase()) ||
-            artwork.medium
-              .toLowerCase()
-              .includes(state.searchTerm.toLowerCase()) ||
-            (artwork.description &&
-              artwork.description
-                .toLowerCase()
-                .includes(state.searchTerm.toLowerCase()))
-
-          const matchesYear =
-            state.selectedYear === null || artwork.year === state.selectedYear
-          const matchesMedium =
-            state.selectedMedium === null ||
-            artwork.medium === state.selectedMedium
-
-          return matchesSearch && matchesYear && matchesMedium
-        })
-
-        set({ filteredArtworks: filtered })
+        set({ filteredArtworks: filterArtworks(state.artworks, state) })
       },
 
       // Modal actions

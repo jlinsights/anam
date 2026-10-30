@@ -7,6 +7,7 @@ import {
   useGalleryStore,
   useArtworks,
   useGalleryFilters,
+  filterArtworks,
 } from '@/lib/stores/gallery-store-safe'
 import {
   ArtworkGridPortrait,
@@ -26,9 +27,26 @@ export function GallerySection({
   // Use store for filters and search
   const storeFilteredArtworks = useArtworks()
   const isStoreSynced = useGalleryStore((state) => state.artworks === artworks)
-  // 동기화 effect가 돌기 전 첫 렌더는 스토어가 비어 있으므로 props를 그대로 보여준다
-  const filteredArtworks = isStoreSynced ? storeFilteredArtworks : artworks
   const { searchTerm, selectedYear, selectedMedium } = useGalleryFilters()
+  // 동기화 effect가 돌기 전 첫 렌더는 스토어가 비어 있으므로 props를 같은 필터로 거른다
+  const filteredArtworks = useMemo(
+    () =>
+      isStoreSynced
+        ? storeFilteredArtworks
+        : filterArtworks(artworks, {
+            searchTerm,
+            selectedYear,
+            selectedMedium,
+          }),
+    [
+      isStoreSynced,
+      storeFilteredArtworks,
+      artworks,
+      searchTerm,
+      selectedYear,
+      selectedMedium,
+    ]
+  )
   const { setArtworks, setSearchTerm, setSelectedYear, clearFilters } =
     useGalleryStore()
 
