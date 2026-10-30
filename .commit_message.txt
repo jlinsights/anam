@@ -1,1 +1,1 @@
-🔒 sharp 0.34.4→0.35.5 보안 패치(libvips·libheif·librsvg 취약점, GHSA-2464-fhr4-w9xw 해소) 및 sharp 요구사항에 맞춰 Node 최소 버전 20.9·CI Node 22로 상향
+🐛 갤러리 동기화 전 첫 렌더에도 스토어에 남은 검색·연도 필터 적용 (Bugbot 지적), 필터 로직을 filterArtworks로 분리

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
+import { useShallow } from 'zustand/react/shallow'
 import type { Artwork, Artist } from '@/lib/types'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -94,6 +95,34 @@ const initialState: GalleryState = {
     animationSpeed: 'normal',
     theme: 'auto',
   },
+}
+
+export interface ArtworkFilters {
+  searchTerm: string
+  selectedYear: number | null
+  selectedMedium: string | null
+}
+
+// 스토어와 GallerySection의 동기화 전 첫 렌더가 같은 규칙으로 거르도록 순수 함수로 둔다
+export function filterArtworks(
+  artworks: Artwork[],
+  { searchTerm, selectedYear, selectedMedium }: ArtworkFilters
+): Artwork[] {
+  const term = searchTerm.toLowerCase()
+
+  return artworks.filter((artwork) => {
+    const matchesSearch =
+      !term ||
+      artwork.title.toLowerCase().includes(term) ||
+      artwork.medium.toLowerCase().includes(term) ||
+      (artwork.description && artwork.description.toLowerCase().includes(term))
+
+    const matchesYear = selectedYear === null || artwork.year === selectedYear
+    const matchesMedium =
+      selectedMedium === null || artwork.medium === selectedMedium
+
+    return matchesSearch && matchesYear && matchesMedium
+  })
 }
 
 // Create the store WITHOUT persistence to avoid hydration issues
@@ -208,31 +237,7 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
 
       updateFilteredArtworks: () => {
         const state = get()
-
-        const filtered = state.artworks.filter((artwork) => {
-          const matchesSearch =
-            !state.searchTerm ||
-            artwork.title
-              .toLowerCase()
-              .includes(state.searchTerm.toLowerCase()) ||
-            artwork.medium
-              .toLowerCase()
-              .includes(state.searchTerm.toLowerCase()) ||
-            (artwork.description &&
-              artwork.description
-                .toLowerCase()
-                .includes(state.searchTerm.toLowerCase()))
-
-          const matchesYear =
-            state.selectedYear === null || artwork.year === state.selectedYear
-          const matchesMedium =
-            state.selectedMedium === null ||
-            artwork.medium === state.selectedMedium
-
-          return matchesSearch && matchesYear && matchesMedium
-        })
-
-        set({ filteredArtworks: filtered })
+        set({ filteredArtworks: filterArtworks(state.artworks, state) })
       },
 
       // Modal actions
@@ -288,26 +293,22 @@ export const useArtworks = () =>
   useGalleryStore(useCallback((state) => state.filteredArtworks, []))
 export const useSelectedArtwork = () =>
   useGalleryStore(useCallback((state) => state.selectedArtwork, []))
+// 객체를 반환하는 셀렉터는 useShallow로 감싼다: zustand v5는 Object.is로 비교하므로
+// 매번 새 객체를 돌려주면 렌더마다 스냅샷이 바뀌어 무한 렌더(React #185)가 난다
 export const useModalState = () =>
   useGalleryStore(
-    useCallback(
-      (state) => ({
-        isOpen: state.isModalOpen,
-        artwork: state.selectedArtwork,
-      }),
-      []
-    )
+    useShallow((state) => ({
+      isOpen: state.isModalOpen,
+      artwork: state.selectedArtwork,
+    }))
   )
 export const useGalleryFilters = () =>
   useGalleryStore(
-    useCallback(
-      (state) => ({
-        searchTerm: state.searchTerm,
-        selectedYear: state.selectedYear,
-        selectedMedium: state.selectedMedium,
-      }),
-      []
-    )
+    useShallow((state) => ({
+      searchTerm: state.searchTerm,
+      selectedYear: state.selectedYear,
+      selectedMedium: state.selectedMedium,
+    }))
   )
 export const usePreferences = () =>
   useGalleryStore(useCallback((state) => state.preferences, []))

@@ -1,12 +1,13 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import type { Artwork } from '@/lib/types'
 import {
   useGalleryStore,
   useArtworks,
   useGalleryFilters,
+  filterArtworks,
 } from '@/lib/stores/gallery-store-safe'
 import {
   ArtworkGridPortrait,
@@ -24,9 +25,35 @@ export function GallerySection({
   onArtworkSelect,
 }: GallerySectionProps) {
   // Use store for filters and search
-  const filteredArtworks = useArtworks()
+  const storeFilteredArtworks = useArtworks()
+  const isStoreSynced = useGalleryStore((state) => state.artworks === artworks)
   const { searchTerm, selectedYear, selectedMedium } = useGalleryFilters()
-  const { setSearchTerm, setSelectedYear, clearFilters } = useGalleryStore()
+  // 동기화 effect가 돌기 전 첫 렌더는 스토어가 비어 있으므로 props를 같은 필터로 거른다
+  const filteredArtworks = useMemo(
+    () =>
+      isStoreSynced
+        ? storeFilteredArtworks
+        : filterArtworks(artworks, {
+            searchTerm,
+            selectedYear,
+            selectedMedium,
+          }),
+    [
+      isStoreSynced,
+      storeFilteredArtworks,
+      artworks,
+      searchTerm,
+      selectedYear,
+      selectedMedium,
+    ]
+  )
+  const { setArtworks, setSearchTerm, setSelectedYear, clearFilters } =
+    useGalleryStore()
+
+  // 그리드는 스토어의 filteredArtworks를 그리므로 props로 받은 작품을 스토어에 넣어야 한다
+  useEffect(() => {
+    setArtworks(artworks)
+  }, [artworks, setArtworks])
 
   // Throttled search handler for better performance
   const throttledSearchUpdate = useThrottledSearch(

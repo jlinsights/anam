@@ -31,7 +31,7 @@ function GalleryLoading() {
 }
 
 // Error fallback for gallery
-function GalleryError({ error }: { error: Error }) {
+function GalleryError() {
   return (
     <div className='min-h-screen bg-paper flex items-center justify-center'>
       <div className='text-center max-w-md mx-auto px-zen-md'>
@@ -79,7 +79,7 @@ function GalleryPageContent() {
   }
 
   if (loading) return <GalleryLoading />
-  if (error) return <GalleryError error={error} />
+  if (error) return <GalleryError />
 
   return (
     <div className='min-h-screen bg-paper'>
@@ -108,7 +108,7 @@ function GalleryPageContent() {
 
 export default function GalleryPage() {
   return (
-    <ErrorBoundary fallback={GalleryError}>
+    <ErrorBoundary fallback={<GalleryError />}>
       <GalleryPageContent />
     </ErrorBoundary>
   )
