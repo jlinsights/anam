@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
+import { useShallow } from 'zustand/react/shallow'
 import type { Artwork, Artist } from '@/lib/types'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -288,26 +289,22 @@ export const useArtworks = () =>
   useGalleryStore(useCallback((state) => state.filteredArtworks, []))
 export const useSelectedArtwork = () =>
   useGalleryStore(useCallback((state) => state.selectedArtwork, []))
+// 객체를 반환하는 셀렉터는 useShallow로 감싼다: zustand v5는 Object.is로 비교하므로
+// 매번 새 객체를 돌려주면 렌더마다 스냅샷이 바뀌어 무한 렌더(React #185)가 난다
 export const useModalState = () =>
   useGalleryStore(
-    useCallback(
-      (state) => ({
-        isOpen: state.isModalOpen,
-        artwork: state.selectedArtwork,
-      }),
-      []
-    )
+    useShallow((state) => ({
+      isOpen: state.isModalOpen,
+      artwork: state.selectedArtwork,
+    }))
   )
 export const useGalleryFilters = () =>
   useGalleryStore(
-    useCallback(
-      (state) => ({
-        searchTerm: state.searchTerm,
-        selectedYear: state.selectedYear,
-        selectedMedium: state.selectedMedium,
-      }),
-      []
-    )
+    useShallow((state) => ({
+      searchTerm: state.searchTerm,
+      selectedYear: state.selectedYear,
+      selectedMedium: state.selectedMedium,
+    }))
   )
 export const usePreferences = () =>
   useGalleryStore(useCallback((state) => state.preferences, []))

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import type { Artwork } from '@/lib/types'
 import {
@@ -26,7 +26,13 @@ export function GallerySection({
   // Use store for filters and search
   const filteredArtworks = useArtworks()
   const { searchTerm, selectedYear, selectedMedium } = useGalleryFilters()
-  const { setSearchTerm, setSelectedYear, clearFilters } = useGalleryStore()
+  const { setArtworks, setSearchTerm, setSelectedYear, clearFilters } =
+    useGalleryStore()
+
+  // 그리드는 스토어의 filteredArtworks를 그리므로 props로 받은 작품을 스토어에 넣어야 한다
+  useEffect(() => {
+    setArtworks(artworks)
+  }, [artworks, setArtworks])
 
   // Throttled search handler for better performance
   const throttledSearchUpdate = useThrottledSearch(

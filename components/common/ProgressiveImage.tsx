@@ -310,12 +310,8 @@ export function ArtworkImage({
       </svg>
     `.trim()
 
-    // Use Buffer.from for Node.js SSR compatibility
-    if (typeof window === 'undefined') {
-      return `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}`
-    } else {
-      return `data:image/svg+xml;base64,${btoa(svgString)}`
-    }
+    // btoa는 Latin-1만 받아 한글 제목에서 예외를 던진다: base64 대신 UTF-8 퍼센트 인코딩을 쓴다
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`
   }
 
   const blurDataURL = generateBlurDataURL()

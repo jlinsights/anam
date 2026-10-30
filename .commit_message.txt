@@ -1,1 +1,1 @@
-🔒 sharp 0.34.4→0.35.5 보안 패치(libvips·libheif·librsvg 취약점, GHSA-2464-fhr4-w9xw 해소) 및 sharp 요구사항에 맞춰 Node 최소 버전 20.9·CI Node 22로 상향
+🐛 /gallery 무한 렌더(React #185) 수정: zustand 객체 셀렉터 useShallow 적용, 작품을 스토어에 동기화해 빈 그리드 해소, 한글 제목 blur placeholder의 btoa 예외 및 에러 경계 fallback 전달 오류 수정
