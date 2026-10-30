@@ -24,7 +24,10 @@ export function GallerySection({
   onArtworkSelect,
 }: GallerySectionProps) {
   // Use store for filters and search
-  const filteredArtworks = useArtworks()
+  const storeFilteredArtworks = useArtworks()
+  const isStoreSynced = useGalleryStore((state) => state.artworks === artworks)
+  // 동기화 effect가 돌기 전 첫 렌더는 스토어가 비어 있으므로 props를 그대로 보여준다
+  const filteredArtworks = isStoreSynced ? storeFilteredArtworks : artworks
   const { searchTerm, selectedYear, selectedMedium } = useGalleryFilters()
   const { setArtworks, setSearchTerm, setSelectedYear, clearFilters } =
     useGalleryStore()

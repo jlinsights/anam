@@ -1,1 +1,1 @@
-🐛 /gallery 무한 렌더(React #185) 수정: zustand 객체 셀렉터 useShallow 적용, 작품을 스토어에 동기화해 빈 그리드 해소, 한글 제목 blur placeholder의 btoa 예외 및 에러 경계 fallback 전달 오류 수정
+🐛 갤러리 첫 렌더에서 스토어 동기화 전 빈 결과가 깜빡이던 문제 수정 (Bugbot 지적)
