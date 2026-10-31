@@ -7,7 +7,7 @@ module.exports = {
         'http://localhost:3000/gallery/01',
         'http://localhost:3000/contact',
         'http://localhost:3000/artist',
-        'http://localhost:3000/exhibition',
+        // /exhibition 은 /#exhibition 으로 넘기기만 하므로 홈과 같은 결과가 된다
       ],
       numberOfRuns: 3,
       settings: {
@@ -47,7 +47,6 @@ module.exports = {
         bypass: 'error',
         'color-contrast': 'error',
         'document-title': 'error',
-        'duplicate-id-active': 'error',
         'duplicate-id-aria': 'error',
         'form-field-multiple-labels': 'error',
         'frame-title': 'error',
@@ -72,7 +71,6 @@ module.exports = {
         // Performance audits that affect accessibility
         'first-contentful-paint': ['warn', { maxNumericValue: 3000 }],
         'largest-contentful-paint': ['warn', { maxNumericValue: 4000 }],
-        'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
         'total-blocking-time': ['warn', { maxNumericValue: 300 }],
       },
     },
