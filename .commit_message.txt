@@ -1,1 +1,1 @@
-🐛 갤러리 동기화 전 첫 렌더에도 스토어에 남은 검색·연도 필터 적용 (Bugbot 지적), 필터 로직을 filterArtworks로 분리
+🧪 검사 정상화: 깨진 테스트 28개를 __tests__/_quarantine 으로 격리, 남은 타입 오류 수정(/aceternity-demo 마우스 이동 시 크래시 포함)

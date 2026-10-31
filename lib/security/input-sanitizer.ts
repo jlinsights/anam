@@ -222,7 +222,8 @@ export function sanitizeObject<T extends Record<string, any>>(
   threats: Record<string, string[]>
   isClean: boolean
 } {
-  const sanitized = { ...obj }
+  // 키별로 값을 바꿔 넣으므로 쓰기 가능한 레코드로 복사하고, 같은 키 구조이니 반환 시 T로 돌린다
+  const sanitized: Record<string, unknown> = { ...obj }
   const threats: Record<string, string[]> = {}
   let hasThreats = false
 
@@ -252,7 +253,7 @@ export function sanitizeObject<T extends Record<string, any>>(
   }
 
   return {
-    sanitized,
+    sanitized: sanitized as T,
     threats,
     isClean: !hasThreats,
   }

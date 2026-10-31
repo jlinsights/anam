@@ -204,7 +204,8 @@ export function useThrottledApiCall<T extends (...args: any[]) => Promise<any>>(
   apiCall: T,
   delay: number = THROTTLE_DELAYS.API,
   deps: React.DependencyList = []
-): T {
+  // 쓰로틀된 호출은 건너뛸 수 있어 Promise를 돌려주지 못한다: 반환 타입을 실제 동작(void)에 맞춘다
+): (...args: Parameters<T>) => void {
   const throttledCall = useRef<ThrottledFunction<T>>()
 
   useEffect(() => {
@@ -216,8 +217,8 @@ export function useThrottledApiCall<T extends (...args: any[]) => Promise<any>>(
   }, [apiCall, delay, ...deps])
 
   return useCallback((...args: Parameters<T>) => {
-    return throttledCall.current?.(...args)
-  }, []) as T
+    throttledCall.current?.(...args)
+  }, [])
 }
 
 /**

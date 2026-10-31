@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useReducer, useCallback } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
@@ -20,7 +20,17 @@ interface LayoutState {
   culturalSeason: string
 }
 
-function layoutReducer(state: LayoutState, action: any): LayoutState {
+// React.CSSProperties는 CSS 사용자 정의 속성(--*)을 모르므로 함께 허용하는 타입
+type CSSWithVars = React.CSSProperties & Record<`--${string}`, string | number>
+
+type LayoutAction =
+  | { type: 'UPDATE_MOUSE'; payload: LayoutState['mousePosition'] }
+  | { type: 'UPDATE_VIEWPORT'; payload: LayoutState['viewportSize'] }
+  | { type: 'UPDATE_SCROLL'; payload: number }
+  | { type: 'UPDATE_INTENSITY'; payload: number }
+  | { type: 'UPDATE_SEASON'; payload: string }
+
+function layoutReducer(state: LayoutState, action: LayoutAction): LayoutState {
   switch (action.type) {
     case 'UPDATE_MOUSE':
       return { ...state, mousePosition: action.payload }
@@ -46,7 +56,8 @@ export function SuperClaudeLayout({
 }: SuperClaudeLayoutProps) {
   const prefersReducedMotion = useReducedMotion()
 
-  const [state, dispatch] = useState<LayoutState>({
+  // dispatch는 리듀서로 상태를 갱신해야 한다: useState였을 땐 액션 객체가 상태를 통째로 덮어써 마우스 이동 시 크래시가 났다
+  const [state, dispatch] = useReducer(layoutReducer, {
     mousePosition: { x: 0.5, y: 0.5 },
     viewportSize: { width: 1200, height: 800 },
     scrollProgress: 0,
@@ -157,6 +168,14 @@ export function SuperClaudeLayout({
   const currentCulturalStyle =
     culturalStyles[culturalContext as keyof typeof culturalStyles]
 
+  const layoutStyle: CSSWithVars = {
+    ...currentCulturalStyle,
+    '--mouse-x': state.mousePosition.x,
+    '--mouse-y': state.mousePosition.y,
+    '--scroll-progress': state.scrollProgress,
+    '--interaction-intensity': state.interactionIntensity,
+  }
+
   // 🎯 SuperClaude Pattern: Variant-Based Layout Classes
   const layoutClasses = {
     gallery: 'zen-brutalist-layout gallery-grid-container',
@@ -176,15 +195,7 @@ export function SuperClaudeLayout({
         layoutClasses[variant],
         className
       )}
-      style={
-        {
-          ...currentCulturalStyle,
-          '--mouse-x': state.mousePosition.x,
-          '--mouse-y': state.mousePosition.y,
-          '--scroll-progress': state.scrollProgress,
-          '--interaction-intensity': state.interactionIntensity,
-        } as React.CSSProperties
-      }
+      style={layoutStyle}
     >
       {/* 🎨 Dynamic Background Layers - BMAD Pattern */}
       <div className='fixed inset-0 pointer-events-none z-0'>
