@@ -1,9 +1,6 @@
 'use client'
 
-import { getArtworks } from '@/lib/artworks'
-import { fetchArtist } from '@/lib/artist'
-import type { Metadata } from 'next'
-import type { Artwork, Artist } from '@/lib/types'
+import type { Artwork } from '@/lib/types'
 import { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react'
 import { useArtworks, useArtist } from '@/hooks/use-artwork-api'
 import Image from 'next/image'
@@ -27,7 +24,6 @@ export default function HomePage() {
   const [isPlaying, setIsPlaying] = useState(true)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [mounted, setMounted] = useState(false)
-  const [fallbackLoaded, setFallbackLoaded] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Fetch data using hooks with cancellation support
@@ -38,17 +34,13 @@ export default function HomePage() {
     retry: retryArtworks,
   } = useArtworks()
 
-  const {
-    data: artist,
-    loading: artistLoading,
-    error: artistError,
-  } = useArtist()
+  const { data: artist, loading: artistLoading } = useArtist()
 
   const loading = artworksLoading || artistLoading
 
   // 아래 두 로딩 화면(early return)과 같은 조건. 이 동안에는 본문·전시 섹션이 DOM 에 없다
   const showLoadingScreen =
-    !mounted || (loading && displayedArtworks.length === 0 && !fallbackLoaded)
+    !mounted || (loading && displayedArtworks.length === 0)
 
   // /exhibition → /#exhibition: 전시 이력은 작가 정보를 받고 로딩 화면이 걷힌 뒤에야 그려지므로
   // 브라우저의 첫 앵커 이동이 빗나간다. 섹션이 실제로 그려진 시점에 한 번 더 맞춘다
@@ -59,138 +51,20 @@ export default function HomePage() {
     document.getElementById('exhibition')?.scrollIntoView()
   }, [exhibitionRendered])
 
-  // Handle client-side hydration and immediate fallback loading
+  // 하이드레이션 뒤에만 본문을 그린다. 작품은 /api/artworks(useArtworks)에서만 받는다.
+  // 예전에는 마운트 직후·300ms·1초·API 오류 때마다 브라우저에서 getArtworks() 를 불렀는데,
+  // 브라우저에는 데이터 출처 키가 없어 늘 지어낸 작품('Tranquility' 등)이 먼저 그려졌다
   useEffect(() => {
     setMounted(true)
-
-    // Immediately load fallback data on mount
-    const loadImmediateFallback = async () => {
-      try {
-        const fallbackArtworks = await getArtworks()
-        if (
-          fallbackArtworks &&
-          fallbackArtworks.length > 0 &&
-          displayedArtworks.length === 0
-        ) {
-          const shuffled = [...fallbackArtworks].sort(() => 0.5 - Math.random())
-          setDisplayedArtworks(shuffled.slice(0, 8))
-          setFallbackLoaded(true)
-          console.log(
-            '⚡ Immediate fallback loaded on mount:',
-            fallbackArtworks.length,
-            'artworks'
-          )
-        }
-      } catch (error) {
-        console.error('❌ Immediate fallback failed on mount:', error)
-      }
-    }
-
-    loadImmediateFallback()
   }, [])
 
-  // Initialize displayed artworks when API data loads (replace fallback if better)
+  // API 에서 받은 작품 중 8점을 섞어 보여 준다
   useEffect(() => {
     if (artworks && artworks.length > 0) {
-      // If we have API data, replace fallback data
       const shuffled = [...artworks].sort(() => 0.5 - Math.random())
       setDisplayedArtworks(shuffled.slice(0, 8))
-      console.log(
-        '✅ API data loaded, replacing fallback:',
-        artworks.length,
-        'artworks'
-      )
     }
   }, [artworks])
-
-  // Enhanced fallback logic with early timeout
-  useEffect(() => {
-    const fallbackTimer = setTimeout(() => {
-      if (displayedArtworks.length === 0) {
-        console.warn('⏰ Loading timeout, forcing immediate fallback data load')
-
-        const loadFallbackData = async () => {
-          try {
-            const fallbackArtworks = await getArtworks()
-            if (fallbackArtworks && fallbackArtworks.length > 0) {
-              const shuffled = [...fallbackArtworks].sort(
-                () => 0.5 - Math.random()
-              )
-              setDisplayedArtworks(shuffled.slice(0, 8))
-              console.log(
-                '✅ Fallback data loaded successfully:',
-                fallbackArtworks.length,
-                'artworks'
-              )
-            }
-          } catch (fallbackError) {
-            console.error('❌ Fallback data load failed:', fallbackError)
-          }
-        }
-
-        loadFallbackData()
-      }
-    }, 1000) // 1초 후 강제 fallback (더 빠르게)
-
-    return () => clearTimeout(fallbackTimer)
-  }, [displayedArtworks.length])
-
-  // Immediate fallback on mount if no API data within 500ms
-  useEffect(() => {
-    if (mounted) {
-      const immediateTimer = setTimeout(() => {
-        if (displayedArtworks.length === 0 && !artworks) {
-          console.warn('🚀 Immediate fallback triggered')
-
-          const loadImmediateFallback = async () => {
-            try {
-              const fallbackArtworks = await getArtworks()
-              if (fallbackArtworks && fallbackArtworks.length > 0) {
-                const shuffled = [...fallbackArtworks].sort(
-                  () => 0.5 - Math.random()
-                )
-                setDisplayedArtworks(shuffled.slice(0, 8))
-                console.log(
-                  '⚡ Immediate fallback successful:',
-                  fallbackArtworks.length,
-                  'artworks'
-                )
-              }
-            } catch (error) {
-              console.error('❌ Immediate fallback failed:', error)
-            }
-          }
-
-          loadImmediateFallback()
-        }
-      }, 300) // 300ms 후 즉시 fallback
-
-      return () => clearTimeout(immediateTimer)
-    }
-  }, [mounted, displayedArtworks.length, artworks])
-
-  // Original fallback for API errors
-  useEffect(() => {
-    if (artworksError && !loading) {
-      console.warn('API failed, attempting to load static data:', artworksError)
-
-      const loadFallbackData = async () => {
-        try {
-          const fallbackArtworks = await getArtworks()
-          if (fallbackArtworks && fallbackArtworks.length > 0) {
-            const shuffled = [...fallbackArtworks].sort(
-              () => 0.5 - Math.random()
-            )
-            setDisplayedArtworks(shuffled.slice(0, 8))
-          }
-        } catch (fallbackError) {
-          console.error('Even fallback failed:', fallbackError)
-        }
-      }
-
-      loadFallbackData()
-    }
-  }, [artworksError, loading])
 
   // Enhanced auto-rotation with user control (BMAD: User Ability)
   const startAutoRotation = useCallback(() => {
@@ -263,7 +137,7 @@ export default function HomePage() {
   const featuredArtwork =
     displayedArtworks.length > 0 ? displayedArtworks[0] : undefined
 
-  // Show loading only for very short period, then force fallback
+  // 하이드레이션 전에는 로딩 화면
   if (!mounted) {
     return (
       <div className='min-h-screen bg-white dark:bg-gray-900 transition-colors flex items-center justify-center'>
@@ -277,8 +151,8 @@ export default function HomePage() {
     )
   }
 
-  // Only show loading if we don't have any data (including fallback)
-  if (loading && displayedArtworks.length === 0 && !fallbackLoaded) {
+  // 첫 데이터가 오기 전에만 로딩 화면
+  if (loading && displayedArtworks.length === 0) {
     return (
       <div className='min-h-screen bg-white dark:bg-gray-900 transition-colors flex items-center justify-center'>
         <div className='text-center'>
@@ -701,13 +575,23 @@ export default function HomePage() {
                 </div>
               )}
             </>
+          ) : artworksError ? (
+            <div className='text-center py-12' role='alert'>
+              <p className='text-gray-500 dark:text-gray-400'>
+                작품을 불러오지 못했습니다.
+              </p>
+              <button
+                type='button'
+                onClick={() => retryArtworks()}
+                className='mt-4 px-5 py-2 border-2 border-ink text-ink hover:bg-ink hover:text-paper transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold'
+              >
+                다시 시도
+              </button>
+            </div>
           ) : (
             <div className='text-center py-12'>
               <p className='text-gray-500 dark:text-gray-400'>
                 표시할 작품이 없습니다.
-              </p>
-              <p className='text-sm text-gray-400 dark:text-gray-500 mt-2'>
-                데이터를 불러오는 중입니다...
               </p>
             </div>
           )}

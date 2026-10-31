@@ -1,11 +1,9 @@
 import {
-  fetchArtistFromAirtable,
   fetchArtworksFromAirtable,
   fetchFeaturedArtworks,
   fetchTreasureArtworks,
 } from '@/lib/airtable'
-import type { Artist, Artwork } from '@/lib/types'
-import { getArtistImageUrl } from './image-utils'
+import type { Artwork } from '@/lib/types'
 
 // 레거시 이미지 경로 생성 함수 (로컬 정의)
 function createLegacyImagePath(
@@ -39,160 +37,14 @@ export function getLocalArtworkImagePath(
   return `/Images/Artworks/${year}/${filename}`
 }
 
-// 로컬 fallback 데이터
-export const fallbackArtistData: Artist = {
-  id: 'artist-anam',
-  name: '아남 배옥영 (ANAM Bae Ok Young)',
-  bio: '한국의 전통 서예와 현대적 감각을 결합한 독창적인 작품 세계를 구축하고 있는 서예 작가입니다. 전통 서예의 정신을 계승하면서도 현대적 미감을 탐구하며, 문자의 조형성과 먹의 물성을 통해 내면의 세계를 표현합니다. 다수의 개인전과 그룹전에 참여하였으며, 그의 작품은 여러 미술관과 개인 컬렉션에 소장되어 있습니다.',
-  statement:
-    '전통 서예의 정신을 바탕으로 현대적 감각을 더하여, 과거와 현재가 조화를 이루는 작품을 추구합니다. 각 작품은 선과 공간, 여백의 관계를 탐구하는 과정이며, 전통에 뿌리를 두되 동시대의 감성과 소통하는 새로운 서예의 가능성을 모색합니다.',
-  profileImageUrl: getArtistImageUrl('배옥영.jpeg'),
-  birthYear: 1980,
-  education: ['서예학과 졸업', '서예학 석사'],
-  // 실제 기록만 보여 준다. 지어낸 전시를 넣으면 홈 "전시 이력"·작가 소개에 사실처럼 나온다
-  exhibitions: [],
-  awards: [
-    '2024 한국서예대전 대상',
-    '2023 현대서예협회 우수상',
-    '2022 신진서예가상',
-  ],
-  collections: ['미술관 소장', '개인 컬렉션 다수'],
-  website: 'https://anam.com',
-  socialLinks: {
-    instagram: 'https://instagram.com/anam_art',
-    website: 'https://anam.com',
-  },
-}
-
-// Generate comprehensive fallback data for 61 artworks matching Number-based slugs
-export const fallbackArtworksData: Artwork[] = Array.from(
-  { length: 61 },
-  (_, index) => {
-    const id = (index + 1).toString()
-    const slug = (index + 1).toString().padStart(2, '0') // 01, 02, 03, etc.
-    const year = 2021 + Math.floor(index / 15) // Distribute across years 2021-2024
-
-    // Simple English titles to avoid InvalidCharacterError during build
-    const titles = [
-      'Harmony',
-      'Serenity',
-      'Tranquility',
-      'Balance',
-      'Flow',
-      'Essence',
-      'Spirit',
-      'Peace',
-      'Depth',
-      'Grace',
-      'Vitality',
-      'Energy',
-      'Moment',
-      'Eternal',
-      'Nature',
-      'Heart',
-      'Mind',
-      'Soul',
-      'Dream',
-      'Reality',
-      'Tradition',
-      'Modern',
-      'Meeting',
-      'Farewell',
-      'Longing',
-      'Hope',
-      'Love',
-      'Freedom',
-      'Release',
-      'Creation',
-      'Birth',
-      'Growth',
-      'Change',
-      'Completion',
-      'Beginning',
-      'End',
-      'Cycle',
-      'Essence',
-      'Truth',
-      'Wisdom',
-      'Insight',
-      'Enlightenment',
-      'Meditation',
-      'Practice',
-      'Path',
-      'Journey',
-      'Purpose',
-      'Meaning',
-      'Value',
-      'Beauty',
-      'Sublime',
-      'Sacred',
-      'Divine',
-      'Light',
-      'Shadow',
-      'Void',
-      'Silence',
-      'Breath',
-      'Rhythm',
-      'Movement',
-      'Unity',
-    ]
-
-    const mediums = [
-      'Ink on paper',
-      'Ink on hanji',
-      'Ink and color on paper',
-      'Traditional ink',
-    ]
-    const dimensions = [
-      '70 x 140 cm',
-      '90 x 90 cm',
-      '70 x 100 cm',
-      '50 x 70 cm',
-      '100 x 70 cm',
-      '140 x 70 cm',
-      '80 x 120 cm',
-      '60 x 90 cm',
-    ]
-
-    const title = titles[index] || `작품 ${slug}`
-    const medium = mediums[index % mediums.length]
-    const dimension = dimensions[index % dimensions.length]
-
-    // Calculate aspect ratio from dimensions
-    const [width, height] = dimension.split(' x ').map((d) => parseInt(d))
-    const aspectRatio = `${width}/${height}`
-
-    return {
-      id,
-      slug,
-      title,
-      year,
-      medium,
-      dimensions: dimension,
-      aspectRatio,
-      description: `${title} - A contemporary calligraphy work that explores the relationship between tradition and modernity through the expressive power of ink and void space.`,
-      imageUrl: getOptimizedArtworkImagePath(slug, 'medium'),
-      imageId: slug,
-      imageUrlQuery: `${title} korean calligraphy art`,
-      artistNote: `A modern interpretation of ${title} through contemporary calligraphic expression.`,
-      featured: index < 3, // First 3 are featured
-      category:
-        year >= 2024 ? 'recent' : year >= 2022 ? 'contemporary' : 'classic',
-      available: true,
-      tags: [
-        title.length > 2 ? title.substring(0, 2) : title,
-        medium.includes('color') ? 'color' : 'ink',
-        year.toString(),
-      ],
-      createdAt: `${year}-01-${((index % 28) + 1).toString().padStart(2, '0')}T00:00:00Z`,
-      updatedAt: `${year}-01-${((index % 28) + 1).toString().padStart(2, '0')}T00:00:00Z`,
-    }
-  }
-)
+// 지어낸 작품·작가 데이터는 두지 않는다. 예전에는 'Harmony'·'Serenity' 같은 영어 제목에
+// 2021년·Ink on paper 를 붙인 61점과 수상·학력·생년을 지어낸 작가 정보를 여기서 만들어,
+// 데이터를 못 받으면(브라우저에서는 늘) 실제처럼 보여 줬다. 실제 데이터가 없으면 비어 있거나 오류여야 한다
 
 /**
- * 작품 데이터를 가져오는 메인 함수 (Supabase → Airtable → fallback 순서)
- * Supabase가 우선이고, 실패 시 Airtable, 최종적으로 fallback 사용
+ * 작품 데이터를 가져오는 메인 함수 (Supabase → Airtable 순서)
+ * 둘 다 실패하면 빈 배열. 서버 전용: 브라우저에는 두 출처의 키가 없으므로
+ * 클라이언트 컴포넌트는 이 함수 대신 /api/artworks 를 부른다
  */
 export async function getArtworks(): Promise<Artwork[]> {
   try {
@@ -224,14 +76,11 @@ export async function getArtworks(): Promise<Artwork[]> {
       console.warn('⚠️ Airtable also unavailable:', airtableError)
     }
 
-    // 3. Final fallback to local data
-    console.warn(
-      '🔄 Using fallback artwork data (both Supabase and Airtable unavailable)'
-    )
-    return fallbackArtworksData
+    console.warn('⚠️ No artworks: both Supabase and Airtable unavailable')
+    return []
   } catch (error) {
     console.error('❌ Error in getArtworks:', error)
-    return fallbackArtworksData
+    return []
   }
 }
 
@@ -317,99 +166,18 @@ export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
 }
 
 /**
- * 작가 정보 가져오기 (Supabase → Airtable → fallback 순서)
+ * 클라이언트 컴포넌트용: 서버 API(/api/artworks)에서 실제 작품을 받는다.
+ * 실패하면 예외를 던져 화면이 오류 상태를 보이게 한다(지어낸 작품으로 채우지 않음)
  */
-export async function fetchArtist(
-  fallbackKey = 'default'
-): Promise<Artist | null> {
-  try {
-    // 1. Try Supabase first (primary data source)
-    try {
-      const { fetchArtistFromSupabase } =
-        await import('@/lib/supabase/artworks')
-      const artistFromSupabase = await fetchArtistFromSupabase()
-      if (artistFromSupabase) {
-        console.log('✅ Loaded artist data from Supabase')
-        return artistFromSupabase
-      }
-    } catch (supabaseError) {
-      console.warn('⚠️ Supabase unavailable, trying Airtable:', supabaseError)
-    }
-
-    // 2. Fallback to Airtable if Supabase fails
-    try {
-      const artistFromAirtable = await fetchArtistFromAirtable()
-      if (artistFromAirtable) {
-        console.log('✅ Loaded artist data from Airtable (fallback)')
-        return artistFromAirtable
-      }
-    } catch (airtableError) {
-      console.warn('⚠️ Airtable also unavailable:', airtableError)
-    }
-
-    // 3. Final fallback 데이터 사용
-    console.warn(
-      '🔄 Using fallback artist data (both Supabase and Airtable unavailable)'
-    )
-    return fallbackArtistData
-  } catch (error) {
-    console.error('❌ Error in fetchArtist:', error)
-    return fallbackArtistData
+export async function fetchArtworksFromApi(
+  signal?: AbortSignal
+): Promise<Artwork[]> {
+  const res = await fetch('/api/artworks', { signal })
+  if (!res.ok) {
+    throw new Error(`작품을 불러오지 못했습니다 (HTTP ${res.status})`)
   }
-}
-
-/**
- * 서버 API를 통해 작품 데이터 가져오기 (클라이언트용)
- */
-export async function getArtworksFromSource(): Promise<Artwork[]> {
-  try {
-    const res = await fetch('/api/artworks', {
-      next: { revalidate: 300 }, // 5분 캐시
-    })
-
-    if (!res.ok) {
-      console.error('API responded with error:', res.status)
-      // API 실패 시 fallback 데이터 즉시 반환
-      console.warn('🔄 API failed, using fallback artwork data')
-      return fallbackArtworksData
-    }
-
-    // JSON 파싱 실패(HTML 등) 대비
-    let json
-    try {
-      json = await res.json()
-    } catch (err) {
-      console.error('Failed to parse JSON from /api/artworks:', err)
-      // JSON 파싱 실패 시에도 fallback 데이터 반환
-      console.warn('🔄 JSON parse failed, using fallback artwork data')
-      return fallbackArtworksData
-    }
-
-    const artworks = (json.data || []) as Artwork[]
-
-    // 데이터가 없거나 비어있는 경우에도 fallback 사용
-    if (!artworks || artworks.length === 0) {
-      console.warn(
-        '🔄 No artworks in API response, using fallback artwork data'
-      )
-      return fallbackArtworksData
-    }
-
-    console.log(`✅ Loaded ${artworks.length} artworks from API`)
-    return artworks
-  } catch (error) {
-    console.error('Failed to fetch /api/artworks:', error)
-    // 모든 에러 상황에서 fallback 데이터 반환
-    console.warn('🔄 API error, using fallback artwork data')
-    return fallbackArtworksData
-  }
-}
-
-/**
- * Alias for getArtworks for backward compatibility
- */
-export async function fetchArtworks(): Promise<Artwork[]> {
-  return await getArtworksFromSource()
+  const json = (await res.json()) as { data?: Artwork[] }
+  return json.data ?? []
 }
 
 // 무작위 추천 작품 가져오기 (현재 작품 제외)

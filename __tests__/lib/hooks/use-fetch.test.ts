@@ -96,3 +96,39 @@ describe('useFetch', () => {
     expect(result.current.error).toMatch(/timed out/)
   })
 })
+
+// 예전에는 /api/artworks·/api/artist 가 실패하면 이 훅이 지어낸 작품 61점·작가 정보를
+// 성공 데이터처럼 돌려줬다. 실패는 오류로 남아 화면이 오류 상태를 보여야 한다
+describe('useFetch: 실패를 지어낸 데이터로 바꾸지 않는다', () => {
+  const originalFetch = global.fetch
+  afterEach(() => {
+    global.fetch = originalFetch
+  })
+
+  it.each([
+    ['/api/artworks', 'HTTP 503'],
+    ['/api/artist', 'HTTP 503'],
+    ['/api/artworks', 'network'],
+    ['/api/artist', 'network'],
+  ])('%s %s → data 없음, 오류 있음', async (url, kind) => {
+    global.fetch = jest.fn(async () => {
+      if (kind === 'network') throw new TypeError('Failed to fetch')
+      return new Response(JSON.stringify({ success: false, data: null }), {
+        status: 503,
+        headers: { 'content-type': 'application/json' },
+      })
+    }) as unknown as typeof fetch
+
+    const { result } = renderHook(() =>
+      useFetch<unknown>(url, {
+        immediate: true,
+        retryAttempts: 0,
+        timeout: 5000,
+      })
+    )
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.data).toBeNull()
+    expect(result.current.error).toBeTruthy()
+  })
+})

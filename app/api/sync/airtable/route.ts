@@ -1,3 +1,4 @@
+import { clearCacheAndRevalidate } from '@/lib/cache'
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 
@@ -46,33 +47,10 @@ export async function POST(request: NextRequest) {
       changes: Object.keys(payload.changedTablesById || {}).length,
     })
 
-    // Trigger cache revalidation for artworks
-    try {
-      const revalidateUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/api/revalidate`
-      const revalidateSecret = process.env.REVALIDATE_SECRET || ''
-
-      if (revalidateUrl && revalidateSecret) {
-        const revalidateResponse = await fetch(revalidateUrl, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${revalidateSecret}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            tags: ['artworks'],
-            paths: ['/api/artworks', '/gallery', '/'],
-          }),
-        })
-
-        if (revalidateResponse.ok) {
-          console.log('Cache revalidated successfully after Airtable webhook')
-        } else {
-          console.error('Cache revalidation failed:', revalidateResponse.status)
-        }
-      }
-    } catch (revalidateError) {
-      console.error('Failed to revalidate cache:', revalidateError)
-    }
+    // 같은 서버에서 직접 갱신한다. 예전에는 이 사이트의 /api/revalidate 를 HTTP 로 불렀는데
+    // 요청 형식(Bearer 헤더 + {tags, paths})이 그 엔드포인트(body.secret·body.tag)와 달라 늘 401 이었고
+    // 실패를 삼킨 채 "revalidated" 라고 응답했다
+    clearCacheAndRevalidate('artworks')
 
     const response = {
       success: true,

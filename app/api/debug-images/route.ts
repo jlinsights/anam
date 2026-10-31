@@ -1,4 +1,3 @@
-import { fallbackArtworksData } from '@/lib/artworks'
 import { fetchArtworksFromAirtable } from '@/lib/airtable'
 import { validateDebugAccess } from '@/lib/debug-guard'
 import {
@@ -25,7 +24,6 @@ export async function GET(request: Request) {
   try {
     // Test both data sources
     const airtableData = await fetchArtworksFromAirtable()
-    const fallbackData = fallbackArtworksData.slice(0, 3) // First 3 for comparison
 
     // Check if images exist
     const imageChecks = []
@@ -54,15 +52,6 @@ export async function GET(request: Request) {
             imageUrl: artwork.imageUrl,
             number: artwork.number,
           })) || [],
-      },
-      fallback: {
-        count: fallbackData.length,
-        samples: fallbackData.map((artwork) => ({
-          id: artwork.id,
-          slug: artwork.slug,
-          title: artwork.title,
-          imageUrl: artwork.imageUrl,
-        })),
       },
       imageStructure: imageChecks,
       environment: {

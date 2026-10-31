@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Head from 'next/head'
-import { getArtworks } from '@/lib/artworks'
+import { fetchArtworksFromApi } from '@/lib/artworks'
 import { GallerySection } from '@/components/single-page/GallerySection'
 import { ErrorBoundary } from '@/components/error-boundary'
 import type { Artwork } from '@/lib/types'
@@ -57,21 +57,25 @@ function GalleryPageContent() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
+  // 서버 API 에서 실제 작품을 받는다. 브라우저에는 데이터 출처 키가 없어 getArtworks() 를 부르면
+  // 지어낸 작품이 나왔다. 실패하면 오류 화면(GalleryError)
   useEffect(() => {
+    const controller = new AbortController()
     const loadArtworks = async () => {
       try {
-        const data = await getArtworks()
-        setArtworks(data)
+        setArtworks(await fetchArtworksFromApi(controller.signal))
       } catch (err) {
+        if (controller.signal.aborted) return
         setError(
           err instanceof Error ? err : new Error('Failed to load artworks')
         )
       } finally {
-        setLoading(false)
+        if (!controller.signal.aborted) setLoading(false)
       }
     }
 
     loadArtworks()
+    return () => controller.abort()
   }, [])
 
   const handleArtworkSelect = (artwork: Artwork) => {
