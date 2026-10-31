@@ -16,13 +16,3 @@ export function parseBirthYear(...sources: string[]): number | undefined {
   }
   return undefined
 }
-
-// 메일 본문(HTML)에 방문자 입력을 넣기 전에 이스케이프한다. sanitizeObject의 태그 제거와 별개의 2차 방어
-export function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-}

@@ -7,7 +7,6 @@ import { withRateLimit, getClientIP } from '@/lib/rate-limit'
 import { sanitizeObject, threatMonitor } from '@/lib/security/input-sanitizer'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { escapeHtml } from '@/lib/content-text'
 
 // 문의 폼 데이터 스키마
 const contactSchema = z.object({
@@ -88,14 +87,8 @@ export async function POST(request: NextRequest) {
         },
       })
 
-      const safe = {
-        name: escapeHtml(validatedData.name),
-        email: escapeHtml(validatedData.email),
-        phone: validatedData.phone ? escapeHtml(validatedData.phone) : '',
-        subject: escapeHtml(validatedData.subject),
-        message: escapeHtml(validatedData.message),
-      }
-
+      // 방문자 입력은 위 sanitizeObject(stripTags)에서 이미 HTML 인코딩되어 있다.
+      // 여기서 다시 이스케이프하면 &amp;amp; · &#x2F; 처럼 이중 인코딩되어 메일 본문이 깨진다
       // 이메일 내용 구성
       const mailOptions = {
         // 받은 메일에서 바로 답장하면 문의자에게 가도록
@@ -111,22 +104,22 @@ export async function POST(request: NextRequest) {
           
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="color: #495057; margin-top: 0;">문의자 정보</h3>
-            <p><strong>이름:</strong> ${safe.name}</p>
-            <p><strong>이메일:</strong> ${safe.email}</p>
+            <p><strong>이름:</strong> ${validatedData.name}</p>
+            <p><strong>이메일:</strong> ${validatedData.email}</p>
             ${
-              safe.phone
-                ? `<p><strong>전화번호:</strong> ${safe.phone}</p>`
+              validatedData.phone
+                ? `<p><strong>전화번호:</strong> ${validatedData.phone}</p>`
                 : ''
             }
           </div>
           
           <div style="background-color: #ffffff; padding: 20px; border: 1px solid #dee2e6; border-radius: 8px;">
             <h3 style="color: #495057; margin-top: 0;">문의 내용</h3>
-            <p><strong>제목:</strong> ${safe.subject}</p>
+            <p><strong>제목:</strong> ${validatedData.subject}</p>
             <div style="margin-top: 15px;">
               <strong>내용:</strong>
               <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 10px; white-space: pre-wrap;">
-                ${safe.message}
+                ${validatedData.message}
               </div>
             </div>
           </div>
