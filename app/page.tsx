@@ -9,15 +9,14 @@ import { useArtworks, useArtist } from '@/hooks/use-artwork-api'
 import Image from 'next/image'
 import Link from 'next/link'
 import { MinimalHeader } from '@/components/layout/MinimalHeader'
+import { ExhibitionHistory } from '@/components/exhibition/ExhibitionHistory'
+import { exhibitionHistory } from '@/lib/exhibition-history'
 
 // ✅ PERFORMANCE: Lazy load heavy components
 const HeroSection = lazy(() =>
   import('@/components/sections/HeroSection').then((mod) => ({
     default: mod.HeroSection,
   }))
-)
-const UpcomingExhibition = lazy(
-  () => import('@/components/exhibition/UpcomingExhibition')
 )
 
 // Metadata is handled in layout.tsx
@@ -46,6 +45,19 @@ export default function HomePage() {
   } = useArtist()
 
   const loading = artworksLoading || artistLoading
+
+  // 아래 두 로딩 화면(early return)과 같은 조건. 이 동안에는 본문·전시 섹션이 DOM 에 없다
+  const showLoadingScreen =
+    !mounted || (loading && displayedArtworks.length === 0 && !fallbackLoaded)
+
+  // /exhibition → /#exhibition: 전시 이력은 작가 정보를 받고 로딩 화면이 걷힌 뒤에야 그려지므로
+  // 브라우저의 첫 앵커 이동이 빗나간다. 섹션이 실제로 그려진 시점에 한 번 더 맞춘다
+  const exhibitionRendered =
+    !showLoadingScreen && exhibitionHistory(artist?.exhibitions).length > 0
+  useEffect(() => {
+    if (!exhibitionRendered || window.location.hash !== '#exhibition') return
+    document.getElementById('exhibition')?.scrollIntoView()
+  }, [exhibitionRendered])
 
   // Handle client-side hydration and immediate fallback loading
   useEffect(() => {
@@ -745,31 +757,8 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* Upcoming Exhibition Section - Lazy loaded */}
-      <Suspense
-        fallback={
-          <div className='container mx-auto px-4 py-8'>
-            <div className='bg-gray-50 dark:bg-gray-800 rounded-lg p-8 animate-pulse'>
-              <div className='h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4'></div>
-              <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3'></div>
-            </div>
-          </div>
-        }
-      >
-        <UpcomingExhibition />
-      </Suspense>
-
-      {/* Footer */}
-      <footer className='bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-0'>
-        <div className='container mx-auto px-4 py-8'>
-          <div className='text-center text-gray-600 dark:text-gray-300'>
-            <p>&copy; 2024 아남 배옥영. All rights reserved.</p>
-            <p className='mt-2 text-sm'>
-              전통 서예와 현대적 감각이 조화를 이루는 독창적 작품
-            </p>
-          </div>
-        </div>
-      </footer>
+      {/* 전시 이력: Supabase 작가 데이터의 실제 기록(원본은 Airtable "전시이력") — 사이트 푸터는 layout.tsx 하나만 쓴다 */}
+      <ExhibitionHistory exhibitions={artist?.exhibitions} />
     </div>
   )
 }
