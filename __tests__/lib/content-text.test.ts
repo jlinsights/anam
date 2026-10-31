@@ -1,5 +1,5 @@
 import { sanitizeText } from '@/lib/airtable'
-import { parseBirthYear, realText } from '@/lib/content-text'
+import { escapeHtml, parseBirthYear, realText } from '@/lib/content-text'
 
 describe('parseBirthYear', () => {
   it('Airtable 이름 칸의 (b.1955) 표기에서 연도를 읽는다', () => {
@@ -31,6 +31,14 @@ describe('sanitizeText', () => {
   it('제어 문자는 지우고 줄바꿈은 남긴다', () => {
     expect(sanitizeText('소개\r\n\n* 동양철학박사\u0000')).toBe(
       '소개\n\n* 동양철학박사'
+    )
+  })
+})
+
+describe('escapeHtml', () => {
+  it('문의 메일 본문에 들어갈 방문자 입력의 HTML 특수 문자를 바꾼다', () => {
+    expect(escapeHtml('<a href="x">\'링크\'</a> & 끝')).toBe(
+      '&lt;a href=&quot;x&quot;&gt;&#39;링크&#39;&lt;/a&gt; &amp; 끝'
     )
   })
 })
