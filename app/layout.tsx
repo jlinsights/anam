@@ -1,4 +1,5 @@
 import { ClientLayout } from '@/components/client-layout'
+import { SiteFooter } from '@/components/layout/SiteFooter'
 import type { Metadata } from 'next'
 import { IBM_Plex_Sans_KR, Noto_Serif_KR } from 'next/font/google'
 import './globals.css'
@@ -232,14 +233,7 @@ export default function RootLayout({
       >
         <ClientLayout>
           <main id='main-content'>{children}</main>
-          {/* Footer */}
-          <footer className='bg-ink text-paper py-8'>
-            <div className='container-art text-center'>
-              <p className='text-responsive-sm text-ink-light'>
-                © 2025 {SITE_CONFIG.siteName} ({SITE_CONFIG.publisher})
-              </p>
-            </div>
-          </footer>
+          <SiteFooter />
         </ClientLayout>
       </body>
     </html>

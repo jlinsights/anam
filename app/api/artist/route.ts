@@ -30,7 +30,8 @@ function getFallbackArtistData(): Artist {
     techniques: ['전통 붓글씨', '현대 캘리그래피', '수묵화'],
     materials: ['화선지', '먹', '붓', '인주'],
     awards: [],
-    exhibitions: ['개인전 다수', '그룹전 참여'],
+    // 실제 기록만 보여 준다. 지어낸 전시를 넣으면 홈 "전시 이력"에 사실처럼 나온다
+    exhibitions: [],
     collections: [],
   }
 }
