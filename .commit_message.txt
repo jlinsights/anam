@@ -1,1 +1,1 @@
-🔤 글꼴 역할 정리(Inter→IBM Plex Sans KR, 제목·본문은 Noto Serif KR, 큰 제목 자간 좁힘) 및 PRODUCT.md·DESIGN.md 디자인 체계 문서 추가
+🧾 지어낸 사실 걷어내기: 홈 통계·출생년도 1970 대체값·작품 '수집 정보' 제거, Airtable 템플릿 문구 숨김, 작가 소개 줄바꿈 복원, 작품 문의 버튼과 /contact 문의 페이지 복구

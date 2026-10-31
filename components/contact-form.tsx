@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/hooks/use-toast'
 import { ErrorBoundary } from '@/components/error-boundary'
 import { Loader2, Send } from 'lucide-react'
 
@@ -19,17 +18,26 @@ interface ContactFormData {
 
 interface ContactFormProps {
   className?: string
+  /** 작품 상세에서 넘어온 경우 제목 칸을 미리 채운다 */
+  defaultSubject?: string
 }
 
-export function ContactForm({ className = '' }: ContactFormProps) {
-  const { toast } = useToast()
+type SubmitStatus =
+  { kind: 'idle' } | { kind: 'success' } | { kind: 'error'; message: string }
+
+// 화면에 Toaster가 없어 토스트가 보이지 않았다. 결과는 폼 아래에 직접 알린다
+export function ContactForm({
+  className = '',
+  defaultSubject = '',
+}: ContactFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [status, setStatus] = useState<SubmitStatus>({ kind: 'idle' })
   const abortControllerRef = useRef<AbortController | null>(null)
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
     phone: '',
-    subject: '',
+    subject: defaultSubject,
     message: '',
   })
 
@@ -63,6 +71,7 @@ export function ContactForm({ className = '' }: ContactFormProps) {
     // Create new abort controller
     abortControllerRef.current = new AbortController()
     setIsSubmitting(true)
+    setStatus({ kind: 'idle' })
 
     try {
       const response = await fetch('/api/contact', {
@@ -74,19 +83,10 @@ export function ContactForm({ className = '' }: ContactFormProps) {
         signal: abortControllerRef.current.signal,
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
+      const result = await response.json().catch(() => ({}))
 
-      const result = await response.json()
-
-      if (result.success) {
-        toast({
-          title: '문의 전송 완료',
-          description:
-            '문의가 성공적으로 전송되었습니다. 빠른 시일 내에 답변드리겠습니다.',
-          duration: 5000,
-        })
+      if (response.ok && result.success) {
+        setStatus({ kind: 'success' })
 
         // 폼 초기화
         setFormData({
@@ -97,26 +97,20 @@ export function ContactForm({ className = '' }: ContactFormProps) {
           message: '',
         })
       } else {
-        toast({
-          title: '전송 실패',
-          description: result.message || '문의 전송 중 오류가 발생했습니다.',
-          variant: 'destructive',
-          duration: 5000,
+        setStatus({
+          kind: 'error',
+          message: result.message || '문의 전송 중 오류가 발생했습니다.',
         })
       }
     } catch (error) {
       // Handle AbortError (request was cancelled)
       if (error instanceof Error && error.name === 'AbortError') {
-        console.log('Contact form submission was cancelled')
         return
       }
 
-      console.error('Form submission error:', error)
-      toast({
-        title: '전송 실패',
-        description: '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-        variant: 'destructive',
-        duration: 5000,
+      setStatus({
+        kind: 'error',
+        message: '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
       })
     } finally {
       setIsSubmitting(false)
@@ -221,6 +215,17 @@ export function ContactForm({ className = '' }: ContactFormProps) {
                 </>
               )}
             </Button>
+          </div>
+
+          <div aria-live='polite' className='mt-zen-sm min-h-[1.5rem] text-sm'>
+            {status.kind === 'success' && (
+              <p className='text-ink dark:text-neutral-100'>
+                문의가 전송되었습니다. 빠른 시일 내에 답변드리겠습니다.
+              </p>
+            )}
+            {status.kind === 'error' && (
+              <p className='text-red-700 dark:text-red-400'>{status.message}</p>
+            )}
           </div>
         </form>
 

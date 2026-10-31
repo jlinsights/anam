@@ -209,7 +209,7 @@ export function ArtworkDetailPage({
 
               {/* Technical details */}
               <motion.div
-                className='grid grid-cols-1 sm:grid-cols-2 gap-6'
+                className='grid grid-cols-1 gap-6'
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.8 }}
@@ -237,23 +237,6 @@ export function ArtworkDetailPage({
                         <strong>가격:</strong> {artwork.price}
                       </div>
                     )}
-                  </div>
-                </div>
-
-                <div className='space-y-2'>
-                  <h4 className='font-display font-semibold text-gray-900 dark:text-white'>
-                    수집 정보
-                  </h4>
-                  <div className='space-y-1 text-sm text-gray-600 dark:text-gray-400'>
-                    <div>
-                      <strong>작품 ID:</strong> {artwork.id}
-                    </div>
-                    <div>
-                      <strong>소장:</strong> 개인 소장
-                    </div>
-                    <div>
-                      <strong>상태:</strong> 양호
-                    </div>
                     {artwork.tags && artwork.tags.length > 0 && (
                       <div className='pt-2'>
                         <strong>태그:</strong>
@@ -280,22 +263,23 @@ export function ArtworkDetailPage({
                 animate={{ opacity: 1 }}
                 transition={{ duration: 1, delay: 1 }}
               >
-                <button
+                <Link
+                  href={`/contact?artwork=${encodeURIComponent(artwork.title)}`}
                   className='
-                px-8 py-4
-                bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-display font-bold
-                hover:bg-yellow-600 hover:text-gray-900
-                transition-all duration-300
-                shadow-lg hover:shadow-xl
-                transform hover:-translate-x-1 hover:-translate-y-1
-                border-4 border-gray-900 dark:border-gray-100 hover:border-yellow-600
-              '
+                  inline-block text-center px-8 py-4
+                  bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-body font-bold
+                  hover:bg-yellow-600 hover:text-gray-900
+                  transition-all duration-300
+                  shadow-lg hover:shadow-xl
+                  transform hover:-translate-x-1 hover:-translate-y-1
+                  border-4 border-gray-900 dark:border-gray-100 hover:border-yellow-600
+                '
                 >
-                  고화질 이미지 보기
-                </button>
+                  이 작품 문의하기
+                </Link>
 
                 <Link
-                  href='/#artist'
+                  href='/artist'
                   className='
                   inline-block text-center px-8 py-4
                   bg-white dark:bg-gray-800 border-4 border-gray-900 dark:border-gray-100 text-gray-900 dark:text-white font-display font-bold

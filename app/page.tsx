@@ -311,12 +311,6 @@ export default function HomePage() {
                 }
               : undefined
           }
-          stats={{
-            // API 응답 전에 폴백 데이터로 먼저 렌더되므로 artworks는 아직 null일 수 있다
-            totalArtworks: artworks?.length ?? displayedArtworks.length,
-            yearsActive: 30,
-            exhibitions: 25,
-          }}
         />
       </Suspense>
 

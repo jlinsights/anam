@@ -329,9 +329,9 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
         transition={{ duration: 1 }}
         viewport={{ once: true }}
       >
-        <h2 className='font-calligraphy font-bold text-gray-900 dark:text-white text-3xl md:text-4xl mb-4'>
+        <h1 className='font-calligraphy font-bold text-gray-900 dark:text-white text-3xl md:text-4xl mb-4'>
           작가 소개
-        </h2>
+        </h1>
         <p className='font-display text-gray-600 dark:text-gray-400 text-lg'>
           Artist Profile • 書藝家
         </p>

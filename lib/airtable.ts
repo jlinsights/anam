@@ -1,3 +1,4 @@
+import { parseBirthYear, realText } from '@/lib/content-text'
 import {
   getBase as getAirtableBase,
   safeAirtableRequest,
@@ -125,10 +126,13 @@ async function createAirtableBase() {
  */
 
 // 텍스트 필드 정리 함수 - 제어 문자 및 문제가 되는 문자 제거
-function sanitizeText(text: any): string {
+export function sanitizeText(text: any): string {
   if (!text || typeof text !== 'string') return ''
-  // Remove control characters (0x00-0x1F) and DEL characters (0x7F-0x9F)
-  return text.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim()
+  // 제어 문자를 지우되 줄바꿈(\n)과 탭은 남긴다. 작가 소개의 문단·목록 줄바꿈이 사라지던 문제
+  return text
+    .replace(/\r\n?/g, '\n')
+    .replace(/[\x00-\x08\x0B-\x1F\x7F-\x9F]/g, '')
+    .trim()
 }
 
 // 필드 값을 우선순위에 따라 가져오는 함수
@@ -486,8 +490,9 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
             pickField<string>(fields, ARTWORK_FIELD_MAP, 'dimensions') ||
               '70 x 140 cm'
           ),
-        description:
-          pickField<string>(fields, ARTWORK_FIELD_MAP, 'description') || '',
+        description: realText(
+          pickField<string>(fields, ARTWORK_FIELD_MAP, 'description')
+        ),
         number: pickField<number | string>(fields, ARTWORK_FIELD_MAP, 'number'), // Airtable Number 필드
         imageUrl: (() => {
           // 우선순위 1: Airtable slug 필드를 이용한 최적화된 이미지 매칭
@@ -600,8 +605,9 @@ export async function fetchArtworksFromAirtable(): Promise<Artwork[] | null> {
           return defaultPath
         })(),
         imageUrlQuery: `${title} calligraphy art`,
-        artistNote:
-          pickField<string>(fields, ARTWORK_FIELD_MAP, 'artistNote') || '',
+        artistNote: realText(
+          pickField<string>(fields, ARTWORK_FIELD_MAP, 'artistNote')
+        ),
         featured:
           pickField<boolean>(fields, ARTWORK_FIELD_MAP, 'featured') || false,
         category:
@@ -684,7 +690,12 @@ export async function fetchArtistFromAirtable(): Promise<Artist | null> {
     // 필드 매핑 헬퍼 함수들
     const getName = () => {
       const name = getFieldValue(fields, ['name', 'Name', '이름', '작가명'])
-      return name?.toString() || 'Unknown Artist'
+      // 출생 연도 표기 "(b.1955)"는 birthYear로 따로 보여 주므로 이름에서는 뗀다
+      const display = name
+        ?.toString()
+        .replace(/\s*\(b\.\s*\d{4}\)\s*$/, '')
+        .trim()
+      return display || 'Unknown Artist'
     }
 
     const getString = (primary: string, ...alts: string[]) =>
@@ -760,8 +771,11 @@ export async function fetchArtistFromAirtable(): Promise<Artist | null> {
       name: getName(),
       bio: getBio(),
       profileImageUrl: getProfileImageUrl(),
-      birthYear:
-        parseInt(getString('birthYear', 'Birth Year', '출생년도')) || 1970,
+      birthYear: parseBirthYear(
+        getString('birthYear', 'Birth Year', '출생년도'),
+        getFieldValue(fields, ['name', 'Name', '이름', '작가명'])?.toString() ??
+          ''
+      ),
       education: parseMultiline(
         getFieldValue(fields, ['education', 'Education', '학력'])
       ),
