@@ -184,13 +184,13 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
               </div>
             )}
 
-            {/* Featured badge */}
+            {/* Featured badge: 금색은 두 테마 모두 밝으므로 글자는 테마와 무관하게 짙게 둔다 */}
             {artwork.featured && (
               <div className='mt-zen-xs'>
                 <span
                   className='
                   inline-block px-2 py-1 
-                  bg-gold text-ink text-xs font-body font-bold
+                  bg-gold text-gray-900 text-xs font-body font-bold
                   border border-ink
                 '
                 >
@@ -254,22 +254,22 @@ export const ArtworkGridPortrait = memo(function ArtworkGridPortrait({
   )
 
   return (
-    <div
+    // 키보드 격자 탐색이 없는 작품 목록이므로 grid/gridcell 이 아니라 목록으로 둔다
+    <ul
       className={gridClasses}
-      role='grid'
       aria-label={`작품 갤러리 - ${artworks.length}개 작품`}
     >
       {artworks.map((artwork, index) => (
-        <div key={artwork.id} role='gridcell'>
+        <li key={artwork.id}>
           <ArtworkCardPortrait
             artwork={artwork}
             showMetadata={showMetadata}
             priority={index < 8} // Prioritize first 8 images for above-fold loading
             index={index}
           />
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 })
 

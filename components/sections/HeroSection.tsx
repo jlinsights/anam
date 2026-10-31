@@ -167,9 +167,9 @@ export function HeroSection({
                 {/* Artwork overlay */}
                 <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-all duration-500'>
                   <div className='absolute bottom-0 left-0 right-0 p-6 text-white'>
-                    <h3 className='text-xl font-medium mb-2'>
+                    <p className='text-xl font-medium mb-2'>
                       {featuredArtwork.title}
-                    </h3>
+                    </p>
                     <div className='flex items-center gap-3 text-sm opacity-90'>
                       <span>{featuredArtwork.year}</span>
                       <span>•</span>

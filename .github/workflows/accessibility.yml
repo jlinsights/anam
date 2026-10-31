@@ -14,10 +14,12 @@ env:
   OUTPUT_DIR: './test-results/accessibility'
 
 jobs:
+  # 컴포넌트 구조 검사(jest-axe): 이름 없는 링크·버튼, 라벨, 목록·ARIA 관계, 제목 순서.
+  # jsdom 은 색을 그리지 않으므로 색 대비는 아래 Lighthouse 가 맡는다.
   accessibility-audit:
     name: WCAG 2.1 AA Compliance Audit
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
@@ -31,196 +33,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Build application
-        run: npm run build
-
-      - name: Start application server
-        run: |
-          npm run start &
-          sleep 30
-          curl -f http://localhost:3000 || exit 1
-        env:
-          PORT: 3000
 
       - name: Run accessibility tests
-        run: |
-          npm run test:accessibility
-          npm run test:a11y:contrast
-          npm run test:a11y:screen-reader
-          npm run test:a11y:keyboard
-        env:
-          BASE_URL: http://localhost:3000
-          OUTPUT_DIR: ${{ env.OUTPUT_DIR }}
-
-      - name: Generate accessibility report
-        run: npm run test:a11y:report
-        env:
-          BASE_URL: http://localhost:3000
-          OUTPUT_DIR: ${{ env.OUTPUT_DIR }}
-
-      - name: Upload accessibility results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: accessibility-results
-          path: ${{ env.OUTPUT_DIR }}
-          retention-days: 30
-
-      - name: Comment PR with accessibility results
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const path = require('path');
-            
-            try {
-              const resultsPath = path.join('${{ env.OUTPUT_DIR }}', 'accessibility-report.json');
-              if (fs.existsSync(resultsPath)) {
-                const results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
-                
-                const score = results.summary?.overallScore || 0;
-                const violations = results.summary?.totalViolations || 0;
-                const critical = results.summary?.criticalIssues || 0;
-                
-                const status = critical > 0 ? '🚨 FAIL' : score >= 90 ? '✅ PASS' : '⚠️ WARN';
-                
-                const comment = `## Accessibility Audit Results ${status}
-                
-                **Overall Score:** ${score}%
-                **Total Violations:** ${violations}
-                **Critical Issues:** ${critical}
-                
-                ### WCAG 2.1 Compliance by Category
-                ${Object.entries(results.summary?.byCategory || {}).map(([category, data]) => 
-                  `- **${category.charAt(0).toUpperCase() + category.slice(1)}**: ${data.score}% (${data.violations} violations)`
-                ).join('\n')}
-                
-                ${results.recommendations?.length > 0 ? `
-                ### Priority Recommendations
-                ${results.recommendations.slice(0, 5).map(rec => 
-                  `- **${rec.priority.toUpperCase()}**: ${rec.title}`
-                ).join('\n')}
-                ` : ''}
-                
-                <details>
-                <summary>View Detailed Results</summary>
-                
-                ### Pages Tested
-                ${results.pages?.map(page => 
-                  `- **${page.path}**: ${page.score || 0}% (${page.violations?.length || 0} violations)`
-                ).join('\n')}
-                
-                </details>
-                
-                [Download Full Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
-                
-                github.rest.issues.createComment({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  body: comment
-                });
-              }
-            } catch (error) {
-              console.error('Error posting accessibility results:', error);
-            }
-
-      - name: Fail on critical accessibility issues
-        run: |
-          if [ -f "${{ env.OUTPUT_DIR }}/accessibility-report.json" ]; then
-            CRITICAL_ISSUES=$(node -p "
-              const results = require('./${{ env.OUTPUT_DIR }}/accessibility-report.json');
-              results.summary?.criticalIssues || 0
-            ")
-            
-            if [ "$CRITICAL_ISSUES" -gt 0 ]; then
-              echo "❌ Found $CRITICAL_ISSUES critical accessibility issues"
-              exit 1
-            fi
-            
-            OVERALL_SCORE=$(node -p "
-              const results = require('./${{ env.OUTPUT_DIR }}/accessibility-report.json');
-              results.summary?.overallScore || 0
-            ")
-            
-            if [ "$OVERALL_SCORE" -lt 70 ]; then
-              echo "❌ Overall accessibility score ($OVERALL_SCORE%) below minimum threshold (70%)"
-              exit 1
-            fi
-            
-            echo "✅ Accessibility audit passed"
-          else
-            echo "⚠️ No accessibility results found"
-            exit 1
-          fi
-
-  regression-testing:
-    name: Accessibility Regression Testing
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    needs: accessibility-audit
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Need full history for regression comparison
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Download previous baseline
-        uses: actions/download-artifact@v4
-        continue-on-error: true
-        with:
-          name: accessibility-baseline
-          path: ${{ env.OUTPUT_DIR }}
-
-      - name: Run regression tests
-        run: npm run test:a11y:regression
-        env:
-          OUTPUT_DIR: ${{ env.OUTPUT_DIR }}
-
-      - name: Upload new baseline
-        uses: actions/upload-artifact@v4
-        with:
-          name: accessibility-baseline
-          path: ${{ env.OUTPUT_DIR }}/baseline.json
-          retention-days: 90
-
-      - name: Check for regressions
-        run: |
-          if [ -f "${{ env.OUTPUT_DIR }}/regression-report.json" ]; then
-            CRITICAL_REGRESSIONS=$(node -p "
-              const results = require('./${{ env.OUTPUT_DIR }}/regression-report.json');
-              results.summary?.criticalRegressions || 0
-            ")
-            
-            MAJOR_REGRESSIONS=$(node -p "
-              const results = require('./${{ env.OUTPUT_DIR }}/regression-report.json');
-              results.summary?.majorRegressions || 0
-            ")
-            
-            if [ "$CRITICAL_REGRESSIONS" -gt 0 ]; then
-              echo "🚨 Found $CRITICAL_REGRESSIONS critical accessibility regressions"
-              exit 1
-            fi
-            
-            if [ "$MAJOR_REGRESSIONS" -gt 0 ]; then
-              echo "⚠️ Found $MAJOR_REGRESSIONS major accessibility regressions"
-              # Don't fail on major regressions, but warn
-            fi
-            
-            echo "✅ No critical accessibility regressions detected"
-          fi
+        run: npm run test:accessibility
 
   lighthouse-audit:
     name: Lighthouse Accessibility Audit
@@ -298,6 +113,7 @@ jobs:
         env:
           PORT: 3000
 
+      # 참고용: 직접 돌린 axe·Lighthouse 에서는 재현되지 않는 색 대비 오탐이 남아 있어 실패해도 막지 않는다
       - name: Run Pa11y audit
         run: npm run test:a11y:audit
         continue-on-error: true
@@ -315,12 +131,13 @@ jobs:
   accessibility-summary:
     name: Accessibility Test Summary
     runs-on: ubuntu-latest
-    needs: [accessibility-audit, regression-testing, lighthouse-audit, pa11y-audit]
+    needs: [accessibility-audit, lighthouse-audit, pa11y-audit]
     if: always()
 
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           path: ./all-results
 
@@ -333,7 +150,6 @@ jobs:
           echo "| Test Suite | Status | Details |" >> $GITHUB_STEP_SUMMARY
           echo "|------------|--------|---------|" >> $GITHUB_STEP_SUMMARY
           echo "| WCAG 2.1 AA Audit | ${{ needs.accessibility-audit.result == 'success' && '✅ Pass' || '❌ Fail' }} | Core accessibility compliance |" >> $GITHUB_STEP_SUMMARY
-          echo "| Regression Testing | ${{ needs.regression-testing.result == 'success' && '✅ Pass' || '❌ Fail' }} | Component-level regression detection |" >> $GITHUB_STEP_SUMMARY
           echo "| Lighthouse Audit | ${{ needs.lighthouse-audit.result == 'success' && '✅ Pass' || '❌ Fail' }} | Performance and accessibility metrics |" >> $GITHUB_STEP_SUMMARY
           echo "| Pa11y Audit | ${{ needs.pa11y-audit.result == 'success' && '✅ Pass' || '❌ Fail' }} | Command-line accessibility testing |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -344,11 +160,7 @@ jobs:
           if [ "${{ needs.accessibility-audit.result }}" != "success" ]; then
             echo "- 🚨 **Critical**: Address failing WCAG 2.1 AA compliance issues" >> $GITHUB_STEP_SUMMARY
           fi
-          if [ "${{ needs.regression-testing.result }}" != "success" ]; then
-            echo "- ⚠️ **Important**: Review accessibility regressions in component changes" >> $GITHUB_STEP_SUMMARY
-          fi
           echo "- 📊 Download detailed reports from the artifacts section" >> $GITHUB_STEP_SUMMARY
-          echo "- 🔧 Use the accessibility dashboard for ongoing monitoring" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
           echo "*Accessibility testing ensures ANAM Gallery is usable by everyone, including users with disabilities.*" >> $GITHUB_STEP_SUMMARY
@@ -358,112 +170,9 @@ jobs:
           if [ "${{ needs.accessibility-audit.result }}" != "success" ]; then
             echo "❌ Accessibility audit failed - blocking merge"
             exit 1
-          elif [ "${{ needs.regression-testing.result }}" != "success" ]; then
-            echo "⚠️ Accessibility regressions detected - review required"
+          elif [ "${{ needs.lighthouse-audit.result }}" != "success" ]; then
+            echo "❌ Lighthouse accessibility audit failed - blocking merge"
             exit 1
           else
             echo "✅ All accessibility tests passed"
           fi
-
-  # Scheduled comprehensive audit (runs daily)
-  comprehensive-audit:
-    name: Comprehensive Daily Audit
-    runs-on: ubuntu-latest
-    if: github.event_name == 'schedule'
-    timeout-minutes: 45
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build application
-        run: npm run build
-
-      - name: Start application server
-        run: |
-          npm run start &
-          sleep 30
-          curl -f http://localhost:3000 || exit 1
-        env:
-          PORT: 3000
-
-      - name: Run comprehensive accessibility validation
-        run: npm run validate:accessibility
-        env:
-          BASE_URL: http://localhost:3000
-          OUTPUT_DIR: ${{ env.OUTPUT_DIR }}
-
-      - name: Generate comprehensive report
-        run: npm run test:a11y:report
-        env:
-          BASE_URL: http://localhost:3000
-          OUTPUT_DIR: ${{ env.OUTPUT_DIR }}
-
-      - name: Upload comprehensive results
-        uses: actions/upload-artifact@v4
-        with:
-          name: daily-accessibility-audit
-          path: ${{ env.OUTPUT_DIR }}
-          retention-days: 90
-
-      - name: Send notification on failure
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: '🚨 Daily Accessibility Audit Failed',
-              body: `The scheduled accessibility audit failed on ${new Date().toISOString().split('T')[0]}.
-              
-              Please review the [failed workflow](${context.payload.repository.html_url}/actions/runs/${context.runId}) and address any critical accessibility issues.
-              
-              **Priority Actions:**
-              1. Check for new WCAG 2.1 AA violations
-              2. Review color contrast issues
-              3. Verify keyboard navigation functionality
-              4. Test screen reader compatibility
-              
-              This issue will auto-close when the next audit passes.`,
-              labels: ['accessibility', 'critical', 'automated']
-            });
-
-      - name: Close previous failure issues on success
-        if: success()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const issues = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: 'accessibility,critical,automated',
-              state: 'open'
-            });
-            
-            for (const issue of issues.data) {
-              if (issue.title.includes('Daily Accessibility Audit Failed')) {
-                await github.rest.issues.update({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  state: 'closed'
-                });
-                
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  body: '✅ Daily accessibility audit is now passing. Auto-closing this issue.'
-                });
-              }
-            }

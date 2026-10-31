@@ -235,7 +235,7 @@ export default function RootLayout({
           {/* Footer */}
           <footer className='bg-ink text-paper py-8'>
             <div className='container-art text-center'>
-              <p className='text-responsive-sm text-ink-light'>
+              <p className='text-responsive-sm text-paper'>
                 © 2025 {SITE_CONFIG.siteName} ({SITE_CONFIG.publisher})
               </p>
             </div>
