@@ -6,6 +6,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const require = createRequire(import.meta.url);
 
+// Dev-only allowance so impeccable live mode can load. Guarded by NODE_ENV.
+const __impeccableLiveDev =
+  process.env.NODE_ENV === "development" ? " http://localhost:8400" : "";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -232,11 +236,11 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' data:",
+              `script-src 'self' 'unsafe-eval' 'unsafe-inline' data:${__impeccableLiveDev}`,
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com data:",
               "font-src 'self' https://fonts.gstatic.com data:",
               "img-src 'self' data: blob: https://imagedelivery.net https://fonts.gstatic.com https://*.vercel.app",
-              "connect-src 'self'",
+              `connect-src 'self'${__impeccableLiveDev}`,
               "media-src 'self' data: blob:",
               "object-src 'none'",
               "base-uri 'self'",

@@ -45,3 +45,6 @@ next-env.d.ts
 # Playwright 결과물
 /test-results/
 /playwright-report/
+
+# impeccable live mode 세션 상태
+.impeccable/live/

@@ -1,18 +1,23 @@
 import { ClientLayout } from '@/components/client-layout'
 import type { Metadata } from 'next'
-import { Inter, Noto_Serif_KR } from 'next/font/google'
+import { IBM_Plex_Sans_KR, Noto_Serif_KR } from 'next/font/google'
 import './globals.css'
 import {
   SITE_CONFIG,
   generateStructuredData,
 } from '@/lib/constants/site-config'
 
-const inter = Inter({
+// 한글 UI 글자(메뉴·버튼·작품 정보)용 산세리프. Inter에는 한글이 없어 OS 기본 글꼴로 대체되던 것을 바꾼다
+const plexSansKR = IBM_Plex_Sans_KR({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-plex-sans-kr',
+  weight: ['300', '400', '500', '600', '700'],
   display: 'swap',
-  preload: true,
-  fallback: ['system-ui', 'arial'],
+  // 한글 글꼴은 구글이 유니코드 범위별로 수십 개 파일로 쪼개 주므로, preload를 켜면
+  // 굵기마다 모든 조각이 <link rel=preload>로 붙는다(홈 HTML 33KB → 116KB, 링크 374개).
+  // swap으로 대체 글꼴을 먼저 보여 주고 필요한 조각만 내려받게 둔다
+  preload: false,
+  fallback: ['Apple SD Gothic Neo', 'Malgun Gothic', 'sans-serif'],
 })
 
 const notoSerifKR = Noto_Serif_KR({
@@ -21,7 +26,7 @@ const notoSerifKR = Noto_Serif_KR({
   weight: ['400', '500', '600', '700'],
   display: 'swap',
   preload: true,
-  fallback: ['serif', 'Times New Roman'],
+  fallback: ['AppleMyungjo', 'Batang', 'serif'],
 })
 
 export const metadata: Metadata = {
@@ -164,32 +169,12 @@ export default function RootLayout({
         <style
           dangerouslySetInnerHTML={{
             __html: `
-            /* Optimized font fallbacks for CLS prevention */
-            @font-face {
-              font-family: 'Inter-fallback';
-              src: local('system-ui'), local('arial');
-              ascent-override: 90.2%;
-              descent-override: 22.5%;
-              line-gap-override: 0%;
-              font-display: optional;
-              size-adjust: 100%;
-            }
-            @font-face {
-              font-family: 'NotoSerifKR-fallback';
-              src: local('serif'), local('Times New Roman'), local('Noto Serif CJK KR');
-              ascent-override: 116%;
-              descent-override: 29%;
-              line-gap-override: 0%;
-              font-display: optional;
-              size-adjust: 100%;
-            }
-            
             /* Critical above-the-fold styles - LCP 최적화 */
             * { box-sizing: border-box; }
             body { 
               margin: 0; 
               padding: 0; 
-              font-family: var(--font-inter), 'Inter-fallback', system-ui, sans-serif;
+              font-family: var(--font-plex-sans-kr), 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
               line-height: 1.6;
               text-rendering: optimizeSpeed;
             }
@@ -242,7 +227,7 @@ export default function RootLayout({
         {/* ✅ SIMPLE ERROR PREVENTION - Basic only */}
       </head>
       <body
-        className={`${inter.variable} ${notoSerifKR.variable}`}
+        className={`${plexSansKR.variable} ${notoSerifKR.variable}`}
         suppressHydrationWarning
       >
         <ClientLayout>
