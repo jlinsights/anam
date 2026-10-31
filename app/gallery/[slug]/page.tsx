@@ -12,8 +12,11 @@ interface ArtworkPageProps {
 // Helper function to sanitize text for metadata
 function sanitizeText(text: string): string {
   if (!text || typeof text !== 'string') return ''
-  // Remove control characters and other problematic characters
-  return text.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim()
+  // 제어 문자를 지우되 줄바꿈(\n)과 탭은 남긴다. 작품 해설의 문단 줄바꿈이 사라지지 않게
+  return text
+    .replace(/\r\n?/g, '\n')
+    .replace(/[\x00-\x08\x0B-\x1F\x7F-\x9F]/g, '')
+    .trim()
 }
 
 export async function generateMetadata({

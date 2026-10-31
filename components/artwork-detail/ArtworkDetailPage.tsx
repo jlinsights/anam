@@ -1,12 +1,9 @@
-'use client'
-
-import { useState, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import Link from 'next/link'
 import type { Artwork, Artist } from '@/lib/types'
 import { ArtworkImage } from '@/components/common/ProgressiveImage'
 import { ArtworkErrorBoundary } from '@/components/error-boundary/ArtworkErrorBoundary'
+import { fullImageFor, sortByNumber } from '@/lib/artwork-full-image'
 
 interface ArtworkDetailPageProps {
   artwork: Artwork
@@ -14,355 +11,286 @@ interface ArtworkDetailPageProps {
   artist?: Artist
 }
 
+const RELATED_COUNT = 6
+
+// 표구한 족자처럼: 잘리지 않은 작품을 한지 여백과 먹선 2px 틀 안에 앉힌다 (DESIGN.md)
 export function ArtworkDetailPage({
   artwork,
   allArtworks,
   artist,
 }: ArtworkDetailPageProps) {
-  const router = useRouter()
-  const [imageLoaded, setImageLoaded] = useState(false)
+  const ordered = sortByNumber(allArtworks)
+  const index = ordered.findIndex((work) => work.id === artwork.id)
+  const previous = index > 0 ? ordered[index - 1] : null
+  const next =
+    index >= 0 && index < ordered.length - 1 ? ordered[index + 1] : null
+  const others = pickOthers(ordered, index)
+  const image = fullImageFor(artwork)
 
-  // Find related artworks (same year or medium)
-  const relatedArtworks = useMemo(() => {
-    return allArtworks
-      .filter(
-        (work) =>
-          work.id !== artwork.id &&
-          (work.year === artwork.year || work.medium === artwork.medium)
-      )
-      .slice(0, 6)
-  }, [allArtworks, artwork])
+  const facts = [
+    { label: '제작 연도', value: artwork.year ? `${artwork.year}년` : '' },
+    { label: '재료', value: artwork.medium },
+    { label: '크기', value: artwork.dimensions },
+  ].filter((fact) => fact.value)
 
-  // Find current artwork index for navigation
-  const currentIndex = useMemo(() => {
-    return allArtworks.findIndex((work) => work.id === artwork.id)
-  }, [allArtworks, artwork])
-
-  const previousArtwork =
-    currentIndex > 0 ? allArtworks[currentIndex - 1] : null
-  const nextArtwork =
-    currentIndex < allArtworks.length - 1 ? allArtworks[currentIndex + 1] : null
+  const inquiryHref = `/contact?artwork=${encodeURIComponent(artwork.title)}`
 
   return (
     <ArtworkErrorBoundary>
-      <div className='min-h-screen bg-gray-50 dark:bg-gray-900'>
-        {/* Header with navigation */}
-        <header className='sticky top-0 z-50 bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur-sm border-b-2 border-gray-800 dark:border-gray-200'>
-          <div className='max-w-7xl mx-auto px-8 py-4'>
-            <div className='flex justify-between items-center'>
-              <button
-                onClick={() => router.back()}
-                className='flex items-center text-gray-900 dark:text-white hover:text-yellow-600 transition-colors duration-300'
-              >
-                <span className='mr-2'>←</span>
-                <span className='font-display font-medium'>뒤로가기</span>
-              </button>
+      <div className='min-h-screen bg-paper text-ink'>
+        <nav aria-label='작품 이동' className='border-b-2 border-ink'>
+          <div className='max-w-7xl mx-auto px-6 md:px-8 h-16 flex items-center justify-between gap-6 font-body text-sm'>
+            <Link
+              href='/gallery'
+              className='inline-flex items-center gap-2 py-2 hover:text-ink-light transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold'
+            >
+              <span aria-hidden='true'>←</span>
+              작품 목록
+            </Link>
 
-              <div className='flex items-center space-x-4'>
-                {previousArtwork && (
-                  <Link
-                    href={`/gallery/${previousArtwork.slug}`}
-                    className='p-2 text-gray-900 dark:text-white hover:text-yellow-600 transition-colors duration-300'
-                    title='이전 작품'
-                  >
-                    ←
-                  </Link>
-                )}
-                <span className='font-display text-sm text-gray-600 dark:text-gray-400'>
-                  {currentIndex + 1} / {allArtworks.length}
+            <div className='flex items-center gap-1'>
+              <StepLink artwork={previous} direction='previous' />
+              {index >= 0 && (
+                <span className='px-3 tabular-nums text-ink-light'>
+                  {index + 1} / {ordered.length}
                 </span>
-                {nextArtwork && (
-                  <Link
-                    href={`/gallery/${nextArtwork.slug}`}
-                    className='p-2 text-gray-900 dark:text-white hover:text-yellow-600 transition-colors duration-300'
-                    title='다음 작품'
-                  >
-                    →
-                  </Link>
-                )}
-              </div>
+              )}
+              <StepLink artwork={next} direction='next' />
             </div>
           </div>
-        </header>
+        </nav>
 
-        <main className='max-w-7xl mx-auto px-6 py-16'>
-          {/* Main artwork section */}
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-16 items-start'>
-            {/* Artwork image */}
-            <motion.div
-              className='relative'
-              initial={{ opacity: 0, x: -40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+        <main className='max-w-7xl mx-auto px-6 md:px-8 py-12 md:py-20'>
+          <div className='grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start'>
+            <figure className='lg:col-span-7'>
+              <div className='border-2 border-ink bg-paper-warm p-5 md:p-10 flex justify-center'>
+                {image ? (
+                  <Image
+                    src={image.src}
+                    width={image.width}
+                    height={image.height}
+                    alt={`${artwork.title}, ${artist?.name ?? '아남 배옥영'} 작`}
+                    priority
+                    sizes='(min-width: 1280px) 680px, (min-width: 1024px) 55vw, 92vw'
+                    className='h-auto w-auto max-w-full max-h-[78vh] object-contain'
+                  />
+                ) : (
+                  <div className='relative w-full aspect-square'>
+                    <ArtworkImage
+                      artwork={artwork}
+                      size='large'
+                      className='absolute inset-0'
+                      priority
+                    />
+                  </div>
+                )}
+              </div>
+              {image && (
+                <figcaption className='mt-3 font-body text-xs text-ink-light'>
+                  <a
+                    href={image.src}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='underline underline-offset-4 hover:text-ink transition-colors duration-300'
+                  >
+                    큰 이미지로 보기
+                    <span className='sr-only'> (새 창)</span>
+                  </a>
+                </figcaption>
+              )}
+            </figure>
+
+            <section
+              aria-labelledby='artwork-title'
+              className='lg:col-span-5 lg:sticky lg:top-12'
             >
-              <div
-                className='
-              relative aspect-square bg-amber-50 dark:bg-amber-900 border-4 border-gray-900 dark:border-gray-100
-              shadow-lg hover:shadow-xl
-              transition-all duration-500
-              overflow-hidden
-            '
+              <h1
+                id='artwork-title'
+                className='font-display font-bold text-3xl md:text-4xl leading-tight tracking-[-0.02em] text-balance'
               >
-                <ArtworkImage
-                  artwork={artwork}
-                  size='large'
-                  className='absolute inset-4'
-                  priority={true}
-                  onLoad={() => setImageLoaded(true)}
-                  onError={() => {
-                    console.warn(
-                      'Failed to load artwork image for:',
-                      artwork.title
-                    )
-                    setImageLoaded(true) // Hide loading state even on error
-                  }}
-                  fallbackSrc='/Images/placeholder.jpg'
-                />
+                {artwork.title}
+              </h1>
+              <p className='mt-3 font-display text-ink-light'>
+                {artist?.name ?? '아남 배옥영'}
+              </p>
 
-                {/* Loading overlay */}
-                <AnimatePresence>
-                  {!imageLoaded && (
-                    <motion.div
-                      className='absolute inset-4 bg-orange-50 dark:bg-orange-900 flex items-center justify-center'
-                      initial={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.5 }}
+              {facts.length > 0 && (
+                <dl className='mt-10 border-t-2 border-ink font-body text-sm'>
+                  {facts.map((fact) => (
+                    <div
+                      key={fact.label}
+                      className='grid grid-cols-[6rem_1fr] gap-4 py-3 border-b border-stone'
                     >
-                      <div className='text-center'>
-                        <div className='w-12 h-12 border-2 border-gray-900 dark:border-gray-100 border-t-transparent rounded-full animate-spin mb-4'></div>
-                        <p className='font-display text-gray-600 dark:text-gray-400'>
-                          작품 이미지 로딩중...
-                        </p>
-                      </div>
-                    </motion.div>
+                      <dt className='text-ink-light'>{fact.label}</dt>
+                      <dd className='tabular-nums'>{fact.value}</dd>
+                    </div>
+                  ))}
+                  {artwork.available && (
+                    <div className='grid grid-cols-[6rem_1fr] gap-4 py-3 border-b border-stone'>
+                      <dt className='text-ink-light'>소장</dt>
+                      <dd className='inline-flex items-center gap-2'>
+                        <span
+                          aria-hidden='true'
+                          className='inline-block w-2 h-2 bg-gold'
+                        />
+                        소장 문의 가능
+                      </dd>
+                    </div>
                   )}
-                </AnimatePresence>
-              </div>
-            </motion.div>
+                </dl>
+              )}
 
-            {/* Artwork information */}
-            <motion.div
-              className='space-y-8'
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              <div>
-                <h1 className='font-calligraphy font-bold text-gray-900 dark:text-white text-3xl md:text-4xl mb-4'>
-                  {artwork.title}
-                </h1>
-                <div className='flex flex-wrap gap-2 text-lg font-display text-gray-600 dark:text-gray-400 mb-6'>
-                  <span>{artwork.year}년</span>
-                  {artwork.medium && (
-                    <>
-                      <span>•</span>
-                      <span>{artwork.medium}</span>
-                    </>
-                  )}
-                  {artwork.dimensions && (
-                    <>
-                      <span>•</span>
-                      <span>{artwork.dimensions}</span>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* Description */}
               {artwork.description && (
-                <motion.div
-                  className='bg-orange-50 dark:bg-orange-900 p-8 border-l-4 border-yellow-600'
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.4 }}
-                >
-                  <h3 className='font-display font-semibold text-gray-900 dark:text-white mb-4'>
-                    작품 해설
-                  </h3>
-                  <p className='font-display text-gray-900 dark:text-white leading-relaxed whitespace-pre-wrap'>
+                <div className='mt-10'>
+                  <h2 className='font-display font-bold text-lg'>작품 해설</h2>
+                  <p className='mt-3 font-display leading-[1.85] whitespace-pre-line max-w-[60ch]'>
                     {artwork.description}
                   </p>
-                </motion.div>
-              )}
-
-              {/* Artist notes */}
-              {artwork.artistNote && (
-                <motion.div
-                  className='bg-amber-50 dark:bg-amber-900 p-8 border-2 border-gray-900/20 dark:border-gray-100/20'
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.6 }}
-                >
-                  <h3 className='font-display font-semibold text-gray-900 dark:text-white mb-4'>
-                    작가 노트
-                  </h3>
-                  <blockquote className='font-display text-gray-600 dark:text-gray-400 italic leading-relaxed'>
-                    &quot;{artwork.artistNote}&quot;
-                  </blockquote>
-                  {artist?.name && (
-                    <cite className='block mt-4 text-sm text-gray-600 dark:text-gray-400'>
-                      - {artist.name}
-                    </cite>
-                  )}
-                </motion.div>
-              )}
-
-              {/* Technical details */}
-              <motion.div
-                className='grid grid-cols-1 gap-6'
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.8 }}
-              >
-                <div className='space-y-2'>
-                  <h4 className='font-display font-semibold text-gray-900 dark:text-white'>
-                    작품 정보
-                  </h4>
-                  <div className='space-y-1 text-sm text-gray-600 dark:text-gray-400'>
-                    <div>
-                      <strong>제작연도:</strong> {artwork.year}년
-                    </div>
-                    {artwork.medium && (
-                      <div>
-                        <strong>재료:</strong> {artwork.medium}
-                      </div>
-                    )}
-                    {artwork.dimensions && (
-                      <div>
-                        <strong>크기:</strong> {artwork.dimensions}
-                      </div>
-                    )}
-                    {artwork.price && (
-                      <div>
-                        <strong>가격:</strong> {artwork.price}
-                      </div>
-                    )}
-                    {artwork.tags && artwork.tags.length > 0 && (
-                      <div className='pt-2'>
-                        <strong>태그:</strong>
-                        <div className='flex flex-wrap gap-1 mt-1'>
-                          {artwork.tags.map((tag, index) => (
-                            <span
-                              key={index}
-                              className='px-2 py-1 bg-yellow-600/20 text-gray-900 dark:text-white text-xs rounded'
-                            >
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 </div>
-              </motion.div>
+              )}
 
-              {/* Action buttons */}
-              <motion.div
-                className='flex flex-col sm:flex-row gap-4 pt-6'
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1, delay: 1 }}
-              >
+              {artwork.artistNote && (
+                <blockquote className='mt-10 border-t border-stone pt-6 font-display leading-[1.85] whitespace-pre-line max-w-[60ch]'>
+                  {artwork.artistNote}
+                  <footer className='mt-3 font-body text-sm text-ink-light'>
+                    작가의 말
+                  </footer>
+                </blockquote>
+              )}
+
+              <div className='mt-12 flex flex-col sm:flex-row sm:items-center gap-5'>
                 <Link
-                  href={`/contact?artwork=${encodeURIComponent(artwork.title)}`}
-                  className='
-                  inline-block text-center px-8 py-4
-                  bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-body font-bold
-                  hover:bg-yellow-600 hover:text-gray-900
-                  transition-all duration-300
-                  shadow-lg hover:shadow-xl
-                  transform hover:-translate-x-1 hover:-translate-y-1
-                  border-4 border-gray-900 dark:border-gray-100 hover:border-yellow-600
-                '
+                  href={inquiryHref}
+                  className='inline-flex justify-center items-center px-8 py-4 bg-ink text-paper font-body font-medium border-2 border-ink hover:bg-paper hover:text-ink transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold'
                 >
                   이 작품 문의하기
                 </Link>
-
                 <Link
                   href='/artist'
-                  className='
-                  inline-block text-center px-8 py-4
-                  bg-white dark:bg-gray-800 border-4 border-gray-900 dark:border-gray-100 text-gray-900 dark:text-white font-display font-bold
-                  hover:bg-gray-900 dark:hover:bg-gray-100 hover:text-white dark:hover:text-gray-900
-                  transition-all duration-300
-                  shadow-lg hover:shadow-xl
-                  transform hover:translate-x-1 hover:translate-y-1
-                '
+                  className='font-body text-sm underline underline-offset-4 hover:text-ink-light transition-colors duration-300'
                 >
-                  작가 소개 보기
+                  작가 소개
                 </Link>
-              </motion.div>
-            </motion.div>
+              </div>
+            </section>
           </div>
 
-          {/* Related artworks */}
-          {relatedArtworks.length > 0 && (
-            <motion.section
-              className='mt-24 pt-16 border-t-2 border-gray-900/20 dark:border-gray-100/20'
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.2 }}
+          {others.length > 0 && (
+            <section
+              aria-labelledby='other-works'
+              className='mt-24 md:mt-32 pt-12 border-t-2 border-ink'
             >
-              <h2 className='font-calligraphy font-bold text-gray-900 dark:text-white text-2xl mb-8 text-center'>
-                관련 작품
-              </h2>
-
-              <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6'>
-                {relatedArtworks.map((relatedArtwork, index) => (
-                  <motion.div
-                    key={relatedArtwork.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 1.4 + index * 0.1 }}
-                  >
-                    <Link
-                      href={`/gallery/${relatedArtwork.slug}`}
-                      className='block group'
-                    >
-                      <div
-                        className='
-                      relative aspect-square bg-amber-50 dark:bg-amber-900 border-2 border-gray-900 dark:border-gray-100
-                      shadow-md group-hover:shadow-lg
-                      transition-all duration-300
-                      group-hover:-translate-x-1 group-hover:-translate-y-1
-                      overflow-hidden
-                    '
-                      >
-                        <ArtworkImage
-                          artwork={relatedArtwork}
-                          size='thumb'
-                          className='absolute inset-2'
-                        />
-
-                        <div
-                          className='
-                        absolute inset-0 bg-yellow-600/10 opacity-0 group-hover:opacity-100
-                        transition-opacity duration-300
-                        flex items-center justify-center
-                      '
-                        >
-                          <span className='font-display text-gray-900 dark:text-white text-xs'>
-                            보기
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className='mt-2 text-center'>
-                        <p className='font-display text-gray-900 dark:text-white text-sm font-medium truncate'>
-                          {relatedArtwork.title}
-                        </p>
-                        <p className='font-display text-gray-600 dark:text-gray-400 text-xs'>
-                          {relatedArtwork.year}년
-                        </p>
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))}
+              <div className='flex items-baseline justify-between gap-6'>
+                <h2
+                  id='other-works'
+                  className='font-display font-bold text-2xl'
+                >
+                  다른 작품
+                </h2>
+                <Link
+                  href='/gallery'
+                  className='font-body text-sm underline underline-offset-4 hover:text-ink-light transition-colors duration-300'
+                >
+                  전체 {ordered.length}점 보기
+                </Link>
               </div>
-            </motion.section>
+              <ul className='mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-6 gap-y-10'>
+                {others.map((work) => (
+                  <li key={work.id}>
+                    <OtherWork artwork={work} />
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
         </main>
       </div>
     </ArtworkErrorBoundary>
+  )
+}
+
+// 현재 작품 다음부터 번호 순으로 이어지는 작품들 (끝에 닿으면 처음으로 돈다)
+function pickOthers(ordered: Artwork[], index: number): Artwork[] {
+  if (ordered.length <= 1) return []
+  const start = index >= 0 ? index + 1 : 0
+  const count = Math.min(RELATED_COUNT, ordered.length - 1)
+  return Array.from(
+    { length: count },
+    (_, offset) => ordered[(start + offset) % ordered.length]
+  ).filter((work) => work !== ordered[index])
+}
+
+interface StepLinkProps {
+  artwork: Artwork | null
+  direction: 'previous' | 'next'
+}
+
+function StepLink({ artwork, direction }: StepLinkProps) {
+  const label = direction === 'previous' ? '이전 작품' : '다음 작품'
+  const arrow = direction === 'previous' ? '←' : '→'
+  const base =
+    'w-11 h-11 inline-flex items-center justify-center border-2 transition-colors duration-300'
+
+  if (!artwork) {
+    return (
+      <span
+        aria-hidden='true'
+        className={`${base} border-transparent text-ink-lighter`}
+      >
+        {arrow}
+      </span>
+    )
+  }
+
+  return (
+    <Link
+      href={`/gallery/${artwork.slug}`}
+      aria-label={`${label}: ${artwork.title}`}
+      title={artwork.title}
+      className={`${base} border-transparent hover:border-ink focus-visible:border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold`}
+    >
+      <span aria-hidden='true'>{arrow}</span>
+    </Link>
+  )
+}
+
+function OtherWork({ artwork }: { artwork: Artwork }) {
+  const image = fullImageFor(artwork)
+
+  return (
+    <Link
+      href={`/gallery/${artwork.slug}`}
+      className='group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold'
+    >
+      <div className='aspect-square border-2 border-ink bg-paper-warm p-3 transition-colors duration-300 group-hover:bg-paper-cream'>
+        {/* 세로로 긴 족자도 칸을 늘리지 않도록 정사각형 안에 채워 맞춘다 */}
+        <div className='relative w-full h-full'>
+          {image ? (
+            <Image
+              src={image.src}
+              fill
+              alt=''
+              sizes='(min-width: 1024px) 160px, (min-width: 640px) 30vw, 45vw'
+              className='object-contain'
+            />
+          ) : (
+            <ArtworkImage
+              artwork={artwork}
+              size='thumb'
+              alt=''
+              className='absolute inset-0'
+            />
+          )}
+        </div>
+      </div>
+      <p className='mt-3 font-display text-sm leading-snug group-hover:underline underline-offset-4'>
+        {artwork.title}
+      </p>
+      {artwork.year ? (
+        <p className='mt-1 font-body text-xs text-ink-light tabular-nums'>
+          {artwork.year}
+        </p>
+      ) : null}
+    </Link>
   )
 }
