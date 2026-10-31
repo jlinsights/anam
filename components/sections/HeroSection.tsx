@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { ChevronDown, Eye, Calendar, Palette } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { useThrottledMouseMove } from '@/lib/hooks/use-throttled-handlers'
 
 interface HeroSectionProps {
@@ -18,11 +18,6 @@ interface HeroSectionProps {
     year: string
     medium: string
   }
-  stats?: {
-    totalArtworks: number
-    yearsActive: number
-    exhibitions: number
-  }
 }
 
 export function HeroSection({
@@ -30,11 +25,6 @@ export function HeroSection({
   subtitle = '전통과 현대가 만나는 서예의 새로운 지평',
   description = '깊이 있는 전통 서예 기법과 현대적 감각이 조화를 이루는 독창적인 작품 세계를 만나보세요.',
   featuredArtwork,
-  stats = {
-    totalArtworks: 58,
-    yearsActive: 30,
-    exhibitions: 25,
-  },
 }: HeroSectionProps) {
   const heroRef = useRef<HTMLDivElement>(null)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -126,50 +116,6 @@ export function HeroSection({
             >
               {description}
             </motion.p>
-
-            {/* Stats */}
-            <motion.div
-              className='grid grid-cols-3 gap-8'
-              initial={{ opacity: 0, y: 20 }}
-              animate={isVisible ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.8 }}
-            >
-              <div className='text-center'>
-                <div className='flex items-center justify-center mb-2'>
-                  <Palette className='w-5 h-5 text-gray-500 mr-2' />
-                </div>
-                <div className='text-3xl font-bold text-gray-900 dark:text-white'>
-                  {stats.totalArtworks}
-                </div>
-                <div className='text-sm text-gray-600 dark:text-gray-400'>
-                  작품
-                </div>
-              </div>
-
-              <div className='text-center'>
-                <div className='flex items-center justify-center mb-2'>
-                  <Calendar className='w-5 h-5 text-gray-500 mr-2' />
-                </div>
-                <div className='text-3xl font-bold text-gray-900 dark:text-white'>
-                  {stats.yearsActive}
-                </div>
-                <div className='text-sm text-gray-600 dark:text-gray-400'>
-                  년 경력
-                </div>
-              </div>
-
-              <div className='text-center'>
-                <div className='flex items-center justify-center mb-2'>
-                  <Eye className='w-5 h-5 text-gray-500 mr-2' />
-                </div>
-                <div className='text-3xl font-bold text-gray-900 dark:text-white'>
-                  {stats.exhibitions}
-                </div>
-                <div className='text-sm text-gray-600 dark:text-gray-400'>
-                  전시회
-                </div>
-              </div>
-            </motion.div>
 
             {/* CTA Buttons */}
             <motion.div

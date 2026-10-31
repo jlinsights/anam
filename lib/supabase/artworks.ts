@@ -4,6 +4,7 @@
  */
 
 import { createSupabaseClient } from './server'
+import { realText } from '@/lib/content-text'
 import type { Tables } from './database.types'
 import type { Artwork, Artist } from '@/lib/types'
 import { captureError } from '@/lib/error-logger'
@@ -22,11 +23,11 @@ function mapArtworkRow(row: ArtworkRow): Artwork {
     medium: row.medium,
     dimensions: row.dimensions || '70 x 140 cm',
     aspectRatio: row.aspect_ratio || '2/1',
-    description: row.description || '',
+    description: realText(row.description ?? undefined),
     imageUrl: row.image_path || '',
     imageUrlQuery: row.image_url_query || undefined,
     number: row.number || undefined,
-    artistNote: row.artist_note || undefined,
+    artistNote: realText(row.artist_note ?? undefined) || undefined,
     featured: row.featured || false,
     category: row.category || undefined,
     tags: row.tags || [],

@@ -28,22 +28,6 @@ export default async function ArtistPage() {
 
   return (
     <div className='min-h-screen bg-white dark:bg-gray-900'>
-      {/* Page Header */}
-      <div className='bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-b border-gray-200 dark:border-gray-800'>
-        <div className='max-w-7xl mx-auto px-6 py-12'>
-          <div className='text-center'>
-            <h1 className='font-calligraphy font-bold text-gray-900 dark:text-white text-4xl md:text-5xl mb-4'>
-              작가 소개
-            </h1>
-            <p className='font-display text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto'>
-              전통의 깊이와 현대적 감각을 조화시키며, 한국 미학의 정수를 현대적
-              언어로 재해석하는 서예 작가
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Enhanced Artist Section */}
       <EnhancedArtistSection artist={artist || undefined} />
 
       {/* Bottom Navigation */}
