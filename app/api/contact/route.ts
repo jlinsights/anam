@@ -87,8 +87,12 @@ export async function POST(request: NextRequest) {
         },
       })
 
+      // 방문자 입력은 위 sanitizeObject(stripTags)에서 이미 HTML 인코딩되어 있다.
+      // 여기서 다시 이스케이프하면 &amp;amp; · &#x2F; 처럼 이중 인코딩되어 메일 본문이 깨진다
       // 이메일 내용 구성
       const mailOptions = {
+        // 받은 메일에서 바로 답장하면 문의자에게 가도록
+        replyTo: validatedData.email,
         from: `"아남 갤러리 문의" <${process.env.SMTP_USER}>`,
         to: process.env.CONTACT_EMAIL || 'heelang@orientalcalligraphy.org',
         subject: `[아남 갤러리 문의] ${validatedData.subject}`,
