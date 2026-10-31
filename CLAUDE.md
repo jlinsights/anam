@@ -302,7 +302,7 @@ NEXT_PUBLIC_SITE_URL=https://anam-gallery.vercel.app
 ## Testing Strategy
 
 - **Unit Tests**: Jest + Testing Library for components
-- **Coverage Target**: 70% minimum across functions, lines, branches, statements
+- **커버리지 하한 (래칫)**: `jest.config.js` 의 `coverageThreshold` 는 목표치가 아니라 지금 실측의 바닥값이다(2026-10-31 기준 약 4%). 테스트를 늘려 실측이 오르면 값을 올리고, 내리지 않는다
 - **Test Files**: `__tests__/` directory and `*.test.tsx` files
 - **Mocking**: Airtable API calls mocked for reliable testing
 - **🆕 Design System Tests**: Specific tests for Zen Brutalism components and
