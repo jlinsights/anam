@@ -1,1 +1,1 @@
-🐛 홈 작품 갤러리 무한 로딩 수정(useFetch 재렌더·StrictMode 시 요청 취소·loading 고착), 꾸며 낸 다가오는 전시를 실제 전시 이력으로 교체(fallback 의 지어낸 전시 제거), 푸터 하나로 통합·보강
+♻️ /api/artworks·/api/artist 캐시를 lib/cache 로 옮겨 동기화 직후 같은 서버에서 새 데이터를 주게 함(Codex 리뷰 #21)

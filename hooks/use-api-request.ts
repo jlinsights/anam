@@ -245,92 +245,31 @@ export function useFetch<T>(
   const fetchOptionsRef = useRef(fetchOptions)
   fetchOptionsRef.current = fetchOptions
 
+  // 실패는 오류로 던진다. 예전에는 /api/artworks·/api/artist 실패 시 지어낸 작품 61점·작가 정보를
+  // 성공 데이터처럼 돌려줘 화면에 실제처럼 나왔다
   const requestFn = useCallback(
     async (signal: AbortSignal): Promise<T> => {
-      try {
-        const response = await fetch(url, {
-          ...fetchOptionsRef.current,
-          signal,
-        })
+      const response = await fetch(url, {
+        ...fetchOptionsRef.current,
+        signal,
+      })
 
-        if (!response.ok) {
-          console.error(
-            `API error for ${url}:`,
-            response.status,
-            response.statusText
-          )
-
-          // For artworks API, try to use fallback data from local module
-          if (url.includes('/api/artworks')) {
-            console.warn('🔄 API failed, attempting to use fallback data')
-            try {
-              const { fallbackArtworksData } = await import('@/lib/artworks')
-              return fallbackArtworksData as unknown as T
-            } catch (importError) {
-              console.error('Failed to import fallback data:', importError)
-              throw new Error(`HTTP error! status: ${response.status}`)
-            }
-          }
-
-          // For artist API, try to use fallback data
-          if (url.includes('/api/artist')) {
-            console.warn(
-              '🔄 Artist API failed, attempting to use fallback data'
-            )
-            try {
-              const { fallbackArtistData } = await import('@/lib/artworks')
-              return fallbackArtistData as unknown as T
-            } catch (importError) {
-              console.error(
-                'Failed to import fallback artist data:',
-                importError
-              )
-              throw new Error(`HTTP error! status: ${response.status}`)
-            }
-          }
-
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-
-        const contentType = response.headers.get('content-type')
-        if (contentType && contentType.includes('application/json')) {
-          const result = await response.json()
-          return result.data ?? result
-        }
-
-        return response.text() as unknown as T
-      } catch (error) {
-        // If it's an AbortError, re-throw it
-        if ((error as Error).name === 'AbortError') {
-          throw error
-        }
-
-        // For other errors on artworks endpoint, try fallback
-        if (url.includes('/api/artworks')) {
-          console.warn('🔄 Request failed, attempting to use fallback data')
-          try {
-            const { fallbackArtworksData } = await import('@/lib/artworks')
-            return fallbackArtworksData as unknown as T
-          } catch (importError) {
-            console.error('Failed to import fallback data:', importError)
-          }
-        }
-
-        // For other errors on artist endpoint, try fallback
-        if (url.includes('/api/artist')) {
-          console.warn(
-            '🔄 Artist request failed, attempting to use fallback data'
-          )
-          try {
-            const { fallbackArtistData } = await import('@/lib/artworks')
-            return fallbackArtistData as unknown as T
-          } catch (importError) {
-            console.error('Failed to import fallback artist data:', importError)
-          }
-        }
-
-        throw error
+      if (!response.ok) {
+        console.error(
+          `API error for ${url}:`,
+          response.status,
+          response.statusText
+        )
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
+
+      const contentType = response.headers.get('content-type')
+      if (contentType && contentType.includes('application/json')) {
+        const result = await response.json()
+        return result.data ?? result
+      }
+
+      return response.text() as unknown as T
     },
     [url]
   )

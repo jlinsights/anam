@@ -2,60 +2,56 @@ import {
   fetchArtworksFromSupabase,
   fetchArtworkBySlugFromSupabase,
 } from '@/lib/supabase/artworks'
-import { fallbackArtworksData } from '@/lib/artworks'
-import {
-  createErrorResponse,
-  createSuccessResponse,
-  handleExternalServiceError,
-} from '@/lib/error-handler'
+import { createErrorResponse, createSuccessResponse } from '@/lib/error-handler'
+import { clearCache, getCachedData, setCachedData } from '@/lib/cache'
 import { withRateLimit } from '@/lib/rate-limit'
+import { hasBearerSecret } from '@/lib/server-secret'
 import type { Artwork } from '@/lib/types'
 import { NextRequest, NextResponse } from 'next/server'
 
-// 캐시 설정
-let cachedArtworks: Artwork[] | null = null
-let cacheTimestamp = 0
+// 캐시: lib/cache 의 공용 저장소에 둔다. 동기화(clearCacheAndRevalidate)가 함께 비우게 하려고
+// 모듈 변수 대신 여기 둔다(예전에는 동기화 뒤에도 최대 1분간 이전 데이터를 줬다)
+const CACHE_KEY = 'api:artworks'
 const CACHE_DURATION = 1 * 60 * 1000 // 1분
 
-async function getCachedArtworks(): Promise<Artwork[]> {
-  const now = Date.now()
-
-  // 캐시가 유효한지 확인
-  if (cachedArtworks && now - cacheTimestamp < CACHE_DURATION) {
+// 실제 작품만 캐시한다. 못 받으면 null 을 돌려주고 캐시하지 않는다(복구되면 다음 요청에서 바로 실제 데이터).
+// 예전에는 실패 시 지어낸 작품 61점을 돌려주고 그것까지 캐시했다
+async function getCachedArtworks(): Promise<Artwork[] | null> {
+  const cached = getCachedData(CACHE_KEY) as Artwork[] | null
+  if (cached) {
     console.log('📦 Using cached artworks data')
-    return cachedArtworks
+    return cached
   }
 
-  // 새로운 데이터 가져오기 (Supabase 우선, 실패 시 fallback)
   try {
     const artworks = await fetchArtworksFromSupabase()
-
     if (artworks && artworks.length > 0) {
-      cachedArtworks = artworks
-      cacheTimestamp = now
+      setCachedData(CACHE_KEY, artworks, CACHE_DURATION)
       console.log(`✅ Cached ${artworks.length} artworks from Supabase`)
       return artworks
-    } else {
-      console.warn('⚠️ No artworks from Supabase, using fallback data')
-      cachedArtworks = fallbackArtworksData
-      cacheTimestamp = now
-      return fallbackArtworksData
     }
+    console.warn('⚠️ No artworks from Supabase')
+    return null
   } catch (error) {
-    console.error(
-      '❌ Error fetching artworks from Supabase, using fallback data:',
-      error
-    )
-    cachedArtworks = fallbackArtworksData
-    cacheTimestamp = now
-    return fallbackArtworksData
+    console.error('❌ Error fetching artworks from Supabase:', error)
+    return null
   }
+}
+
+function artworksUnavailable() {
+  return NextResponse.json(
+    {
+      success: false,
+      message: '작품 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.',
+      data: null,
+    },
+    { status: 503 }
+  )
 }
 
 // 캐시 무효화 함수
 function invalidateCache() {
-  cachedArtworks = null
-  cacheTimestamp = 0
+  clearCache()
   console.log('🗑️ Cache invalidated')
 }
 
@@ -66,11 +62,6 @@ export async function GET(request: NextRequest) {
       const slug = searchParams.get('slug')
 
       const artworks = await getCachedArtworks()
-
-      // getCachedArtworks() now always returns fallback data, so artworks should never be empty
-      // But let's add a final safety net just in case
-      const finalArtworks =
-        artworks && artworks.length > 0 ? artworks : fallbackArtworksData
 
       // 특정 slug가 요청된 경우 (Supabase에서 직접 조회 시도)
       if (slug) {
@@ -90,8 +81,10 @@ export async function GET(request: NextRequest) {
           )
         }
 
+        if (!artworks) return artworksUnavailable()
+
         // Fallback to cached artworks
-        const artwork = finalArtworks.find(
+        const artwork = artworks.find(
           (artwork: Artwork) => artwork.slug === slug
         )
         return NextResponse.json(
@@ -104,15 +97,17 @@ export async function GET(request: NextRequest) {
         )
       }
 
+      if (!artworks) return artworksUnavailable()
+
       // 모든 작품 반환
       return NextResponse.json({
         success: true,
-        message: `Found ${finalArtworks.length} artworks`,
-        data: finalArtworks,
+        message: `Found ${artworks.length} artworks`,
+        data: artworks,
       })
     } catch (error) {
-      // Return fallback data with proper error handling
-      return handleExternalServiceError(error, fallbackArtworksData)
+      console.error('❌ GET /api/artworks failed:', error)
+      return artworksUnavailable()
     }
   })
 }
@@ -124,11 +119,20 @@ export async function POST(request: NextRequest) {
       const { searchParams } = new URL(request.url)
       const action = searchParams.get('action')
 
+      // 인증 없이 열려 있으면 누구나 캐시를 비우고 데이터를 다시 불러오게 할 수 있다
+      if (!hasBearerSecret(request.headers, 'REVALIDATE_SECRET')) {
+        return NextResponse.json(
+          { success: false, message: 'Unauthorized' },
+          { status: 401 }
+        )
+      }
+
       if (action === 'refresh') {
         invalidateCache()
 
         // 새로운 데이터 즉시 가져오기
         const artworks = await getCachedArtworks()
+        if (!artworks) return artworksUnavailable()
 
         return NextResponse.json({
           success: true,

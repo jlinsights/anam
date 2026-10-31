@@ -163,7 +163,7 @@ ANAM/
 │
 ├── lib/                          # Core utilities and data management
 │   ├── airtable.ts               # Airtable CMS integration
-│   ├── artworks.ts               # Artwork data with fallback system (58 works)
+│   ├── artworks.ts               # 작품 로더: 서버 getArtworks()(Supabase→Airtable), 클라이언트 fetchArtworksFromApi()
 │   ├── types.ts                  # TypeScript interfaces
 │   ├── utils.ts                  # Common utilities
 │   └── image-utils.ts            # Image optimization utilities
@@ -184,9 +184,10 @@ The project uses a sophisticated dual-data system:
    - `Artist` table: artist bio, exhibitions, awards, contact info
    - Environment variables: `AIRTABLE_API_KEY`, `AIRTABLE_BASE_ID`
 
-2. **Fallback System**: Local static data in `lib/artworks.ts`
-   - Ensures site functionality even if Airtable is unavailable
-   - Contains 58 predefined artworks with complete metadata
+2. **지어낸 fallback 없음** (2026-11-01): 실제 데이터를 못 받으면 비어 있거나 오류(503)다
+   - 예전 `fallbackArtworksData`(영어 제목 61점)·`fallbackArtistData`(수상·생년 등)는 실제처럼 화면에 나와 삭제했다. 다시 만들지 않는다
+   - 운영 데이터는 Supabase 에서 읽는다(원본 Airtable, `scripts/migrate-airtable-to-supabase`)
+   - 클라이언트 컴포넌트는 `getArtworks()` 를 부르지 않는다 — 브라우저에는 데이터 출처 키가 없다. `/api/artworks`(`useArtworks`·`fetchArtworksFromApi`)를 쓴다
 
 3. **Image Management**:
    - Local images in `/public/Images/Artworks/{year}/`
@@ -247,7 +248,7 @@ The project uses a sophisticated dual-data system:
 
 #### **🎨 Gallery & Artwork Management**
 
-- **58 Artworks**: Real-time Airtable integration with local fallback
+- **Artworks**: Supabase(원본 Airtable) 실시간 연동, 실패 시 오류 표시
 - **Responsive Grid**: 4x3 (desktop) → 3x4 (tablet) → 2x6 (mobile)
 - **Advanced Search**: Real-time filtering by title, year, medium, category
 - **Lightbox Modal**: Full-screen artwork viewing with keyboard navigation
@@ -323,8 +324,7 @@ NEXT_PUBLIC_SITE_URL=https://anam-gallery.vercel.app
 ### Adding New Artwork
 
 1. Add optimized images to `/public/Images/Artworks/{year}/`
-2. Update Airtable `Artworks` table OR modify `fallbackArtworksData` in
-   `lib/artworks.ts`
+2. Airtable `Artworks` 표를 고치고 Supabase 로 이관한다 (코드에 작품 데이터를 넣지 않는다)
 3. Ensure slug follows pattern: `anam-{title}-{year}`
 
 ### 🆕 **Working with Zen Brutalism Components**
