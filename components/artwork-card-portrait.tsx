@@ -110,7 +110,7 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
               >
                 <span className='text-xs'>🖼</span>
               </div>
-              <span className='font-display text-paper text-sm font-medium block'>
+              <span className='font-body text-paper text-sm font-medium block'>
                 작품 상세보기
               </span>
               <div className='text-xs text-paper/80 mt-1'>
@@ -137,7 +137,9 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
                   aria-hidden='true'
                 />
                 <dt className='sr-only'>제작년도:</dt>
-                <dd className='font-display text-sm'>{artwork.year}년</dd>
+                <dd className='font-body text-sm tabular-nums'>
+                  {artwork.year}년
+                </dd>
               </div>
 
               {/* Medium */}
@@ -148,7 +150,7 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
                     aria-hidden='true'
                   />
                   <dt className='sr-only'>재료:</dt>
-                  <dd className='font-display text-sm line-clamp-1'>
+                  <dd className='font-body text-sm line-clamp-1'>
                     {artwork.medium}
                   </dd>
                 </div>
@@ -159,7 +161,7 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
                 <div className='flex items-center gap-2 text-ink-light'>
                   <Ruler className='w-4 h-4 flex-shrink-0' aria-hidden='true' />
                   <dt className='sr-only'>크기:</dt>
-                  <dd className='font-display text-sm line-clamp-1'>
+                  <dd className='font-body text-sm tabular-nums line-clamp-1'>
                     {artwork.dimensions}
                   </dd>
                 </div>
@@ -170,12 +172,12 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
             {(artwork.series || artwork.technique) && (
               <div className='pt-zen-xs border-t border-stone/20'>
                 {artwork.series && (
-                  <p className='font-display text-xs text-ink-light'>
+                  <p className='font-body text-xs text-ink-light'>
                     시리즈: {artwork.series}
                   </p>
                 )}
                 {artwork.technique && (
-                  <p className='font-display text-xs text-ink-light mt-1'>
+                  <p className='font-body text-xs text-ink-light mt-1'>
                     기법: {artwork.technique}
                   </p>
                 )}
@@ -188,7 +190,7 @@ export const ArtworkCardPortrait = memo(function ArtworkCardPortrait({
                 <span
                   className='
                   inline-block px-2 py-1 
-                  bg-gold text-ink text-xs font-display font-bold
+                  bg-gold text-ink text-xs font-body font-bold
                   border border-ink
                 '
                 >

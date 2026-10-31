@@ -1,1 +1,1 @@
-🧪 검사 정상화: 깨진 테스트 28개를 __tests__/_quarantine 으로 격리, 남은 타입 오류 수정(/aceternity-demo 마우스 이동 시 크래시 포함)
+🔤 글꼴 역할 정리(Inter→IBM Plex Sans KR, 제목·본문은 Noto Serif KR, 큰 제목 자간 좁힘) 및 PRODUCT.md·DESIGN.md 디자인 체계 문서 추가

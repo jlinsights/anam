@@ -118,7 +118,7 @@ export function GallerySection({
               className='
                 px-zen-md py-zen-sm border-2 border-ink
                 bg-paper focus:bg-paper-warm
-                font-display text-ink
+                font-body text-ink
                 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20
                 transition-colors duration-300
                 w-64
@@ -152,7 +152,7 @@ export function GallerySection({
               className='
                 px-zen-md py-zen-sm border-2 border-ink
                 bg-paper focus:bg-paper-warm
-                font-display text-ink
+                font-body text-ink
                 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20
                 transition-colors duration-300
               '
@@ -175,7 +175,7 @@ export function GallerySection({
             <button
               onClick={clearFilters}
               className='
-                px-zen-sm py-zen-xs text-sm font-display
+                px-zen-sm py-zen-xs text-sm font-body
                 text-ink-light hover:text-gold
                 border border-ink/20 hover:border-gold
                 transition-colors duration-300
@@ -198,7 +198,7 @@ export function GallerySection({
         viewport={{ once: true }}
       >
         <p
-          className='font-display text-ink-light text-sm'
+          className='font-body text-ink-light text-sm'
           role='status'
           aria-live='polite'
           aria-label={`검색 결과: ${filteredArtworks.length}개 작품 ${searchTerm || selectedYear ? '검색됨' : '전체'}`}
@@ -242,14 +242,14 @@ export function GallerySection({
           >
             검색 결과가 없습니다
           </h2>
-          <p className='font-display text-ink-light text-sm mb-zen-md'>
+          <p className='font-body text-ink-light text-sm mb-zen-md'>
             다른 검색어나 필터를 시도해보세요
           </p>
           <button
             onClick={clearFilters}
             className='
               px-zen-md py-zen-sm
-              bg-ink text-paper font-display
+              bg-ink text-paper font-body
               hover:bg-gold transition-colors duration-300
               focus:outline-none focus:ring-2 focus:ring-gold/20
             '
