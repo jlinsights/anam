@@ -1,5 +1,19 @@
-import { http, HttpResponse } from 'msw'
+import { http, HttpResponse, type DefaultBodyType, type PathParams } from 'msw'
 import type { Artwork, Artist } from '@/lib/types'
+
+// 성공·실패 응답을 한 핸들러에서 함께 돌려주므로 응답 본문을 공통 봉투 타입으로 묶는다
+interface ApiEnvelope {
+  success: boolean
+  data?: unknown
+  error?: { message: string; code: string; statusCode: number }
+  timestamp: string
+}
+
+interface ContactBody {
+  name?: string
+  email?: string
+  message?: string
+}
 
 // Mock 데이터
 export const mockArtworks: Artwork[] = [
@@ -181,7 +195,7 @@ export const apiHandlers = [
   }),
 
   // 개별 아트워크 API
-  http.get('/api/artworks/:slug', ({ params }) => {
+  http.get<PathParams, DefaultBodyType, ApiEnvelope>('/api/artworks/:slug', ({ params }) => {
     const { slug } = params
     const artwork = mockArtworks.find(art => art.slug === slug)
     
@@ -217,11 +231,11 @@ export const apiHandlers = [
   }),
 
   // 연락처 폼 API
-  http.post('/api/contact', async ({ request }) => {
+  http.post<PathParams, ContactBody, ApiEnvelope>('/api/contact', async ({ request }) => {
     const body = await request.json()
     
     // 유효성 검사 시뮬레이션
-    if (!body.name || !body.email || !body.message) {
+    if (!body?.name || !body?.email || !body?.message) {
       return HttpResponse.json(
         {
           success: false,

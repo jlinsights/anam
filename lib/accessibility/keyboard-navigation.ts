@@ -470,10 +470,8 @@ export class KeyboardNavigationTesting {
 
     // Find trigger button
     const trigger =
-      dropdown.closest('[aria-haspopup]') ||
-      (document.querySelector(
-        `[aria-controls="${dropdown.id}"]`
-      ) as HTMLElement)
+      dropdown.closest<HTMLElement>('[aria-haspopup]') ||
+      document.querySelector<HTMLElement>(`[aria-controls="${dropdown.id}"]`)
 
     const initialFocus = trigger
       ? this.testDropdownInitialFocus(
@@ -1090,7 +1088,7 @@ export class KeyboardNavigationTesting {
 
     return (
       interactiveTags.includes(tagName) ||
-      (role && interactiveRoles.includes(role))
+      (role !== null && interactiveRoles.includes(role))
     )
   }
 

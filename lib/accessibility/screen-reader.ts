@@ -905,7 +905,7 @@ export class ScreenReaderTesting {
     })
 
     const averageScore =
-      scores.reduce((sum, score) => sum + score, 0) / scores.length
+      scores.reduce<number>((sum, score) => sum + score, 0) / scores.length
     const issuesPenalty = Math.min(
       results.reduce((sum, r) => sum + r.issues.length, 0) * 5,
       50

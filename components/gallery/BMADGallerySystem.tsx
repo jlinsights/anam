@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { motion, useAnimation, useInView, AnimatePresence } from 'framer-motion'
-import { useThrottle } from '@/lib/hooks/use-throttled-handlers'
 import { cn } from '@/lib/utils'
 import type { Artwork } from '@/lib/types'
 import Image from 'next/image'

@@ -142,12 +142,12 @@ export const THROTTLE_DELAYS = {
  * Creates a throttled mouse move handler optimized for tracking
  */
 export function createThrottledMouseHandler<
-  T extends (event: MouseEvent | React.MouseEvent) => void,
+  E extends MouseEvent | React.MouseEvent,
 >(
-  handler: T,
+  handler: (event: E) => void,
   delay: number = THROTTLE_DELAYS.MOUSE_MOVE
-): ThrottledFunction<T> {
-  return throttleAnimationFrame(handler) as ThrottledFunction<T>
+): ThrottledFunction<(event: E) => void> {
+  return throttleAnimationFrame(handler)
 }
 
 /**
@@ -222,15 +222,18 @@ export function useThrottleAnimationFrame<T extends (...args: any[]) => any>(
   return React.useMemo(() => throttleAnimationFrame(func), [func, ...deps])
 }
 
+export interface ThrottleMetric {
+  calls: number
+  throttled: number
+  lastCall: number
+}
+
 /**
  * Performance monitoring for throttled functions
  */
 export class ThrottleMonitor {
   private static instance: ThrottleMonitor
-  private metrics: Map<
-    string,
-    { calls: number; throttled: number; lastCall: number }
-  > = new Map()
+  private metrics: Map<string, ThrottleMetric> = new Map()
 
   static getInstance(): ThrottleMonitor {
     if (!ThrottleMonitor.instance) {
@@ -251,7 +254,12 @@ export class ThrottleMonitor {
     this.metrics.set(name, metric)
   }
 
-  getMetrics(name?: string) {
+  // 이름을 주면 그 항목 하나, 안 주면 전체 맵: 호출부가 두 모양을 구분할 수 있게 오버로드로 나눈다
+  getMetrics(): Record<string, ThrottleMetric>
+  getMetrics(name: string): ThrottleMetric | undefined
+  getMetrics(
+    name?: string
+  ): Record<string, ThrottleMetric> | ThrottleMetric | undefined {
     if (name) return this.metrics.get(name)
     return Object.fromEntries(this.metrics.entries())
   }

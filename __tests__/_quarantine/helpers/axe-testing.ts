@@ -9,7 +9,7 @@ import {
   ACCESSIBILITY_CONFIG,
   AccessibilityTestResult,
   AccessibilityViolation,
-} from './index'
+} from '@/lib/accessibility'
 
 // Configure axe for optimal testing
 const axeConfig: Spec = {
