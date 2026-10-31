@@ -3,31 +3,30 @@ import {
   fetchArtworkBySlugFromSupabase,
 } from '@/lib/supabase/artworks'
 import { createErrorResponse, createSuccessResponse } from '@/lib/error-handler'
+import { clearCache, getCachedData, setCachedData } from '@/lib/cache'
 import { withRateLimit } from '@/lib/rate-limit'
 import { hasBearerSecret } from '@/lib/server-secret'
 import type { Artwork } from '@/lib/types'
 import { NextRequest, NextResponse } from 'next/server'
 
-// 캐시 설정
-let cachedArtworks: Artwork[] | null = null
-let cacheTimestamp = 0
+// 캐시: lib/cache 의 공용 저장소에 둔다. 동기화(clearCacheAndRevalidate)가 함께 비우게 하려고
+// 모듈 변수 대신 여기 둔다(예전에는 동기화 뒤에도 최대 1분간 이전 데이터를 줬다)
+const CACHE_KEY = 'api:artworks'
 const CACHE_DURATION = 1 * 60 * 1000 // 1분
 
 // 실제 작품만 캐시한다. 못 받으면 null 을 돌려주고 캐시하지 않는다(복구되면 다음 요청에서 바로 실제 데이터).
 // 예전에는 실패 시 지어낸 작품 61점을 돌려주고 그것까지 캐시했다
 async function getCachedArtworks(): Promise<Artwork[] | null> {
-  const now = Date.now()
-
-  if (cachedArtworks && now - cacheTimestamp < CACHE_DURATION) {
+  const cached = getCachedData(CACHE_KEY) as Artwork[] | null
+  if (cached) {
     console.log('📦 Using cached artworks data')
-    return cachedArtworks
+    return cached
   }
 
   try {
     const artworks = await fetchArtworksFromSupabase()
     if (artworks && artworks.length > 0) {
-      cachedArtworks = artworks
-      cacheTimestamp = now
+      setCachedData(CACHE_KEY, artworks, CACHE_DURATION)
       console.log(`✅ Cached ${artworks.length} artworks from Supabase`)
       return artworks
     }
@@ -52,8 +51,7 @@ function artworksUnavailable() {
 
 // 캐시 무효화 함수
 function invalidateCache() {
-  cachedArtworks = null
-  cacheTimestamp = 0
+  clearCache()
   console.log('🗑️ Cache invalidated')
 }
 

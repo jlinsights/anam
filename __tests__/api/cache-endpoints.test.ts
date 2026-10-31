@@ -5,6 +5,9 @@ import { NextRequest } from 'next/server'
 
 jest.mock('@/lib/cache', () => ({
   clearCacheAndRevalidate: jest.fn(),
+  clearCache: jest.fn(),
+  getCachedData: jest.fn(() => null),
+  setCachedData: jest.fn(),
 }))
 jest.mock('@/lib/supabase/artworks', () => ({
   fetchArtworksFromSupabase: jest.fn(async () => [
