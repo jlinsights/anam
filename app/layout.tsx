@@ -13,7 +13,10 @@ const plexSansKR = IBM_Plex_Sans_KR({
   variable: '--font-plex-sans-kr',
   weight: ['300', '400', '500', '600', '700'],
   display: 'swap',
-  preload: true,
+  // 한글 글꼴은 구글이 유니코드 범위별로 수십 개 파일로 쪼개 주므로, preload를 켜면
+  // 굵기마다 모든 조각이 <link rel=preload>로 붙는다(홈 HTML 33KB → 116KB, 링크 374개).
+  // swap으로 대체 글꼴을 먼저 보여 주고 필요한 조각만 내려받게 둔다
+  preload: false,
   fallback: ['Apple SD Gothic Neo', 'Malgun Gothic', 'sans-serif'],
 })
 

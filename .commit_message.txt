@@ -1,1 +1,1 @@
-🔤 글꼴 역할 정리(Inter→IBM Plex Sans KR, 제목·본문은 Noto Serif KR, 큰 제목 자간 좁힘) 및 PRODUCT.md·DESIGN.md 디자인 체계 문서 추가
+⚡ IBM Plex Sans KR preload 끄기: 한글 글꼴 조각 374개가 전부 preload 링크로 붙어 홈 HTML이 33KB→116KB로 커지고 CI 서버 확인 단계가 실패하던 문제
