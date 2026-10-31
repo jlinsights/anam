@@ -49,11 +49,8 @@ export const fallbackArtistData: Artist = {
   profileImageUrl: getArtistImageUrl('배옥영.jpeg'),
   birthYear: 1980,
   education: ['서예학과 졸업', '서예학 석사'],
-  exhibitions: [
-    "2024 개인전 '현대 서예의 향기' - 갤러리",
-    "2023 단체전 '한국 현대 서예전' - 미술관",
-    "2022 개인전 '전통과 현대의 만남' - 서예문화원",
-  ],
+  // 실제 기록만 보여 준다. 지어낸 전시를 넣으면 홈 "전시 이력"·작가 소개에 사실처럼 나온다
+  exhibitions: [],
   awards: [
     '2024 한국서예대전 대상',
     '2023 현대서예협회 우수상',
