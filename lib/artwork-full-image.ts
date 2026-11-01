@@ -32,8 +32,9 @@ export function fullImageFor(artwork: NumberSource): FullImage | null {
   }
 }
 
-// 작은 칸(상세의 "다른 작품" 등)용: 잘리지 않은 medium(긴 변 800px). 크기는 full 비율을 줄여 계산한다.
-// 이미지 최적화를 끈 뒤(next.config images.unoptimized) 작은 칸에 1800px 원본을 쓰면 전송량이 크다
+// 작은 칸(상세의 "다른 작품" 등)용: 잘리지 않은 미리보기(긴 변 800px, scripts/generate-full-images.mjs).
+// 이미지 최적화를 끈 뒤(next.config images.unoptimized) 작은 칸에 1800px 원본을 쓰면 전송량이 크다.
+// 기존 medium 은 fit: cover 정사각형이라 61점 중 41점이 잘려 있어 쓰지 않는다(Codex 리뷰)
 const PREVIEW_MAX_SIDE = 800
 
 export function previewImageFor(artwork: NumberSource): FullImage | null {
@@ -44,7 +45,7 @@ export function previewImageFor(artwork: NumberSource): FullImage | null {
     PREVIEW_MAX_SIDE / Math.max(full.width, full.height)
   )
   return {
-    src: full.src.replace(/-full\.jpg$/, '-medium.jpg'),
+    src: full.src.replace(/-full\.jpg$/, '-preview.jpg'),
     width: Math.round(full.width * scale),
     height: Math.round(full.height * scale),
   }

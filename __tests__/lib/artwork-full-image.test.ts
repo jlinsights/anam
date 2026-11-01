@@ -49,11 +49,27 @@ describe('sortByNumber', () => {
 })
 
 // 이미지 최적화를 끈 뒤(next.config images.unoptimized) 상세의 "다른 작품" 칸(약 160px)이 1800px
-// 원본(15번 655KB)을 받았다(Codex 리뷰). 작은 칸에는 잘리지 않은 800px medium 을 쓴다
+// 원본(15번 655KB)을 받았다(Codex 리뷰). 작은 칸에는 잘리지 않은 800px 미리보기를 쓴다.
+// 기존 medium 은 정사각형으로 잘려 있어(61점 중 41점) 쓰면 안 된다 — 실제 파일 비율까지 확인한다
+function jpegSize(file: string): [number, number] {
+  const fs = require('fs') as typeof import('fs')
+  const buf = fs.readFileSync(file)
+  let i = 2
+  while (i < buf.length) {
+    const marker = buf[i + 1]
+    const length = buf.readUInt16BE(i + 2)
+    if (marker >= 0xc0 && marker <= 0xc3) {
+      return [buf.readUInt16BE(i + 7), buf.readUInt16BE(i + 5)]
+    }
+    i += 2 + length
+  }
+  throw new Error(`JPEG 크기를 읽지 못함: ${file}`)
+}
+
 describe('previewImageFor', () => {
-  it('잘리지 않은 medium 이미지를 원본 비율로 돌려준다', () => {
+  it('잘리지 않은 미리보기 이미지를 원본 비율로 돌려준다', () => {
     const image = previewImageFor({ slug: '61' })
-    expect(image?.src).toBe('/Images/Artworks/optimized/61/61-medium.jpg')
+    expect(image?.src).toBe('/Images/Artworks/optimized/61/61-preview.jpg')
     expect(image!.height).toBeGreaterThan(image!.width * 3)
   })
 
@@ -61,17 +77,23 @@ describe('previewImageFor', () => {
     expect(previewImageFor({ slug: '999' })).toBeNull()
   })
 
-  it('목록의 모든 작품에 medium 파일이 실제로 있다', () => {
-    const fs = require('fs') as typeof import('fs')
+  it('모든 작품의 미리보기 파일이 있고, 원본과 비율이 같으며(잘리지 않음) 긴 변이 800px 이하다', () => {
     const path = require('path') as typeof import('path')
-    const sizes = require('@/lib/artwork-full-sizes.json') as Record<string, number[]>
-    const missing = Object.keys(sizes).filter(
-      (n) =>
-        !fs.existsSync(
-          path.join(__dirname, '..', '..', 'public', previewImageFor({ slug: n })!.src)
-        )
-    )
-    expect(missing).toEqual([])
+    const sizes = require('@/lib/artwork-full-sizes.json') as Record<
+      string,
+      number[]
+    >
+    const problems = Object.entries(sizes).flatMap(([n, [w, h]]) => {
+      const preview = previewImageFor({ slug: n })!
+      const [pw, ph] = jpegSize(
+        path.join(__dirname, '..', '..', 'public', preview.src)
+      )
+      const cropped = Math.abs(pw / ph - w / h) > 0.02
+      const tooBig = Math.max(pw, ph) > 800
+      const wrongSize =
+        Math.abs(pw - preview.width) > 1 || Math.abs(ph - preview.height) > 1
+      return cropped || tooBig || wrongSize ? [`${n}: ${pw}x${ph}`] : []
+    })
+    expect(problems).toEqual([])
   })
 })
-
