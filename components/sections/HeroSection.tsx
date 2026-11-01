@@ -32,7 +32,6 @@ export function HeroSection({
 
   const { scrollY } = useScroll()
   const y = useTransform(scrollY, [0, 500], [0, 150])
-  const opacity = useTransform(scrollY, [0, 300], [1, 0.3])
 
   useEffect(() => {
     setIsVisible(true)
@@ -76,7 +75,9 @@ export function HeroSection({
 
       <motion.div
         className='container mx-auto px-4 py-20 relative z-10'
-        style={{ y, opacity }}
+        /* 스크롤에 따라 흐려지게(opacity 1→0.3) 하지 않는다. 300px 만 내려도 버튼 글자 대비가 1.9:1 로
+           떨어졌다(Lighthouse 는 검사 중 스크롤해서 이 상태를 찍었다). 시차 이동(y)만 남긴다 */
+        style={{ y }}
       >
         <div className='grid lg:grid-cols-2 gap-16 items-center'>
           {/* Content */}
