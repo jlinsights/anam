@@ -97,7 +97,8 @@ async function checkAirtableHealth(): Promise<boolean> {
 async function checkSupabaseHealth(): Promise<boolean> {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    // 연결 확인에 RLS 우회 권한은 필요 없다 (lib/supabase/server.ts 와 같은 anon 키)
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     if (!supabaseUrl || !supabaseKey) {
       return false // 환경 변수 없음 = 사용 안함 = 정상

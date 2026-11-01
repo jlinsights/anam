@@ -20,7 +20,7 @@ import {
   fetchArtworksFromAirtable,
   fetchArtistFromAirtable,
 } from '../lib/airtable'
-import { createSupabaseClient } from '../lib/supabase/server'
+import { createSupabaseAdminClient } from '../lib/supabase/server'
 import type { Artwork, Artist } from '../lib/types'
 
 async function migrateArtworks() {
@@ -37,7 +37,7 @@ async function migrateArtworks() {
     console.log(`📊 Found ${artworks.length} artworks in Airtable`)
 
     // Connect to Supabase
-    const supabase = createSupabaseClient()
+    const supabase = createSupabaseAdminClient()
 
     if (!supabase) {
       console.error(
@@ -115,7 +115,7 @@ async function migrateArtist() {
     console.log(`📊 Found artist: ${artist.name}`)
 
     // Connect to Supabase
-    const supabase = createSupabaseClient()
+    const supabase = createSupabaseAdminClient()
 
     if (!supabase) {
       console.error(
