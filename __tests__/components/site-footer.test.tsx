@@ -11,7 +11,8 @@ describe('SiteFooter', () => {
     expect(hrefs).toEqual(['/gallery', '/artist', '/#exhibition', '/contact'])
   })
 
-  it('연락은 문의 양식으로만 안내하고 이메일·전화번호는 싣지 않는다', () => {
+  // 작가 이메일은 /contact·/artist 에 공개한다(2026-11-01 결정). 푸터는 문의 페이지로만 이끈다
+  it('푸터는 문의 페이지로 안내하고 이메일·전화번호는 싣지 않는다', () => {
     const { container } = render(<SiteFooter />)
     expect(
       screen.getByRole('link', { name: /문의 양식 열기/ })

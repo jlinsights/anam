@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import HomePage from '@/app/page'
 
 // 홈은 클라이언트 페이지다. 예전에는 마운트 직후·300ms·1초·API 오류 때마다 브라우저에서
@@ -23,9 +23,6 @@ jest.mock('@/hooks/use-artwork-api', () => ({
 
 jest.mock('@/components/sections/HeroSection', () => ({
   HeroSection: () => null,
-}))
-jest.mock('@/components/layout/MinimalHeader', () => ({
-  MinimalHeader: () => null,
 }))
 
 const realArtwork = {
@@ -92,3 +89,53 @@ describe('홈 작품 칸 이미지 표시', () => {
   })
 })
 
+// 2026-11-01 사용자: "작품 이미지 전환이 너무 끊긴다". 8칸이 4초마다 한꺼번에 바뀌며 새 그림을 받느라
+// 빈 칸이 번쩍였다. 이제 저절로 넘어가지 않고, "다른 작품 보기"를 누르면 다음 그림을 받아 둔 뒤 바꾼다
+describe('홈 작품 칸 넘김', () => {
+  const many = Array.from({ length: 12 }, (_, i) => ({
+    ...realArtwork,
+    id: `rec${i + 1}`,
+    slug: `anam-${String(i + 1).padStart(2, '0')}`,
+    number: i + 1,
+    title: `작품 ${i + 1}`,
+  }))
+
+  afterEach(() => jest.useRealTimers())
+
+  it('저절로 넘어가지 않는다', async () => {
+    jest.useFakeTimers()
+    artworksState.data = many
+    render(<HomePage />)
+    const before = (await screen.findAllByRole('img')).map((i) =>
+      i.getAttribute('alt')
+    )
+    act(() => {
+      jest.advanceTimersByTime(20000)
+    })
+    const after = screen.getAllByRole('img').map((i) => i.getAttribute('alt'))
+    expect(after).toEqual(before)
+  })
+
+  it('작품 칸은 잘리지 않은 미리보기 이미지를 쓴다', async () => {
+    artworksState.data = many
+    render(<HomePage />)
+    const imgs = await screen.findAllByRole('img')
+    expect(imgs.length).toBe(8)
+    imgs.forEach((img) =>
+      expect(img.getAttribute('src')).toMatch(/-preview\.jpg$/)
+    )
+  })
+
+  it('"다른 작품 보기"로 다음 여덟 점으로 바꾼다', async () => {
+    artworksState.data = many
+    render(<HomePage />)
+    const first = (await screen.findAllByRole('img')).map((i) =>
+      i.getAttribute('alt')
+    )
+    fireEvent.click(screen.getByRole('button', { name: '다른 작품 보기' }))
+    const fresh = await screen.findAllByRole('img', {
+      name: (n) => !first.includes(n),
+    })
+    expect(fresh.length).toBeGreaterThan(0)
+  })
+})

@@ -100,7 +100,7 @@ function GalleryPageContent() {
         />
       </Head>
 
-      <div className='py-zen-xl'>
+      <div>
         <GallerySection
           artworks={artworks}
           onArtworkSelect={handleArtworkSelect}

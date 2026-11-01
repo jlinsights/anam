@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Artwork } from '@/lib/types'
 import {
   useGalleryStore,
@@ -9,10 +8,7 @@ import {
   useGalleryFilters,
   filterArtworks,
 } from '@/lib/stores/gallery-store-safe'
-import {
-  ArtworkGridPortrait,
-  ArtworkCardPortraitSkeleton,
-} from '@/components/artwork-card-portrait'
+import { ArtworkTile } from '@/components/gallery/ArtworkTile'
 import { useThrottledSearch } from '@/lib/hooks/use-throttled-handlers'
 
 interface GallerySectionProps {
@@ -20,11 +16,15 @@ interface GallerySectionProps {
   onArtworkSelect: (artwork: Artwork) => void
 }
 
-export function GallerySection({
-  artworks,
-  onArtworkSelect,
-}: GallerySectionProps) {
-  // Use store for filters and search
+// 모바일 2열 기준 한 번에 12줄. 61점을 한 번에 내리면 10,000px 가 넘었다
+const PAGE_SIZE = 24
+
+const CHIP =
+  'inline-flex min-h-[40px] shrink-0 items-center border px-3 font-body text-sm tabular-nums transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold'
+
+// 61점을 한 화면에 빽빽하지만 잘리지 않게. 예전에는 9:16 세로 틀에 정사각형으로 잘린 그림을 넣고
+// 칸마다 스크롤 등장 효과를 줘 데스크톱 8,300px·모바일 14,800px 를 내려야 했다
+export function GallerySection({ artworks }: GallerySectionProps) {
   const storeFilteredArtworks = useArtworks()
   const isStoreSynced = useGalleryStore((state) => state.artworks === artworks)
   const { searchTerm, selectedYear, selectedMedium } = useGalleryFilters()
@@ -47,217 +47,245 @@ export function GallerySection({
       selectedMedium,
     ]
   )
-  const { setArtworks, setSearchTerm, setSelectedYear, clearFilters } =
-    useGalleryStore()
+  const {
+    setArtworks,
+    setSearchTerm,
+    setSelectedYear,
+    setSelectedMedium,
+    clearFilters,
+  } = useGalleryStore()
 
   // 그리드는 스토어의 filteredArtworks를 그리므로 props로 받은 작품을 스토어에 넣어야 한다
   useEffect(() => {
     setArtworks(artworks)
   }, [artworks, setArtworks])
 
-  // Throttled search handler for better performance
+  // 입력 칸은 바로 반응하고, 거르기만 늦춘다(예전엔 칸 값도 늦게 따라와 글자가 씹혔다)
+  const [query, setQuery] = useState(searchTerm)
   const throttledSearchUpdate = useThrottledSearch(
-    (term: string) => {
-      setSearchTerm(term)
-    },
-    300, // 300ms delay for search input
+    (term: string) => setSearchTerm(term),
+    300,
     []
   )
 
-  // Get unique years for filter
   const availableYears = useMemo(() => {
     const years = [...new Set(artworks.map((artwork) => artwork.year))]
-    return years.sort((a, b) => b - a)
+    return years.filter(Boolean).sort((a, b) => b - a)
   }, [artworks])
 
-  return (
-    <div className='max-w-7xl mx-auto px-zen-md'>
-      {/* Section header */}
-      <motion.header
-        className='text-center mb-zen-xl'
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: true }}
-      >
-        <h1 className='font-calligraphy font-bold text-ink text-3xl md:text-4xl mb-zen-sm'>
-          작품 갤러리
-        </h1>
-        <p className='font-display text-ink-light text-lg'>
-          Gallery • {artworks.length}개 작품
-        </p>
-        <div className='mt-zen-sm flex justify-center' aria-hidden='true'>
-          <div className='w-24 h-1 bg-gold'></div>
-        </div>
-      </motion.header>
+  // 61점이 모두 2024년이면 연도 단추는 쓸모가 없다. 재료(화선지·광목·옻칠종이…)가 실제로 갈라 준다
+  const availableMediums = useMemo(() => {
+    const counts = new Map<string, number>()
+    artworks.forEach((artwork) => {
+      if (artwork.medium)
+        counts.set(artwork.medium, (counts.get(artwork.medium) ?? 0) + 1)
+    })
+    return [...counts.entries()].sort((a, b) => b[1] - a[1])
+  }, [artworks])
 
-      {/* Search and filter controls */}
-      <motion.section
-        className='mb-zen-lg'
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        viewport={{ once: true }}
+  const filtered = Boolean(searchTerm || selectedYear || selectedMedium)
+
+  // 거르는 조건이 바뀌면 처음 24점부터 다시
+  const [limit, setLimit] = useState(PAGE_SIZE)
+  const [focusIndex, setFocusIndex] = useState<number | null>(null)
+  const listRef = useRef<HTMLUListElement>(null)
+  useEffect(() => {
+    setLimit(PAGE_SIZE)
+  }, [searchTerm, selectedYear, selectedMedium])
+  // "더 보기" 뒤에는 새로 나온 첫 작품으로 초점을 옮긴다(키보드 사용자가 처음으로 돌아가지 않게)
+  useEffect(() => {
+    if (focusIndex === null) return
+    listRef.current
+      ?.querySelectorAll<HTMLAnchorElement>('li a')
+      [focusIndex]?.focus()
+    setFocusIndex(null)
+  }, [focusIndex])
+  const visible = filteredArtworks.slice(0, limit)
+  const remaining = filteredArtworks.length - visible.length
+  const showMore = () => {
+    setFocusIndex(visible.length)
+    setLimit((current) => current + PAGE_SIZE)
+  }
+  const resetAll = () => {
+    setQuery('')
+    clearFilters()
+  }
+
+  return (
+    <div className='mx-auto max-w-7xl px-4 sm:px-6 md:px-8'>
+      <header className='flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pt-10 pb-6 md:pt-14'>
+        <div>
+          <h1 className='font-display text-3xl font-bold text-ink md:text-4xl'>
+            작품
+          </h1>
+          <div className='mt-3 h-1 w-24 bg-gold' aria-hidden='true' />
+        </div>
+        <p className='font-body text-sm text-ink-light'>
+          아남 배옥영 작품 {artworks.length}점
+        </p>
+      </header>
+
+      <section
         aria-labelledby='gallery-filters-title'
+        className='z-30 -mx-4 border-y border-ink/15 bg-paper px-4 py-3 sm:-mx-6 sm:px-6 md:-mx-8 md:px-8 lg:sticky lg:top-16'
       >
         <h2 id='gallery-filters-title' className='sr-only'>
-          작품 검색 및 필터
+          작품 검색 및 연도별 보기
         </h2>
-        <div className='flex flex-col sm:flex-row gap-zen-sm justify-center items-center'>
-          {/* Search input */}
-          <div className='relative'>
+        <div className='flex flex-col gap-3 lg:flex-row lg:items-center'>
+          <div>
             <label htmlFor='gallery-search' className='sr-only'>
-              작품 검색
+              작품 제목 검색
             </label>
             <input
               id='gallery-search'
-              type='text'
-              placeholder='작품 검색...'
-              value={searchTerm}
-              onChange={(e) => throttledSearchUpdate(e.target.value)}
-              className='
-                px-zen-md py-zen-sm border-2 border-ink
-                bg-paper focus:bg-paper-warm
-                font-body text-ink
-                focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20
-                transition-colors duration-300
-                w-64
-              '
-              aria-describedby='search-help'
+              type='search'
+              placeholder='작품 제목 검색'
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value)
+                throttledSearchUpdate(e.target.value)
+              }}
+              className='min-h-[40px] w-full border-2 border-ink bg-paper px-3 font-body text-[15px] text-ink placeholder:text-ink-light/70 focus:border-gold focus:bg-paper-warm focus:outline-none focus:ring-4 focus:ring-gold/20 lg:w-60'
             />
+          </div>
+
+          {availableMediums.length > 1 && (
             <div
-              className='absolute right-zen-sm top-1/2 transform -translate-y-1/2'
-              aria-hidden='true'
+              role='group'
+              aria-label='재료'
+              className='-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 lg:flex-1'
             >
-              🔍
-            </div>
-            <div id='search-help' className='sr-only'>
-              작품 제목으로 검색할 수 있습니다
-            </div>
-          </div>
-
-          {/* Year filter */}
-          <div>
-            <label htmlFor='year-filter' className='sr-only'>
-              제작 연도 필터
-            </label>
-            <select
-              id='year-filter'
-              value={selectedYear || ''}
-              onChange={(e) =>
-                setSelectedYear(
-                  e.target.value ? parseInt(e.target.value) : null
+              <button
+                type='button'
+                aria-pressed={!selectedMedium}
+                onClick={() => setSelectedMedium(null)}
+                className={`${CHIP} ${
+                  !selectedMedium
+                    ? 'border-ink bg-ink text-paper'
+                    : 'border-ink/25 text-ink hover:border-ink'
+                }`}
+              >
+                전체
+              </button>
+              {availableMediums.map(([medium, count]) => {
+                const active = selectedMedium === medium
+                return (
+                  <button
+                    key={medium}
+                    type='button'
+                    aria-pressed={active}
+                    onClick={() => setSelectedMedium(active ? null : medium)}
+                    className={`${CHIP} gap-1.5 ${
+                      active
+                        ? 'border-ink bg-ink text-paper'
+                        : 'border-ink/25 text-ink hover:border-ink'
+                    }`}
+                  >
+                    {medium}
+                    <span className='text-xs opacity-70'>{count}</span>
+                  </button>
                 )
-              }
-              className='
-                px-zen-md py-zen-sm border-2 border-ink
-                bg-paper focus:bg-paper-warm
-                font-body text-ink
-                focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20
-                transition-colors duration-300
-              '
-              aria-describedby='year-filter-help'
-            >
-              <option value=''>전체 연도</option>
-              {availableYears.map((year) => (
-                <option key={year} value={year}>
-                  {year}년
-                </option>
-              ))}
-            </select>
-            <div id='year-filter-help' className='sr-only'>
-              제작 연도별로 작품을 필터링할 수 있습니다
+              })}
             </div>
-          </div>
-
-          {/* Clear filters */}
-          {(searchTerm || selectedYear) && (
-            <button
-              onClick={clearFilters}
-              className='
-                px-zen-sm py-zen-xs text-sm font-body
-                text-ink-light hover:text-gold
-                border border-ink/20 hover:border-gold
-                transition-colors duration-300
-                focus:outline-none focus:ring-2 focus:ring-gold/20
-              '
-              aria-label='모든 필터 초기화'
-            >
-              필터 초기화
-            </button>
           )}
+
+          {availableYears.length > 1 && (
+            <div
+              role='group'
+              aria-label='제작 연도'
+              className='-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 lg:flex-1'
+            >
+              <button
+                type='button'
+                aria-pressed={!selectedYear}
+                onClick={() => setSelectedYear(null)}
+                className={`${CHIP} ${
+                  !selectedYear
+                    ? 'border-ink bg-ink text-paper'
+                    : 'border-ink/25 text-ink hover:border-ink'
+                }`}
+              >
+                전체
+              </button>
+              {availableYears.map((year) => {
+                const active = selectedYear === year
+                return (
+                  <button
+                    key={year}
+                    type='button'
+                    aria-pressed={active}
+                    onClick={() => setSelectedYear(active ? null : year)}
+                    className={`${CHIP} ${
+                      active
+                        ? 'border-ink bg-ink text-paper'
+                        : 'border-ink/25 text-ink hover:border-ink'
+                    }`}
+                  >
+                    {year}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          <p
+            className='shrink-0 font-body text-sm text-ink-light tabular-nums'
+            role='status'
+            aria-live='polite'
+          >
+            {filteredArtworks.length}점 {filtered ? '찾음' : '전체'}
+          </p>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Results count */}
-      <motion.div
-        className='text-center mb-zen-md'
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        viewport={{ once: true }}
-      >
-        <p
-          className='font-body text-ink-light text-sm'
-          role='status'
-          aria-live='polite'
-          aria-label={`검색 결과: ${filteredArtworks.length}개 작품 ${searchTerm || selectedYear ? '검색됨' : '전체'}`}
-        >
-          {filteredArtworks.length}개 작품{' '}
-          {searchTerm || selectedYear ? '검색됨' : '전체'}
-        </p>
-      </motion.div>
-
-      {/* Artwork grid with 9:16 portrait layout */}
       {filteredArtworks.length > 0 ? (
-        <section aria-labelledby='gallery-results-title'>
+        <section aria-labelledby='gallery-results-title' className='pt-8 pb-20'>
           <h2 id='gallery-results-title' className='sr-only'>
-            작품 갤러리 결과
+            작품 목록
           </h2>
-          <ArtworkGridPortrait
-            artworks={filteredArtworks}
-            showMetadata={true}
-            columns={{
-              mobile: 2,
-              tablet: 3,
-              desktop: 4,
-              wide: 5,
-            }}
-            className='mb-zen-lg'
-          />
+          <ul
+            ref={listRef}
+            aria-label={`작품 목록 - ${filteredArtworks.length}점`}
+            className='grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:grid-cols-5'
+          >
+            {visible.map((artwork, index) => (
+              <li key={artwork.id}>
+                <ArtworkTile artwork={artwork} eager={index < 10} />
+              </li>
+            ))}
+          </ul>
+          {remaining > 0 && (
+            <div className='mt-12 flex justify-center'>
+              <button
+                type='button'
+                onClick={showMore}
+                className='inline-flex min-h-[48px] items-center border-2 border-ink px-8 font-body text-ink transition-colors hover:bg-ink hover:text-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold'
+              >
+                더 보기 · {remaining}점 남음
+              </button>
+            </div>
+          )}
         </section>
       ) : (
-        /* No results message */
-        <motion.section
-          className='text-center py-zen-xl'
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
+        <section
           aria-labelledby='no-results-title'
+          className='py-24 text-center'
         >
-          <h2
-            id='no-results-title'
-            className='font-display text-ink-light text-lg mb-zen-sm'
-          >
-            검색 결과가 없습니다
+          <h2 id='no-results-title' className='font-display text-lg text-ink'>
+            찾는 작품이 없습니다
           </h2>
-          <p className='font-body text-ink-light text-sm mb-zen-md'>
-            다른 검색어나 필터를 시도해보세요
+          <p className='mt-2 font-body text-sm text-ink-light'>
+            다른 제목으로 찾거나 연도를 바꿔 보세요.
           </p>
           <button
-            onClick={clearFilters}
-            className='
-              px-zen-md py-zen-sm
-              bg-ink text-paper font-body
-              hover:bg-gold transition-colors duration-300
-              focus:outline-none focus:ring-2 focus:ring-gold/20
-            '
-            aria-label='모든 필터를 초기화하고 전체 작품 보기'
+            type='button'
+            onClick={resetAll}
+            className='mt-6 min-h-[44px] border-2 border-ink bg-ink px-6 font-body text-paper transition-colors hover:bg-paper hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold'
           >
             전체 작품 보기
           </button>
-        </motion.section>
+        </section>
       )}
     </div>
   )

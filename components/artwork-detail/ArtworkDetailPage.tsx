@@ -3,6 +3,7 @@ import Link from 'next/link'
 import type { Artwork, Artist } from '@/lib/types'
 import { ArtworkImage } from '@/components/common/ProgressiveImage'
 import { ArtworkErrorBoundary } from '@/components/error-boundary/ArtworkErrorBoundary'
+import { ArtworkKeyNav } from '@/components/artwork-detail/ArtworkKeyNav'
 import {
   fullImageFor,
   previewImageFor,
@@ -38,10 +39,20 @@ export function ArtworkDetailPage({
   ].filter((fact) => fact.value)
 
   const inquiryHref = `/contact?artwork=${encodeURIComponent(artwork.title)}`
+  const hrefFor = (work: Artwork | null) =>
+    work ? `/gallery/${work.slug || work.id}` : null
+  const neighbourImages = [previous, next]
+    .map((work) => (work ? fullImageFor(work)?.src : undefined))
+    .filter((src): src is string => Boolean(src))
 
   return (
     <ArtworkErrorBoundary>
       <div className='min-h-screen bg-paper text-ink'>
+        <ArtworkKeyNav
+          previousHref={hrefFor(previous)}
+          nextHref={hrefFor(next)}
+          prefetchImages={neighbourImages}
+        />
         <nav aria-label='작품 이동' className='border-b-2 border-ink'>
           <div className='max-w-7xl mx-auto px-6 md:px-8 h-16 flex items-center justify-between gap-6 font-body text-sm'>
             <Link
@@ -64,7 +75,7 @@ export function ArtworkDetailPage({
           </div>
         </nav>
 
-        <main className='max-w-7xl mx-auto px-6 md:px-8 py-12 md:py-20'>
+        <div className='max-w-7xl mx-auto px-6 md:px-8 py-12 md:py-20'>
           <div className='grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start'>
             <figure className='lg:col-span-7'>
               <div className='border-2 border-ink bg-paper-warm p-5 md:p-10 flex justify-center'>
@@ -106,7 +117,7 @@ export function ArtworkDetailPage({
 
             <section
               aria-labelledby='artwork-title'
-              className='lg:col-span-5 lg:sticky lg:top-12'
+              className='lg:col-span-5 lg:sticky lg:top-24'
             >
               <h1
                 id='artwork-title'
@@ -207,7 +218,7 @@ export function ArtworkDetailPage({
               </ul>
             </section>
           )}
-        </main>
+        </div>
       </div>
     </ArtworkErrorBoundary>
   )
@@ -244,7 +255,8 @@ function StepLink({ artwork, direction }: StepLinkProps) {
     <Link
       href={`/gallery/${artwork.slug}`}
       aria-label={`${label}: ${artwork.title}`}
-      title={artwork.title}
+      aria-keyshortcuts={direction === 'previous' ? 'ArrowLeft' : 'ArrowRight'}
+      title={`${artwork.title} (키보드 ${arrow})`}
       className={`${base} border-transparent hover:border-ink focus-visible:border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold`}
     >
       <span aria-hidden='true'>{arrow}</span>

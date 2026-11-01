@@ -1,223 +1,107 @@
-'use client'
-
-import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { motion, useScroll, useTransform } from 'framer-motion'
-import { ChevronDown } from 'lucide-react'
-import { useThrottledMouseMove } from '@/lib/hooks/use-throttled-handlers'
+
+interface HeroArtwork {
+  id: string
+  title: string
+  imageUrl: string
+  year: string
+  medium: string
+  /** 상세로 가는 주소 */
+  href?: string
+  width?: number
+  height?: number
+}
 
 interface HeroSectionProps {
   title?: string
   subtitle?: string
   description?: string
-  featuredArtwork?: {
-    id: string
-    title: string
-    imageUrl: string
-    year: string
-    medium: string
-  }
+  featuredArtwork?: HeroArtwork
 }
 
+const FOCUS =
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold'
+
+// 홈 첫 화면. 예전에는 스크롤 시차·마우스 따라 도는 배경·맥박 뛰는 점·떠다니는 카드가 겹쳤고
+// 대표작은 정사각형으로 잘린 그림을 둥근 4:5 틀에 다시 잘라 넣었다. 이제 움직임 없이 잘리지 않은 작품을 보인다
 export function HeroSection({
   title = '아남 배옥영',
   subtitle = '전통과 현대가 만나는 서예의 새로운 지평',
   description = '깊이 있는 전통 서예 기법과 현대적 감각이 조화를 이루는 독창적인 작품 세계를 만나보세요.',
   featuredArtwork,
 }: HeroSectionProps) {
-  const heroRef = useRef<HTMLDivElement>(null)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  const [isVisible, setIsVisible] = useState(false)
-
-  const { scrollY } = useScroll()
-  const y = useTransform(scrollY, [0, 500], [0, 150])
-
-  useEffect(() => {
-    setIsVisible(true)
-  }, [])
-
-  const handleMouseMove = useThrottledMouseMove(
-    useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-      if (!heroRef.current) return
-
-      const rect = heroRef.current.getBoundingClientRect()
-      const x = (e.clientX - rect.left) / rect.width
-      const y = (e.clientY - rect.top) / rect.height
-
-      setMousePosition({ x, y })
-    }, []),
-    []
-  )
-
   return (
     <section
-      ref={heroRef}
-      className='relative min-h-screen flex items-center justify-center overflow-hidden'
-      onMouseMove={handleMouseMove}
-      style={{
-        background: `radial-gradient(
-          circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%,
-          rgba(0, 0, 0, 0.03) 0%,
-          transparent 50%
-        )`,
-      }}
+      aria-labelledby='hero-title'
+      className='mx-auto grid max-w-7xl items-center gap-12 px-4 pt-12 pb-16 sm:px-6 md:px-8 lg:grid-cols-12 lg:gap-16 lg:pt-20 lg:pb-24'
     >
-      {/* Background Elements */}
-      <div className='absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white dark:from-transparent dark:via-gray-900/50 dark:to-gray-900' />
-
-      {/* Subtle background pattern */}
-      <div className='absolute inset-0 opacity-[0.02] dark:opacity-[0.05]'>
-        <div className='absolute top-1/4 left-1/4 w-32 h-32 bg-gray-900 rounded-full blur-3xl' />
-        <div className='absolute top-3/4 right-1/4 w-24 h-24 bg-gray-600 rounded-full blur-2xl' />
-        <div className='absolute bottom-1/2 left-1/2 w-16 h-16 bg-gray-400 rounded-full blur-xl' />
+      <div className='lg:col-span-6'>
+        <h1
+          id='hero-title'
+          className='font-display text-5xl leading-tight tracking-[-0.02em] text-ink sm:text-6xl lg:text-7xl'
+        >
+          {title}
+        </h1>
+        <p className='mt-4 font-display text-xl text-ink-light sm:text-2xl'>
+          {subtitle}
+        </p>
+        <p className='mt-8 max-w-[34rem] font-body text-lg leading-relaxed text-ink'>
+          {description}
+        </p>
+        <div className='mt-10 flex flex-wrap items-center gap-x-8 gap-y-4'>
+          <Link
+            href='/gallery'
+            className={`inline-flex min-h-[52px] items-center border-2 border-ink bg-ink px-8 font-body text-base text-paper transition-colors hover:bg-paper hover:text-ink ${FOCUS}`}
+          >
+            갤러리 둘러보기
+          </Link>
+          <Link
+            href='/artist'
+            className={`inline-flex min-h-[44px] items-center border-b-2 border-ink font-body text-base text-ink transition-colors hover:border-gold ${FOCUS}`}
+          >
+            작가 소개
+          </Link>
+          <Link
+            href='/contact'
+            className={`inline-flex min-h-[44px] items-center border-b-2 border-ink/30 font-body text-base text-ink-light transition-colors hover:border-ink hover:text-ink ${FOCUS}`}
+          >
+            작품 문의
+          </Link>
+        </div>
       </div>
 
-      <motion.div
-        className='container mx-auto px-4 py-20 relative z-10'
-        /* 스크롤에 따라 흐려지게(opacity 1→0.3) 하지 않는다. 300px 만 내려도 버튼 글자 대비가 1.9:1 로
-           떨어졌다(Lighthouse 는 검사 중 스크롤해서 이 상태를 찍었다). 시차 이동(y)만 남긴다 */
-        style={{ y }}
-      >
-        <div className='grid lg:grid-cols-2 gap-16 items-center'>
-          {/* Content */}
-          <motion.div
-            className='space-y-8'
-            initial={{ x: -50 }}
-            animate={isVisible ? { x: 0 } : {}}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
+      {featuredArtwork?.imageUrl && (
+        <figure className='lg:col-span-6'>
+          <Link
+            href={featuredArtwork.href ?? '/gallery'}
+            className={`group block ${FOCUS}`}
           >
-            {/* Title */}
-            <div className='space-y-4'>
-              <motion.h1
-                className='text-5xl sm:text-6xl lg:text-7xl font-serif text-gray-900 dark:text-white leading-tight'
-                initial={{ y: 20 }}
-                animate={isVisible ? { y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                {title}
-              </motion.h1>
-
-              <motion.p
-                className='text-xl sm:text-2xl text-gray-600 dark:text-gray-300 font-light tracking-wide'
-                initial={{ y: 20 }}
-                animate={isVisible ? { y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.4 }}
-              >
-                {subtitle}
-              </motion.p>
+            <div className='flex aspect-[5/4] items-center justify-center border-2 border-ink bg-paper-warm p-6 sm:p-10'>
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 파일을 그대로 준다(images.unoptimized) */}
+              <img
+                src={featuredArtwork.imageUrl}
+                width={featuredArtwork.width}
+                height={featuredArtwork.height}
+                alt={featuredArtwork.title}
+                loading='eager'
+                fetchPriority='high'
+                decoding='async'
+                className='h-auto max-h-full w-auto max-w-full object-contain'
+              />
             </div>
-
-            {/* Description */}
-            <motion.p
-              className='text-lg text-gray-700 dark:text-gray-400 leading-relaxed max-w-2xl'
-              initial={{ y: 20 }}
-              animate={isVisible ? { y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.6 }}
-            >
-              {description}
-            </motion.p>
-
-            {/* CTA Buttons: 투명도로 페이드하지 않는다. 마지막(약 1.8초)에 나타나는 주요 버튼이 그동안 흐려
-                글자 대비가 1.9:1 까지 떨어졌다(Lighthouse color-contrast). 위치만 움직이고 글자는 처음부터 또렷하게 */}
-            <motion.div
-              className='flex flex-col sm:flex-row gap-4'
-              initial={{ y: 20 }}
-              animate={isVisible ? { y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 1.0 }}
-            >
-              <Link
-                href='/gallery'
-                className='group flex items-center justify-center gap-3 px-8 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full font-medium transition-all duration-300 hover:bg-gray-800 dark:hover:bg-gray-100 hover:scale-105 hover:shadow-xl'
-              >
-                <span>갤러리 둘러보기</span>
-                <motion.div
-                  className='w-2 h-2 bg-current rounded-full'
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-              </Link>
-
-              <Link
-                href='/artist'
-                className='group flex items-center justify-center gap-3 px-8 py-4 bg-transparent border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-full font-medium transition-all duration-300 hover:border-gray-900 dark:hover:border-white hover:bg-gray-50 dark:hover:bg-gray-800'
-              >
-                <span>작가 소개</span>
-                <ChevronDown className='w-4 h-4 transition-transform group-hover:translate-x-1' />
-              </Link>
-            </motion.div>
-          </motion.div>
-
-          {/* Featured Artwork */}
-          {featuredArtwork && (
-            <motion.div
-              className='relative'
-              initial={{ opacity: 0, x: 50 }}
-              animate={isVisible ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              <div className='relative aspect-[4/5] rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800 shadow-2xl'>
-                <Image
-                  src={featuredArtwork.imageUrl}
-                  alt={featuredArtwork.title}
-                  fill
-                  className='object-cover'
-                  sizes='(max-width: 1024px) 100vw, 50vw'
-                  priority
-                />
-
-                {/* Artwork overlay */}
-                <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-all duration-500'>
-                  <div className='absolute bottom-0 left-0 right-0 p-6 text-white'>
-                    <p className='text-xl font-medium mb-2'>
-                      {featuredArtwork.title}
-                    </p>
-                    <div className='flex items-center gap-3 text-sm opacity-90'>
-                      <span>{featuredArtwork.year}</span>
-                      <span>•</span>
-                      <span>{featuredArtwork.medium}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating card */}
-              <motion.div
-                className='absolute -bottom-6 -right-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700'
-                animate={{
-                  y: [0, -5, 0],
-                  rotate: [0, 1, 0],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-              >
-                <div className='text-xs text-gray-600 dark:text-gray-400 mb-1'>
-                  대표작
-                </div>
-                <div className='font-medium text-gray-900 dark:text-white'>
-                  {featuredArtwork.title}
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </div>
-
-        {/* Scroll Indicator: 글자가 있으므로 투명도로 페이드하지 않고, gray-400(흰 배경 약 2.5:1) 대신
-            gray-600·dark gray-400 으로 대비를 맞춘다 */}
-        <div className='absolute bottom-8 left-1/2 transform -translate-x-1/2'>
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className='flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400'
-          >
-            <span className='text-xs font-light'>더 많은 작품들</span>
-            <ChevronDown className='w-5 h-5' />
-          </motion.div>
-        </div>
-      </motion.div>
+            <figcaption className='mt-3 flex items-baseline justify-between gap-4 font-body text-sm'>
+              <span className='font-display text-base font-bold text-ink group-hover:underline group-hover:underline-offset-4'>
+                {featuredArtwork.title}
+              </span>
+              <span className='shrink-0 text-ink-light tabular-nums'>
+                {[featuredArtwork.year, featuredArtwork.medium]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </span>
+            </figcaption>
+          </Link>
+        </figure>
+      )}
     </section>
   )
 }

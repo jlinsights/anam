@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { fetchArtist } from '@/lib/artist'
 import { EnhancedArtistSection } from '@/components/single-page/EnhancedArtistSection'
 import { Metadata } from 'next'
@@ -27,54 +26,8 @@ export default async function ArtistPage() {
   const artist = await fetchArtist('anam-artist')
 
   return (
-    <div className='min-h-screen bg-white dark:bg-gray-900'>
+    <div className='min-h-screen bg-paper text-ink'>
       <EnhancedArtistSection artist={artist || undefined} />
-
-      {/* Bottom Navigation */}
-      <div className='bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700'>
-        <div className='max-w-7xl mx-auto px-6 py-12'>
-          <div className='flex flex-col md:flex-row justify-between items-center gap-6'>
-            <div className='text-center md:text-left'>
-              <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-2'>
-                더 많은 작품을 둘러보세요
-              </h3>
-              <p className='font-display text-gray-600 dark:text-gray-400'>
-                아남 배옥영 작가의 다양한 서예 작품들을 갤러리에서 만나보실 수
-                있습니다.
-              </p>
-            </div>
-            <div className='flex gap-4'>
-              <Link
-                href='/gallery'
-                className='
-                px-8 py-4
-                bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-display font-bold
-                hover:bg-yellow-600 hover:text-gray-900
-                transition-all duration-300
-                shadow-lg hover:shadow-xl
-                border-4 border-gray-900 dark:border-gray-100 hover:border-yellow-600
-                transform hover:-translate-x-1 hover:-translate-y-1
-              '
-              >
-                갤러리 보기
-              </Link>
-              <Link
-                href='/'
-                className='
-                px-8 py-4
-                bg-white dark:bg-gray-800 border-4 border-gray-900 dark:border-gray-100 text-gray-900 dark:text-white font-display font-bold
-                hover:bg-gray-900 dark:hover:bg-gray-100 hover:text-white dark:hover:text-gray-900
-                transition-all duration-300
-                shadow-lg hover:shadow-xl
-                transform hover:translate-x-1 hover:translate-y-1
-              '
-              >
-                홈으로 돌아가기
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
