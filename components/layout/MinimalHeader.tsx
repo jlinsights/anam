@@ -40,24 +40,15 @@ export function MinimalHeader() {
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
+        {/* 홈 히어로가 밝은 배경이라 글자색은 스크롤과 상관없이 짙게 둔다. 스크롤하면 배경만 생긴다 */}
         <nav className='container mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex items-center justify-between h-16 sm:h-20'>
             {/* Logo */}
             <Link href='/' className='flex items-center space-x-2 group'>
-              <span
-                className={`text-2xl sm:text-3xl font-serif transition-colors duration-300 ${
-                  isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'
-                } group-hover:text-gray-600 dark:group-hover:text-gray-300`}
-              >
+              <span className='text-2xl sm:text-3xl font-serif transition-colors duration-300 text-gray-900 dark:text-white group-hover:text-gray-600 dark:group-hover:text-gray-300'>
                 아남
               </span>
-              <span
-                className={`text-xs sm:text-sm font-light tracking-wider uppercase transition-colors duration-300 ${
-                  isScrolled
-                    ? 'text-gray-600 dark:text-gray-400'
-                    : 'text-white/80'
-                }`}
-              >
+              <span className='text-xs sm:text-sm font-light tracking-wider uppercase text-gray-600 dark:text-gray-400'>
                 Gallery
               </span>
             </Link>
@@ -70,20 +61,14 @@ export function MinimalHeader() {
                   href={item.href}
                   className={`relative text-sm font-light tracking-wide transition-colors duration-300 ${
                     pathname === item.href
-                      ? isScrolled
-                        ? 'text-gray-900 dark:text-white'
-                        : 'text-white'
-                      : isScrolled
-                        ? 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                        : 'text-white/70 hover:text-white'
+                      ? 'text-gray-900 dark:text-white'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
                   <span>{item.name}</span>
                   {pathname === item.href && (
                     <motion.div
-                      className={`absolute -bottom-1 left-0 right-0 h-px ${
-                        isScrolled ? 'bg-gray-900 dark:bg-white' : 'bg-white'
-                      }`}
+                      className='absolute -bottom-1 left-0 right-0 h-px bg-gray-900 dark:bg-white'
                       layoutId='navbar-indicator'
                     />
                   )}
@@ -95,9 +80,9 @@ export function MinimalHeader() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`md:hidden p-2 transition-colors duration-300 ${
-                isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'
-              }`}
+              aria-label={isMobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
+              aria-expanded={isMobileMenuOpen}
+              className='md:hidden p-2 text-gray-900 dark:text-white'
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -127,7 +112,7 @@ export function MinimalHeader() {
                   }`}
                 >
                   <span>{item.nameKo}</span>
-                  <span className='block text-sm text-gray-400 dark:text-gray-600 mt-1'>
+                  <span className='block text-sm text-gray-500 dark:text-gray-400 mt-1'>
                     {item.name}
                   </span>
                 </Link>

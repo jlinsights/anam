@@ -32,7 +32,6 @@ export function HeroSection({
 
   const { scrollY } = useScroll()
   const y = useTransform(scrollY, [0, 500], [0, 150])
-  const opacity = useTransform(scrollY, [0, 300], [1, 0.3])
 
   useEffect(() => {
     setIsVisible(true)
@@ -76,22 +75,24 @@ export function HeroSection({
 
       <motion.div
         className='container mx-auto px-4 py-20 relative z-10'
-        style={{ y, opacity }}
+        /* 스크롤에 따라 흐려지게(opacity 1→0.3) 하지 않는다. 300px 만 내려도 버튼 글자 대비가 1.9:1 로
+           떨어졌다(Lighthouse 는 검사 중 스크롤해서 이 상태를 찍었다). 시차 이동(y)만 남긴다 */
+        style={{ y }}
       >
         <div className='grid lg:grid-cols-2 gap-16 items-center'>
           {/* Content */}
           <motion.div
             className='space-y-8'
-            initial={{ opacity: 0, x: -50 }}
-            animate={isVisible ? { opacity: 1, x: 0 } : {}}
+            initial={{ x: -50 }}
+            animate={isVisible ? { x: 0 } : {}}
             transition={{ duration: 0.8, ease: 'easeOut' }}
           >
             {/* Title */}
             <div className='space-y-4'>
               <motion.h1
                 className='text-5xl sm:text-6xl lg:text-7xl font-serif text-gray-900 dark:text-white leading-tight'
-                initial={{ opacity: 0, y: 20 }}
-                animate={isVisible ? { opacity: 1, y: 0 } : {}}
+                initial={{ y: 20 }}
+                animate={isVisible ? { y: 0 } : {}}
                 transition={{ duration: 0.8, delay: 0.2 }}
               >
                 {title}
@@ -99,8 +100,8 @@ export function HeroSection({
 
               <motion.p
                 className='text-xl sm:text-2xl text-gray-600 dark:text-gray-300 font-light tracking-wide'
-                initial={{ opacity: 0, y: 20 }}
-                animate={isVisible ? { opacity: 1, y: 0 } : {}}
+                initial={{ y: 20 }}
+                animate={isVisible ? { y: 0 } : {}}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
                 {subtitle}
@@ -110,18 +111,19 @@ export function HeroSection({
             {/* Description */}
             <motion.p
               className='text-lg text-gray-700 dark:text-gray-400 leading-relaxed max-w-2xl'
-              initial={{ opacity: 0, y: 20 }}
-              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              initial={{ y: 20 }}
+              animate={isVisible ? { y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
               {description}
             </motion.p>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons: 투명도로 페이드하지 않는다. 마지막(약 1.8초)에 나타나는 주요 버튼이 그동안 흐려
+                글자 대비가 1.9:1 까지 떨어졌다(Lighthouse color-contrast). 위치만 움직이고 글자는 처음부터 또렷하게 */}
             <motion.div
               className='flex flex-col sm:flex-row gap-4'
-              initial={{ opacity: 0, y: 20 }}
-              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              initial={{ y: 20 }}
+              animate={isVisible ? { y: 0 } : {}}
               transition={{ duration: 0.8, delay: 1.0 }}
             >
               <Link
@@ -167,9 +169,9 @@ export function HeroSection({
                 {/* Artwork overlay */}
                 <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-all duration-500'>
                   <div className='absolute bottom-0 left-0 right-0 p-6 text-white'>
-                    <h3 className='text-xl font-medium mb-2'>
+                    <p className='text-xl font-medium mb-2'>
                       {featuredArtwork.title}
-                    </h3>
+                    </p>
                     <div className='flex items-center gap-3 text-sm opacity-90'>
                       <span>{featuredArtwork.year}</span>
                       <span>•</span>
@@ -203,22 +205,18 @@ export function HeroSection({
           )}
         </div>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          className='absolute bottom-8 left-1/2 transform -translate-x-1/2'
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-        >
+        {/* Scroll Indicator: 글자가 있으므로 투명도로 페이드하지 않고, gray-400(흰 배경 약 2.5:1) 대신
+            gray-600·dark gray-400 으로 대비를 맞춘다 */}
+        <div className='absolute bottom-8 left-1/2 transform -translate-x-1/2'>
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className='flex flex-col items-center gap-2 text-gray-400 dark:text-gray-600'
+            className='flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400'
           >
             <span className='text-xs font-light'>더 많은 작품들</span>
             <ChevronDown className='w-5 h-5' />
           </motion.div>
-        </motion.div>
+        </div>
       </motion.div>
     </section>
   )

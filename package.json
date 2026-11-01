@@ -23,7 +23,7 @@
     "test:api": "jest --testPathPattern=__tests__/api",
     "test:accessibility": "jest --testPathPattern=__tests__/accessibility",
     "test:a11y": "npm run test:accessibility && npm run test:a11y:audit",
-    "test:a11y:audit": "pa11y-ci --sitemap https://anam-gallery.vercel.app/sitemap.xml",
+    "test:a11y:audit": "pa11y-ci --config pa11y.config.js",
     "test:a11y:contrast": "node scripts/test-color-contrast.js",
     "test:a11y:screen-reader": "jest --testPathPattern=__tests__/accessibility/screen-reader",
     "test:a11y:keyboard": "jest --testPathPattern=__tests__/accessibility/keyboard",
