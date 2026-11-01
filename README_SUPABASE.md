@@ -20,8 +20,8 @@ ANAM Gallery가 이제 **Supabase**를 주 데이터 소스로 사용합니다!
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key  # 선택사항
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key          # 필수 — 앱은 이 키로만 읽는다
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key      # 이관 스크립트(scripts/) 전용
 ```
 
 ### 2. 데이터베이스 스키마 생성

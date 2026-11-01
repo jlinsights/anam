@@ -98,7 +98,8 @@ __tests__/               # Jest. _quarantine/ 은 깨진 채 격리된 테스트
 | 변수 | 용도 |
 |---|---|
 | `AIRTABLE_API_KEY`, `AIRTABLE_BASE_ID` | 원본 데이터 |
-| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | 운영 작품 데이터 |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 운영 작품 데이터 읽기. 앱은 anon 키만 쓴다(`lib/supabase/server.ts`, RLS 공개 읽기 정책) |
+| `SUPABASE_SERVICE_ROLE_KEY` | `scripts/` 의 이관 스크립트 전용(RLS 우회, `createSupabaseAdminClient()`). 앱 코드는 가져오지 않는다(테스트가 막음) — anon 키가 없을 때 대신 쓰지도 않는다 |
 | `REVALIDATE_SECRET`, `ADMIN_SYNC_TOKEN`, `AIRTABLE_WEBHOOK_SECRET` | 캐시 갱신·동기화 인증 (비어 있으면 요청을 거부) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `CONTACT_EMAIL` | 문의 메일 |
 | `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN` | 오류 수집 |
