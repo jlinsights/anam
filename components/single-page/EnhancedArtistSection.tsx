@@ -38,9 +38,9 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
       >
         {/* Biography */}
         <div>
-          <h4 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
+          <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
             작가 소개
-          </h4>
+          </h3>
           <p className='font-display text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap'>
             {artistData.bio}
           </p>
@@ -49,9 +49,9 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
         {/* Artist Statement */}
         {artistData.statement && (
           <div className='bg-amber-50 dark:bg-amber-900/20 p-6 rounded-lg border-l-4 border-yellow-600'>
-            <h4 className='font-display font-bold text-gray-900 dark:text-white text-lg mb-3'>
+            <h3 className='font-display font-bold text-gray-900 dark:text-white text-lg mb-3'>
               작가의 말
-            </h4>
+            </h3>
             <p className='font-display text-gray-700 dark:text-gray-300 leading-relaxed italic'>
               &quot;{artistData.statement}&quot;
             </p>
@@ -116,9 +116,9 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
         {/* Education */}
         {artistData.education && artistData.education.length > 0 && (
           <div>
-            <h4 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
+            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
               학력
-            </h4>
+            </h3>
             <ul className='space-y-2'>
               {artistData.education.map((edu, index) => (
                 <li key={index} className='flex items-start'>
@@ -135,9 +135,9 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
         {/* Exhibitions */}
         {artistData.exhibitions && artistData.exhibitions.length > 0 && (
           <div>
-            <h4 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
+            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
               전시 이력
-            </h4>
+            </h3>
             <ul className='space-y-3'>
               {artistData.exhibitions.map((exhibition, index) => (
                 <li
@@ -156,9 +156,9 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
         {/* Awards */}
         {artistData.awards && artistData.awards.length > 0 && (
           <div>
-            <h4 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
+            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
               수상 경력
-            </h4>
+            </h3>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               {artistData.awards.map((award, index) => (
                 <div
@@ -178,9 +178,9 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
         {/* Collections */}
         {artistData.collections && artistData.collections.length > 0 && (
           <div>
-            <h4 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
+            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
               작품 소장처
-            </h4>
+            </h3>
             <ul className='space-y-2'>
               {artistData.collections.map((collection, index) => (
                 <li key={index} className='flex items-start'>
@@ -197,9 +197,9 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
         {/* Publications */}
         {artistData.publications && artistData.publications.length > 0 && (
           <div>
-            <h4 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
+            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
               출판물
-            </h4>
+            </h3>
             <ul className='space-y-2'>
               {artistData.publications.map((publication, index) => (
                 <li key={index} className='flex items-start'>
@@ -227,9 +227,9 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
         {/* Philosophy */}
         {artistData.philosophy && (
           <div>
-            <h4 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
+            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
               작업 철학
-            </h4>
+            </h3>
             <div className='bg-gray-50 dark:bg-gray-800 p-6 rounded-lg'>
               <p className='font-display text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap'>
                 {artistData.philosophy}
@@ -241,9 +241,9 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
         {/* Influences */}
         {artistData.influences && artistData.influences.length > 0 && (
           <div>
-            <h4 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
+            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
               예술적 영향
-            </h4>
+            </h3>
             <div className='flex flex-wrap gap-3'>
               {artistData.influences.map((influence, index) => (
                 <span
@@ -260,9 +260,9 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
         {/* Techniques */}
         {artistData.techniques && artistData.techniques.length > 0 && (
           <div>
-            <h4 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
+            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
               주요 기법
-            </h4>
+            </h3>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               {artistData.techniques.map((technique, index) => (
                 <div key={index} className='flex items-center'>
@@ -279,9 +279,9 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
         {/* Materials */}
         {artistData.materials && artistData.materials.length > 0 && (
           <div>
-            <h4 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
+            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
               사용 재료
-            </h4>
+            </h3>
             <div className='flex flex-wrap gap-3'>
               {artistData.materials.map((material, index) => (
                 <span
@@ -299,9 +299,9 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
         {artistData.teachingExperience &&
           artistData.teachingExperience.length > 0 && (
             <div>
-              <h4 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
+              <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
                 교육 경력
-              </h4>
+              </h3>
               <ul className='space-y-2'>
                 {artistData.teachingExperience.map((experience, index) => (
                   <li key={index} className='flex items-start'>
@@ -363,7 +363,7 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
                 <div className='aspect-square flex items-center justify-center'>
                   <div className='text-center'>
                     <div className='w-32 h-32 border-4 border-gray-300 dark:border-gray-600 rounded-full mb-4 mx-auto flex items-center justify-center'>
-                      <span className='font-calligraphy text-gray-400 dark:text-gray-500 text-4xl'>
+                      <span className='font-calligraphy text-gray-600 dark:text-gray-400 text-4xl'>
                         芽南
                       </span>
                     </div>
@@ -377,10 +377,10 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
 
             {/* Artist Name & Basic Info */}
             <div className='text-center mb-6'>
-              <h3 className='font-calligraphy font-bold text-gray-900 dark:text-white text-2xl mb-2'>
+              <h2 className='font-calligraphy font-bold text-gray-900 dark:text-white text-2xl mb-2'>
                 {artistData.name}
-              </h3>
-              <p className='font-display text-yellow-600 font-medium mb-2'>
+              </h2>
+              <p className='font-display text-yellow-800 dark:text-yellow-500 font-medium mb-2'>
                 ANAM Bae Ok Young
               </p>
               {artistData.birthYear && (
@@ -432,9 +432,9 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
             {/* Memberships */}
             {artistData.memberships && artistData.memberships.length > 0 && (
               <div className='mt-6 pt-6 border-t border-gray-200 dark:border-gray-700'>
-                <h4 className='font-display font-semibold text-gray-900 dark:text-white text-sm mb-3'>
+                <h3 className='font-display font-semibold text-gray-900 dark:text-white text-sm mb-3'>
                   소속 단체
-                </h4>
+                </h3>
                 <ul className='space-y-1'>
                   {artistData.memberships.map((membership, index) => (
                     <li
@@ -464,7 +464,7 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
               onClick={() => setActiveTab('bio')}
               className={`pb-4 px-2 font-display font-medium transition-colors relative ${
                 activeTab === 'bio'
-                  ? 'text-yellow-600'
+                  ? 'text-yellow-800 dark:text-yellow-500'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
@@ -480,7 +480,7 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
               onClick={() => setActiveTab('career')}
               className={`pb-4 px-2 font-display font-medium transition-colors relative ${
                 activeTab === 'career'
-                  ? 'text-yellow-600'
+                  ? 'text-yellow-800 dark:text-yellow-500'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
@@ -496,7 +496,7 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
               onClick={() => setActiveTab('philosophy')}
               className={`pb-4 px-2 font-display font-medium transition-colors relative ${
                 activeTab === 'philosophy'
-                  ? 'text-yellow-600'
+                  ? 'text-yellow-800 dark:text-yellow-500'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >

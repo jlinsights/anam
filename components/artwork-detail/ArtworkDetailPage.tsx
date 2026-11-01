@@ -231,15 +231,9 @@ function StepLink({ artwork, direction }: StepLinkProps) {
   const base =
     'w-11 h-11 inline-flex items-center justify-center border-2 transition-colors duration-300'
 
+  // 처음·끝 작품에서는 흐린 화살표 대신 같은 크기의 빈칸만 둔다(누를 수 없는 글자가 대비 검사에 걸리지 않게)
   if (!artwork) {
-    return (
-      <span
-        aria-hidden='true'
-        className={`${base} border-transparent text-ink-lighter`}
-      >
-        {arrow}
-      </span>
-    )
+    return <span aria-hidden='true' className={`${base} border-transparent`} />
   }
 
   return (
