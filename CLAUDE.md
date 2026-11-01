@@ -43,7 +43,7 @@ npm run test:e2e       # Playwright (__tests__/e2e)
 | 작품 목록(서버) | Supabase → 없으면 Airtable → 둘 다 없으면 `[]` | `lib/artworks.ts` `getArtworks()` |
 | 작품 상세 `/gallery/[slug]` | Supabase 우선 | `lib/artworks.ts` `getArtworkBySlug()` |
 | 작품 목록(클라이언트) | `/api/artworks` | `hooks/use-artwork-api.ts` `useArtworks()`, `fetchArtworksFromApi()` |
-| 작가(서버 페이지) | Airtable | `lib/artist.ts` `fetchArtist()` |
+| 작가(서버 페이지 `/artist`) | Supabase → 없으면 Airtable (5분마다 다시 생성) | `lib/artist.ts` `fetchArtist()` |
 | 작가(클라이언트) | `/api/artist` → Supabase | `useArtist()`, `app/api/artist/route.ts` |
 | 전시 이력 | 작가 데이터에서 정리 | `lib/exhibition-history.ts` |
 

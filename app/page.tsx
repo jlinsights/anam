@@ -11,6 +11,7 @@ import {
 } from 'react'
 import { useArtworks, useArtist } from '@/hooks/use-artwork-api'
 import Link from 'next/link'
+import { ArtistBio } from '@/components/artist/ArtistBio'
 import { ExhibitionHistory } from '@/components/exhibition/ExhibitionHistory'
 import { ArtworkTile } from '@/components/gallery/ArtworkTile'
 import { exhibitionHistory } from '@/lib/exhibition-history'
@@ -226,20 +227,35 @@ export default function HomePage() {
             aria-labelledby='home-artist-title'
             className='grid gap-6 border-t-2 border-ink pt-12 pb-20 lg:grid-cols-12'
           >
-            <h2
-              id='home-artist-title'
-              className='font-display text-2xl font-bold md:text-3xl lg:col-span-4'
-            >
-              작가 소개
-            </h2>
+            <div className='lg:col-span-4'>
+              <h2
+                id='home-artist-title'
+                className='font-display text-2xl font-bold md:text-3xl'
+              >
+                작가 소개
+              </h2>
+              {artist.profileImageUrl && (
+                <div className='mt-8 hidden max-w-[220px] border-2 border-ink bg-paper-warm p-3 lg:block'>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 주소를 그대로 준다(images.unoptimized) */}
+                  <img
+                    src={artist.profileImageUrl}
+                    alt={artist.name}
+                    loading='lazy'
+                    decoding='async'
+                    className='h-auto w-full'
+                  />
+                </div>
+              )}
+            </div>
             <div className='lg:col-span-8'>
-              <p className='font-display text-xl'>{artist.name}</p>
-              {artist.bio && (
-                <p className='mt-4 max-w-[65ch] font-body leading-relaxed text-ink'>
-                  {artist.bio}
+              <p className='font-display text-2xl text-ink'>{artist.name}</p>
+              {artist.birthYear && (
+                <p className='mt-1 font-body text-sm tabular-nums text-ink-light'>
+                  b.{artist.birthYear}
                 </p>
               )}
-              <div className='mt-8 flex flex-wrap gap-x-8 gap-y-3'>
+              <ArtistBio bio={artist.bio} className='mt-6' />
+              <div className='mt-10 flex flex-wrap gap-x-8 gap-y-3'>
                 <Link
                   href='/artist'
                   className={`inline-flex min-h-[44px] items-center border-b-2 border-ink font-body hover:border-gold ${FOCUS}`}

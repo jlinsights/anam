@@ -4,7 +4,7 @@
  */
 
 import { createSupabaseClient } from './server'
-import { realText } from '@/lib/content-text'
+import { parseBirthYear, realText } from '@/lib/content-text'
 import type { Tables } from './database.types'
 import type { Artwork, Artist } from '@/lib/types'
 import { captureError } from '@/lib/error-logger'
@@ -170,11 +170,12 @@ export async function fetchArtistFromSupabase(): Promise<Artist | null> {
     // Transform to Artist type
     const artist: Artist = {
       id: data.id,
-      name: data.name,
+      // 이름 칸은 Airtable 원문 "芽南 裵玉永 (b.1955)" 그대로다. Airtable 로더와 같이 생년 표기를 떼어 따로 둔다
+      name: data.name.replace(/\s*\(b\.\s*\d{4}\)\s*$/, '').trim() || data.name,
       bio: data.bio || '',
       statement: data.statement || undefined,
       profileImageUrl: data.profile_image_url || undefined,
-      birthYear: data.birth_year || undefined,
+      birthYear: data.birth_year || parseBirthYear(data.name),
       education: data.education || [],
       exhibitions: data.exhibitions || [],
       awards: data.awards || [],

@@ -21,8 +21,12 @@ export const metadata: Metadata = {
   },
 }
 
+// 빌드 때 한 번 찍어 두면 작가 데이터(전시 이력 등)를 고쳐도 다음 배포까지 바뀌지 않는다.
+// 홈(/api/artist, 5분 캐시)과 맞춰 5분마다 다시 만든다
+export const revalidate = 300
+
 export default async function ArtistPage() {
-  // Fetch artist data from Airtable
+  // Supabase 사본 먼저, 없으면 Airtable (lib/artist.ts)
   const artist = await fetchArtist('anam-artist')
 
   return (

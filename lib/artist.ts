@@ -1,4 +1,5 @@
 import { fetchArtistFromAirtable } from '@/lib/airtable'
+import { fetchArtistFromSupabase } from '@/lib/supabase/artworks'
 import { Artist } from '@/lib/types'
 
 const CACHE_KEY = 'artist_data'
@@ -8,8 +9,9 @@ export async function fetchArtist(id: string): Promise<Artist | null> {
   try {
     console.log(`Fetching artist with ID: ${id}`)
 
-    // 에어테이블에서 작가 데이터 가져오기
-    const artist = await fetchArtistFromAirtable()
+    // 홈(/api/artist)과 같은 Supabase 사본을 먼저 읽는다. 없을 때만 원본 Airtable
+    const artist =
+      (await fetchArtistFromSupabase()) ?? (await fetchArtistFromAirtable())
 
     if (!artist) {
       console.log(`No artist found`)
