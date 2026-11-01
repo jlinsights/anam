@@ -92,12 +92,17 @@ describe('이관 스크립트용 Supabase 관리자 클라이언트', () => {
       for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
         const p = path.join(dir, entry.name)
         if (entry.isDirectory()) walk(p)
-        else if (/\.(ts|tsx)$/.test(entry.name) && !p.endsWith(path.join('lib', 'supabase', 'server.ts'))) {
-          if (fs.readFileSync(p, 'utf8').includes('createSupabaseAdminClient')) offenders.push(path.relative(root, p))
+        else if (
+          /\.(ts|tsx)$/.test(entry.name) &&
+          !p.endsWith(path.join('lib', 'supabase', 'server.ts'))
+        ) {
+          if (fs.readFileSync(p, 'utf8').includes('createSupabaseAdminClient'))
+            offenders.push(path.relative(root, p))
         }
       }
     }
-    for (const d of ['app', 'lib', 'hooks', 'components']) walk(path.join(root, d))
+    for (const d of ['app', 'lib', 'hooks', 'components'])
+      walk(path.join(root, d))
     expect(offenders).toEqual([])
   })
 })
