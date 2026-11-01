@@ -5,6 +5,7 @@ import {
 } from '@/lib/error-handler'
 import { withRateLimit, getClientIP } from '@/lib/rate-limit'
 import { sanitizeObject, threatMonitor } from '@/lib/security/input-sanitizer'
+import { ARTIST_EMAIL } from '@/lib/contact'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
@@ -73,6 +74,18 @@ export async function POST(request: NextRequest) {
       // 입력 데이터 검증 (sanitized 데이터 사용)
       const validatedData = contactSchema.parse(sanitizationResult.sanitized)
 
+      // SMTP 계정이 없으면 보내 볼 수도 없다. 500 대신 503으로 알려 화면이 메일 링크를 내놓게 한다
+      if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+        return NextResponse.json(
+          {
+            success: false,
+            code: 'MAIL_NOT_CONFIGURED',
+            message: '지금은 온라인으로 문의를 보낼 수 없습니다.',
+          },
+          { status: 503 }
+        )
+      }
+
       // 이메일 전송 로직 (Nodemailer 사용)
       const nodemailer = require('nodemailer')
 
@@ -94,7 +107,7 @@ export async function POST(request: NextRequest) {
         // 받은 메일에서 바로 답장하면 문의자에게 가도록
         replyTo: validatedData.email,
         from: `"아남 갤러리 문의" <${process.env.SMTP_USER}>`,
-        to: process.env.CONTACT_EMAIL || 'heelang@orientalcalligraphy.org',
+        to: process.env.CONTACT_EMAIL || ARTIST_EMAIL,
         subject: `[아남 갤러리 문의] ${validatedData.subject}`,
         html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

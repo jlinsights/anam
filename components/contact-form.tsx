@@ -1,20 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { ErrorBoundary } from '@/components/error-boundary'
-import { Loader2, Send } from 'lucide-react'
-
-interface ContactFormData {
-  name: string
-  email: string
-  phone: string
-  subject: string
-  message: string
-}
+import { useEffect, useRef, useState } from 'react'
+import { ARTIST_EMAIL, mailtoHref, type ContactDraft } from '@/lib/contact'
 
 interface ContactFormProps {
   className?: string
@@ -23,283 +10,298 @@ interface ContactFormProps {
 }
 
 type SubmitStatus =
-  { kind: 'idle' } | { kind: 'success' } | { kind: 'error'; message: string }
+  | { kind: 'idle' }
+  | { kind: 'sending' }
+  | { kind: 'sent' }
+  | {
+      kind: 'failed'
+      reason: 'unavailable' | 'invalid' | 'network'
+      message?: string
+    }
 
-// 화면에 Toaster가 없어 토스트가 보이지 않았다. 결과는 폼 아래에 직접 알린다
+const INQUIRY_TYPES = ['작품 소장', '주문 제작', '강연', '전시', '기타']
+
+const EMPTY: ContactDraft = {
+  name: '',
+  email: '',
+  phone: '',
+  subject: '',
+  message: '',
+}
+
+// DESIGN.md Inputs: 2px 먹 테두리, 한지 바탕, 각진 모서리, 초점은 금 테두리 + 따뜻한 한지
+const FIELD =
+  'block w-full border-2 border-ink bg-paper px-4 py-3 md:px-5 font-body text-base text-ink ' +
+  'placeholder:text-ink-light/60 rounded-none transition-colors ' +
+  'focus:outline-none focus:border-gold focus:bg-paper-warm focus:ring-4 focus:ring-gold/20'
+
 export function ContactForm({
   className = '',
   defaultSubject = '',
 }: ContactFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [status, setStatus] = useState<SubmitStatus>({ kind: 'idle' })
-  const abortControllerRef = useRef<AbortController | null>(null)
-  const [formData, setFormData] = useState<ContactFormData>({
-    name: '',
-    email: '',
-    phone: '',
+  const [draft, setDraft] = useState<ContactDraft>({
+    ...EMPTY,
     subject: defaultSubject,
-    message: '',
   })
+  // 작품 상세에서 넘어왔다면 대개 소장 문의다
+  const [inquiryType, setInquiryType] = useState<string>(
+    defaultSubject ? '작품 소장' : ''
+  )
+  const [status, setStatus] = useState<SubmitStatus>({ kind: 'idle' })
+  const abortRef = useRef<AbortController | null>(null)
+  const statusRef = useRef<HTMLDivElement>(null)
 
-  const handleInputChange = (
+  useEffect(() => () => abortRef.current?.abort(), [])
+
+  useEffect(() => {
+    if (status.kind === 'sent' || status.kind === 'failed')
+      statusRef.current?.focus()
+  }, [status.kind])
+
+  const update = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+    setDraft((prev) => ({ ...prev, [name]: value }))
   }
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
-      }
-    }
-  }, [])
+  // 작가가 메일 제목만 보고도 무슨 문의인지 알게 한다: "[주문 제작] 제목"
+  const payload: ContactDraft = {
+    ...draft,
+    subject: inquiryType ? `[${inquiryType}] ${draft.subject}` : draft.subject,
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    // Cancel any existing request
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
-    }
-
-    // Create new abort controller
-    abortControllerRef.current = new AbortController()
-    setIsSubmitting(true)
-    setStatus({ kind: 'idle' })
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+    setStatus({ kind: 'sending' })
 
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-        signal: abortControllerRef.current.signal,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
       })
-
       const result = await response.json().catch(() => ({}))
 
       if (response.ok && result.success) {
-        setStatus({ kind: 'success' })
-
-        // 폼 초기화
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          subject: '',
-          message: '',
+        setDraft(EMPTY)
+        setInquiryType('')
+        setStatus({ kind: 'sent' })
+      } else if (response.status === 400) {
+        setStatus({
+          kind: 'failed',
+          reason: 'invalid',
+          message: result.message,
         })
       } else {
-        setStatus({
-          kind: 'error',
-          message: result.message || '문의 전송 중 오류가 발생했습니다.',
-        })
+        setStatus({ kind: 'failed', reason: 'unavailable' })
       }
     } catch (error) {
-      // Handle AbortError (request was cancelled)
-      if (error instanceof Error && error.name === 'AbortError') {
-        return
-      }
-
-      setStatus({
-        kind: 'error',
-        message: '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-      })
+      if (error instanceof Error && error.name === 'AbortError') return
+      setStatus({ kind: 'failed', reason: 'network' })
     } finally {
-      setIsSubmitting(false)
-      abortControllerRef.current = null
+      if (abortRef.current === controller) abortRef.current = null
     }
   }
 
-  return (
-    <ErrorBoundary>
-      <div className={`contact-card-balanced ${className}`}>
-        {/* 헤더 */}
-        <div className='flex items-center gap-zen-sm mb-zen-md'>
-          <div className='p-zen-xs bg-gold/10 rounded-lg'>
-            <Send className='w-4 h-4 text-gold' />
-          </div>
-          <h2 className='text-sm font-medium text-ink dark:text-neutral-100'>
-            문의사항
-          </h2>
-        </div>
+  const sending = status.kind === 'sending'
 
-        {/* 폼 */}
-        <form
-          onSubmit={handleSubmit}
-          className='contact-form-compact flex-1 flex flex-col'
-        >
-          {/* 이름 */}
-          <FormField
+  return (
+    <form onSubmit={handleSubmit} className={`space-y-7 ${className}`}>
+      <div className='grid gap-7 md:grid-cols-2'>
+        <Field id='name' label='이름'>
+          <input
             id='name'
-            label='이름'
             name='name'
             type='text'
-            value={formData.name}
-            onChange={handleInputChange}
+            autoComplete='name'
             required
-            placeholder='이름을 입력해주세요'
+            value={draft.name}
+            onChange={update}
+            disabled={sending}
+            className={FIELD}
           />
-
-          {/* 이메일 */}
-          <FormField
+        </Field>
+        <Field id='email' label='이메일' hint='회신받으실 주소'>
+          <input
             id='email'
-            label='이메일'
             name='email'
             type='email'
-            value={formData.email}
-            onChange={handleInputChange}
+            autoComplete='email'
+            inputMode='email'
             required
-            placeholder='이메일을 입력해주세요'
+            value={draft.email}
+            onChange={update}
+            disabled={sending}
+            className={FIELD}
           />
-
-          {/* 전화번호 */}
-          <FormField
-            id='phone'
-            label='전화번호'
-            name='phone'
-            type='tel'
-            value={formData.phone}
-            onChange={handleInputChange}
-            placeholder='전화번호를 입력해주세요 (선택사항)'
-          />
-
-          {/* 제목 */}
-          <FormField
-            id='subject'
-            label='제목'
-            name='subject'
-            type='text'
-            value={formData.subject}
-            onChange={handleInputChange}
-            required
-            placeholder='문의 제목을 입력해주세요'
-          />
-
-          {/* 메시지 */}
-          <FormField
-            id='message'
-            label='메시지'
-            name='message'
-            type='textarea'
-            value={formData.message}
-            onChange={handleInputChange}
-            required
-            placeholder='문의 내용을 자세히 입력해주세요'
-            rows={5}
-          />
-
-          {/* 제출 버튼 */}
-          <div className='mt-zen-lg'>
-            <Button
-              type='submit'
-              disabled={isSubmitting}
-              className='w-full contact-submit-button'
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className='w-4 h-4 mr-zen-sm animate-spin' />
-                  전송 중...
-                </>
-              ) : (
-                <>
-                  <Send className='w-4 h-4 mr-zen-sm' />
-                  문의 전송
-                </>
-              )}
-            </Button>
-          </div>
-
-          <div aria-live='polite' className='mt-zen-sm min-h-[1.5rem] text-sm'>
-            {status.kind === 'success' && (
-              <p className='text-ink dark:text-neutral-100'>
-                문의가 전송되었습니다. 빠른 시일 내에 답변드리겠습니다.
-              </p>
-            )}
-            {status.kind === 'error' && (
-              <p className='text-red-700 dark:text-red-400'>{status.message}</p>
-            )}
-          </div>
-        </form>
-
-        {/* 하단 안내 */}
-        <div className='mt-zen-md pt-zen-md border-t border-border/50'>
-          <p className='text-xs text-ink-light dark:text-neutral-300 text-center'>
-            문의하신 내용은 빠른 시일 내에 답변드리겠습니다.
-          </p>
-        </div>
+        </Field>
       </div>
-    </ErrorBoundary>
+
+      <Field id='phone' label='전화번호' optional>
+        <input
+          id='phone'
+          name='phone'
+          type='tel'
+          autoComplete='tel'
+          inputMode='tel'
+          value={draft.phone}
+          onChange={update}
+          disabled={sending}
+          className={FIELD}
+        />
+      </Field>
+
+      <fieldset>
+        <legend className='mb-2 flex items-baseline gap-2 font-body text-sm font-medium text-ink'>
+          문의 종류
+          <span className='text-xs font-normal text-ink-light'>선택</span>
+        </legend>
+        <div className='flex flex-wrap gap-2'>
+          {INQUIRY_TYPES.map((type) => (
+            <label key={type} className='cursor-pointer'>
+              <input
+                type='radio'
+                name='inquiryType'
+                value={type}
+                checked={inquiryType === type}
+                onChange={() => setInquiryType(type)}
+                disabled={sending}
+                className='peer sr-only'
+              />
+              <span className='inline-flex min-h-[40px] items-center border border-ink/25 px-4 font-body text-sm text-ink transition-colors hover:border-ink peer-checked:border-ink peer-checked:bg-ink peer-checked:text-paper peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-gold'>
+                {type}
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <Field id='subject' label='제목'>
+        <input
+          id='subject'
+          name='subject'
+          type='text'
+          required
+          maxLength={120}
+          placeholder='예: 작품 소장 문의'
+          value={draft.subject}
+          onChange={update}
+          disabled={sending}
+          className={FIELD}
+        />
+      </Field>
+
+      <Field id='message' label='내용'>
+        <textarea
+          id='message'
+          name='message'
+          required
+          rows={7}
+          maxLength={5000}
+          placeholder='관심 있는 작품, 용도(소장·선물·전시), 원하시는 일정 등을 적어 주세요.'
+          value={draft.message}
+          onChange={update}
+          disabled={sending}
+          className={`${FIELD} min-h-[11rem] resize-y leading-relaxed`}
+        />
+      </Field>
+
+      <div className='flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between'>
+        <p className='font-body text-sm text-ink-light'>
+          적어 주신 내용은 작가에게 메일로 전해집니다.
+        </p>
+        <button
+          type='submit'
+          disabled={sending}
+          className='inline-flex min-h-[48px] items-center justify-center border-2 border-ink bg-ink px-10 font-body text-base text-paper transition-colors hover:bg-paper hover:text-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gold/40 disabled:cursor-wait disabled:opacity-60 disabled:hover:bg-ink disabled:hover:text-paper'
+        >
+          {sending ? '보내는 중…' : '문의 보내기'}
+        </button>
+      </div>
+
+      <div
+        ref={statusRef}
+        tabIndex={-1}
+        aria-live='polite'
+        className='focus:outline-none'
+      >
+        <StatusMessage status={status} draft={payload} />
+      </div>
+    </form>
   )
 }
 
-interface FormFieldProps {
+interface FieldProps {
   id: string
-  name: string
-  type: 'text' | 'email' | 'tel' | 'textarea'
   label: string
-  placeholder: string
-  value: string
-  onChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => void
-  required?: boolean
-  disabled?: boolean
-  rows?: number
+  hint?: string
+  optional?: boolean
+  children: React.ReactNode
 }
 
-function FormField({
-  id,
-  name,
-  type,
-  label,
-  placeholder,
-  value,
-  onChange,
-  required = false,
-  disabled = false,
-  rows = 3,
-}: FormFieldProps) {
+function Field({ id, label, hint, optional = false, children }: FieldProps) {
   return (
-    <div className='space-y-zen-sm void-breathing'>
-      <Label
+    <div>
+      <label
         htmlFor={id}
-        className='text-sm text-ink font-medium dark:text-neutral-100'
+        className='mb-2 flex items-baseline gap-2 font-body text-sm font-medium text-ink'
       >
-        {label} {required && '*'}
-      </Label>
-      {type === 'textarea' ? (
-        <Textarea
-          id={id}
-          name={name}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          rows={rows}
-          required={required}
-          disabled={disabled}
-          className='zen-brutalist-input dark:text-neutral-100 dark:bg-neutral-800 dark:border-neutral-600 dark:placeholder:text-neutral-500'
-        />
-      ) : (
-        <Input
-          id={id}
-          name={name}
-          type={type}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          required={required}
-          disabled={disabled}
-          className='zen-brutalist-input dark:text-neutral-100 dark:bg-neutral-800 dark:border-neutral-600 dark:placeholder:text-neutral-500'
-        />
-      )}
+        {label}
+        {optional && (
+          <span className='text-xs font-normal text-ink-light'>선택</span>
+        )}
+        {hint && (
+          <span className='text-xs font-normal text-ink-light'>· {hint}</span>
+        )}
+      </label>
+      {children}
+    </div>
+  )
+}
+
+function StatusMessage({
+  status,
+  draft,
+}: {
+  status: SubmitStatus
+  draft: ContactDraft
+}) {
+  if (status.kind === 'sent') {
+    return (
+      <p className='border-t-2 border-ink pt-4 font-body text-ink'>
+        문의를 받았습니다. 적어 주신 이메일로 회신드립니다.
+      </p>
+    )
+  }
+  if (status.kind !== 'failed') return null
+
+  if (status.reason === 'invalid') {
+    return (
+      <p className='border-t-2 border-ink pt-4 font-body text-ink'>
+        {status.message || '입력하신 내용을 다시 확인해 주세요.'}
+      </p>
+    )
+  }
+
+  return (
+    <div className='border-t-2 border-ink pt-4 font-body text-ink'>
+      <p>
+        {status.reason === 'network'
+          ? '연결이 끊겨 문의를 보내지 못했습니다.'
+          : '지금은 온라인으로 문의를 보낼 수 없습니다.'}{' '}
+        적어 주신 내용은 그대로 남아 있습니다.
+      </p>
+      <a
+        href={mailtoHref(draft)}
+        className='mt-3 inline-block font-medium underline underline-offset-4 hover:text-ink-light'
+      >
+        메일로 직접 보내기 ({ARTIST_EMAIL})
+      </a>
     </div>
   )
 }
