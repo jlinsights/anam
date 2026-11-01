@@ -20,6 +20,12 @@ describe('書境 2026 출품작 → artworks 행', () => {
     works.forEach((w, i) => expect(w.number).toBe(62 + i))
   })
 
+  // 협회 표기(한지에 먹·옻칠종이에 먹)를 그대로 쓰면 갤러리 재료 칩이 기존 화선지·옻칠종이와 둘로 갈라진다
+  it('재료는 갤러리의 기존 표기를 쓴다', () => {
+    const media = new Set(works.map((w) => w.medium))
+    expect([...media].sort()).toEqual(['옻칠종이', '화선지'])
+  })
+
   it('데이터 파일에 연락처·주소·생년월일·가격이 없다', () => {
     const text = JSON.stringify(data)
     expect(text).not.toMatch(
