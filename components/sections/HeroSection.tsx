@@ -82,16 +82,16 @@ export function HeroSection({
           {/* Content */}
           <motion.div
             className='space-y-8'
-            initial={{ opacity: 0, x: -50 }}
-            animate={isVisible ? { opacity: 1, x: 0 } : {}}
+            initial={{ x: -50 }}
+            animate={isVisible ? { x: 0 } : {}}
             transition={{ duration: 0.8, ease: 'easeOut' }}
           >
             {/* Title */}
             <div className='space-y-4'>
               <motion.h1
                 className='text-5xl sm:text-6xl lg:text-7xl font-serif text-gray-900 dark:text-white leading-tight'
-                initial={{ opacity: 0, y: 20 }}
-                animate={isVisible ? { opacity: 1, y: 0 } : {}}
+                initial={{ y: 20 }}
+                animate={isVisible ? { y: 0 } : {}}
                 transition={{ duration: 0.8, delay: 0.2 }}
               >
                 {title}
@@ -99,8 +99,8 @@ export function HeroSection({
 
               <motion.p
                 className='text-xl sm:text-2xl text-gray-600 dark:text-gray-300 font-light tracking-wide'
-                initial={{ opacity: 0, y: 20 }}
-                animate={isVisible ? { opacity: 1, y: 0 } : {}}
+                initial={{ y: 20 }}
+                animate={isVisible ? { y: 0 } : {}}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
                 {subtitle}
@@ -110,8 +110,8 @@ export function HeroSection({
             {/* Description */}
             <motion.p
               className='text-lg text-gray-700 dark:text-gray-400 leading-relaxed max-w-2xl'
-              initial={{ opacity: 0, y: 20 }}
-              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              initial={{ y: 20 }}
+              animate={isVisible ? { y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
               {description}
@@ -204,22 +204,18 @@ export function HeroSection({
           )}
         </div>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          className='absolute bottom-8 left-1/2 transform -translate-x-1/2'
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-        >
+        {/* Scroll Indicator: 글자가 있으므로 투명도로 페이드하지 않고, gray-400(흰 배경 약 2.5:1) 대신
+            gray-600·dark gray-400 으로 대비를 맞춘다 */}
+        <div className='absolute bottom-8 left-1/2 transform -translate-x-1/2'>
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className='flex flex-col items-center gap-2 text-gray-400 dark:text-gray-600'
+            className='flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400'
           >
             <span className='text-xs font-light'>더 많은 작품들</span>
             <ChevronDown className='w-5 h-5' />
           </motion.div>
-        </motion.div>
+        </div>
       </motion.div>
     </section>
   )
