@@ -104,15 +104,19 @@ async function checkSupabaseHealth(): Promise<boolean> {
       return false // 환경 변수 없음 = 사용 안함 = 정상
     }
 
-    // Supabase health endpoint 확인
-    const response = await fetch(`${supabaseUrl}/rest/v1/`, {
-      headers: {
-        apikey: supabaseKey,
-        Authorization: `Bearer ${supabaseKey}`,
-      },
-    })
+    // 앱이 실제로 읽는 공개 표에서 한 줄을 읽는다. REST 루트(/rest/v1/)는 anon 키로 거부돼
+    // 실제 읽기가 되는데도 degraded 로 나왔다(2026-11-01, __tests__/api/health-supabase-probe.test.ts)
+    const response = await fetch(
+      `${supabaseUrl}/rest/v1/artworks?select=id&limit=1`,
+      {
+        headers: {
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+        },
+      }
+    )
 
-    return response.ok || response.status === 404 // 404도 정상 (endpoint 존재)
+    return response.ok
   } catch (error) {
     console.warn('Supabase health check failed:', error)
     return false
