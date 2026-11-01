@@ -5,23 +5,10 @@ import {
   handleAuthError,
 } from '@/lib/error-handler'
 import { NextRequest, NextResponse } from 'next/server'
-import crypto from 'crypto'
+import { isValidSecret } from '@/lib/server-secret'
 
 // 시크릿이 없으면 누구나 캐시를 무효화할 수 있으므로 필수로 둔다
 const WEBHOOK_SECRET = process.env.REVALIDATE_SECRET
-
-function isValidSecret(provided: unknown, expected: string): boolean {
-  if (typeof provided !== 'string') {
-    return false
-  }
-  // 문자 수가 아니라 바이트 수를 비교해야 한다: 길이가 다르면 timingSafeEqual이 예외를 던진다
-  const providedBuf = Buffer.from(provided, 'utf8')
-  const expectedBuf = Buffer.from(expected, 'utf8')
-  if (providedBuf.length !== expectedBuf.length) {
-    return false
-  }
-  return crypto.timingSafeEqual(providedBuf, expectedBuf)
-}
 
 export async function POST(req: NextRequest) {
   try {

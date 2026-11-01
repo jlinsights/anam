@@ -31,7 +31,7 @@ web
 ## Operating Context
 
 - 작품·작가 정보는 Airtable에서 관리하고, 사이트는 ISR과 `/api/revalidate`로 갱신한다.
-- 다만 코드에서 작품을 읽는 순서는 Supabase → Airtable → 로컬 대체 데이터다(`lib/artworks.ts`). 작품 상세는 실제로 Supabase 사본을 보여 준다. 작가 정보는 Airtable에서 바로 읽는다(`lib/airtable.ts`). Airtable을 고친 뒤 Supabase 사본도 맞춰야 화면이 바뀐다.
+- 다만 코드에서 작품을 읽는 순서는 Supabase → Airtable 이고, 둘 다 실패하면 빈 목록이다(`lib/artworks.ts`, 지어낸 대체 데이터는 2026-11-01 삭제). 작품 상세는 실제로 Supabase 사본을 보여 준다. 작가 정보는 서버 페이지는 Airtable에서 바로(`lib/artist.ts` → `lib/airtable.ts`), 첫 화면은 `/api/artist`로 Supabase 사본에서 읽는다. Airtable을 고친 뒤 Supabase 사본도 맞춰야 화면이 바뀐다.
 - 운영 주소는 `anam.orientalcalligraphy.org`, 배포 주소는 `anam-gallery.vercel.app`(Vercel).
 - 전시 관람객은 휴대폰으로, 수집가·큐레이터는 데스크톱으로 오는 경우가 많다고 본다(가정, 접속 통계로 확인 전).
 - 주요 경로: `/`(첫 화면), `/gallery`(전체 작품, 검색·연도 필터), `/gallery/[slug]`(작품 상세·해설), `/artist`(작가 소개), `/exhibition`(전시), `/contact`(문의).
@@ -43,7 +43,7 @@ web
 - 문의 양식은 메일로 보내는데, 운영 환경의 SMTP 환경 변수가 아직 Vercel에 설정되지 않았다(사용자가 추가 예정). 그 전까지 실제 발송은 확인되지 않은 상태다.
 - 받는 주소는 `CONTACT_EMAIL`이고, 비어 있으면 희랑 작가 주소(`heelang@orientalcalligraphy.org`)로 간다(`app/api/contact/route.ts`). 아남 작가용 받는 주소는 아직 정하지 않았다.
 - `/exhibition`은 첫 화면의 없는 구역(`/#exhibition`)으로 보내고 있어 사실상 빈 경로다. 書境 전시 일정·장소가 확인되면 채운다.
-- `/aceternity-demo`, `/single-page` 같은 데모·실험 경로가 운영에 공개되어 있다. 유지할지는 정하지 않았다.
+- `/single-page` 실험 경로가 운영에 공개되어 있다. 유지할지는 정하지 않았다. (`/aceternity-demo`는 2026-11-01 삭제)
 
 ## Brand Commitments
 
@@ -54,10 +54,10 @@ web
 
 - 작품 61점 (Airtable, 2026-10-31 운영 사이트에서 "61개 작품" 확인). 이미지는 `public/Images/Artworks/`.
 - 작가 사진: `public/Images/Artist/배옥영.jpeg`.
-- **작가 사실 정보의 유일한 출처는 Airtable이다.** `lib/artist.ts`의 로컬 대체 데이터(1980년생, 「2024 한국미술대전 대상」, 「미술대학 졸업」 등)는 자리 채움 값이며, 화면에 보이거나 다른 곳에 옮겨 쓰면 안 된다.
+- **작가 사실 정보의 유일한 출처는 Airtable이다.** 예전 코드에 있던 자리 채움 작가 정보(1980년생, 「2024 한국미술대전 대상」, 「미술대학 졸업」 등)는 2026-11-01 모두 삭제했다. 되살리거나 다른 곳에 옮겨 쓰면 안 된다.
 - 출생 연도는 Airtable에 따로 칸이 없고, 이름 칸 「芽南 裵玉永 (b.1955)」에만 있다. 코드는 여기서 1955를 읽는다(`lib/content-text.ts`의 `parseBirthYear`).
 - 작품 61점 모두 Airtable·Supabase의 `description`이 「작품 설명 혹은 평론」, `artistNote`가 「작가의 글」이라는 템플릿 문구다(2026-10-31 확인). 화면에서는 걸러 내지만, 실제 해설은 아직 하나도 없다.
-- `lib/constants/site-config.ts`의 SNS 주소(instagram `anam_art`, `anam.com`, twitter `@anam_art`)는 실제 계정인지 확인되지 않았다.
+- 확인된 SNS 계정이 없다. 예전 `lib/constants/site-config.ts`의 미확인 주소(instagram `anam_art`, `anam.com`, twitter `@anam_art`)는 2026-11-01 삭제했고, 실제 계정이 확인되면 그때 넣는다.
 - 없는 것: 확인된 수상·학력·전시 이력 목록, 추천사, 언론 보도, 판매 가격. 지어내지 않는다.
 
 ## Product Principles

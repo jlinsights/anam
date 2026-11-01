@@ -15,12 +15,11 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
     'bio'
   )
 
-  // Use provided artist data or fallback
-  const artistData = artist || {
+  // 작가 데이터가 없을 때의 기본값. 생년 등 사실은 지어내지 않는다(예전에는 1955 를 넣어 보여 줬다)
+  const artistData: Artist = artist || {
     id: 'anam',
     name: '아남 배옥영',
     bio: '전통 서예의 깊이와 현대적 감각을 조화시키며, 한국 미학의 정수를 현대적 언어로 재해석하는 작업을 하고 있습니다.',
-    birthYear: 1955,
     exhibitions: [],
     awards: [],
     education: [],

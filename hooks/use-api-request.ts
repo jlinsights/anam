@@ -59,13 +59,15 @@ export function useApiRequest<T>(
 
   // Execute the request
   const execute = useCallback(async (): Promise<T | null> => {
+    // 이 호출의 요청 신호. catch 에서 "아직 내 요청이 최신인가"를 가르는 데 쓴다
+    let signal: AbortSignal | undefined
     try {
       // Cancel any existing request
       cleanup()
 
       // Create new abort controller
       abortControllerRef.current = new AbortController()
-      const signal = abortControllerRef.current.signal
+      signal = abortControllerRef.current.signal
 
       // Check if component is still mounted
       if (!mountedRef.current) {
@@ -75,18 +77,19 @@ export function useApiRequest<T>(
       setState((prev) => ({ ...prev, loading: true, error: null }))
 
       // Set up timeout
+      const requestSignal = signal
       const timeoutId = setTimeout(() => {
-        if (!signal.aborted) {
+        if (!requestSignal.aborted) {
           abortControllerRef.current?.abort()
         }
       }, timeout)
 
       try {
-        const data = await requestFn(signal)
+        const data = await requestFn(requestSignal)
         clearTimeout(timeoutId)
 
         // Check if request was cancelled or component unmounted
-        if (signal.aborted || !mountedRef.current) {
+        if (requestSignal.aborted || !mountedRef.current) {
           return null
         }
 
@@ -103,8 +106,13 @@ export function useApiRequest<T>(
         throw error
       }
     } catch (error) {
-      // Check if component is still mounted
-      if (!mountedRef.current) {
+      // 언마운트됐거나, 새 요청이 이 요청을 대체했으면(cleanup 이 컨트롤러를 바꿈) 상태를 건드리지 않는다.
+      // 타임아웃은 컨트롤러를 바꾸지 않으므로 아래 타임아웃 처리로 그대로 간다
+      if (
+        !mountedRef.current ||
+        !signal ||
+        abortControllerRef.current?.signal !== signal
+      ) {
         return null
       }
 
@@ -193,6 +201,9 @@ export function useApiRequest<T>(
 
   // Execute on mount if immediate is true
   useEffect(() => {
+    // 이 효과가 다시 돌 때(의존성 변경·StrictMode) 정리 함수가 false 로 바꿔 둔 값을 되돌린다.
+    // 그러지 않으면 다음 요청이 "언마운트됨"으로 보고 loading 을 끝내지 못한다
+    mountedRef.current = true
     if (immediate) {
       execute()
     }
@@ -229,94 +240,38 @@ export function useFetch<T>(
     ...fetchOptions
   } = options
 
+  // fetchOptions 는 렌더마다 새 객체라 의존성에 넣으면 요청 함수가 매번 바뀌어
+  // 마운트 효과가 다시 돌고 진행 중 요청이 취소된다. 최신 값만 ref 로 읽는다
+  const fetchOptionsRef = useRef(fetchOptions)
+  fetchOptionsRef.current = fetchOptions
+
+  // 실패는 오류로 던진다. 예전에는 /api/artworks·/api/artist 실패 시 지어낸 작품 61점·작가 정보를
+  // 성공 데이터처럼 돌려줘 화면에 실제처럼 나왔다
   const requestFn = useCallback(
     async (signal: AbortSignal): Promise<T> => {
-      try {
-        const response = await fetch(url, {
-          ...fetchOptions,
-          signal,
-        })
+      const response = await fetch(url, {
+        ...fetchOptionsRef.current,
+        signal,
+      })
 
-        if (!response.ok) {
-          console.error(
-            `API error for ${url}:`,
-            response.status,
-            response.statusText
-          )
-
-          // For artworks API, try to use fallback data from local module
-          if (url.includes('/api/artworks')) {
-            console.warn('🔄 API failed, attempting to use fallback data')
-            try {
-              const { fallbackArtworksData } = await import('@/lib/artworks')
-              return fallbackArtworksData as unknown as T
-            } catch (importError) {
-              console.error('Failed to import fallback data:', importError)
-              throw new Error(`HTTP error! status: ${response.status}`)
-            }
-          }
-
-          // For artist API, try to use fallback data
-          if (url.includes('/api/artist')) {
-            console.warn(
-              '🔄 Artist API failed, attempting to use fallback data'
-            )
-            try {
-              const { fallbackArtistData } = await import('@/lib/artworks')
-              return fallbackArtistData as unknown as T
-            } catch (importError) {
-              console.error(
-                'Failed to import fallback artist data:',
-                importError
-              )
-              throw new Error(`HTTP error! status: ${response.status}`)
-            }
-          }
-
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-
-        const contentType = response.headers.get('content-type')
-        if (contentType && contentType.includes('application/json')) {
-          const result = await response.json()
-          return result.data ?? result
-        }
-
-        return response.text() as unknown as T
-      } catch (error) {
-        // If it's an AbortError, re-throw it
-        if ((error as Error).name === 'AbortError') {
-          throw error
-        }
-
-        // For other errors on artworks endpoint, try fallback
-        if (url.includes('/api/artworks')) {
-          console.warn('🔄 Request failed, attempting to use fallback data')
-          try {
-            const { fallbackArtworksData } = await import('@/lib/artworks')
-            return fallbackArtworksData as unknown as T
-          } catch (importError) {
-            console.error('Failed to import fallback data:', importError)
-          }
-        }
-
-        // For other errors on artist endpoint, try fallback
-        if (url.includes('/api/artist')) {
-          console.warn(
-            '🔄 Artist request failed, attempting to use fallback data'
-          )
-          try {
-            const { fallbackArtistData } = await import('@/lib/artworks')
-            return fallbackArtistData as unknown as T
-          } catch (importError) {
-            console.error('Failed to import fallback artist data:', importError)
-          }
-        }
-
-        throw error
+      if (!response.ok) {
+        console.error(
+          `API error for ${url}:`,
+          response.status,
+          response.statusText
+        )
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
+
+      const contentType = response.headers.get('content-type')
+      if (contentType && contentType.includes('application/json')) {
+        const result = await response.json()
+        return result.data ?? result
+      }
+
+      return response.text() as unknown as T
     },
-    [url, fetchOptions]
+    [url]
   )
 
   return useApiRequest(requestFn, {
