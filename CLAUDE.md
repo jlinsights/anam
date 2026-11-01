@@ -52,6 +52,9 @@ npm run test:e2e       # Playwright (__tests__/e2e)
 - 동기화 경로: `/api/admin/sync`(`ADMIN_SYNC_TOKEN`), `/api/sync/airtable`(Airtable 웹훅, `AIRTABLE_WEBHOOK_SECRET`), `/api/revalidate`(`REVALIDATE_SECRET`). 셋 다 캐시만 비운다 — Supabase 사본을 갱신하지는 않는다. 웹훅 설정은 `docs/AIRTABLE_WEBHOOK_SETUP.md`.
 - 메모리 캐시는 서버리스 인스턴스마다 따로 있다. 한 인스턴스를 비워도 다른 인스턴스는 TTL 까지 이전 값을 줄 수 있다.
 - 작품 이미지: `public/Images/Artworks/`. 큰 이미지 크기 표는 `lib/artwork-full-sizes.json`(`scripts/generate-full-images.mjs` 로 생성), 경로는 `lib/artwork-full-image.ts`.
+- **작품 이미지는 정적 파일을 그대로 준다.** `next.config.mjs` 의 `images.unoptimized: true` — Vercel 이미지 최적화(`/_next/image`)는 2026-11-01 한도가 소진돼 402 를 냈다. 크기별 파일(thumb·medium·large·full)을 이미 만들어 두었으니 최적화 서버에 기대지 않는다.
+- **이미지에 로딩 효과를 넣지 않는다.** 스피너·깜빡이는 덮개·투명도 페이드·IntersectionObserver 로 src 늦게 넣기 모두 금지. `<img loading="lazy" decoding="async">`(첫 화면은 `eager`)와 종이색 바탕이면 된다 — seonggok.com 방식. 예전 효과들은 실패 시 스피너만 영원히 돌거나 그림을 반투명하게 덮었다. `components/common/ProgressiveImage.tsx`·홈 작품 칸 테스트가 지킨다.
+- **서비스 워커를 쓰지 않는다.** 예전 `public/sw.js` 는 이미지 실패를 "이미지를 불러올 수 없습니다" 가짜 그림으로 바꾸고 30일 캐시했다. 지금 `public/sw.js` 는 이미 설치된 방문자 브라우저에서 스스로 해제하는 워커이고, `components/service-worker-registration.tsx` 는 등록 대신 해제·캐시 삭제를 한다. 둘 다 지우지 않는다(옛 워커가 남은 방문자가 있다).
 
 ## 구조
 

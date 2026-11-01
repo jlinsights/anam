@@ -3,7 +3,11 @@ import Link from 'next/link'
 import type { Artwork, Artist } from '@/lib/types'
 import { ArtworkImage } from '@/components/common/ProgressiveImage'
 import { ArtworkErrorBoundary } from '@/components/error-boundary/ArtworkErrorBoundary'
-import { fullImageFor, sortByNumber } from '@/lib/artwork-full-image'
+import {
+  fullImageFor,
+  previewImageFor,
+  sortByNumber,
+} from '@/lib/artwork-full-image'
 
 interface ArtworkDetailPageProps {
   artwork: Artwork
@@ -249,7 +253,8 @@ function StepLink({ artwork, direction }: StepLinkProps) {
 }
 
 function OtherWork({ artwork }: { artwork: Artwork }) {
-  const image = fullImageFor(artwork)
+  // 약 160px 칸이므로 1800px 원본 대신 잘리지 않은 800px medium 을 쓴다
+  const image = previewImageFor(artwork)
 
   return (
     <Link

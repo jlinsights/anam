@@ -21,6 +21,10 @@ const nextConfig = {
   // React 19 호환성을 위한 설정
   reactStrictMode: true,
   images: {
+    // Vercel 이미지 최적화(/_next/image)를 쓰지 않는다. 2026-11-01 팀 한도가 소진돼 402 를 돌려주면서
+    // 모든 작품 이미지가 깨졌다. 작품 이미지는 public/Images/Artworks/optimized/ 에 크기별로 미리 만들어
+    // 두었으므로 정적 파일을 그대로 준다(__tests__/config/next-image-unoptimized.test.ts).
+    unoptimized: true,
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],

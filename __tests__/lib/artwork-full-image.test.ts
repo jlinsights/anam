@@ -1,6 +1,7 @@
 import {
   artworkNumber,
   fullImageFor,
+  previewImageFor,
   sortByNumber,
 } from '@/lib/artwork-full-image'
 
@@ -46,3 +47,31 @@ describe('sortByNumber', () => {
     expect(input[0].slug).toBe('10')
   })
 })
+
+// 이미지 최적화를 끈 뒤(next.config images.unoptimized) 상세의 "다른 작품" 칸(약 160px)이 1800px
+// 원본(15번 655KB)을 받았다(Codex 리뷰). 작은 칸에는 잘리지 않은 800px medium 을 쓴다
+describe('previewImageFor', () => {
+  it('잘리지 않은 medium 이미지를 원본 비율로 돌려준다', () => {
+    const image = previewImageFor({ slug: '61' })
+    expect(image?.src).toBe('/Images/Artworks/optimized/61/61-medium.jpg')
+    expect(image!.height).toBeGreaterThan(image!.width * 3)
+  })
+
+  it('목록에 없는 번호는 null', () => {
+    expect(previewImageFor({ slug: '999' })).toBeNull()
+  })
+
+  it('목록의 모든 작품에 medium 파일이 실제로 있다', () => {
+    const fs = require('fs') as typeof import('fs')
+    const path = require('path') as typeof import('path')
+    const sizes = require('@/lib/artwork-full-sizes.json') as Record<string, number[]>
+    const missing = Object.keys(sizes).filter(
+      (n) =>
+        !fs.existsSync(
+          path.join(__dirname, '..', '..', 'public', previewImageFor({ slug: n })!.src)
+        )
+    )
+    expect(missing).toEqual([])
+  })
+})
+
