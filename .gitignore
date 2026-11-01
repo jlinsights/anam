@@ -24,6 +24,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+# dev 서버 로그 (예전에 2MB 넘는 로그가 커밋됐다)
+*.log
 
 # local env files
 .env*.local

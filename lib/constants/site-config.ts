@@ -49,12 +49,9 @@ export const SITE_CONFIG = {
     textColor: '#1a1a1a',
   },
 
-  // Social Media
-  social: {
-    instagram: 'https://instagram.com/anam_art',
-    website: 'https://anam.com',
-    twitter: '@anam_art',
-  },
+  // 소셜 계정: 작가의 실제 계정이 확인되면 여기에 넣는다. 예전 값(anam.com·instagram.com/anam_art·@anam_art)은
+  // 작가 것이 아닌 지어낸 주소였는데 모든 페이지의 twitter:creator·JSON-LD sameAs 로 나갔다
+  social: {} as { instagram?: string; website?: string; twitter?: string },
 
   // Images
   images: {
@@ -105,7 +102,9 @@ export const STRUCTURED_DATA = {
     knowsAbout: SITE_CONFIG.artist.knowsAbout,
     image: `${SITE_CONFIG.url}${SITE_CONFIG.artist.image}`,
     url: `${SITE_CONFIG.url}/#artist`,
-    sameAs: [SITE_CONFIG.social.instagram, SITE_CONFIG.social.website],
+    sameAs: [SITE_CONFIG.social.instagram, SITE_CONFIG.social.website].filter(
+      (url): url is string => Boolean(url)
+    ),
   },
 
   website: {
