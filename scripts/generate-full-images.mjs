@@ -21,7 +21,11 @@ const files = fs
   .filter((file) => /^anam-\d+-\d{4}\.jpe?g$/i.test(file))
   .sort()
 
-const manifest = {}
+// 기존 목록에 덮어쓴다(새로 만들지 않는다). 원본이 저장소에 없는 작품 — 書境 2026 출품작(62~,
+// scripts/import-seokyeong) — 이 목록에서 빠지면 갤러리·상세 칸이 깨진다
+const manifest = fs.existsSync(manifestPath)
+  ? JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
+  : {}
 for (const file of files) {
   const number = file.match(/^anam-(\d+)-/)[1].padStart(2, '0')
   const outDir = path.join(optimizedDir, number)

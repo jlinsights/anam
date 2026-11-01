@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getArtworkBySlug, getArtworks } from '@/lib/artworks'
 import { fetchArtist } from '@/lib/artist'
+import { fullImageFor } from '@/lib/artwork-full-image'
 import { ArtworkDetailPage } from '@/components/artwork-detail/ArtworkDetailPage'
 import type { Artwork, Artist } from '@/lib/types'
 import type { Metadata } from 'next'
@@ -33,6 +34,7 @@ export async function generateMetadata({
 
   // Sanitize all text fields
   const sanitizedTitle = sanitizeText(artwork.title)
+  const shareImage = fullImageFor(artwork)
   const sanitizedDescription = sanitizeText(
     artwork.description || '아남 배옥영 작가의 현대 서예 작품입니다.'
   )
@@ -43,22 +45,18 @@ export async function generateMetadata({
     openGraph: {
       title: `${sanitizedTitle} | 아남 배옥영`,
       description: sanitizedDescription || `${artwork.year}년 작품`,
-      images: [
-        {
-          url: (() => {
-            // slug에서 숫자 부분 추출 (anam-36 → 36)
-            if (!artwork.slug || typeof artwork.slug !== 'string') {
-              return `/Images/Artworks/optimized/01/01-large.jpg`
-            }
-            const numberMatch = artwork.slug.match(/anam-(\d+)/)
-            const number = numberMatch ? numberMatch[1].padStart(2, '0') : '01'
-            return `/Images/Artworks/optimized/${number}/${number}-large.jpg`
-          })(),
-          width: 1200,
-          height: 1200,
-          alt: sanitizedTitle,
-        },
-      ],
+      // 잘리지 않은 full 파일과 실제 크기. 예전 large(1200 정사각형)는 잘려 있었고
+      // 書境 2026 출품작(62~)에는 아예 없어 404 였다. 이미지가 없으면 다른 작품 그림을 대신 쓰지 않는다
+      images: shareImage
+        ? [
+            {
+              url: shareImage.src,
+              width: shareImage.width,
+              height: shareImage.height,
+              alt: sanitizedTitle,
+            },
+          ]
+        : [],
     },
   }
 }

@@ -47,6 +47,7 @@ npm run test:e2e       # Playwright (__tests__/e2e)
 | 작가(클라이언트) | `/api/artist` → Supabase | `useArtist()`, `app/api/artist/route.ts` |
 | 전시 이력 | 작가 데이터에서 정리 | `lib/exhibition-history.ts` |
 
+- **書境 2026 출품작(`anam-62` ~ `anam-115`, 54점)은 ANAM Airtable 에 없다.** 협회 Airtable(전시 출품 목록)에서 작품 칸만 옮긴 `scripts/data/seokyeong-2026.json` 을 `scripts/import-seokyeong` 으로 Supabase 에 넣었다. 이미지 원본은 저장소에 없고 full·preview 만 있다. `migrate-airtable-to-supabase` 는 슬러그로 upsert 만 하므로 이 행을 지우지 않지만, ANAM Airtable 이 같은 슬러그를 쓰게 되면 덮어쓴다.
 - **Airtable 만 고치면 작품 화면은 바뀌지 않는다.** Supabase 사본도 맞춰야 한다: `scripts/migrate-airtable-to-supabase.ts`. 절차는 `docs/SUPABASE_MIGRATION_GUIDE.md`.
 - 캐시: `lib/cache.ts` 의 공용 메모리 저장소(`getCachedData`·`setCachedData`·`clearCache`)와 `clearCacheAndRevalidate(tag)`(메모리 캐시를 비우고 `revalidateTag`). API 라우트 캐시도 여기 둬야 동기화가 함께 비운다.
 - 동기화 경로: `/api/admin/sync`(`ADMIN_SYNC_TOKEN`), `/api/sync/airtable`(Airtable 웹훅, `AIRTABLE_WEBHOOK_SECRET`), `/api/revalidate`(`REVALIDATE_SECRET`). 셋 다 캐시만 비운다 — Supabase 사본을 갱신하지는 않는다. 웹훅 설정은 `docs/AIRTABLE_WEBHOOK_SETUP.md`.
