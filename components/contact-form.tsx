@@ -32,7 +32,7 @@ const EMPTY: ContactDraft = {
 // DESIGN.md Inputs: 2px 먹 테두리, 한지 바탕, 각진 모서리, 초점은 금 테두리 + 따뜻한 한지
 const FIELD =
   'block w-full border-2 border-ink bg-paper px-4 py-3 md:px-5 font-body text-base text-ink ' +
-  'placeholder:text-ink-light/60 rounded-none transition-colors ' +
+  'placeholder:text-ink-light rounded-none transition-colors ' +
   'focus:outline-none focus:border-gold focus:bg-paper-warm focus:ring-4 focus:ring-gold/20'
 
 export function ContactForm({

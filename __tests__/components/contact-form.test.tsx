@@ -1,5 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { readFileSync } from 'fs'
+import path from 'path'
 import { ContactForm } from '@/components/contact-form'
 
 function mockFetch(status: number, body: Record<string, unknown>) {
@@ -97,5 +99,14 @@ describe('ContactForm', () => {
   it('작품 상세에서 오면 "작품 소장"이 미리 골라져 있다', () => {
     render(<ContactForm defaultSubject='「도산가」 작품 문의' />)
     expect(screen.getByRole('radio', { name: '작품 소장' })).toBeChecked()
+  })
+
+  // 흰 한지 위 text-ink-light 는 4.75:1. 투명도를 섞으면 /60 은 2.3:1 로 AA(4.5:1) 미달(Codex 리뷰 #27)
+  it('자리 표시 글자에 투명도를 섞지 않는다', () => {
+    const source = readFileSync(
+      path.join(process.cwd(), 'components/contact-form.tsx'),
+      'utf8'
+    )
+    expect(source).not.toMatch(/placeholder:text-[\w-]+\/\d+/)
   })
 })
