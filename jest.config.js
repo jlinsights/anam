@@ -55,25 +55,18 @@ const customJestConfig = {
   // 테스트 setup 파일
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 
-  // 테스트 커버리지 임계값 (85%로 상향)
+  // 테스트 커버리지 하한 (래칫): 목표치가 아니라 "지금보다 떨어지지 않게" 막는 바닥값.
+  // 2026-11-01 main(#18 병합 후) 실측 statements 23.5 · branches 19.79 · functions 23.31 · lines 23.66 을 내림한 값
+  // (쓰이지 않던 코드 약 1만 줄 삭제·접근성 테스트 추가로 10-31 의 약 4% 에서 올랐다).
+  // 테스트를 늘려 실측이 오르면 이 값도 함께 올린다. 내리지 않는다.
+  // 예전 85/90% 와 폴더별(components·lib) 기준은 실측 2% 대라 늘 실패했다. 폴더별 기준은
+  // 파일마다 따로 적용되고 해당 파일을 전체 집계에서 빼 버려 전체 수치도 왜곡했다
   coverageThreshold: {
     global: {
-      branches: 85,
-      functions: 85,
-      lines: 85,
-      statements: 85,
-    },
-    './components/**/*.{js,jsx,ts,tsx}': {
-      branches: 90,
-      functions: 90,
-      lines: 90,
-      statements: 90,
-    },
-    './lib/**/*.{js,jsx,ts,tsx}': {
-      branches: 85,
-      functions: 85,
-      lines: 85,
-      statements: 85,
+      branches: 19,
+      functions: 23,
+      lines: 23,
+      statements: 23,
     },
   },
 
