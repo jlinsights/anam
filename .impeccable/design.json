@@ -1,37 +1,217 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-31T13:30:00+09:00",
+  "generatedAt": "2026-11-01T17:00:00+09:00",
   "title": "Design System: 아남 배옥영 서예 갤러리",
   "extensions": {
     "colorMeta": {
-      "ink": { "role": "primary", "displayName": "먹 (Ink)", "canonical": "hsl(222.2 47.4% 11.2%)", "tonalRamp": ["hsl(222 47% 6%)", "hsl(222 47% 11%)", "hsl(220 30% 22%)", "hsl(218 22% 34%)", "hsl(215 16% 47%)", "hsl(212 18% 60%)", "hsl(210 20% 75%)", "hsl(210 22% 90%)"] },
-      "ink-light": { "role": "neutral", "displayName": "흐린 먹 (Ink Light)", "canonical": "hsl(215.4 16.3% 46.9%)", "tonalRamp": ["hsl(215 16% 15%)", "hsl(215 16% 25%)", "hsl(215 16% 35%)", "hsl(215 16% 47%)", "hsl(215 16% 58%)", "hsl(215 16% 70%)", "hsl(215 16% 82%)", "hsl(215 16% 94%)"] },
-      "ink-lighter": { "role": "neutral", "displayName": "옅은 먹 (Ink Lighter)", "canonical": "hsl(210 20% 65%)", "tonalRamp": ["hsl(210 20% 15%)", "hsl(210 20% 27%)", "hsl(210 20% 39%)", "hsl(210 20% 52%)", "hsl(210 20% 65%)", "hsl(210 20% 76%)", "hsl(210 20% 86%)", "hsl(210 20% 95%)"] },
-      "paper": { "role": "neutral", "displayName": "흰 한지 (Paper)", "canonical": "hsl(0 0% 100%)", "tonalRamp": ["hsl(0 0% 15%)", "hsl(0 0% 27%)", "hsl(0 0% 40%)", "hsl(0 0% 52%)", "hsl(0 0% 65%)", "hsl(0 0% 78%)", "hsl(0 0% 90%)", "hsl(0 0% 100%)"] },
-      "paper-warm": { "role": "neutral", "displayName": "따뜻한 한지 (Paper Warm)", "canonical": "hsl(30 40% 98%)", "tonalRamp": ["hsl(30 40% 15%)", "hsl(30 40% 27%)", "hsl(30 40% 40%)", "hsl(30 40% 55%)", "hsl(30 40% 70%)", "hsl(30 40% 82%)", "hsl(30 40% 92%)", "hsl(30 40% 98%)"] },
-      "paper-cream": { "role": "neutral", "displayName": "미색 한지 (Paper Cream)", "canonical": "hsl(45 25% 96%)", "tonalRamp": ["hsl(45 25% 15%)", "hsl(45 25% 27%)", "hsl(45 25% 40%)", "hsl(45 25% 55%)", "hsl(45 25% 70%)", "hsl(45 25% 82%)", "hsl(45 25% 91%)", "hsl(45 25% 96%)"] },
-      "paper-aged": { "role": "neutral", "displayName": "묵은 한지 (Paper Aged)", "canonical": "hsl(40 15% 92%)", "tonalRamp": ["hsl(40 15% 15%)", "hsl(40 15% 27%)", "hsl(40 15% 40%)", "hsl(40 15% 54%)", "hsl(40 15% 68%)", "hsl(40 15% 80%)", "hsl(40 15% 92%)", "hsl(40 15% 97%)"] },
-      "gold": { "role": "secondary", "displayName": "표구 금 (Mounting Gold)", "canonical": "hsl(45 100% 50%)", "tonalRamp": ["hsl(45 100% 15%)", "hsl(45 100% 22%)", "hsl(45 100% 30%)", "hsl(45 100% 40%)", "hsl(45 100% 50%)", "hsl(45 100% 62%)", "hsl(45 100% 75%)", "hsl(45 100% 90%)"] },
-      "gold-dark": { "role": "secondary", "displayName": "짙은 금 (Aged Gold)", "canonical": "hsl(45 100% 30%)", "tonalRamp": ["hsl(45 100% 10%)", "hsl(45 100% 16%)", "hsl(45 100% 23%)", "hsl(45 100% 30%)", "hsl(45 100% 40%)", "hsl(45 100% 55%)", "hsl(45 100% 72%)", "hsl(45 100% 88%)"] },
-      "stone": { "role": "neutral", "displayName": "돌 (Stone)", "canonical": "hsl(210 15% 85%)", "tonalRamp": ["hsl(210 15% 15%)", "hsl(210 15% 27%)", "hsl(210 15% 40%)", "hsl(210 15% 53%)", "hsl(210 15% 66%)", "hsl(210 15% 77%)", "hsl(210 15% 85%)", "hsl(210 15% 94%)"] }
+      "ink": {
+        "role": "primary",
+        "displayName": "먹 (Ink)",
+        "canonical": "hsl(222.2 47.4% 11.2%)",
+        "tonalRamp": [
+          "hsl(222 47% 6%)",
+          "hsl(222 47% 11%)",
+          "hsl(220 30% 22%)",
+          "hsl(218 22% 34%)",
+          "hsl(215 16% 47%)",
+          "hsl(212 18% 60%)",
+          "hsl(210 20% 75%)",
+          "hsl(210 22% 90%)"
+        ]
+      },
+      "ink-light": {
+        "role": "neutral",
+        "displayName": "흐린 먹 (Ink Light)",
+        "canonical": "hsl(215.4 16.3% 46.9%)",
+        "tonalRamp": [
+          "hsl(215 16% 15%)",
+          "hsl(215 16% 25%)",
+          "hsl(215 16% 35%)",
+          "hsl(215 16% 47%)",
+          "hsl(215 16% 58%)",
+          "hsl(215 16% 70%)",
+          "hsl(215 16% 82%)",
+          "hsl(215 16% 94%)"
+        ]
+      },
+      "ink-lighter": {
+        "role": "neutral",
+        "displayName": "옅은 먹 (Ink Lighter)",
+        "canonical": "hsl(210 20% 65%)",
+        "tonalRamp": [
+          "hsl(210 20% 15%)",
+          "hsl(210 20% 27%)",
+          "hsl(210 20% 39%)",
+          "hsl(210 20% 52%)",
+          "hsl(210 20% 65%)",
+          "hsl(210 20% 76%)",
+          "hsl(210 20% 86%)",
+          "hsl(210 20% 95%)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "흰 한지 (Paper)",
+        "canonical": "hsl(0 0% 100%)",
+        "tonalRamp": [
+          "hsl(0 0% 15%)",
+          "hsl(0 0% 27%)",
+          "hsl(0 0% 40%)",
+          "hsl(0 0% 52%)",
+          "hsl(0 0% 65%)",
+          "hsl(0 0% 78%)",
+          "hsl(0 0% 90%)",
+          "hsl(0 0% 100%)"
+        ]
+      },
+      "paper-warm": {
+        "role": "neutral",
+        "displayName": "따뜻한 한지 (Paper Warm)",
+        "canonical": "hsl(30 40% 98%)",
+        "tonalRamp": [
+          "hsl(30 40% 15%)",
+          "hsl(30 40% 27%)",
+          "hsl(30 40% 40%)",
+          "hsl(30 40% 55%)",
+          "hsl(30 40% 70%)",
+          "hsl(30 40% 82%)",
+          "hsl(30 40% 92%)",
+          "hsl(30 40% 98%)"
+        ]
+      },
+      "paper-cream": {
+        "role": "neutral",
+        "displayName": "미색 한지 (Paper Cream)",
+        "canonical": "hsl(45 25% 96%)",
+        "tonalRamp": [
+          "hsl(45 25% 15%)",
+          "hsl(45 25% 27%)",
+          "hsl(45 25% 40%)",
+          "hsl(45 25% 55%)",
+          "hsl(45 25% 70%)",
+          "hsl(45 25% 82%)",
+          "hsl(45 25% 91%)",
+          "hsl(45 25% 96%)"
+        ]
+      },
+      "paper-aged": {
+        "role": "neutral",
+        "displayName": "묵은 한지 (Paper Aged)",
+        "canonical": "hsl(40 15% 92%)",
+        "tonalRamp": [
+          "hsl(40 15% 15%)",
+          "hsl(40 15% 27%)",
+          "hsl(40 15% 40%)",
+          "hsl(40 15% 54%)",
+          "hsl(40 15% 68%)",
+          "hsl(40 15% 80%)",
+          "hsl(40 15% 92%)",
+          "hsl(40 15% 97%)"
+        ]
+      },
+      "gold": {
+        "role": "secondary",
+        "displayName": "표구 금 (Mounting Gold)",
+        "canonical": "hsl(45 100% 50%)",
+        "tonalRamp": [
+          "hsl(45 100% 15%)",
+          "hsl(45 100% 22%)",
+          "hsl(45 100% 30%)",
+          "hsl(45 100% 40%)",
+          "hsl(45 100% 50%)",
+          "hsl(45 100% 62%)",
+          "hsl(45 100% 75%)",
+          "hsl(45 100% 90%)"
+        ]
+      },
+      "gold-dark": {
+        "role": "secondary",
+        "displayName": "짙은 금 (Aged Gold)",
+        "canonical": "hsl(45 100% 30%)",
+        "tonalRamp": [
+          "hsl(45 100% 10%)",
+          "hsl(45 100% 16%)",
+          "hsl(45 100% 23%)",
+          "hsl(45 100% 30%)",
+          "hsl(45 100% 40%)",
+          "hsl(45 100% 55%)",
+          "hsl(45 100% 72%)",
+          "hsl(45 100% 88%)"
+        ]
+      },
+      "stone": {
+        "role": "neutral",
+        "displayName": "돌 (Stone)",
+        "canonical": "hsl(210 15% 85%)",
+        "tonalRamp": [
+          "hsl(210 15% 15%)",
+          "hsl(210 15% 27%)",
+          "hsl(210 15% 40%)",
+          "hsl(210 15% 53%)",
+          "hsl(210 15% 66%)",
+          "hsl(210 15% 77%)",
+          "hsl(210 15% 85%)",
+          "hsl(210 15% 94%)"
+        ]
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "첫 화면의 작가명 하나." },
-      "headline": { "displayName": "Headline", "purpose": "페이지 제목과 작품명." },
-      "title": { "displayName": "Title", "purpose": "작품 카드 제목과 소제목." },
-      "body": { "displayName": "Body", "purpose": "작가 소개와 작품 해설 같은 읽는 글." },
-      "ui": { "displayName": "UI", "purpose": "메뉴, 버튼, 검색창, 선택 상자." },
-      "label": { "displayName": "Label", "purpose": "제작 연도, 재료, 크기, 작품 수. 고정폭 숫자." }
+      "display": {
+        "displayName": "Display",
+        "purpose": "첫 화면의 작가명 하나."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "페이지 제목과 작품명."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "작품 카드 제목과 소제목."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "작가 소개와 작품 해설 같은 읽는 글."
+      },
+      "ui": {
+        "displayName": "UI",
+        "purpose": "메뉴, 버튼, 검색창, 선택 상자."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "제작 연도, 재료, 크기, 작품 수. 고정폭 숫자."
+      }
     },
-    "shadows": [],
+    "shadows": [
+      {
+        "name": "seal-offset",
+        "value": "8px 8px 0 hsl(var(--ink))",
+        "purpose": "작품 갤러리 카드 hover·포커스 때만. 카드를 4px 왼쪽 위로 옮기며 나타나는 번지지 않는 먹색 도장 그림자."
+      }
+    ],
     "motion": [
-      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "버튼·입력창·카드의 색과 테두리 전환 (0.3초)." }
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "버튼·입력창·카드의 색과 테두리 전환 (0.3초)."
+      }
     ],
     "breakpoints": [
-      { "name": "sm", "value": "640px" },
-      { "name": "md", "value": "768px" },
-      { "name": "lg", "value": "1024px" },
-      { "name": "xl", "value": "1280px" }
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
     ]
   },
   "components": [
@@ -86,33 +266,65 @@
   ],
   "narrative": {
     "northStar": "The Mounted Scroll",
-    "overview": "작품 한 점 한 점을 표구하듯 다룬다. 각진 테두리 안에 작품을 앉히고, 그 둘레에 한지의 여백을 넓게 두고, 금은 족자의 비단 띠처럼 한 줄만 쓴다. 인터페이스는 표구 틀이지 그림이 아니다. 화면에서 가장 강한 것은 언제나 작품 이미지와 붓글씨다.\n\n틀은 단단하고 곧다. 모서리는 둥글리지 않고(반지름 0), 경계는 그림자 대신 먹색 선으로 긋는다. 여백은 넉넉하게 두되 숨 쉬는 간격(8·16·32·64·128px)을 따른다. 글자는 두 목소리로 나눈다. 제목과 읽는 글은 명조(Noto Serif KR), 메뉴·버튼·작품 정보 같은 인터페이스 글자는 고딕(IBM Plex Sans KR)이다.",
+    "overview": "작품 한 점 한 점을 표구하듯 다룬다. 각진 테두리 안에 작품을 앉히고, 그 둘레에 한지의 여백을 넓게 두고, 금은 족자의 비단 띠처럼 한 줄만 쓴다. 인터페이스는 표구 틀이지 그림이 아니다. 화면에서 가장 강한 것은 언제나 작품 이미지와 붓글씨다.\n\n틀은 단단하고 곧다. 모서리는 둥글리지 않고(반지름 0), 경계는 그림자 대신 먹색 선으로 긋는다. 여백은 넉넉하게 두되 숨 쉬는 간격(8·16·32·64·128px)을 따른다. 글자는 두 목소리로 나눈다. 제목과 읽는 글은 명조(Noto Serif KR), 메뉴·버튼·작품 정보 같은 인터페이스 글자는 고딕(IBM Plex Sans KR)이다.\n\n작품 이미지는 꾸밈 없이 바로 보여 준다. 스피너·깜빡이는 덮개·투명도 페이드 없이, 이미지가 오기 전에는 한지색 바탕만 보인다. 표구 틀은 그림이 늦게 와도 자리를 지키는 빈 액자다.\n\n**지금 화면의 상태 (2026-11-01 운영 확인):** 작품 갤러리(`/gallery`), 작품 상세(`/gallery/[slug]`), 문의(`/contact`), 바닥글은 이 체계를 따른다. 첫 화면(`/`)의 히어로·머리띠·작품 칸은 아직 다른 언어(둥근 알약 버튼, 둥근 이미지와 번지는 그림자, 회색 Tailwind 색, 영어 메뉴)로 남아 있고, 작가 소개(`/artist`)는 배치는 맞지만 색과 모서리가 Tailwind `yellow-600`·`amber`·`gray`, `rounded-lg`, `shadow-lg` 로 남아 있다. 이 문서는 두 화면을 맞출 기준이며, 그 현재 모습을 따라 할 근거가 아니다.",
     "keyCharacteristics": [
       "모든 틀은 각졌다 (반지름 0).",
-      "깊이는 그림자가 아니라 먹색 2px 선과 한지 색의 단계로 만든다.",
+      "깊이는 그림자가 아니라 먹색 2px 선과 한지 색의 단계로 만든다. 예외는 갤러리 카드의 hover 도장 그림자 하나다.",
       "금은 한 화면에 한 번, 표시가 필요한 곳에만.",
-      "제목·읽는 글은 명조, 인터페이스는 고딕."
+      "제목·읽는 글은 명조, 인터페이스는 고딕.",
+      "작품은 한지 매트 위에 잘리지 않은 채 놓인다. 로딩 효과는 없다.",
+      "밝은 화면 하나만 쓴다. 다크 모드는 없다."
     ],
     "rules": [
-      { "name": "The One Seal Rule", "body": "금은 한 화면에 표시 하나에만 쓴다: 제목 띠, 현재 상태, 포커스 중 하나. 글자 색이나 넓은 면을 금으로 칠하지 않는다.", "section": "colors" },
-      { "name": "The Named Token Rule", "body": "색은 먹·한지·금·돌 토큰으로만 쓴다. `gray-*`, `slate-*`, `yellow-600` 같은 Tailwind 기본 회색·노랑은 이 체계 밖의 흔적이며, 새 코드에 쓰지 않는다.", "section": "colors" },
-      { "name": "The Two Voices Rule", "body": "읽고 감상하는 글은 명조, 누르고 고르는 글은 고딕이다. 한 요소 안에서 두 글꼴을 섞지 않는다.", "section": "typography" },
-      { "name": "The Tight Display Rule", "body": "24px 이상 제목은 자간을 0 이하로 둔다. 한글 큰 글자에 자간을 더하면 글자가 흩어져 보인다.", "section": "typography" },
-      { "name": "The Line-Not-Shadow Rule", "body": "면을 띄우고 싶으면 그림자를 더하지 말고 테두리를 긋거나 한지 단계를 하나 올린다.", "section": "elevation" }
+      {
+        "name": "The One Seal Rule",
+        "body": "금은 한 화면에 표시 하나에만 쓴다: 제목 띠, 현재 상태, 포커스 중 하나. 글자 색이나 넓은 면을 금으로 칠하지 않는다.",
+        "section": "colors"
+      },
+      {
+        "name": "The Named Token Rule",
+        "body": "색은 먹·한지·금·돌 토큰으로만 쓴다. `gray-*`, `slate-*`, `yellow-600` 같은 Tailwind 기본 회색·노랑은 이 체계 밖의 흔적이며, 새 코드에 쓰지 않는다. 지금 첫 화면(`app/page.tsx`, `HeroSection`, `MinimalHeader`)과 작가 소개(`EnhancedArtistSection`, `yellow-600`·`amber-50` 등)에 남아 있다.",
+        "section": "colors"
+      },
+      {
+        "name": "The Light Only Rule",
+        "body": "화면은 밝은 한지 하나다. `globals.css` 의 `.dark` 토큰과 Tailwind `dark:` 클래스, 첫 화면 머리띠의 테마 단추는 남은 흔적이다. 단추를 눌러도 테마가 바뀌지 않는다(테마 공급자가 없다, 2026-11-01 확인). 새 코드에 `dark:` 를 더하지 않는다.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "읽고 감상하는 글은 명조, 누르고 고르는 글은 고딕이다. 한 요소 안에서 두 글꼴을 섞지 않는다.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tight Display Rule",
+        "body": "24px 이상 제목은 자간을 0 이하로 둔다. 한글 큰 글자에 자간을 더하면 글자가 흩어져 보인다.",
+        "section": "typography"
+      },
+      {
+        "name": "The Line-Not-Shadow Rule",
+        "body": "면을 띄우고 싶으면 그림자를 더하지 말고 테두리를 긋거나 한지 단계를 하나 올린다. 번지는 그림자(`shadow-soft`·`shadow-xl`·`shadow-2xl` 등)는 체계 밖이다. 지금 첫 화면 히어로 이미지·대표작 표, 홈 작품 칸 hover, 작가 사진(`shadow-lg`), 작가 소개 하단 단추(`shadow-lg`·`shadow-xl`)에 남아 있다.",
+        "section": "elevation"
+      }
     ],
     "dos": [
-      "**Do** 작품 이미지와 붓글씨를 화면에서 가장 크고 강하게 둔다.",
-      "**Do** 틀과 입력창은 2px 먹색 테두리와 0px 모서리로 만든다.",
-      "**Do** 금은 한 화면에 표시 하나에만 쓴다 (The One Seal Rule).",
-      "**Do** 제목과 읽는 글은 Noto Serif KR, 인터페이스와 정보는 IBM Plex Sans KR로 쓴다.",
-      "**Do** 숫자 정보(연도, 크기, 작품 수)는 고정폭 숫자로 맞춘다."
+      "Do 작품 이미지와 붓글씨를 화면에서 가장 크고 강하게 둔다.",
+      "Do 작품은 따뜻한 한지 매트 위에 잘리지 않은 원본 비율로 앉힌다 (`NN-full`·`NN-preview`).",
+      "Do 틀과 입력창은 2px 먹색 테두리와 0px 모서리로 만든다.",
+      "Do 금은 한 화면에 표시 하나에만 쓴다 (The One Seal Rule).",
+      "Do 제목과 읽는 글은 Noto Serif KR, 인터페이스와 정보는 IBM Plex Sans KR로 쓴다.",
+      "Do 숫자 정보(연도, 크기, 작품 수, 순번)는 고정폭 숫자로 맞춘다.",
+      "Do 움직임은 위치(`x`·`y`)와 색 전환으로만 준다."
     ],
     "donts": [
-      "**Don't** 모서리를 둥글리지 않는다. 알약 버튼, 둥근 카드, 둥근 이미지는 체계 밖이다.",
-      "**Don't** 그림자로 면을 띄우지 않는다.",
-      "**Don't** `gray-*`, `slate-*`, `yellow-600` 같은 Tailwind 기본 색을 새로 쓰지 않는다.",
-      "**Don't** 24px 이상 한글 제목에 자간을 더하지 않는다.",
-      "**Don't** 금을 글자 색이나 넓은 바탕으로 쓰지 않는다."
+      "Don't 모서리를 둥글리지 않는다. 알약 버튼, 둥근 카드, 둥근 이미지는 체계 밖이다.",
+      "Don't 번지는 그림자로 면을 띄우지 않는다. 그림자는 갤러리 카드 hover 의 먹색 도장 그림자 하나뿐이다.",
+      "Don't `gray-*`, `slate-*`, `yellow-600` 같은 Tailwind 기본 색이나 `dark:` 클래스를 새로 쓰지 않는다.",
+      "Don't 작품 이미지에 스피너·흐림·깜빡이는 덮개·투명도 페이드를 넣지 않는다.",
+      "Don't 글자가 든 요소의 투명도를 움직이지 않는다(스크롤 연동 포함). 색 대비가 떨어진다.",
+      "Don't 정사각형으로 잘린 `NN-medium`·`NN-large` 를 작품 전체를 보여 줄 자리에 쓰지 않는다.",
+      "Don't 24px 이상 한글 제목에 자간을 더하지 않는다.",
+      "Don't 금을 글자 색이나 넓은 바탕으로 쓰지 않는다."
     ]
   }
 }
