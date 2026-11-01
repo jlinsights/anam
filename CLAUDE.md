@@ -1,554 +1,110 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with
-code in this repository.
+> 이 파일이 에이전트 지침의 단일 출처다. `AGENTS.md`(Codex 등)는 이 파일을 가리키는 포인터일 뿐이니 내용은 여기에만 쓴다.
 
-## Project Overview
+서예가 **아남 배옥영(芽南 裵玉永)** 의 작품 갤러리. Next.js App Router 사이트이고 Vercel 에 배포한다.
 
-**ANAM Gallery** is a Next.js-based digital calligraphy gallery for Korean
-artist 아남 배옥영 (ANAM Bae Ok Young). The project features an innovative **Zen
-Brutalism Foundation** design system that combines traditional Korean aesthetic
-principles with cutting-edge web technologies.
+- 무엇을·누구를 위해 만드는지: `PRODUCT.md`
+- 화면 디자인 원칙·색·글꼴: `DESIGN.md`
+- 이 파일: 코드에서 지켜야 할 것과 실제 구조
 
-### 🚀 **BMad-Method Integration (Agent OS)**
+현재 수치(작품 수·테스트 수·커버리지 기준 등)는 여기 옮겨 적지 않는다. 문서의 숫자는 금방 낡는다 — 필요하면 해당 파일이나 데이터를 직접 본다.
 
-The project now includes a comprehensive **bmad-method framework integration** through Agent OS, providing AI-assisted development methodology for creating a professional Korean calligraphy gallery platform:
+## 절대 규칙
 
-**Key Features**:
-- **Cultural Context Database**: AI-powered cultural analysis and educational content generation
-- **Gallery Enhancement System**: Professional gallery features and advanced user experience design
-- **Multi-Agent Orchestration**: Coordinated AI agents for specialized domain expertise
-- **Quality Assurance Framework**: Comprehensive validation and expert review processes
+1. **사실은 출처에서만.** 작가·작품 정보(약력·수상·생년·해설·SNS 주소 등)를 코드에 지어 넣지 않는다. 데이터를 못 받으면 비워 두거나 오류를 보여 준다.
+   - 예전 `fallbackArtworksData`(영어 제목 작품 목록)·`fallbackArtistData`(수상·생년)·가짜 SNS 주소가 운영 화면에 실제처럼 나갔다. 2026-11-01 모두 삭제했다. 되살리지 않는다.
+   - 테스트 `__tests__/lib/no-fabricated-artworks.test.ts`·`__tests__/lib/site-config.test.ts` 가 이를 지킨다.
+2. **클라이언트 컴포넌트는 서버 로더를 부르지 않는다.** `'use client'` 파일에서 `getArtworks()` 같은 서버 함수를 부르면 브라우저에 데이터 출처 키가 없어 늘 빈 값이 된다. 클라이언트는 `/api/artworks`·`/api/artist` 를 쓴다(`hooks/use-artwork-api.ts` 의 `useArtworks`·`useArtist`, `lib/artworks.ts` 의 `fetchArtworksFromApi`).
+3. **실패는 캐시하지 않는다.** `/api/artworks`·`/api/artist` 는 실제 데이터를 못 받으면 503 을 주고, 그 결과를 캐시에 넣지 않는다. 200 + `data: null` 을 돌려주면 `useFetch` 가 응답 봉투를 데이터로 착각한다.
+4. **캐시를 비우는 엔드포인트는 인증한다.** 시크릿 비교는 `lib/server-secret.ts`(`isValidSecret`·`hasBearerSecret`, 타이밍 안전·빈 env 는 거부)를 쓴다.
 
-**Agent OS Structure**:
-```
-.agent-os/
-├── product/                    # Product specifications
-│   ├── cultural-context-database.md
-│   ├── gallery-enhancement.md
-│   └── integration-plan.md
-├── agents/                     # Specialized AI agents
-│   ├── cultural-context-agent.md
-│   ├── gallery-enhancement-agent.md
-│   └── integration-coordinator.md
-└── workflows/                  # Process workflows
-    └── cultural-analysis.md
-```
-
-### 🎯 **Zen Brutalism Foundation Design Philosophy**
-
-**Core Concept**: "전통의 깊이와 현대적 몰입감을 동시에 제공하는 UI/UX 디자인"
-(UI/UX design that simultaneously provides traditional depth and modern
-immersion)
-
-**3-Phase Evolution System**:
-
-- **Phase 1**: **백지의 시작** (White Space Foundation) - Zen minimalism +
-  geometric brutalism
-- **Phase 2**: **먹과 유리의 조화** (Ink & Glass Harmony) - Multi-layer glass
-  morphism + fluid ink effects
-- **Phase 3**: **전통의 깊이** (Traditional Depth) - Korean composition
-  principles + cultural layers
-
-## Development Commands
-
-### Core Commands
+## 명령
 
 ```bash
-# Development
-npm run dev              # Start development server (localhost:3000)
-npm run dev -- --port 3001  # Alternative port if 3000 is in use
-npm run dev:turbo        # Start with Turbo mode
-
-# Build & Deploy
-npm run build            # Production build
-npm run start            # Production server
-npm run deploy           # Deploy to Vercel production
-npm run deploy:preview   # Deploy to Vercel preview
-
-# Quality & Testing
-npm run lint             # ESLint code checking
-npm run type-check       # TypeScript type checking
-npm run test             # Run Jest tests
-npm run test:watch       # Run tests in watch mode
-npm run test:coverage    # Generate test coverage report
-npm run test:ci          # CI-optimized test run
-
-# Asset Management
-npm run optimize-images  # Optimize artwork images
+npm run dev            # localhost:3000
+npm run type-check     # tsc --noEmit
+npm run lint:check     # eslint . (확인만)
+npm run lint           # eslint --fix . — 파일을 고친다. 실행 전후로 git status 를 비교할 것
+npm test               # jest
+npm run test:coverage  # 커버리지 기준은 jest.config.js 의 coverageThreshold
+npm run build          # 프로덕션 빌드
+npm run test:e2e       # Playwright (__tests__/e2e)
 ```
 
-### 🆕 **Zen Brutalism Development Commands**
+**Claude Code 에서 빌드·테스트할 때는 `env -u NODE_ENV` 를 붙인다.** 셸에 `NODE_ENV=development` 가 주입돼 있으면 `next build` 가 `/404` 프리렌더에서 `<Html> should not be imported` 로 실패한다.
 
-```bash
-# Demo Pages Development
-npm run dev              # Access new demo pages:
-                         # /zen-demo (Phase 1)
-                         # /immersive-demo (Phase 2)
-                         # /cultural-demo (Phase 3)
+## 데이터 흐름
 
-# Design System Testing
-npm run test -- --testPathPattern=zen-brutalist     # Test design components
-npm run test -- --testPathPattern=immersive         # Test interactive effects
-npm run test -- --testPathPattern=cultural          # Test cultural integration
-```
+원본은 작가 측이 관리하는 **Airtable** 하나다. 운영 작품 데이터는 그 **Supabase 사본**에서 읽는다.
 
-## Architecture Overview
+| 무엇 | 어디서 읽나 | 파일 |
+|---|---|---|
+| 작품 목록(서버) | Supabase → 없으면 Airtable → 둘 다 없으면 `[]` | `lib/artworks.ts` `getArtworks()` |
+| 작품 상세 `/gallery/[slug]` | Supabase 우선 | `lib/artworks.ts` `getArtworkBySlug()` |
+| 작품 목록(클라이언트) | `/api/artworks` | `hooks/use-artwork-api.ts` `useArtworks()`, `fetchArtworksFromApi()` |
+| 작가(서버 페이지) | Airtable | `lib/artist.ts` `fetchArtist()` |
+| 작가(클라이언트) | `/api/artist` → Supabase | `useArtist()`, `app/api/artist/route.ts` |
+| 전시 이력 | 작가 데이터에서 정리 | `lib/exhibition-history.ts` |
 
-### Tech Stack
+- **Airtable 만 고치면 작품 화면은 바뀌지 않는다.** Supabase 사본도 맞춰야 한다: `scripts/migrate-airtable-to-supabase.ts`. 절차는 `docs/SUPABASE_MIGRATION_GUIDE.md`.
+- 캐시: `lib/cache.ts` 의 공용 메모리 저장소(`getCachedData`·`setCachedData`·`clearCache`)와 `clearCacheAndRevalidate(tag)`(메모리 캐시를 비우고 `revalidateTag`). API 라우트 캐시도 여기 둬야 동기화가 함께 비운다.
+- 동기화 경로: `/api/admin/sync`(`ADMIN_SYNC_TOKEN`), `/api/sync/airtable`(Airtable 웹훅, `AIRTABLE_WEBHOOK_SECRET`), `/api/revalidate`(`REVALIDATE_SECRET`). 셋 다 캐시만 비운다 — Supabase 사본을 갱신하지는 않는다. 웹훅 설정은 `docs/AIRTABLE_WEBHOOK_SETUP.md`.
+- 메모리 캐시는 서버리스 인스턴스마다 따로 있다. 한 인스턴스를 비워도 다른 인스턴스는 TTL 까지 이전 값을 줄 수 있다.
+- 작품 이미지: `public/Images/Artworks/`. 큰 이미지 크기 표는 `lib/artwork-full-sizes.json`(`scripts/generate-full-images.mjs` 로 생성), 경로는 `lib/artwork-full-image.ts`.
 
-- **Framework**: Next.js 15.3.3 with App Router
-- **Language**: TypeScript 5
-- **Runtime**: React 19
-- **Styling**: Tailwind CSS + **Zen Brutalism Foundation** custom theme
-- **UI Components**: Radix UI + shadcn/ui + **Custom Design System**
-- **CMS**: Airtable (58 artworks + artist data management)
-- **Images**: Optimized WebP/AVIF with responsive sizing
-- **Deployment**: Vercel with ISR (Incremental Static Regeneration)
-- **Animation**: CSS Custom Properties + Transform3D + Mouse tracking
-
-### 🆕 **Zen Brutalism Components**
-
-#### **Hero Components**
-
-- `ZenBrutalistHero` - Base hero component with phase-specific styling
-- `ZenBrutalistHeroPhase1` - Foundation phase hero (zen minimalism)
-- `ZenBrutalistHeroPhase2` - Immersion phase hero (glass morphism)
-- `ZenBrutalistHeroPhase3` - Cultural phase hero (traditional integration)
-
-#### **Artwork Card Components**
-
-- `ZenBrutalistArtworkCard` - Phase 1: Zen + brutal design variants
-- `ImmersiveArtworkCard` - Phase 2: Glass morphism + ink flow effects
-- `CulturalArtworkCard` - Phase 3: Traditional composition + seasonal aesthetics
-
-#### **Layout Components**
-
-- `ZenBrutalistFooter` - Enhanced footer with cultural design integration
-- Interactive mouse tracking and dynamic backgrounds
-- Phase navigation with design evolution journey
-
-### Directory Structure
+## 구조
 
 ```
-ANAM/
-├── app/                          # Next.js App Router
-│   ├── api/                      # API routes (Airtable integration)
-│   ├── gallery/                  # Gallery pages with [slug] dynamic routes
-│   │   ├── page.tsx              # Main gallery (58 artworks)
-│   │   └── [slug]/               # Individual artwork detail pages
-│   ├── artist/                   # Artist profile page
-│   ├── exhibition/               # Exhibition information
-│   ├── contact/                  # Contact page
-│   │
-│   ├── zen-demo/                 # 🆕 Phase 1: Zen Foundation Demo
-│   ├── immersive-demo/           # 🆕 Phase 2: Glass Immersion Demo
-│   ├── cultural-demo/            # 🆕 Phase 3: Cultural Integration Demo
-│   │
-│   ├── layout.tsx                # Root layout with theme provider
-│   └── globals.css               # 🆕 Zen Brutalism global styles
-│
-├── components/                   # Reusable React components
-│   ├── ui/                       # shadcn/ui base components
-│   │
-│   ├── zen-brutalist-hero.tsx    # 🆕 Phase-specific hero sections
-│   ├── zen-brutalist-footer.tsx  # 🆕 Cultural design footer
-│   ├── zen-brutalist-artwork-card.tsx      # 🆕 Phase 1 artwork cards
-│   ├── immersive-artwork-card.tsx          # 🆕 Phase 2 immersive cards
-│   ├── cultural-artwork-card.tsx           # 🆕 Phase 3 cultural cards
-│   │
-│   ├── artwork-card.tsx          # Legacy gallery artwork display
-│   ├── site-header.tsx           # Navigation with language switcher
-│   └── theme-toggle.tsx          # Dark/light theme toggle
-│
-├── lib/                          # Core utilities and data management
-│   ├── airtable.ts               # Airtable CMS integration
-│   ├── artworks.ts               # 작품 로더: 서버 getArtworks()(Supabase→Airtable), 클라이언트 fetchArtworksFromApi()
-│   ├── types.ts                  # TypeScript interfaces
-│   ├── utils.ts                  # Common utilities
-│   └── image-utils.ts            # Image optimization utilities
-│
-├── public/Images/                # Artwork assets organized by year
-│   ├── Artworks/                 # 58 artwork images (2021-2025)
-│   └── Artist/                   # Artist profile images
-│
-└── tailwind.config.ts            # 🆕 Zen Brutalism theme configuration
+app/
+  page.tsx               # 첫 화면 (client) — /api 로 작품·작가를 받는다
+  gallery/page.tsx       # 전체 작품 (client)
+  gallery/[slug]/        # 작품 상세 (server, force-dynamic)
+  artist/ contact/ exhibition/ offline/
+  single-page/           # 실험 경로. 운영에 공개돼 있고 유지 여부 미정(PRODUCT.md). /aceternity-demo 는 2026-11-01 삭제
+  api/                   # artworks · artist · contact · revalidate · admin/sync · sync/airtable · health …
+                         # debug·debug-images 는 lib/debug-guard.ts(ENABLE_DEBUG_ROUTES)로, test-*·performance·
+                         # security·rate-limit 는 각 라우트의 NODE_ENV==='production' 검사로 운영에서 막는다
+components/
+  sections/ single-page/ exhibition/ layout/ artwork-detail/ common/ error-boundary/ ui/
+hooks/                   # use-api-request.ts(useApiRequest·useFetch), use-artwork-api.ts(useArtworks·useArtist 등)
+lib/
+  artworks.ts artist.ts airtable.ts supabase/   # 데이터 로더
+  cache.ts server-secret.ts rate-limit.ts debug-guard.ts error-handler.ts
+  constants/site-config.ts                      # 사이트 메타·SNS(확인된 계정만)
+  types.ts schemas.ts content-text.ts exhibition-history.ts
+scripts/                 # 이관·이미지·점검용 Node 스크립트 (앱 번들에 들어가지 않음)
+__tests__/               # Jest. _quarantine/ 은 깨진 채 격리된 테스트 — jest·tsc 둘 다 건너뛴다
 ```
 
-### Data Management System
+2026-11-01 어디서도 import 되지 않던 파일을 정리했다. 새 파일을 만들기 전에 비슷한 것이 이미 있는지 먼저 찾고, 만든 파일은 실제로 어딘가에서 쓰이게 한다.
 
-The project uses a sophisticated dual-data system:
+## 테스트
 
-1. **Primary Data Source**: Airtable CMS
-   - `Artworks` table: 58 artworks with metadata, descriptions, artist notes
-   - `Artist` table: artist bio, exhibitions, awards, contact info
-   - Environment variables: `AIRTABLE_API_KEY`, `AIRTABLE_BASE_ID`
+- Jest + Testing Library. 새 동작·버그 수정에는 테스트를 먼저 쓴다(실패 확인 → 구현).
+- `__tests__/_quarantine/` 은 되살릴 때만 손댄다. 방법과 목록은 그 폴더의 `README.md`.
+- 라우트 테스트에서 `jest.mock('@/lib/cache', …)` 를 쓰면 라우트가 쓰는 함수(`getCachedData`·`setCachedData`·`clearCache`·`clearCacheAndRevalidate`)를 모두 목에 넣는다. 빠지면 라우트가 500 을 낸다.
+- CI 의 WCAG 접근성 검사(`.github/workflows/accessibility.yml`)는 `main` 에서도 실패해 왔다. PR 에서 이 검사만 빨간 것은 그 PR 탓이 아닐 수 있다 — `main` 결과와 비교한다.
 
-2. **지어낸 fallback 없음** (2026-11-01): 실제 데이터를 못 받으면 비어 있거나 오류(503)다
-   - 예전 `fallbackArtworksData`(영어 제목 61점)·`fallbackArtistData`(수상·생년 등)는 실제처럼 화면에 나와 삭제했다. 다시 만들지 않는다
-   - 운영 데이터는 Supabase 에서 읽는다(원본 Airtable, `scripts/migrate-airtable-to-supabase`)
-   - 클라이언트 컴포넌트는 `getArtworks()` 를 부르지 않는다 — 브라우저에는 데이터 출처 키가 없다. `/api/artworks`(`useArtworks`·`fetchArtworksFromApi`)를 쓴다
+## 환경 변수
 
-3. **Image Management**:
-   - Local images in `/public/Images/Artworks/{year}/`
-   - Multiple sizes: `-thumb.jpg`, `-medium.jpg`, `-large.jpg`
-   - Responsive image loading with WebP optimization
+| 변수 | 용도 |
+|---|---|
+| `AIRTABLE_API_KEY`, `AIRTABLE_BASE_ID` | 원본 데이터 |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | 운영 작품 데이터 |
+| `REVALIDATE_SECRET`, `ADMIN_SYNC_TOKEN`, `AIRTABLE_WEBHOOK_SECRET` | 캐시 갱신·동기화 인증 (비어 있으면 요청을 거부) |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `CONTACT_EMAIL` | 문의 메일 |
+| `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN` | 오류 수집 |
+| `ENABLE_DEBUG_ROUTES` | 운영에서 debug 라우트 허용 (기본 꺼짐) |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Search Console |
 
-### 🎨 **Zen Brutalism Design System**
+## 배포
 
-#### **Color Palette**
+- Vercel. `main` 에 머지하면 배포된다. 배포 주소 `anam-gallery.vercel.app`, 운영 주소 `anam.orientalcalligraphy.org`.
+- 데이터를 고친 뒤에는 Supabase 사본 갱신 → `/api/admin/sync` 또는 `/api/revalidate` 로 캐시를 비운다.
 
-```css
-/* Traditional Korean Colors */
---ink: 28 25 23 /* 먹색 - primary text */ --paper: 254 252 232
-  /* 한지색 - background */ --gold: 168 85 27 /* 황금색 - accent */ --stone: 120
-  113 108 /* 돌색 - secondary */ --brush: 87 83 74 /* 붓색 - neutral */
-  /* Seasonal Colors (사계절 미학) */ --season-spring: 134 239 172
-  /* 봄 - spring teal */ --season-summer: 74 222 128 /* 여름 - summer green */
-  --season-autumn: 251 191 36 /* 가을 - autumn gold */ --season-winter: 156 163
-  175 /* 겨울 - winter gray */;
-```
+## 작업 규칙
 
-#### **Typography Hierarchy**
-
-```css
-/* Zen Typography */
-.zen-typography-display     /* 64px - main titles */
-.zen-typography-hero        /* 48px - hero titles */
-.zen-typography-section     /* 32px - section titles */
-.zen-typography-body        /* 18px - body text */
-
-/* Brutal Typography */
-.brutal-typography-impact     /* Strong impact text */
-.brutal-typography-statement  /* Declarative messages */
-.brutal-typography-accent     /* Accent elements */
-```
-
-#### **Spacing System (여백의 미학)**
-
-```css
-/* Zen Breathing Scale */
---zen-xs: 0.5rem /* 8px - minimal breathing */ --zen-sm: 1rem
-  /* 16px - basic breathing */ --zen-md: 2rem /* 32px - medium breathing */
-  --zen-lg: 4rem /* 64px - deep breathing */ --zen-xl: 8rem
-  /* 128px - meditative breathing */ --zen-2xl: 16rem
-  /* 256px - absolute silence */ --zen-3xl: 24rem /* 384px - complete void */
-  --zen-4xl: 32rem /* 512px - infinite space */;
-```
-
-#### **Interactive Effects**
-
-- **Mouse Tracking**: Real-time cursor-based background effects
-- **Glass Morphism**: 3-layer independent blur and saturation system
-- **Fluid Ink**: Dynamic gradient animations mimicking traditional brush strokes
-- **Cultural Layers**: Traditional Korean composition principles (삼분법,
-  음양균형)
-
-### Key Features
-
-#### **🎨 Gallery & Artwork Management**
-
-- **Artworks**: Supabase(원본 Airtable) 실시간 연동, 실패 시 오류 표시
-- **Responsive Grid**: 4x3 (desktop) → 3x4 (tablet) → 2x6 (mobile)
-- **Advanced Search**: Real-time filtering by title, year, medium, category
-- **Lightbox Modal**: Full-screen artwork viewing with keyboard navigation
-- **Artist Notes**: Detailed artwork descriptions and creation intent
-
-#### **🖱️ Interactive Experience**
-
-- **Real-time Mouse Tracking**: Dynamic background effects responding to cursor
-- **Multi-layer Glass Depth**: 3-stage independent blur and transparency
-- **Fluid Ink Animation**: Digital recreation of traditional calligraphy brush
-  strokes
-- **Seasonal Aesthetics**: Four-season color changes and breathing space system
-
-#### **🎯 User Experience (UX)**
-
-- **Progressive Web App**: Mobile app-like installation and offline usage
-- **Dark/Light Theme**: Automatic theme switching based on system preference
-- **WCAG 2.1 AA Compliance**: Full screen reader and keyboard navigation support
-- **Performance Optimization**: WebP image auto-conversion, lazy loading, CDN
-  optimization
-
-#### **🆕 Demo Pages**
-
-- **`/zen-demo`**: Phase 1 zen minimalism showcase
-- **`/immersive-demo`**: Phase 2 immersive glass + ink effects
-- **`/cultural-demo`**: Phase 3 traditional cultural integration
-
-## Environment Setup
-
-### Required Environment Variables
-
-```bash
-# Airtable Integration (optional - falls back to local data)
-AIRTABLE_API_KEY=your_airtable_api_key
-AIRTABLE_BASE_ID=your_airtable_base_id
-
-# Production URLs
-NEXT_PUBLIC_SITE_URL=https://anam-gallery.vercel.app
-```
-
-### Development Workflow
-
-1. **Environment setup**: Node.js 18+, npm install
-2. **Start development**: `npm run dev` (or `npm run dev -- --port 3001` if port
-   3000 is in use)
-3. **Code quality**: Always run `npm run lint` and `npm run type-check` before
-   commits
-4. **Testing**: Use `npm run test:coverage` to ensure adequate test coverage
-5. **Images**: Use `npm run optimize-images` when adding new artwork images
-6. **🆕 Design System**: Test Zen Brutalism components in demo pages
-
-## Testing Strategy
-
-- **Unit Tests**: Jest + Testing Library for components
-- **Coverage Target**: 70% minimum across functions, lines, branches, statements
-- **Test Files**: `__tests__/` directory and `*.test.tsx` files
-- **Mocking**: Airtable API calls mocked for reliable testing
-- **🆕 Design System Tests**: Specific tests for Zen Brutalism components and
-  interactions
-
-## Deployment Notes
-
-- **Platform**: Vercel with automatic deployments from git
-- **ISR**: Uses Next.js ISR with `revalidateTag("artworks")` for cache
-  invalidation
-- **Performance**: Image optimization, bundle splitting, CDN delivery
-- **Security**: CSP headers, XSS protection, secure asset handling
-- **🆕 Build Success**: Recent successful deployment with all Zen Brutalism
-  components
-
-## Common Development Tasks
-
-### Adding New Artwork
-
-1. Add optimized images to `/public/Images/Artworks/{year}/`
-2. Airtable `Artworks` 표를 고치고 Supabase 로 이관한다 (코드에 작품 데이터를 넣지 않는다)
-3. Ensure slug follows pattern: `anam-{title}-{year}`
-
-### 🆕 **Working with Zen Brutalism Components**
-
-#### **Creating New Hero Sections**
-
-```typescript
-// Use preset configurations
-<ZenBrutalistHeroPhase1
-  navigation={{
-    demo: { href: '/zen-demo#showcase', label: '디자인 시스템 탐험' },
-    next: { href: '/immersive-demo', label: 'Phase 2' },
-  }}
-  enableInteraction={true}
-/>
-
-// Or create custom hero
-<ZenBrutalistHero
-  phase="2"
-  title={{ main: "Custom Title", sub: "Subtitle" }}
-  description={{ primary: "Description text" }}
-  concept="CUSTOM CONCEPT"
-  variant="fusion"
-  enableInteraction={true}
-/>
-```
-
-#### **Implementing Interactive Artwork Cards**
-
-```typescript
-// Phase 1: Zen Brutalism
-<ZenBrutalistArtworkCard
-  artwork={artwork}
-  variant="zen|brutal|glass-ink|fusion"
-  immersionLevel="subtle|moderate|intense|maximum"
-  traditionalDepth={true}
-  showMetadata={true}
-/>
-
-// Phase 2: Immersive Effects
-<ImmersiveArtworkCard
-  artwork={artwork}
-  variant="zen-immersive|brutal-glass|ink-flow|depth-fusion"
-  intensity="subtle|moderate|intense|maximum"
-  culturalDepth={true}
-  showActions={true}
-/>
-
-// Phase 3: Cultural Integration
-<CulturalArtworkCard
-  artwork={artwork}
-  variant="traditional|seasonal|balanced|immersive"
-  composition="centered|flowing|grid"
-  culturalSeason="spring|summer|autumn|winter|eternal"
-  depthLayer="foreground|middle|background|cultural|temporal"
-  enableStroke={true}
-  enableVoidBreathing={true}
-/>
-```
-
-#### **Adding Mouse Tracking Interactions**
-
-```typescript
-const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-
-const handleMouseMove = useCallback(
-  (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current || !enableInteraction) return
-
-    const rect = containerRef.current.getBoundingClientRect()
-    const x = (e.clientX - rect.left) / rect.width
-    const y = (e.clientY - rect.top) / rect.height
-
-    setMousePosition({ x, y })
-  },
-  [enableInteraction]
-)
-
-// Apply dynamic background
-const dynamicBackground = {
-  background: `radial-gradient(
-    circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%,
-    hsla(var(--ink) / 0.08) 0%,
-    hsla(var(--gold) / 0.05) 40%,
-    transparent 70%
-  )`,
-}
-```
-
-### Modifying Gallery Layout
-
-- Gallery pagination: 12 items per page
-- Grid responsive breakpoints: `tailwind.config.ts`
-- Card component: `components/artwork-card.tsx` (legacy) or new Zen Brutalist
-  cards
-- **🆕 Demo layouts**: Check `/zen-demo`, `/immersive-demo`, `/cultural-demo`
-  for advanced layouts
-
-### Theme/Styling Changes
-
-- **🆕 Zen Brutalism config**: `tailwind.config.ts` (extended with custom theme)
-- Global styles: `app/globals.css` (includes Zen Brutalism classes)
-- Theme provider: `components/theme-provider.tsx`
-- **🆕 Custom animations**: Defined in `globals.css` with CSS custom properties
-
-## Performance Considerations
-
-- Images automatically optimized to WebP/AVIF
-- Bundle analysis available via `@next/bundle-analyzer`
-- Lazy loading implemented for artwork galleries
-- Cache strategies: memory cache + localStorage for client-side data
-- **🆕 Interactive optimizations**: Efficient mouse tracking and animation
-  performance
-- **🆕 Glass morphism performance**: Hardware-accelerated CSS transforms and
-  filters
-
-## 🆕 **Zen Brutalism Development Guidelines**
-
-### **Design Principles**
-
-1. **여백의 미학 (Void Aesthetics)**: Use the 8-stage breathing system for
-   spacing
-2. **브루탈리즘 구조 (Brutal Structure)**: Maintain geometric precision and
-   strong contrasts
-3. **글래스 모피즘 진화 (Glass Morphism Evolution)**: Implement 3-layer depth
-   effects
-4. **문화적 상호작용 (Cultural Interaction)**: Integrate traditional Korean
-   composition principles
-
-### **Component Development**
-
-- Always implement both `enableInteraction` prop and non-interactive fallbacks
-- Use consistent variant patterns: `zen|brutal|glass-ink|fusion`
-- Include proper TypeScript interfaces for all props
-- Implement mouse tracking with `useCallback` for performance
-- Follow traditional Korean color palette and seasonal aesthetics
-
-### **Testing Interactive Components**
-
-```bash
-# Test mouse tracking
-npm run test -- --testNamePattern="mouse tracking"
-
-# Test glass morphism effects
-npm run test -- --testNamePattern="glass morphism"
-
-# Test cultural integration
-npm run test -- --testNamePattern="cultural"
-```
-
-### **Performance Best Practices**
-
-- Use `useCallback` for mouse event handlers
-- Implement `useRef` for DOM element references
-- Apply CSS `transform3d` for hardware acceleration
-- Use CSS custom properties for dynamic styling
-- Optimize glass morphism filters for 60fps performance
-
-## Troubleshooting
-
-### Common Issues
-
-#### **Port 3000 in Use**
-
-```bash
-# Use alternative port
-npm run dev -- --port 3001
-```
-
-#### **Build Failures**
-
-```bash
-# Check for missing dependencies
-npm install
-npm run lint
-npm run type-check
-npm run build
-```
-
-#### **🆕 Interactive Effects Not Working**
-
-- Ensure `enableInteraction={true}` is set
-- Check browser console for JavaScript errors
-- Verify CSS custom properties are supported
-- Test mouse event handlers with DevTools
-
-#### **🆕 Zen Brutalism Styles Not Applying**
-
-- Verify `tailwind.config.ts` includes Zen Brutalism theme
-- Check `globals.css` for custom CSS classes
-- Ensure proper CSS custom property definitions
-- Test with hard refresh to clear CSS cache
-
-### **Deployment Checklist**
-
-- [ ] All Zen Brutalism components tested in demo pages
-- [ ] Mouse tracking interactions working across browsers
-- [ ] Glass morphism effects rendering correctly
-- [ ] Traditional Korean colors displaying properly
-- [ ] Performance metrics meet targets (LCP < 2.5s, FID < 100ms)
-- [ ] All artwork images optimized and loading
-- [ ] Airtable integration working with fallback system
-
-## Recent Updates
-
-### ✅ **Zen Brutalism Foundation Complete**
-
-- **3-Phase Design System**: Fully implemented and deployed
-- **Interactive Components**: 5 new component families with mouse tracking
-- **Demo Pages**: 3 comprehensive showcases of design evolution
-- **Performance**: Optimized for 60fps interactions and fast loading
-- **Cultural Integration**: Traditional Korean aesthetics digitally implemented
-
-### ✅ **Build & Deployment Success**
-
-- **Production Build**: ✓ Compiled successfully in 10.0s
-- **Static Generation**: ✓ Generated 55 static pages
-- **Airtable Integration**: ✓ Successfully fetched 58 artworks
-- **Vercel Deployment**: ✓ Live at https://anam-gallery.vercel.app
-
----
-
-## 🎨 **"전통의 깊이와 현대적 몰입감을 동시에 제공하는 혁신적인 디지털 갤러리"**
-
-The ANAM Gallery now represents a breakthrough in digital art presentation,
-combining traditional Korean calligraphy aesthetics with cutting-edge web
-interaction design through the Zen Brutalism Foundation system.
+- 코드 변경 시 `.commit_message.txt` 에 한 줄 설명(이모지 포함, 한국어)을 기록한다.
+- 커밋 메시지·PR·저장소 문서는 한국어로 쓴다.
+- 루트의 `*_SUMMARY.md`·`*_REPORT.md` 류는 과거 작업 기록이라 지금 코드와 다를 수 있다. 사실 확인은 코드로 한다.
