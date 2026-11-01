@@ -1,1 +1,1 @@
-♻️ /api/artworks·/api/artist 캐시를 lib/cache 로 옮겨 동기화 직후 같은 서버에서 새 데이터를 주게 함(Codex 리뷰 #21)
+🔥 쓰이지 않는 소스 30개(10,695줄)·대상이 사라진 격리 테스트 10개·.bak/.disabled·디버그 스크립트·dev 로그 삭제, CLAUDE.md 를 실제 구조로 재작성하고 AGENTS.md 포인터 추가
