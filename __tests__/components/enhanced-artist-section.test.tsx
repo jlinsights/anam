@@ -56,4 +56,44 @@ describe('EnhancedArtistSection', () => {
     )
     expect(container.textContent).not.toMatch(/[🏆📚👥📧🌐📷]/u)
   })
+
+  it('생년은 "b.1955" 로 쓴다("1955년생" 아님)', () => {
+    render(
+      <EnhancedArtistSection
+        artist={{
+          id: 'a1',
+          name: '芽南 裵玉永',
+          bio: '서예가',
+          birthYear: 1955,
+          exhibitions: [],
+          awards: [],
+          education: [],
+        }}
+      />
+    )
+    expect(screen.getByText('b.1955')).toBeInTheDocument()
+    expect(screen.queryByText(/1955년생/)).toBeNull()
+  })
+
+  // 데이터 원문은 "연도 | 종류 | 제목". 예전엔 세로줄째 그대로, 오래된 것부터 보여 줬다
+  it('전시 이력은 최근 것부터 연도·제목·종류로 나눠 보여 준다', () => {
+    render(
+      <EnhancedArtistSection
+        artist={{
+          ...full,
+          exhibitions: [
+            '2018 | 개인전 | 제1회 아남 배옥영 초대전',
+            '2026 | 개인전 | 제7회 아남 배옥영 개인전',
+          ],
+        }}
+      />
+    )
+    const list = screen.getByRole('list', { name: '전시 이력' })
+    const items = Array.from(list.querySelectorAll('li')).map(
+      (li) => li.textContent ?? ''
+    )
+    expect(items[0]).toMatch(/2026.*제7회 아남 배옥영 개인전.*개인전/)
+    expect(items[1]).toMatch(/2018.*제1회/)
+    expect(list.textContent).not.toMatch(/\|/)
+  })
 })

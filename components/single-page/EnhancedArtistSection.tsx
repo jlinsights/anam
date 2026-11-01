@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Artist } from '@/lib/types'
+import { exhibitionHistory } from '@/lib/exhibition-history'
+import { ArtistBio } from '@/components/artist/ArtistBio'
 
 interface EnhancedArtistSectionProps {
   artist?: Artist
@@ -90,7 +92,7 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
             </p>
             {a.birthYear && (
               <p className='mt-1 font-body text-sm text-ink-light'>
-                {a.birthYear}년생
+                b.{a.birthYear}
               </p>
             )}
 
@@ -113,9 +115,7 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
 
         <div className='space-y-16 lg:col-span-8'>
           <Section title='소개'>
-            <p className='max-w-[65ch] whitespace-pre-wrap font-body text-[17px] leading-[1.9] text-ink'>
-              {a.bio}
-            </p>
+            <ArtistBio bio={a.bio} />
             {a.statement && (
               <figure className='mt-10 max-w-[60ch] border-y border-ink/20 py-8'>
                 <blockquote className='font-display text-xl leading-relaxed text-ink'>
@@ -145,13 +145,20 @@ export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
           {careerBlocks.length > 0 && (
             <Section title='경력'>
               <div className='space-y-10'>
-                {careerBlocks.map((block) => (
-                  <ListBlock
-                    key={block.title}
-                    title={block.title}
-                    items={block.items ?? []}
-                  />
-                ))}
+                {careerBlocks.map((block) =>
+                  block.title === '전시 이력' ? (
+                    <ExhibitionBlock
+                      key={block.title}
+                      lines={block.items ?? []}
+                    />
+                  ) : (
+                    <ListBlock
+                      key={block.title}
+                      title={block.title}
+                      items={block.items ?? []}
+                    />
+                  )
+                )}
               </div>
             </Section>
           )}
@@ -220,6 +227,45 @@ function ListBlock({ title, items }: { title: string; items: string[] }) {
         {items.map((item, index) => (
           <li key={`${index}-${item}`} className='py-2.5 leading-relaxed'>
             {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+// 데이터 원문 "2018 | 개인전 | 제1회 …" 를 홈 전시 이력과 같은 규칙으로 나눠, 최근 것부터 보여 준다
+function ExhibitionBlock({ lines }: { lines: string[] }) {
+  const entries = exhibitionHistory(lines)
+  if (entries.length === 0) return null
+  return (
+    <div>
+      <h3
+        id='artist-exhibitions-title'
+        className='mb-3 font-body text-sm font-medium text-ink-light'
+      >
+        전시 이력
+      </h3>
+      <ul
+        aria-labelledby='artist-exhibitions-title'
+        className='max-w-[65ch] divide-y divide-ink/10 border-t border-ink/15 font-body text-ink'
+      >
+        {entries.map((entry, index) => (
+          <li
+            key={`${index}-${entry.title}`}
+            className='grid grid-cols-[3.5rem_1fr] gap-x-4 py-2.5 leading-relaxed'
+          >
+            <span className='tabular-nums text-ink-light'>
+              {entry.year ?? ''}
+            </span>
+            <span>
+              {entry.title}
+              {entry.kind && (
+                <span className='ml-2 text-sm text-ink-light'>
+                  {entry.kind}
+                </span>
+              )}
+            </span>
           </li>
         ))}
       </ul>
