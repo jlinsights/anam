@@ -152,5 +152,47 @@ describe('GallerySection', () => {
     // 새로 나온 첫 작품으로 초점을 옮겨 키보드로 이어 볼 수 있다
     expect(screen.getByRole('link', { name: /작품 25/ })).toHaveFocus()
   })
+
+  // 상세에 들어갔다 뒤로 오면 GallerySection 이 다시 마운트된다. 펼친 개수가 24로 돌아가면
+  // 방금 본 뒤쪽 작품이 다시 숨겨진다(Codex 리뷰 #28)
+  it('상세에 갔다 돌아와도(다시 마운트) 펼친 작품 수를 유지한다', async () => {
+    const user = userEvent.setup()
+    const many = Array.from({ length: 30 }, (_, i) =>
+      makeArtwork(String(i + 1), 2024)
+    )
+    const first = render(
+      <GallerySection artworks={many} onArtworkSelect={() => {}} />
+    )
+    await user.click(
+      await screen.findByRole('button', { name: /더 보기 · 6점 남음/ })
+    )
+    first.unmount()
+
+    render(<GallerySection artworks={many} onArtworkSelect={() => {}} />)
+    expect(await screen.findAllByRole('listitem')).toHaveLength(30)
+    expect(screen.queryByRole('button', { name: /더 보기/ })).toBeNull()
+  })
+
+  it('거르는 조건을 바꾸면 처음 24점부터 다시 보여 준다', async () => {
+    const user = userEvent.setup()
+    const many = [
+      ...Array.from({ length: 26 }, (_, i) =>
+        makeArtwork(String(i + 1), 2024, '화선지')
+      ),
+      ...Array.from({ length: 26 }, (_, i) =>
+        makeArtwork(String(i + 101), 2024, '광목')
+      ),
+    ]
+    render(<GallerySection artworks={many} onArtworkSelect={() => {}} />)
+    await user.click(
+      await screen.findByRole('button', { name: /더 보기 · 28점 남음/ })
+    )
+    expect(screen.getAllByRole('listitem')).toHaveLength(48)
+    await user.click(screen.getByRole('button', { name: /광목/ }))
+    expect(screen.getAllByRole('listitem')).toHaveLength(24)
+    expect(
+      screen.getByRole('button', { name: /더 보기 · 2점 남음/ })
+    ).toBeInTheDocument()
+  })
 })
 

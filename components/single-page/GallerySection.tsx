@@ -16,9 +16,6 @@ interface GallerySectionProps {
   onArtworkSelect: (artwork: Artwork) => void
 }
 
-// 모바일 2열 기준 한 번에 12줄. 61점을 한 번에 내리면 10,000px 가 넘었다
-const PAGE_SIZE = 24
-
 const CHIP =
   'inline-flex min-h-[40px] shrink-0 items-center border px-3 font-body text-sm tabular-nums transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold'
 
@@ -53,7 +50,10 @@ export function GallerySection({ artworks }: GallerySectionProps) {
     setSelectedYear,
     setSelectedMedium,
     clearFilters,
+    showMoreArtworks,
   } = useGalleryStore()
+  // 펼친 개수는 스토어에 둔다: 상세에 갔다 돌아와 다시 마운트돼도 유지되고, 거르는 조건이 바뀔 때만 처음으로
+  const limit = useGalleryStore((state) => state.visibleCount)
 
   // 그리드는 스토어의 filteredArtworks를 그리므로 props로 받은 작품을 스토어에 넣어야 한다
   useEffect(() => {
@@ -85,13 +85,8 @@ export function GallerySection({ artworks }: GallerySectionProps) {
 
   const filtered = Boolean(searchTerm || selectedYear || selectedMedium)
 
-  // 거르는 조건이 바뀌면 처음 24점부터 다시
-  const [limit, setLimit] = useState(PAGE_SIZE)
   const [focusIndex, setFocusIndex] = useState<number | null>(null)
   const listRef = useRef<HTMLUListElement>(null)
-  useEffect(() => {
-    setLimit(PAGE_SIZE)
-  }, [searchTerm, selectedYear, selectedMedium])
   // "더 보기" 뒤에는 새로 나온 첫 작품으로 초점을 옮긴다(키보드 사용자가 처음으로 돌아가지 않게)
   useEffect(() => {
     if (focusIndex === null) return
@@ -104,7 +99,7 @@ export function GallerySection({ artworks }: GallerySectionProps) {
   const remaining = filteredArtworks.length - visible.length
   const showMore = () => {
     setFocusIndex(visible.length)
-    setLimit((current) => current + PAGE_SIZE)
+    showMoreArtworks()
   }
   const resetAll = () => {
     setQuery('')
