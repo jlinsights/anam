@@ -1,1 +1,1 @@
-🔀 main 병합(#20~#22): 레이아웃 푸터는 main 의 SiteFooter 로 정리
+♿ 홈 히어로 버튼을 투명도 페이드 없이 위치만 움직이게 해 Lighthouse 색 대비(1.9:1) 실패 해소, CLAUDE.md 접근성 CI 설명 갱신

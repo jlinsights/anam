@@ -84,7 +84,9 @@ __tests__/               # Jest. _quarantine/ 은 깨진 채 격리된 테스트
 - Jest + Testing Library. 새 동작·버그 수정에는 테스트를 먼저 쓴다(실패 확인 → 구현).
 - `__tests__/_quarantine/` 은 되살릴 때만 손댄다. 방법과 목록은 그 폴더의 `README.md`.
 - 라우트 테스트에서 `jest.mock('@/lib/cache', …)` 를 쓰면 라우트가 쓰는 함수(`getCachedData`·`setCachedData`·`clearCache`·`clearCacheAndRevalidate`)를 모두 목에 넣는다. 빠지면 라우트가 500 을 낸다.
-- CI 의 WCAG 접근성 검사(`.github/workflows/accessibility.yml`)는 `main` 에서도 실패해 왔다. PR 에서 이 검사만 빨간 것은 그 PR 탓이 아닐 수 있다 — `main` 결과와 비교한다.
+- 접근성 CI(`.github/workflows/accessibility.yml`): jest-axe(`__tests__/accessibility/`)는 구조를, Lighthouse 는 실제 빌드에서 색 대비를 본다. 둘 다 실패하면 머지를 막는다. Pa11y 는 참고용.
+  - jsdom 은 색을 그리지 않는다 — 대비 문제는 Lighthouse 에서만 드러난다.
+  - **글자를 투명도로 페이드인하지 않는다.** Lighthouse 가 애니메이션 도중을 찍으면 흐려진 글자를 대비 미달로 잡는다(홈 히어로 버튼 1.9:1). 등장 효과는 위치(`y`·`x`)로 준다.
 
 ## 환경 변수
 

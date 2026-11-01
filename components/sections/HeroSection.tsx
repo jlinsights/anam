@@ -117,11 +117,12 @@ export function HeroSection({
               {description}
             </motion.p>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons: 투명도로 페이드하지 않는다. 마지막(약 1.8초)에 나타나는 주요 버튼이 그동안 흐려
+                글자 대비가 1.9:1 까지 떨어졌다(Lighthouse color-contrast). 위치만 움직이고 글자는 처음부터 또렷하게 */}
             <motion.div
               className='flex flex-col sm:flex-row gap-4'
-              initial={{ opacity: 0, y: 20 }}
-              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              initial={{ y: 20 }}
+              animate={isVisible ? { y: 0 } : {}}
               transition={{ duration: 0.8, delay: 1.0 }}
             >
               <Link
