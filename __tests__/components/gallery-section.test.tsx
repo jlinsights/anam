@@ -92,6 +92,17 @@ describe('GallerySection', () => {
     expect(src).not.toMatch(/whileInView|framer-motion/)
   })
 
+  // 흰 한지 위 text-ink-light 는 4.75:1, /70 을 섞으면 2.72:1 로 AA(4.5:1) 미달(Codex 리뷰 #27 과 같은 문제)
+  it('검색창 자리 표시 글자에 투명도를 섞지 않는다', () => {
+    const fs = jest.requireActual('fs') as typeof import('fs')
+    const path = jest.requireActual('path') as typeof import('path')
+    const src = fs.readFileSync(
+      path.join(process.cwd(), 'components/single-page/GallerySection.tsx'),
+      'utf8'
+    )
+    expect(src).not.toMatch(/placeholder:text-[\w-]+\/\d+/)
+  })
+
   it('연도 단추로 바로 거르고 "전체"로 되돌린다', async () => {
     const user = userEvent.setup()
     render(

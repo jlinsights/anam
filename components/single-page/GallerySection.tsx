@@ -146,7 +146,7 @@ export function GallerySection({ artworks }: GallerySectionProps) {
                 setQuery(e.target.value)
                 throttledSearchUpdate(e.target.value)
               }}
-              className='min-h-[40px] w-full border-2 border-ink bg-paper px-3 font-body text-[15px] text-ink placeholder:text-ink-light/70 focus:border-gold focus:bg-paper-warm focus:outline-none focus:ring-4 focus:ring-gold/20 lg:w-60'
+              className='min-h-[40px] w-full border-2 border-ink bg-paper px-3 font-body text-[15px] text-ink placeholder:text-ink-light focus:border-gold focus:bg-paper-warm focus:outline-none focus:ring-4 focus:ring-gold/20 lg:w-60'
             />
           </div>
 
