@@ -16,7 +16,9 @@ interface ContactPageProps {
 // 작품 상세의 "이 작품 문의하기"는 ?artwork=<작품명> 으로 들어온다
 function subjectFor(artwork: string | string[] | undefined): string {
   const title = (Array.isArray(artwork) ? artwork[0] : artwork)?.trim()
-  return title ? `「${title.slice(0, 80)}」 작품 문의` : ''
+  if (!title) return ''
+  // 글자(코드 포인트) 단위로 자른다. slice 는 이모지를 반쪽으로 남겨 메일 링크 인코딩이 깨졌다
+  return `「${Array.from(title).slice(0, 80).join('')}」 작품 문의`
 }
 
 export default async function ContactPage({ searchParams }: ContactPageProps) {
