@@ -1,1 +1,1 @@
-♿ 홈 히어로 버튼을 투명도 페이드 없이 위치만 움직이게 해 Lighthouse 색 대비(1.9:1) 실패 해소, CLAUDE.md 접근성 CI 설명 갱신
+♿ Lighthouse 대상에서 데이터 없이 not-found(200)가 되는 작품 상세를 빼고, CI 가 빈 데이터 상태만 본다는 점을 CLAUDE.md 에 기록(Codex 리뷰 #18)

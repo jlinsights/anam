@@ -86,6 +86,7 @@ __tests__/               # Jest. _quarantine/ 은 깨진 채 격리된 테스트
 - 라우트 테스트에서 `jest.mock('@/lib/cache', …)` 를 쓰면 라우트가 쓰는 함수(`getCachedData`·`setCachedData`·`clearCache`·`clearCacheAndRevalidate`)를 모두 목에 넣는다. 빠지면 라우트가 500 을 낸다.
 - 접근성 CI(`.github/workflows/accessibility.yml`): jest-axe(`__tests__/accessibility/`)는 구조를, Lighthouse 는 실제 빌드에서 색 대비를 본다. 둘 다 실패하면 머지를 막는다. Pa11y 는 참고용.
   - jsdom 은 색을 그리지 않는다 — 대비 문제는 Lighthouse 에서만 드러난다.
+  - CI 에는 데이터 키가 없어 Lighthouse 는 **데이터가 빈 상태**(홈 오류 안내, 빈 갤러리)만 본다. 작품 상세는 not-found 가 200 으로 나와 검사 대상에서 뺐다(`lighthouserc.js`). 실제 작품이 그려진 화면의 색 대비는 CI 가 지키지 못한다.
   - **글자를 투명도로 페이드인하지 않는다.** Lighthouse 가 애니메이션 도중을 찍으면 흐려진 글자를 대비 미달로 잡는다(홈 히어로 버튼 1.9:1). 등장 효과는 위치(`y`·`x`)로 준다.
 
 ## 환경 변수

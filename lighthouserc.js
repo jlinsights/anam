@@ -1,10 +1,12 @@
 module.exports = {
   ci: {
     collect: {
+      // CI 에는 Supabase·Airtable 키가 없어 데이터가 빈 상태로 그려진다(홈은 오류 안내, /gallery 는 빈 목록).
+      // 그래서 작품 상세(/gallery/[slug])는 넣지 않는다 — 데이터가 없으면 not-found 화면이 200 으로 나와
+      // 상세 페이지 대신 그 화면을 검사하게 된다. 상세 페이지 구조는 jest-axe(__tests__/accessibility)가 맡는다.
       url: [
         'http://localhost:3000/',
         'http://localhost:3000/gallery',
-        'http://localhost:3000/gallery/01',
         'http://localhost:3000/contact',
         'http://localhost:3000/artist',
         // /exhibition 은 /#exhibition 으로 넘기기만 하므로 홈과 같은 결과가 된다
