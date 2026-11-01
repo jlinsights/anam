@@ -1,5 +1,6 @@
 import { ClientLayout } from '@/components/client-layout'
 import { SiteFooter } from '@/components/layout/SiteFooter'
+import { SiteHeader } from '@/components/layout/SiteHeader'
 import type { Metadata } from 'next'
 import { IBM_Plex_Sans_KR, Noto_Serif_KR } from 'next/font/google'
 import './globals.css'
@@ -232,7 +233,10 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ClientLayout>
-          <main id='main-content'>{children}</main>
+          <SiteHeader />
+          <main id='main-content' tabIndex={-1} className='focus:outline-none'>
+            {children}
+          </main>
           <SiteFooter />
         </ClientLayout>
       </body>

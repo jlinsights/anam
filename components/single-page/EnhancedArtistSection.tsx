@@ -1,7 +1,3 @@
-'use client'
-
-import { motion } from 'framer-motion'
-import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Artist } from '@/lib/types'
@@ -10,548 +6,264 @@ interface EnhancedArtistSectionProps {
   artist?: Artist
 }
 
+const FOCUS =
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold'
+
+// 작가 데이터가 없을 때의 기본값. 생년 등 사실은 지어내지 않는다(예전에는 1955 를 넣어 보여 줬다)
+const FALLBACK: Artist = {
+  id: 'anam',
+  name: '아남 배옥영',
+  bio: '전통 서예의 깊이와 현대적 감각을 조화시키며, 한국 미학의 정수를 현대적 언어로 재해석하는 작업을 하고 있습니다.',
+  exhibitions: [],
+  awards: [],
+  education: [],
+}
+
+const has = (list?: string[]): list is string[] =>
+  Array.isArray(list) && list.length > 0
+
+// 작가 소개를 한 장의 글처럼 읽게 한다. 예전에는 소개·경력·작품 세계를 탭 뒤에 숨겼고(탭 ARIA 없음),
+// 노란·호박색 상자, 둥근 모서리, 그림자, 이모지 아이콘, 등장 효과가 디자인 체계 밖에 있었다
 export function EnhancedArtistSection({ artist }: EnhancedArtistSectionProps) {
-  const [activeTab, setActiveTab] = useState<'bio' | 'career' | 'philosophy'>(
-    'bio'
-  )
+  const a = artist ?? FALLBACK
 
-  // 작가 데이터가 없을 때의 기본값. 생년 등 사실은 지어내지 않는다(예전에는 1955 를 넣어 보여 줬다)
-  const artistData: Artist = artist || {
-    id: 'anam',
-    name: '아남 배옥영',
-    bio: '전통 서예의 깊이와 현대적 감각을 조화시키며, 한국 미학의 정수를 현대적 언어로 재해석하는 작업을 하고 있습니다.',
-    exhibitions: [],
-    awards: [],
-    education: [],
-  }
+  const facts = [
+    { label: '출생 연도', value: a.birthYear ? `${a.birthYear}년` : '' },
+    { label: '출생지', value: a.birthPlace ?? '' },
+    { label: '현 거주지', value: a.currentLocation ?? '' },
+    {
+      label: '전문 분야',
+      value: has(a.specialties) ? a.specialties.join(', ') : '',
+    },
+  ].filter((fact) => fact.value)
 
-  // Tab content components
-  const TabContent = {
-    bio: (
-      <motion.div
-        key='bio'
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.5 }}
-        className='space-y-6'
-      >
-        {/* Biography */}
-        <div>
-          <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
-            작가 소개
-          </h3>
-          <p className='font-display text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap'>
-            {artistData.bio}
-          </p>
-        </div>
+  const careerBlocks = [
+    { title: '학력', items: a.education },
+    { title: '전시 이력', items: a.exhibitions },
+    { title: '수상 경력', items: a.awards },
+    { title: '작품 소장처', items: a.collections },
+    { title: '출판물', items: a.publications },
+  ].filter((block) => has(block.items))
 
-        {/* Artist Statement */}
-        {artistData.statement && (
-          <div className='bg-amber-50 dark:bg-amber-900/20 p-6 rounded-lg border-l-4 border-yellow-600'>
-            <h3 className='font-display font-bold text-gray-900 dark:text-white text-lg mb-3'>
-              작가의 말
-            </h3>
-            <p className='font-display text-gray-700 dark:text-gray-300 leading-relaxed italic'>
-              &quot;{artistData.statement}&quot;
-            </p>
-          </div>
-        )}
-
-        {/* Personal Info Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          {artistData.birthYear && (
-            <div className='bg-gray-50 dark:bg-gray-800 p-4 rounded-lg'>
-              <span className='font-display text-gray-600 dark:text-gray-400 text-sm'>
-                출생년도
-              </span>
-              <p className='font-display text-gray-900 dark:text-white font-medium'>
-                {artistData.birthYear}년
-              </p>
-            </div>
-          )}
-          {artistData.birthPlace && (
-            <div className='bg-gray-50 dark:bg-gray-800 p-4 rounded-lg'>
-              <span className='font-display text-gray-600 dark:text-gray-400 text-sm'>
-                출생지
-              </span>
-              <p className='font-display text-gray-900 dark:text-white font-medium'>
-                {artistData.birthPlace}
-              </p>
-            </div>
-          )}
-          {artistData.currentLocation && (
-            <div className='bg-gray-50 dark:bg-gray-800 p-4 rounded-lg'>
-              <span className='font-display text-gray-600 dark:text-gray-400 text-sm'>
-                현 거주지
-              </span>
-              <p className='font-display text-gray-900 dark:text-white font-medium'>
-                {artistData.currentLocation}
-              </p>
-            </div>
-          )}
-          {artistData.specialties && artistData.specialties.length > 0 && (
-            <div className='bg-gray-50 dark:bg-gray-800 p-4 rounded-lg'>
-              <span className='font-display text-gray-600 dark:text-gray-400 text-sm'>
-                전문 분야
-              </span>
-              <p className='font-display text-gray-900 dark:text-white font-medium'>
-                {artistData.specialties.join(', ')}
-              </p>
-            </div>
-          )}
-        </div>
-      </motion.div>
-    ),
-
-    career: (
-      <motion.div
-        key='career'
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.5 }}
-        className='space-y-8'
-      >
-        {/* Education */}
-        {artistData.education && artistData.education.length > 0 && (
-          <div>
-            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
-              학력
-            </h3>
-            <ul className='space-y-2'>
-              {artistData.education.map((edu, index) => (
-                <li key={index} className='flex items-start'>
-                  <span className='text-yellow-600 mr-2'>•</span>
-                  <span className='font-display text-gray-700 dark:text-gray-300'>
-                    {edu}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Exhibitions */}
-        {artistData.exhibitions && artistData.exhibitions.length > 0 && (
-          <div>
-            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
-              전시 이력
-            </h3>
-            <ul className='space-y-3'>
-              {artistData.exhibitions.map((exhibition, index) => (
-                <li
-                  key={index}
-                  className='border-l-2 border-gray-200 dark:border-gray-700 pl-4 py-1'
-                >
-                  <span className='font-display text-gray-700 dark:text-gray-300'>
-                    {exhibition}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Awards */}
-        {artistData.awards && artistData.awards.length > 0 && (
-          <div>
-            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
-              수상 경력
-            </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              {artistData.awards.map((award, index) => (
-                <div
-                  key={index}
-                  className='bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800'
-                >
-                  <span className='font-display text-gray-900 dark:text-white flex items-center'>
-                    <span className='text-yellow-600 mr-2'>🏆</span>
-                    {award}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Collections */}
-        {artistData.collections && artistData.collections.length > 0 && (
-          <div>
-            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
-              작품 소장처
-            </h3>
-            <ul className='space-y-2'>
-              {artistData.collections.map((collection, index) => (
-                <li key={index} className='flex items-start'>
-                  <span className='text-yellow-600 mr-2'>▪</span>
-                  <span className='font-display text-gray-700 dark:text-gray-300'>
-                    {collection}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Publications */}
-        {artistData.publications && artistData.publications.length > 0 && (
-          <div>
-            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
-              출판물
-            </h3>
-            <ul className='space-y-2'>
-              {artistData.publications.map((publication, index) => (
-                <li key={index} className='flex items-start'>
-                  <span className='text-yellow-600 mr-2'>📚</span>
-                  <span className='font-display text-gray-700 dark:text-gray-300'>
-                    {publication}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </motion.div>
-    ),
-
-    philosophy: (
-      <motion.div
-        key='philosophy'
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.5 }}
-        className='space-y-8'
-      >
-        {/* Philosophy */}
-        {artistData.philosophy && (
-          <div>
-            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
-              작업 철학
-            </h3>
-            <div className='bg-gray-50 dark:bg-gray-800 p-6 rounded-lg'>
-              <p className='font-display text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap'>
-                {artistData.philosophy}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Influences */}
-        {artistData.influences && artistData.influences.length > 0 && (
-          <div>
-            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
-              예술적 영향
-            </h3>
-            <div className='flex flex-wrap gap-3'>
-              {artistData.influences.map((influence, index) => (
-                <span
-                  key={index}
-                  className='px-4 py-2 bg-amber-100 dark:bg-amber-900/30 text-gray-900 dark:text-white rounded-full font-display text-sm'
-                >
-                  {influence}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Techniques */}
-        {artistData.techniques && artistData.techniques.length > 0 && (
-          <div>
-            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
-              주요 기법
-            </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              {artistData.techniques.map((technique, index) => (
-                <div key={index} className='flex items-center'>
-                  <div className='w-2 h-2 bg-yellow-600 rounded-full mr-3'></div>
-                  <span className='font-display text-gray-700 dark:text-gray-300'>
-                    {technique}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Materials */}
-        {artistData.materials && artistData.materials.length > 0 && (
-          <div>
-            <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
-              사용 재료
-            </h3>
-            <div className='flex flex-wrap gap-3'>
-              {artistData.materials.map((material, index) => (
-                <span
-                  key={index}
-                  className='px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg font-display text-sm border border-gray-200 dark:border-gray-700'
-                >
-                  {material}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Teaching Experience */}
-        {artistData.teachingExperience &&
-          artistData.teachingExperience.length > 0 && (
-            <div>
-              <h3 className='font-display font-bold text-gray-900 dark:text-white text-xl mb-4'>
-                교육 경력
-              </h3>
-              <ul className='space-y-2'>
-                {artistData.teachingExperience.map((experience, index) => (
-                  <li key={index} className='flex items-start'>
-                    <span className='text-yellow-600 mr-2'>👥</span>
-                    <span className='font-display text-gray-700 dark:text-gray-300'>
-                      {experience}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-      </motion.div>
-    ),
-  }
+  const worldBlocks = [
+    { title: '예술적 영향', items: a.influences },
+    { title: '주요 기법', items: a.techniques },
+    { title: '사용 재료', items: a.materials },
+    { title: '교육 경력', items: a.teachingExperience },
+  ].filter((block) => has(block.items))
 
   return (
-    <div className='max-w-7xl mx-auto px-6 py-16'>
-      {/* Section header */}
-      <motion.div
-        className='text-center mb-16'
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: true }}
-      >
-        <h1 className='font-calligraphy font-bold text-gray-900 dark:text-white text-3xl md:text-4xl mb-4'>
+    <div className='mx-auto max-w-7xl px-4 pt-10 pb-20 sm:px-6 md:px-8 md:pt-14'>
+      <header className='pb-10'>
+        <h1 className='font-display text-3xl font-bold text-ink md:text-4xl'>
           작가 소개
         </h1>
-        <p className='font-display text-gray-600 dark:text-gray-400 text-lg'>
-          Artist Profile • 書藝家
-        </p>
-        <div className='mt-4 flex justify-center'>
-          <div className='w-24 h-1 bg-yellow-600'></div>
-        </div>
-      </motion.div>
+        <div className='mt-3 h-1 w-24 bg-gold' aria-hidden='true' />
+      </header>
 
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-12'>
-        {/* Artist Profile Card */}
-        <motion.div
-          className='lg:col-span-1'
-          initial={{ opacity: 0, x: -40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1 }}
-          viewport={{ once: true }}
-        >
-          <div className='sticky top-24'>
-            {/* Profile Image */}
-            <div className='relative bg-amber-50 dark:bg-amber-900 rounded-lg overflow-hidden shadow-lg mb-6'>
-              {artistData.profileImageUrl ? (
+      <div className='grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16'>
+        <aside className='lg:col-span-4'>
+          <div className='lg:sticky lg:top-24'>
+            <div className='border-2 border-ink bg-paper-warm p-4'>
+              {a.profileImageUrl ? (
                 <Image
-                  src={artistData.profileImageUrl}
-                  alt={artistData.name}
+                  src={a.profileImageUrl}
+                  alt={a.name}
                   width={400}
                   height={400}
-                  className='w-full h-auto object-cover'
+                  className='h-auto w-full object-cover'
                 />
               ) : (
-                <div className='aspect-square flex items-center justify-center'>
-                  <div className='text-center'>
-                    <div className='w-32 h-32 border-4 border-gray-300 dark:border-gray-600 rounded-full mb-4 mx-auto flex items-center justify-center'>
-                      <span className='font-calligraphy text-gray-600 dark:text-gray-400 text-4xl'>
-                        芽南
-                      </span>
-                    </div>
-                    <span className='font-display text-gray-500 dark:text-gray-400 text-sm'>
-                      작가 프로필
-                    </span>
-                  </div>
+                <div className='flex aspect-square items-center justify-center'>
+                  <span className='font-display text-5xl text-ink-light'>
+                    芽南
+                  </span>
                 </div>
               )}
             </div>
 
-            {/* Artist Name & Basic Info */}
-            <div className='text-center mb-6'>
-              <h2 className='font-calligraphy font-bold text-gray-900 dark:text-white text-2xl mb-2'>
-                {artistData.name}
-              </h2>
-              <p className='font-display text-yellow-800 dark:text-yellow-500 font-medium mb-2'>
-                ANAM Bae Ok Young
+            <p className='mt-6 font-display text-2xl font-bold text-ink'>
+              {a.name}
+            </p>
+            <p className='mt-1 font-body text-sm uppercase tracking-[0.15em] text-ink-light'>
+              Anam Bae Ok Young
+            </p>
+            {a.birthYear && (
+              <p className='mt-1 font-body text-sm text-ink-light'>
+                {a.birthYear}년생
               </p>
-              {artistData.birthYear && (
-                <p className='font-display text-gray-600 dark:text-gray-400'>
-                  {artistData.birthYear}년생
-                </p>
-              )}
-            </div>
+            )}
 
-            {/* Contact & Social Links */}
-            <div className='space-y-3'>
-              {artistData.email && (
-                <a
-                  href={`mailto:${artistData.email}`}
-                  className='flex items-center text-gray-600 dark:text-gray-400 hover:text-yellow-600 transition-colors'
-                >
-                  <span className='mr-2'>📧</span>
-                  <span className='font-display text-sm'>
-                    {artistData.email}
-                  </span>
-                </a>
-              )}
-              {artistData.website && (
-                <a
-                  href={artistData.website}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='flex items-center text-gray-600 dark:text-gray-400 hover:text-yellow-600 transition-colors'
-                >
-                  <span className='mr-2'>🌐</span>
-                  <span className='font-display text-sm'>웹사이트</span>
-                </a>
-              )}
-              {artistData.socialLinks?.instagram && (
-                <a
-                  href={`https://instagram.com/${artistData.socialLinks.instagram}`}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='flex items-center text-gray-600 dark:text-gray-400 hover:text-yellow-600 transition-colors'
-                >
-                  <span className='mr-2'>📷</span>
-                  <span className='font-display text-sm'>
-                    @{artistData.socialLinks.instagram}
-                  </span>
-                </a>
-              )}
-            </div>
+            <ContactLinks artist={a} />
 
-            {/* Memberships */}
-            {artistData.memberships && artistData.memberships.length > 0 && (
-              <div className='mt-6 pt-6 border-t border-gray-200 dark:border-gray-700'>
-                <h3 className='font-display font-semibold text-gray-900 dark:text-white text-sm mb-3'>
+            {has(a.memberships) && (
+              <div className='mt-8 border-t border-ink/15 pt-6'>
+                <h2 className='font-body text-sm font-medium text-ink'>
                   소속 단체
-                </h3>
-                <ul className='space-y-1'>
-                  {artistData.memberships.map((membership, index) => (
-                    <li
-                      key={index}
-                      className='font-display text-gray-600 dark:text-gray-400 text-sm'
-                    >
-                      • {membership}
-                    </li>
+                </h2>
+                <ul className='mt-3 space-y-1.5 font-body text-sm text-ink-light'>
+                  {a.memberships.map((membership) => (
+                    <li key={membership}>{membership}</li>
                   ))}
                 </ul>
               </div>
             )}
           </div>
-        </motion.div>
+        </aside>
 
-        {/* Artist Content Tabs */}
-        <motion.div
-          className='lg:col-span-2'
-          initial={{ opacity: 0, x: 40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1 }}
-          viewport={{ once: true }}
-        >
-          {/* Tab Navigation */}
-          <div className='flex space-x-4 mb-8 border-b border-gray-200 dark:border-gray-700'>
-            <button
-              onClick={() => setActiveTab('bio')}
-              className={`pb-4 px-2 font-display font-medium transition-colors relative ${
-                activeTab === 'bio'
-                  ? 'text-yellow-800 dark:text-yellow-500'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              작가 소개
-              {activeTab === 'bio' && (
-                <motion.div
-                  className='absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-600'
-                  layoutId='tabIndicator'
-                />
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab('career')}
-              className={`pb-4 px-2 font-display font-medium transition-colors relative ${
-                activeTab === 'career'
-                  ? 'text-yellow-800 dark:text-yellow-500'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              경력 사항
-              {activeTab === 'career' && (
-                <motion.div
-                  className='absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-600'
-                  layoutId='tabIndicator'
-                />
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab('philosophy')}
-              className={`pb-4 px-2 font-display font-medium transition-colors relative ${
-                activeTab === 'philosophy'
-                  ? 'text-yellow-800 dark:text-yellow-500'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              작품 세계
-              {activeTab === 'philosophy' && (
-                <motion.div
-                  className='absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-600'
-                  layoutId='tabIndicator'
-                />
-              )}
-            </button>
-          </div>
+        <div className='space-y-16 lg:col-span-8'>
+          <Section title='소개'>
+            <p className='max-w-[65ch] whitespace-pre-wrap font-body text-[17px] leading-[1.9] text-ink'>
+              {a.bio}
+            </p>
+            {a.statement && (
+              <figure className='mt-10 max-w-[60ch] border-y border-ink/20 py-8'>
+                <blockquote className='font-display text-xl leading-relaxed text-ink'>
+                  {a.statement}
+                </blockquote>
+                <figcaption className='mt-4 font-body text-sm text-ink-light'>
+                  작가의 말
+                </figcaption>
+              </figure>
+            )}
+            {facts.length > 0 && (
+              <dl className='mt-10 grid max-w-[40rem] grid-cols-[7rem_1fr] border-t-2 border-ink font-body'>
+                {facts.map((fact) => (
+                  <div key={fact.label} className='contents'>
+                    <dt className='border-b border-ink/15 py-3 text-sm text-ink-light'>
+                      {fact.label}
+                    </dt>
+                    <dd className='border-b border-ink/15 py-3 text-ink'>
+                      {fact.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+          </Section>
 
-          {/* Tab Content */}
-          <div className='min-h-[400px]'>{TabContent[activeTab]}</div>
+          {careerBlocks.length > 0 && (
+            <Section title='경력'>
+              <div className='space-y-10'>
+                {careerBlocks.map((block) => (
+                  <ListBlock
+                    key={block.title}
+                    title={block.title}
+                    items={block.items ?? []}
+                  />
+                ))}
+              </div>
+            </Section>
+          )}
 
-          {/* Action Buttons */}
-          <motion.div
-            className='mt-12 flex flex-col sm:flex-row gap-4'
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.5 }}
-            viewport={{ once: true }}
-          >
+          {(a.philosophy || worldBlocks.length > 0) && (
+            <Section title='작품 세계'>
+              {a.philosophy && (
+                <p className='max-w-[65ch] whitespace-pre-wrap font-body text-[17px] leading-[1.9] text-ink'>
+                  {a.philosophy}
+                </p>
+              )}
+              <div className='mt-10 space-y-10'>
+                {worldBlocks.map((block) => (
+                  <ListBlock
+                    key={block.title}
+                    title={block.title}
+                    items={block.items ?? []}
+                  />
+                ))}
+              </div>
+            </Section>
+          )}
+
+          <div className='flex flex-wrap items-center gap-x-8 gap-y-4 border-t-2 border-ink pt-10'>
             <Link
               href='/gallery'
-              className='
-              inline-block text-center px-8 py-4
-              bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-display font-bold
-              hover:bg-yellow-600 hover:text-gray-900
-              transition-all duration-300
-              shadow-lg hover:shadow-xl
-              transform hover:-translate-x-1 hover:-translate-y-1
-              border-4 border-gray-900 dark:border-gray-100 hover:border-yellow-600
-            '
+              className={`inline-flex min-h-[52px] items-center border-2 border-ink bg-ink px-8 font-body text-paper transition-colors hover:bg-paper hover:text-ink ${FOCUS}`}
             >
               작품 갤러리 보기
             </Link>
-
-            <a
+            <Link
               href='/contact'
-              className='
-              inline-block text-center px-8 py-4
-              bg-white dark:bg-gray-800 border-4 border-gray-900 dark:border-gray-100 text-gray-900 dark:text-white font-display font-bold
-              hover:bg-gray-900 dark:hover:bg-gray-100 hover:text-white dark:hover:text-gray-900
-              transition-all duration-300
-              shadow-lg hover:shadow-xl
-              transform hover:translate-x-1 hover:translate-y-1
-            '
+              className={`inline-flex min-h-[44px] items-center border-b-2 border-ink font-body text-ink transition-colors hover:border-gold ${FOCUS}`}
             >
-              작가에게 연락하기
-            </a>
-          </motion.div>
-        </motion.div>
+              작가에게 문의하기
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
+  )
+}
+
+function Section({
+  title,
+  children,
+}: {
+  title: string
+  children: React.ReactNode
+}) {
+  return (
+    <section aria-label={title}>
+      <h2 className='mb-6 font-display text-2xl font-bold text-ink'>{title}</h2>
+      {children}
+    </section>
+  )
+}
+
+function ListBlock({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div>
+      <h3 className='mb-3 font-body text-sm font-medium text-ink-light'>
+        {title}
+      </h3>
+      <ul className='max-w-[65ch] divide-y divide-ink/10 border-t border-ink/15 font-body text-ink'>
+        {items.map((item, index) => (
+          <li key={`${index}-${item}`} className='py-2.5 leading-relaxed'>
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function ContactLinks({ artist }: { artist: Artist }) {
+  const links = [
+    artist.email && {
+      href: `mailto:${artist.email}`,
+      label: artist.email,
+      external: false,
+    },
+    artist.website && {
+      href: artist.website,
+      label: '웹사이트',
+      external: true,
+    },
+    artist.socialLinks?.instagram && {
+      href: `https://instagram.com/${artist.socialLinks.instagram}`,
+      label: `인스타그램 @${artist.socialLinks.instagram}`,
+      external: true,
+    },
+  ].filter(Boolean) as { href: string; label: string; external: boolean }[]
+
+  if (links.length === 0) return null
+
+  return (
+    <ul className='mt-6 space-y-2 font-body text-sm'>
+      {links.map((link) => (
+        <li key={link.href}>
+          <a
+            href={link.href}
+            {...(link.external
+              ? { target: '_blank', rel: 'noopener noreferrer' }
+              : {})}
+            className={`break-all text-ink underline underline-offset-4 hover:text-ink-light ${FOCUS}`}
+          >
+            {link.label}
+            {link.external && <span className='sr-only'> (새 창)</span>}
+          </a>
+        </li>
+      ))}
+    </ul>
   )
 }

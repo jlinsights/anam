@@ -20,6 +20,8 @@ interface GalleryState {
   selectedYear: number | null
   selectedMedium: string | null
   filteredArtworks: Artwork[]
+  // 갤러리에 펼쳐 둔 작품 수. 상세에 갔다 돌아와도(다시 마운트) 유지하고, 거르는 조건이 바뀔 때만 처음으로
+  visibleCount: number
 
   // Modal state
   isModalOpen: boolean
@@ -56,6 +58,7 @@ interface GalleryActions {
   setSelectedMedium: (medium: string | null) => void
   clearFilters: () => void
   updateFilteredArtworks: () => void
+  showMoreArtworks: () => void
 
   // Modal actions
   openModal: (artwork: Artwork) => void
@@ -75,6 +78,9 @@ interface GalleryActions {
   reset: () => void
 }
 
+// 모바일 2열 기준 한 번에 12줄. 61점을 한 번에 내리면 10,000px 가 넘었다
+export const GALLERY_PAGE_SIZE = 24
+
 // Initial state
 const initialState: GalleryState = {
   currentSection: 'hero',
@@ -86,6 +92,7 @@ const initialState: GalleryState = {
   selectedYear: null,
   selectedMedium: null,
   filteredArtworks: [],
+  visibleCount: GALLERY_PAGE_SIZE,
   isModalOpen: false,
   modalHistory: [],
   artist: null,
@@ -211,18 +218,22 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
       },
 
       // Search and filter actions
+      // 값이 실제로 바뀔 때만 펼친 개수를 처음으로 되돌린다
       setSearchTerm: (term) => {
-        set({ searchTerm: term })
+        if (get().searchTerm === term) return
+        set({ searchTerm: term, visibleCount: GALLERY_PAGE_SIZE })
         get().updateFilteredArtworks()
       },
 
       setSelectedYear: (year) => {
-        set({ selectedYear: year })
+        if (get().selectedYear === year) return
+        set({ selectedYear: year, visibleCount: GALLERY_PAGE_SIZE })
         get().updateFilteredArtworks()
       },
 
       setSelectedMedium: (medium) => {
-        set({ selectedMedium: medium })
+        if (get().selectedMedium === medium) return
+        set({ selectedMedium: medium, visibleCount: GALLERY_PAGE_SIZE })
         get().updateFilteredArtworks()
       },
 
@@ -231,8 +242,15 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
           searchTerm: '',
           selectedYear: null,
           selectedMedium: null,
+          visibleCount: GALLERY_PAGE_SIZE,
         })
         get().updateFilteredArtworks()
+      },
+
+      showMoreArtworks: () => {
+        set((state) => ({
+          visibleCount: state.visibleCount + GALLERY_PAGE_SIZE,
+        }))
       },
 
       updateFilteredArtworks: () => {
@@ -340,6 +358,7 @@ export function useSafeGalleryStore() {
       setSelectedMedium: () => {},
       clearFilters: () => {},
       updateFilteredArtworks: () => {},
+      showMoreArtworks: () => {},
       openModal: () => {},
       closeModal: () => {},
       setArtist: () => {},

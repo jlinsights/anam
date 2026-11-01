@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
 import { axe } from 'jest-axe'
 import { ArtworkDetailPage } from '@/components/artwork-detail/ArtworkDetailPage'
-import { ArtworkGridPortrait } from '@/components/artwork-card-portrait'
+import { GallerySection } from '@/components/single-page/GallerySection'
 import { ContactForm } from '@/components/contact-form'
 import { EnhancedArtistSection } from '@/components/single-page/EnhancedArtistSection'
 import type { Artist, Artwork } from '@/lib/types'
@@ -47,9 +47,9 @@ describe('접근성: 주요 화면 구조', () => {
 
   it('작품 목록은 grid 역할 없이 목록으로 읽힌다', async () => {
     const { container, getByRole } = render(
-      <ArtworkGridPortrait artworks={artworks} />
+      <GallerySection artworks={artworks} onArtworkSelect={() => {}} />
     )
-    expect(getByRole('list', { name: /작품 갤러리/ })).toBeInTheDocument()
+    expect(getByRole('list', { name: /작품 목록/ })).toBeInTheDocument()
     expect(await axe(container)).toHaveNoViolations()
   })
 

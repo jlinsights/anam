@@ -1,16 +1,11 @@
 import Link from 'next/link'
-
-const links = [
-  { href: '/gallery', label: '작품' },
-  { href: '/artist', label: '작가' },
-  { href: '/#exhibition', label: '전시 이력' },
-  { href: '/contact', label: '문의' },
-]
+import { SITE_LINKS as links } from '@/lib/site-links'
 
 const linkClass =
   'underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold'
 
-// 사이트 공통 푸터. 연락처는 문의 양식으로만 안내한다(이메일·전화번호는 본문에 싣지 않음)
+// 사이트 공통 푸터. 연락은 문의 페이지로 이끈다. 작가 이메일은 /contact·/artist 에 공개하고(2026-11-01 결정)
+// 푸터에는 이메일·전화번호를 싣지 않는다
 export function SiteFooter() {
   const year = new Date().getFullYear()
 

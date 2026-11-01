@@ -18,7 +18,7 @@ export default function Loading() {
         </div>
       </nav>
 
-      <main className='pt-16'>
+      <div className='pt-16'>
         {/* Breadcrumb Skeleton */}
         <div className='fixed top-20 left-4 z-40'>
           <div className='h-8 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse' />
@@ -94,7 +94,7 @@ export default function Loading() {
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   )
 }

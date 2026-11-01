@@ -211,7 +211,6 @@ img {
     --stroke-press: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 점 */
     --stroke-horizontal: cubic-bezier(0.4, 0, 0.2, 1); /* 일 */
     --stroke-vertical: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 궐 */
-    --stroke-hook: cubic-bezier(0.68, -0.55, 0.265, 1.55); /* 갈고리 */
     --stroke-curve: cubic-bezier(0.23, 1, 0.32, 1); /* 곡선 */
 
     /* Glass Morphism Base */
@@ -514,6 +513,8 @@ img {
   /* 스크롤바 스타일링 */
   html {
     scroll-behavior: smooth;
+    /* 위에 붙은 머리띠(SiteHeader, 최대 64px)에 앵커 대상(#exhibition 등)이 가리지 않게 */
+    scroll-padding-top: 5rem;
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted-foreground)) transparent;
   }
