@@ -73,3 +73,22 @@ describe('홈 작품 갤러리', () => {
     expect(getArtworks).not.toHaveBeenCalled()
   })
 })
+
+// 2026-11-01 홈 작품 칸이 "로딩 중" 처럼 보였다. 칸마다 animate-pulse + opacity-0 덮개가 있었는데
+// Tailwind pulse 키프레임이 opacity 를 0.5 로 올려 덮개가 늘 회색으로 깜빡였고, 작품 칸 전체도
+// opacity-0 에서 순서대로 페이드인했다(회전할 때마다 다시). 성곡(seonggok.com)처럼 그림은 바로 보여 준다
+describe('홈 작품 칸 이미지 표시', () => {
+  it('작품 칸에 깜빡이는 로딩 덮개·투명 페이드가 없다', async () => {
+    artworksState.data = [realArtwork]
+
+    const { container } = render(<HomePage />)
+    const img = await screen.findByRole('img', { name: '남도의 아침 Ⅱ' })
+    const tile = img.closest('a') as HTMLElement
+
+    expect(tile).not.toBeNull()
+    expect(tile.className).not.toMatch(/opacity-0|animate-fade-in/)
+    expect(tile.querySelector('.animate-pulse, .animate-spin')).toBeNull()
+    expect(container.querySelector('#gallery .animate-spin')).toBeNull()
+  })
+})
+
