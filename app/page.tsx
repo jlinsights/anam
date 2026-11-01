@@ -341,14 +341,12 @@ export default function HomePage() {
               {/* 1x8 Grid (mobile) → 2x4 Grid (tablet) → 4x2 Grid (desktop) */}
               <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-8'>
                 {displayedArtworks.map((artwork, index) => (
+                  // 작품 칸은 그림을 바로 보여 준다(seonggok.com 처럼). 예전에는 회전할 때마다 칸을 새로
+                  // 만들고(key 에 currentIndex) opacity-0 에서 150ms 간격으로 페이드인해 느리고 비어 보였다
                   <Link
-                    key={`${artwork.id}-${currentIndex}`}
+                    key={artwork.id}
                     href={`/gallery/${artwork.slug || artwork.id}`}
-                    className='group cursor-pointer opacity-0 animate-fade-in'
-                    style={{
-                      animationDelay: `${index * 150}ms`,
-                      animationFillMode: 'forwards',
-                    }}
+                    className='group cursor-pointer'
                     onMouseEnter={() => handleMouseEnter(index)}
                     onMouseLeave={handleMouseLeave}
                   >
@@ -424,13 +422,6 @@ export default function HomePage() {
                                 d='M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'
                               />
                             </svg>
-                          </div>
-
-                          {/* Loading state overlay for better UX */}
-                          <div className='absolute inset-0 bg-gray-100 dark:bg-gray-800 animate-pulse opacity-0 group-hover:opacity-0 transition-opacity'>
-                            <div className='w-full h-full flex items-center justify-center'>
-                              <div className='animate-spin w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full'></div>
-                            </div>
                           </div>
                         </div>
                       ) : (
